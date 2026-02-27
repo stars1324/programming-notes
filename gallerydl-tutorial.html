@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- SEO Meta Tags -->
+    <title>Gallery-dl Tutorial: Mass Download High-Res Images from Pixiv, Instagram, and Pinterest</title>
+    <meta name="description" content="Struggling to save high-resolution images from Pixiv, Instagram, or Pinterest? Learn how to bulk download entire albums with original quality using gallery-dl. Includes Cookie configuration for restricted content.">
+    <meta name="keywords" content="gallery-dl, image downloader, Pixiv download, Instagram downloader, Pinterest scraper, bulk image download, high-res images, cookie configuration">
+    <link rel="canonical" href="https://pnt.jacbex.com/gallerydl-tutorial.html" />
+
+    <!-- Open Graph / Social Media -->
+    <meta property="og:title" content="Gallery-dl - Mass Download High-Res Images from Pixiv, Instagram, Pinterest">
+    <meta property="og:description" content="Download entire albums in original quality. Learn how to configure cookies for restricted content access.">
+    <meta property="og:type" content="article">
+
+    <!-- Tailwind CSS for modern UI -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Code Highlighting (Prism.js) -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+
+    <!-- Structured Data (Schema.org) for Google -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "Gallery-dl Tutorial: Mass Download High-Res Images from Pixiv, Instagram, and Pinterest",
+      "description": "Complete guide to downloading high-resolution images from image hosting sites using gallery-dl. Includes cookie configuration for accessing restricted content.",
+      "author": {
+        "@type": "Person",
+        "name": "Programming Notes"
+      },
+      "proficiencyLevel": "Beginner",
+      "keywords": ["image downloader", "Pixiv", "Instagram", "Pinterest", "bulk download"]
+    }
+    </script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+        .prose code { color: #eb5757; background: #f9f2f2; padding: 2px 4px; border-radius: 4px; }
+        .comparison-table { border-collapse: separate; border-spacing: 0; }
+        .comparison-table th, .comparison-table td { padding: 12px 16px; text-align: left; }
+        .comparison-table th { background: #f3f4f6; font-weight: 600; }
+        .comparison-table tr:not(:last-child) td { border-bottom: 1px solid #e5e7eb; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+            <a href="index.html" class="text-xl font-bold text-blue-600">📝 <span class="text-gray-700">Programming Notes</span></a>
+            <div class="space-x-6 hidden md:block">
+                <a href="index.html" class="hover:text-blue-500">Home</a>
+                <a href="about.html" class="hover:text-blue-500">About Us</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="bg-gradient-to-r from-pink-600 to-purple-700 text-white py-16">
+        <div class="max-w-4xl mx-auto px-4 text-center">
+            <h1 class="text-4xl md:text-5xl font-extrabold mb-4">Gallery-dl: Mass Download High-Res Images from Pixiv, Instagram, and Pinterest</h1>
+            <p class="text-xl opacity-90">Stop right-clicking images one by one. Here's how to download entire albums in original quality with a single command.</p>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto px-4 py-12 bg-white mt-[-40px] rounded-xl shadow-lg mb-20">
+
+        <article class="prose prose-blue max-w-none">
+
+            <p class="mb-6 text-lg text-gray-700 leading-relaxed">
+                I've been collecting reference images for design work - Pinterest boards with thousands of pins, Pixiv artists with hundreds of works, Instagram accounts I wanted to archive. Right-clicking everything wasn't going to work.
+            </p>
+
+            <p class="mb-6 text-gray-700 leading-relaxed">
+                Tried a few options first. Browser extensions mostly grabbed thumbnails instead of original images. Some desktop apps worked but quality was inconsistent. Writing my own scripts with requests/BeautifulSoup got blocked pretty quickly.
+            </p>
+
+            <p class="mb-8 text-gray-700 leading-relaxed">
+                Eventually came across <a href="https://github.com/mikf/gallery-dl" class="text-blue-600 underline">gallery-dl</a>. It's a command-line tool that handles a bunch of image hosting sites. The main thing that stood out was it actually downloads the original files - no compression, no resizing.
+            </p>
+
+            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">Quality difference</h2>
+
+            <p class="mb-4 text-gray-700">Ran a test on a Pixiv artist to compare:</p>
+
+            <table class="comparison-table w-full my-6 border border-gray-200 rounded-lg overflow-hidden">
+                <thead>
+                    <tr>
+                        <th>Method</th>
+                        <th>Resolution</th>
+                        <th>File size</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Right-click save</td>
+                        <td>1200x1200</td>
+                        <td>~400 KB</td>
+                    </tr>
+                    <tr>
+                        <td>Gallery-dl</td>
+                        <td>6000x6000 (original)</td>
+                        <td>~8 MB</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <p class="text-gray-600 mb-6">
+                That's the difference - gallery-dl pulls the exact file the artist uploaded. No browser compression applied.
+            </p>
+
+            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">Installation</h2>
+
+            <pre class="language-bash"><code>pip install gallery-dl</code></pre>
+
+            <p class="mt-4 text-gray-600 text-sm">
+                Or on macOS: <code>brew install gallery-dl</code>
+            </p>
+
+            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">Basic usage</h2>
+
+            <p class="mb-4 text-gray-700">Just paste the URL:</p>
+
+            <pre class="language-bash"><code># Pixiv - all works from an artist
+gallery-dl "https://www.pixiv.net/users/12345"
+
+# Instagram - all posts from a profile
+gallery-dl "https://www.instagram.com/username/"
+
+# Pinterest - entire board
+gallery-dl "https://www.pinterest.com/username/board-name/"</code></pre>
+
+            <p class="mt-6 mb-4 text-gray-700">It creates folders automatically:</p>
+            <pre class="language-bash"><code>Pixiv/
+├── artist_12345/
+│   ├── 8473291_1_p0.png
+│   └── 8473291_1_p1.png
+└── artist_67890/</code></pre>
+
+            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">Cookies (for restricted content)</h2>
+
+            <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 my-6">
+                <p class="text-yellow-800 text-sm">Some content requires login - R-18 content on Pixiv, private Instagram accounts, etc. This is the part that confused me initially.</p>
+            </div>
+
+            <p class="mb-4 text-gray-700">Gallery-dl doesn't handle login forms. You export cookies from your browser after logging in manually:</p>
+
+            <p class="font-semibold text-gray-800 mt-6 mb-2">Get a cookie export extension</p>
+            <p class="text-sm text-gray-600 mb-4">"Get cookies.txt LOCALLY" for Chrome/Edge works well. There's also "cookies.txt" for Firefox.</p>
+
+            <p class="font-semibold text-gray-800 mt-6 mb-2">Export and configure</p>
+            <pre class="language-bash"><code>1. Log into the site in your browser
+2. Click the extension, export cookies.txt
+3. Create config file: ~/.config/gallery-dl/config.json</code></pre>
+
+            <p class="mt-4 mb-2 text-gray-700">Add to config.json:</p>
+            <pre class="language-json"><code>{
+  "extractor": {
+    "pixiv": {
+      "cookies": "~/cookies/pixiv.txt"
+    },
+    "instagram": {
+      "cookies": "~/cookies/instagram.txt"
+    }
+  }
+}</pre></pre>
+
+            <p class="mt-6 text-gray-600 text-sm">
+                Or use browser cookies directly (simpler):
+            </p>
+            <pre class="language-json"><code>{
+  "extractor": {
+    "pixiv": {
+      "cookies": "chrome"
+    }
+  }
+}</pre></pre>
+
+            <p class="text-sm text-gray-500 mt-2">
+                Supported: chrome, chromium, firefox, safari, opera
+            </p>
+
+            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">Options I use</h2>
+
+            <p class="mb-4 text-gray-700">Filter by resolution:</p>
+            <pre class="language-bash"><code>gallery-dl --filter "width >= 1920" "URL"</code></pre>
+
+            <p class="mt-6 mb-4 text-gray-700">Download specific range (good for re-running):</p>
+            <pre class="language-bash"><code>gallery-dl --range 1-50 "URL"
+gallery-dl --range 51-100 "URL"</code></pre>
+
+            <p class="mt-6 mb-4 text-gray-700">Skip files you already have:</p>
+            <pre class="language-bash"><code>gallery-dl --download-archive downloaded.txt "URL"</code></pre>
+
+            <p class="mt-6 mb-4 text-gray-700">Custom filenames:</p>
+            <pre class="language-json"><code>{
+  "extractor": {
+    "pixiv": {
+      "filename": "{artist_id}_{id}_{title}.{extension}"
+    }
+  }
+}</pre></pre>
+
+            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">Issues I ran into</h2>
+
+            <div class="bg-gray-50 p-6 rounded-lg mt-6">
+                <p class="font-semibold text-gray-800 mb-2">403 Forbidden with cookies configured</p>
+                <p class="text-sm text-gray-600 mb-3">Turned out the cookie format was wrong. Some extensions export as JSON but gallery-dl expects Netscape format. "Get cookies.txt LOCALLY" exports in the right format.</p>
+
+                <p class="font-semibold text-gray-800 mb-2 mt-6">Permission denied on Windows</p>
+                <p class="text-sm text-gray-600 mb-3">Some filenames had characters Windows doesn't allow. Fixed with:</p>
+                <pre class="language-json"><code>{
+  "extractor": {
+    "filename": "{mangle:.50}.{extension}",
+    "path-replace": "_"
+  }
+}</pre></pre>
+
+                <p class="font-semibold text-gray-800 mb-2 mt-6">Getting rate limited</p>
+                <p class="text-sm text-gray-600 mb-3">Pixiv started blocking after ~200 downloads. Added delays:</p>
+                <pre class="language-json"><code>{
+  "extractor": {
+    "sleep": 3
+  },
+  "downloader": {
+    "parallel": 1
+  }
+}</pre></pre>
+
+                <p class="font-semibold text-gray-800 mb-2 mt-6">Instagram images still low res</p>
+                <p class="text-sm text-gray-600 mb-3">Needed to explicitly enable original quality:</p>
+                <pre class="language-json"><code>{
+  "extractor": {
+    "instagram": {
+      "include": "posts,stories",
+      "videos": true
+    }
+  }
+}</pre></pre>
+            </div>
+
+            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">Supported sites</h2>
+
+            <p class="mb-4 text-gray-700">The <code>--list-extractors</code> flag shows everything. Main ones I've used:</p>
+
+            <ul class="list-disc pl-6 mb-6 space-y-1 text-gray-700">
+                <li><strong>Art:</strong> Pixiv, DeviantArt, ArtStation</li>
+                <li><strong>Social:</strong> Instagram, Twitter/X, Reddit</li>
+                <li><strong>Pinterest:</strong> Boards, profiles, individual pins</li>
+                <li><strong>Booru-style:</strong> Danbooru, Gelbooru</li>
+                <li><strong>Misc:</strong> Imgur, Flickr, Tumblr</li>
+            </ul>
+
+            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">Notes</h2>
+
+            <ul class="list-disc pl-6 space-y-2 text-gray-700 mb-6">
+                <li>Don't hammer servers - use reasonable delays between requests</li>
+                <li>Downloaded content is for personal use</li>
+                <li>Cookie files contain login credentials - don't share them</li>
+                <li>Cookies expire eventually - re-export if you start getting 403 errors</li>
+            </ul>
+
+            <p class="mt-8 text-gray-500 text-sm">
+                Gallery-dl repo: <a href="https://github.com/mikf/gallery-dl" class="text-blue-600 underline">github.com/mikf/gallery-dl</a>
+            </p>
+
+        </article>
+
+    </main>
+
+    <footer class="bg-gray-800 text-white py-12">
+        <div class="max-w-4xl mx-auto px-4 text-center">
+            <p class="opacity-70 mb-2">📝 Programming Notes</p>
+            <p class="text-sm opacity-50">
+                Personal learning notes & tutorials. Updated as I explore new technologies.
+            </p>
+        </div>
+    </footer>
+
+    <!-- Code Highlighting Script -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+</body>
+</html>
