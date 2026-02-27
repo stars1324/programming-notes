@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- SEO Meta Tags -->
+    <title>Scrapegraph-ai Notes: AI-Powered Web Scraping with LLMs</title>
+    <meta name="description" content="Notes on using Scrapegraph-ai to extract data from websites using LLMs. A Python library for AI-powered web scraping with GPT-4 and other models.">
+    <meta name="keywords" content="Scrapegraph-ai, AI scraping, LLM web scraping, Python, GPT-4 scraping, extract data using LLM">
+    <link rel="canonical" href="https://pnt.jacbex.com/scrapegraph-ai-tutorial.html" />
+
+    <!-- Open Graph / Social Media -->
+    <meta property="og:title" content="Scrapegraph-ai Notes - AI Web Scraping">
+    <meta property="og:description" content="Using Scrapegraph-ai to extract web data with LLMs. My experiments and notes.">
+    <meta property="og:type" content="article">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Code Highlighting -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "Scrapegraph-ai Notes: AI-Powered Web Scraping with LLMs",
+      "description": "Notes on using Scrapegraph-ai to extract data from websites using LLMs.",
+      "author": {
+        "@type": "Person",
+        "name": "Programming Notes"
+      },
+      "proficiencyLevel": "Intermediate"
+    }
+    </script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+        .prose code { color: #eb5757; background: #f9f2f2; padding: 2px 4px; border-radius: 4px; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+            <a href="index.html" class="text-xl font-bold text-blue-600">📝 <span class="text-gray-700">Programming Notes</span></a>
+            <div class="space-x-6 hidden md:block">
+                <a href="index.html" class="hover:text-blue-500">Home</a>
+                <a href="about.html" class="hover:text-blue-500">About Us</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="bg-gradient-to-r from-purple-700 to-pink-700 text-white py-16">
+        <div class="max-w-4xl mx-auto px-4 text-center">
+            <h1 class="text-4xl md:text-5xl font-extrabold mb-4">Scrapegraph-ai: AI-Powered Web Scraping</h1>
+            <p class="text-xl opacity-90">Using LLMs to extract structured data from websites. My notes and experiments.</p>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto px-4 py-12 bg-white mt-[-40px] rounded-xl shadow-lg mb-20">
+
+        <article class="prose prose-blue max-w-none">
+
+            <section id="introduction">
+                <h2 class="text-3xl font-bold mb-4">What Is Scrapegraph-ai?</h2>
+                <p class="mb-4">
+                    <a href="https://github.com/VinciGit00/Scrapegraph-ai" class="text-blue-600 underline" target="_blank">Scrapegraph-ai</a> is a Python library that uses LLMs to scrape websites. Instead of writing CSS selectors or XPath queries, you tell the AI what data you want and it figures out how to extract it.
+                </p>
+                <p class="mb-4">
+                    The idea is pretty cool: you give it a URL and a prompt like "extract all product names and prices", and it uses GPT-4 (or other models) to understand the page structure and pull out the relevant data.
+                </p>
+                <p class="mb-4">
+                    I've been experimenting with it for a project where the target sites have inconsistent HTML structures. Traditional scraping would require writing separate parsers for each site. With Scrapegraph-ai, the AI handles the structure variations automatically.
+                </p>
+
+                <h3 class="text-2xl font-bold mb-3 mt-6">How It Works</h3>
+                <p class="mb-4">Under the hood, it uses a graph-based approach:</p>
+                <ul class="list-disc ml-6 space-y-2 mb-4">
+                    <li><strong>Fetches the page</strong> - Uses Playwright to render JavaScript</li>
+                    <li><strong>Parses HTML</strong> - Converts to a format the LLM can understand</li>
+                    <li><strong>LLM extraction</strong> - Sends the content to an LLM with your prompt</li>
+                    <li><strong>Structured output</strong> - Returns JSON with the extracted data</li>
+                </ul>
+
+                <h3 class="text-2xl font-bold mb-3 mt-6">Why Use It?</h3>
+                <div class="bg-purple-50 border-l-4 border-purple-500 p-4 my-6">
+                    <ul class="list-disc ml-4 space-y-2 text-purple-900">
+                        <li><strong>No manual selectors:</strong> Don't need to inspect HTML and write CSS selectors</li>
+                        <li><strong>Handles dynamic content:</strong> Works with JavaScript-rendered pages</li>
+                        <li><strong>Flexible output:</strong> Can extract any data structure you describe</li>
+                        <li><strong>Resilient to changes:</strong> If the site layout changes, the AI adapts</li>
+                    </ul>
+                </div>
+
+                <h3 class="text-2xl font-bold mb-3 mt-6">The Downsides</h3>
+                <p class="mb-4">It's not magic. There are some real limitations:</p>
+                <ul class="list-disc ml-6 space-y-2 mb-4">
+                    <li><strong>Cost:</strong> Each scrape uses LLM tokens, which adds up</li>
+                    <li><strong>Speed:</strong> Slower than traditional scraping (LLM API calls take time)</li>
+                    <li><strong>Reliability:</strong> Sometimes hallucinates data or misses things</li>
+                    <li><strong>Rate limiting:</strong> Still subject to the same anti-scraping measures</li>
+                </ul>
+            </section>
+
+            <section id="installation" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">Installation</h2>
+                <p class="mb-4">Install with pip:</p>
+                <pre class="language-bash"><code>pip install scrapegraph-ai</code></pre>
+
+                <p class="mb-4 mt-6">You'll also need an OpenAI API key (or whatever LLM you're using):</p>
+                <pre class="language-bash"><code>export OPENAI_API_KEY="your-key-here"</code></pre>
+
+                <p class="mb-4">Or set it in your Python code:</p>
+                <pre class="language-python"><code>import os
+os.environ["OPENAI_API_KEY"] = "your-key-here"</code></pre>
+
+                <p class="mb-4 mt-6">It uses Playwright under the hood, so you might need to install browsers:</p>
+                <pre class="language-bash"><code>playwright install chromium</code></pre>
+            </section>
+
+            <section id="basic-usage" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">Basic Usage</h2>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">SmartScraperGraph</h3>
+                <p class="mb-4">The simplest way to get started:</p>
+                <pre class="language-python"><code>from scrapegraphai.graphs import SmartScraperGraph
+
+# Define what you want to extract
+graph_config = {
+    "llm": {
+        "api_key": os.getenv("OPENAI_API_KEY"),
+        "model": "openai/gpt-4o",
+    },
+    "verbose": True,
+    "headless": True,
+}
+
+# Create the graph
+smart_scraper = SmartScraperGraph(
+    prompt="List all product names, prices, and descriptions",
+    source="https://example-shop.com/products",
+    config=graph_config
+)
+
+# Run it
+result = smart_scraper.run()
+print(result)</code></pre>
+
+                <p class="mb-4 mt-6">The output will be JSON like:</p>
+                <pre class="language-json"><code>{
+  "products": [
+    {
+      "name": "Product A",
+      "price": "$29.99",
+      "description": "A great product"
+    },
+    {
+      "name": "Product B",
+      "price": "$49.99",
+      "description": "Even better"
+    }
+  ]
+}</code></pre>
+
+                <p class="mb-4">Pretty clean. The AI figured out the structure on its own.</p>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">SearchScraperGraph</h3>
+                <p class="mb-4">If you need to search first:</p>
+                <pre class="language-python"><code>from scrapegraphai.graphs import SearchScraperGraph
+
+search_graph = SearchScraperGraph(
+    prompt="Extract the top 5 results for 'python tutorials'",
+    config=graph_config
+)
+
+result = search_graph.run()
+print(result)</code></pre>
+
+                <p class="mb-4">This does a Google search first, then scrapes the results.</p>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">DeepScraperGraph</h3>
+                <p class="mb-4">For multi-page scraping (follows links):</p>
+                <pre class="language-python"><code>from scrapegraphai.graphs import DeepScraperGraph
+
+deep_scraper = DeepScraperGraph(
+    prompt="Extract all blog post titles and links from this page and linked pages",
+    source="https://example.com/blog",
+    config=graph_config,
+    depth=2  # How many levels deep to follow
+)
+
+result = deep_scraper.run()
+print(result)</code></pre>
+
+                <p class="mb-4">Be careful with depth - it can get expensive fast with LLM calls.</p>
+            </section>
+
+            <section id="custom-graphs" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">Building Custom Graphs</h2>
+                <p class="mb-4">The real power is creating custom graphs for specific workflows:</p>
+
+                <pre class="language-python"><code>from scrapegraphai.nodes import (
+    FetchNode,
+    ParseNode,
+    GenerateAnswerNode,
+    GraphNode
+)
+from scrapegraphai.graphs import BaseGraph
+
+# Define custom nodes
+fetch_node = FetchNode(
+    node_name="Fetch",
+    node_params={
+        "loader_kwargs": {
+            "headless": True
+        }
+    }
+)
+
+parse_node = ParseNode(
+    node_name="Parse",
+    node_params={}
+)
+
+gen_answer_node = GenerateAnswerNode(
+    node_name="GenerateAnswer",
+    node_params={
+        "llm_config": {
+            "api_key": os.getenv("OPENAI_API_KEY"),
+            "model": "openai/gpt-4o"
+        }
+    }
+)
+
+# Connect nodes
+custom_graph = BaseGraph(
+    nodes=[
+        fetch_node,
+        parse_node,
+        gen_answer_node
+    ],
+    edges=[
+        ("Fetch", "Parse"),
+        ("Parse", "GenerateAnswer")
+    ]
+)
+
+result = custom_graph.run({
+    "url": "https://example.com",
+    "user_prompt": "Extract all article titles and dates"
+})
+
+print(result)</code></pre>
+
+                <p class="mb-4 mt-6">This lets you add custom logic between fetching and extracting. Useful for things like filtering, validation, or post-processing.</p>
+            </section>
+
+            <section id="different-models" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">Using Different LLMs</h2>
+                <p class="mb-4">Not limited to OpenAI. Works with other providers:</p>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Ollama (Local Models)</h3>
+                <pre class="language-python"><code>graph_config = {
+    "llm": {
+        "model": "ollama/llama3",
+        "base_url": "http://localhost:11434",
+    },
+    "verbose": True,
+    "headless": True,
+}
+
+smart_scraper = SmartScraperGraph(
+    prompt="Extract product data",
+    source="https://example.com",
+    config=graph_config
+)</code></pre>
+
+                <p class="mb-4">This is great for cost savings. No API fees, just run it locally. The downside is smaller models might not extract as accurately.</p>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Groq</h3>
+                <pre class="language-python"><code>graph_config = {
+    "llm": {
+        "api_key": os.getenv("GROQ_API_KEY"),
+        "model": "groq/llama3-70b-8192",
+    },
+    "verbose": True,
+    "headless": True,
+}</code></pre>
+
+                <p class="mb-4">Groq is faster and cheaper than OpenAI. Good for experimentation.</p>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Azure OpenAI</h3>
+                <pre class="language-python"><code>graph_config = {
+    "llm": {
+        "api_key": os.getenv("AZURE_OPENAI_API_KEY"),
+        "model": "azure/openai/gpt-4",
+        "api_base": "https://your-resource.openai.azure.com",
+    },
+    "verbose": True,
+    "headless": True,
+}</code></pre>
+            </section>
+
+            <section id="cost-optimization" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">Cost Optimization</h2>
+                <p class="mb-4">This is the big one. LLM scraping gets expensive fast. Here's what I learned:</p>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">1. Use Cheaper Models for Simple Tasks</h3>
+                <pre class="language-python"><code># For simple extraction
+graph_config = {
+    "llm": {
+        "model": "openai/gpt-3.5-turbo",  # Cheaper than GPT-4
+    }
+}
+
+# For complex extraction
+graph_config = {
+    "llm": {
+        "model": "openai/gpt-4o",  # More accurate
+    }
+}</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">2. Cache Results</h3>
+                <pre class="language-python"><code>import hashlib
+import json
+
+def get_cache_key(url, prompt):
+    return hashlib.md5(f"{url}:{prompt}".encode()).hexdigest()
+
+def scrape_with_cache(url, prompt):
+    cache_key = get_cache_key(url, prompt)
+
+    # Check cache first
+    try:
+        with open(f"cache/{cache_key}.json") as f:
+            return json.load(f)
+    except FileNotFoundError:
+        pass
+
+    # Scrape if not cached
+    result = smart_scraper.run()
+
+    # Save to cache
+    with open(f"cache/{cache_key}.json", "w") as f:
+        json.dump(result, f)
+
+    return result</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">3. Pre-filter Content</h3>
+                <p class="mb-4">Don't send the entire page to the LLM. Extract just what you need first:</p>
+                <pre class="language-python"><code>from bs4 import BeautifulSoup
+
+# Use traditional scraping to narrow down
+response = requests.get(url)
+soup = BeautifulSoup(response.content, 'html.parser')
+
+# Get only the product section
+product_section = soup.find('div', class_='products')
+
+# Send only that section to the LLM
+result = smart_scraper.run({
+    "source": str(product_section),
+    "prompt": "Extract product data"
+})</code></pre>
+
+                <p class="mb-4">This dramatically reduces token usage.</p>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">4. Batch Requests</h3>
+                <pre class="language-python"><code>urls = ["url1", "url2", "url3", ...]
+
+# Process in batches to avoid overwhelming the API
+batch_size = 5
+for i in range(0, len(urls), batch_size):
+    batch = urls[i:i+batch_size]
+
+    results = []
+    for url in batch:
+        result = scrape_with_cache(url, prompt)
+        results.append(result)
+
+    # Save batch results
+    with open(f"batch_{i}.json", "w") as f:
+        json.dump(results, f)</code></pre>
+            </section>
+
+            <section id="issues" class="mt-12 bg-gray-50 p-6 rounded-lg">
+                <h2 class="text-2xl font-bold mb-4 text-gray-900">Issues I Ran Into</h2>
+
+                <h3 class="text-xl font-bold mb-3 mt-6 text-gray-800">Hallucinations</h3>
+                <p class="mb-2">Sometimes the AI makes up data that doesn't exist on the page.</p>
+                <p class="mb-4"><strong>Fix:</strong> Add validation:</p>
+                <pre class="language-python"><code>def validate_extracted_data(extracted, original_html):
+    # Check if extracted values actually exist in the HTML
+    for item in extracted['products']:
+        if item['name'] not in original_html:
+            print(f"Warning: {item['name']} not found in page")
+            # Remove or flag the hallucinated item
+
+    return extracted</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6 text-gray-800">Inconsistent Output</h3>
+                <p class="mb-2">Same prompt, different results across runs.</p>
+                <p class="mb-4"><strong>Fix:</strong> Use structured output with JSON schema:</p>
+                <pre class="language-python"><code>graph_config = {
+    "llm": {
+        "model": "openai/gpt-4o",
+    },
+    "output_format": {
+        "type": "json_schema",
+        "json_schema": {
+            "type": "object",
+            "properties": {
+                "products": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "name": {"type": "string"},
+                            "price": {"type": "string"},
+                            "in_stock": {"type": "boolean"}
+                        },
+                        "required": ["name", "price"]
+                    }
+                }
+            }
+        }
+    }
+}</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6 text-gray-800">Slow Performance</h3>
+                <p class="mb-2">LLM API calls are slow, especially for large pages.</p>
+                <p class="mb-4"><strong>Fix:</strong> Use faster providers (Groq) or smaller models (GPT-3.5) when appropriate.</p>
+
+                <h3 class="text-xl font-bold mb-3 mt-6 text-gray-800">Rate Limiting</h3>
+                <p class="mb-2">Still get blocked by target sites.</p>
+                <p class="mb-4"><strong>Fix:</strong> Same as traditional scraping - use proxies, add delays, rotate user agents. The AI doesn't magically bypass anti-scraping measures.</p>
+            </section>
+
+            <section id="when-to-use" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">When to Use AI Scraping</h2>
+
+                <p class="mb-4">After using it for a while, here's where it makes sense:</p>
+
+                <div class="grid md:grid-cols-2 gap-6 my-6">
+                    <div class="bg-green-50 p-6 rounded-lg border-l-4 border-green-500">
+                        <h4 class="font-bold text-green-900 mb-3">Good For:</h4>
+                        <ul class="list-disc ml-4 space-y-2 text-green-800">
+                            <li>Sites with inconsistent HTML</li>
+                            <li>One-off scraping tasks</li>
+                            <li>Prototyping and exploration</li>
+                            <li>Complex data extraction patterns</li>
+                            <li>When time > cost</li>
+                        </ul>
+                    </div>
+                    <div class="bg-red-50 p-6 rounded-lg border-l-4 border-red-500">
+                        <h4 class="font-bold text-red-900 mb-3">Not Great For:</h4>
+                        <ul class="list-disc ml-4 space-y-2 text-red-800">
+                            <li>Large-scale scraping</li>
+                            <li>Simple, predictable sites</li>
+                            <li>Real-time extraction</li>
+                            <li>Budget-constrained projects</li>
+                            <li>When you need 100% accuracy</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <p class="mb-4">I use it alongside traditional scraping. AI for the complex/unknown sites, BeautifulSoup/Playwright for the straightforward ones.</p>
+            </section>
+
+            <section id="thoughts" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">Final Thoughts</h2>
+                <p class="mb-4">Scrapegraph-ai is a powerful tool but not a replacement for traditional scraping. It's more like a specialized tool for specific situations.</p>
+
+                <p class="mb-4">The cost adds up faster than you'd expect. I burned through $50 in API credits before I realized I needed to be more strategic about when to use it.</p>
+
+                <p class="mb-4">That said, when it works, it's pretty impressive. Watching it extract data from a messy, inconsistent page without any manual selector work is satisfying.</p>
+
+                <p class="mb-4">Link to the project: <a href="https://github.com/VinciGit00/Scrapegraph-ai" class="text-blue-600 underline" target="_blank">github.com/VinciGit00/Scrapegraph-ai</a></p>
+                <p class="mb-4">Docs: <a href="https://scrapegraph-ai.readthedocs.io/" class="text-blue-600 underline" target="_blank">scrapegraph-ai.readthedocs.io</a></p>
+            </section>
+
+        </article>
+
+    </main>
+
+    <footer class="bg-gray-800 text-white py-12">
+        <div class="max-w-4xl mx-auto px-4 text-center">
+            <p class="opacity-70 mb-2">📝 Programming Notes</p>
+            <p class="text-sm opacity-50">
+                Personal learning notes & tutorials. Updated as I explore new technologies.
+            </p>
+        </div>
+    </footer>
+
+    <!-- Code Highlighting -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- SEO Meta Tags -->
+    <title>Instaloader Notes: Download Instagram Photos Without Login</title>
+    <meta name="description" content="Notes on using Instaloader to download Instagram photos and videos. Covers login issues, 429 errors, rate limiting, and using proxies.">
+    <meta name="keywords" content="Instaloader, Instagram downloader, Python, Instagram scraper, 429 error, Instagram without login">
+    <link rel="canonical" href="https://pnt.jacbex.com/instaloader-tutorial.html" />
+
+    <!-- Open Graph / Social Media -->
+    <meta property="og:title" content="Instaloader Notes - Download Instagram Photos">
+    <meta property="og:description" content="How to use Instaloader to download Instagram content. Tips for fixing 429 errors and rate limiting issues.">
+    <meta property="og:type" content="article">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Code Highlighting -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "Instaloader Notes: Download Instagram Photos Without Login",
+      "description": "Notes on using Instaloader to download Instagram photos and videos. Covers common errors and workarounds.",
+      "author": {
+        "@type": "Person",
+        "name": "Programming Notes"
+      },
+      "proficiencyLevel": "Beginner"
+    }
+    </script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+        .prose code { color: #eb5757; background: #f9f2f2; padding: 2px 4px; border-radius: 4px; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+            <a href="index.html" class="text-xl font-bold text-blue-600">📝 <span class="text-gray-700">Programming Notes</span></a>
+            <div class="space-x-6 hidden md:block">
+                <a href="index.html" class="hover:text-blue-500">Home</a>
+                <a href="about.html" class="hover:text-blue-500">About Us</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="bg-gradient-to-r from-pink-600 to-purple-700 text-white py-16">
+        <div class="max-w-4xl mx-auto px-4 text-center">
+            <h1 class="text-4xl md:text-5xl font-extrabold mb-4">Instaloader: Download Instagram Photos</h1>
+            <p class="text-xl opacity-90">Notes on downloading Instagram content without getting blocked immediately.</p>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto px-4 py-12 bg-white mt-[-40px] rounded-xl shadow-lg mb-20">
+
+        <article class="prose prose-blue max-w-none">
+
+            <section id="introduction">
+                <h2 class="text-3xl font-bold mb-4">Why Instaloader?</h2>
+                <p class="mb-4">
+                    Needed to download some Instagram photos for a project. Looked around and found <a href="https://github.com/instaloader/instaloader" class="text-blue-600 underline" target="_blank">Instaloader</a> - a Python tool that can download photos, videos, and stories from Instagram.
+                </p>
+                <p class="mb-4">
+                    The nice thing is you don't necessarily need to log in. Works fine for public profiles. For private profiles you'll need credentials, but then you run into rate limiting pretty quickly.
+                </p>
+                <p class="mb-4">
+                    Anyway, here are my notes from figuring out how to use it without getting banned immediately.
+                </p>
+            </section>
+
+            <section id="installation" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">Installation</h2>
+                <p class="mb-4">Pretty straightforward:</p>
+                <pre class="language-bash"><code>pip install instaloader</code></pre>
+
+                <p class="mb-4 mt-6">That's it. No browser binaries or anything complicated.</p>
+            </section>
+
+            <section id="basic-usage" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">Basic Usage</h2>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Download from Public Profile (No Login)</h3>
+                <p class="mb-4">For public accounts, you don't need to log in:</p>
+                <pre class="language-python"><code>import instaloader
+
+L = instaloader.Instaloader()
+
+# Download all posts from a profile
+L.download_profile(target_profile, profile_pic_only=False)</code></pre>
+
+                <p class="mb-4 mt-6">This creates a folder with the profile name and downloads everything there. Pretty simple.</p>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Download Single Post</h3>
+                <p class="mb-4">If you just want one specific post:</p>
+                <pre class="language-python"><code>import instaloader
+
+L = instaloader.Instaloader()
+
+# Download from a post URL
+post = instaloader.Post.from_shortcode(L.context, "SHORTCODE_FROM_URL")
+L.download_post(post, target="post_folder")</code></pre>
+
+                <p class="mb-4">The shortcode is the part at the end of the URL. Like if the URL is <code>instagram.com/p/ABC123/</code>, then <code>ABC123</code> is the shortcode.</p>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Download with Login</h3>
+                <p class="mb-4">For private profiles or to avoid some restrictions:</p>
+                <pre class="language-python"><code>import instaloader
+
+L = instaloader.Instaloader()
+
+# Login (optional but recommended to avoid some restrictions)
+L.login(USER, PASSWORD)
+
+# Then download as usual
+L.download_profile(target_profile)</code></pre>
+
+                <div class="bg-yellow-50 border-l-4 border-yellow-500 p-4 my-6">
+                    <p class="text-sm text-yellow-800 font-bold">Warning:</p>
+                    <p class="text-sm text-yellow-700">Storing passwords in plain text is a bad idea. Use environment variables or a config file for credentials. I'm keeping it simple here for demonstration.</p>
+                </div>
+            </section>
+
+            <section id="common-errors" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">Common Errors & Fixes</h2>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">429 Too Many Requests</h3>
+                <p class="mb-4">This is the big one. Instagram will block you if you request too much too fast.</p>
+
+                <p class="mb-4"><strong>Symptoms:</strong></p>
+                <ul class="list-disc ml-6 mb-4">
+                    <li>Downloads suddenly stop working</li>
+                    <li>Get HTTP 429 errors</li>
+                    <li>"Redirected to login page" messages</li>
+                </ul>
+
+                <p class="mb-4"><strong>What helps:</strong></p>
+
+                <h4 class="font-bold mb-2 mt-4">1. Add Delays</h4>
+                <p class="mb-4">Instaloader has a rate limit feature. Use it:</p>
+                <pre class="language-python"><code>import instaloader
+import time
+
+L = instaloader.Instaloader()
+
+# Add delay between requests (in seconds)
+L.context.quiet = True  # Less output
+
+posts = instaloader.NodeIterator(
+    L.context,
+    "9dc1f5ecaa4f41b58931f8f1a53fa24a",
+    lambda d: d['data']['user']['edge_owner_to_timeline_media'],
+    lambda n: instaloader.Post(L.context, n),
+    {'id': target_id},
+    f"/graphql/query/query_hash/9dc1f5ecaa4f41b58931f8f1a53fa24a/variables/{{\"id\":\"{target_id}\",\"first\":50}}",
+    lambda d: d['data']['user']['edge_owner_to_timeline_media']['page_info']
+)
+
+for post in posts:
+    L.download_post(post, target=target_profile)
+    time.sleep(10)  # Wait 10 seconds between downloads</code></pre>
+
+                <p class="mb-4">10 seconds between downloads is safer. 5 seconds might work for a while but you'll get blocked eventually.</p>
+
+                <h4 class="font-bold mb-2 mt-4">2. Use Proxies</h4>
+                <p class="mb-4">This is what actually solved it for me. Rotate your IP:</p>
+                <pre class="language-python"><code>import instaloader
+
+# Load proxies from a file
+def load_proxies(filename):
+    with open(filename) as f:
+        return [line.strip() for line in f if line.strip()]
+
+proxies = load_proxies("proxies.txt")
+proxy_index = 0
+
+L = instaloader.Instaloader()
+
+# Set proxy for each request
+L.context._session.proxies = {
+    'http': f'http://{proxies[proxy_index]}',
+    'https': f'https://{proxies[proxy_index]}'
+}
+
+# Rotate proxy every N downloads
+download_count = 0
+for post in posts:
+    L.download_post(post, target=target_profile)
+    download_count += 1
+
+    if download_count % 10 == 0:
+        proxy_index = (proxy_index + 1) % len(proxies)
+        L.context._session.proxies = {
+            'http': f'http://{proxies[proxy_index]}',
+            'https': f'https://{proxies[proxy_index]}'
+        }
+        print(f"Switched to proxy {proxy_index + 1}")
+
+    time.sleep(5)</code></pre>
+
+                <p class="mb-4">I used residential proxies from a service. Datacenter proxies got blocked pretty quickly. Your mileage may vary.</p>
+
+                <div class="bg-blue-50 border-l-4 border-blue-500 p-4 my-6">
+                    <p class="text-sm text-blue-800 font-bold">Proxy format:</p>
+                    <p class="text-sm text-blue-700 mt-2">The proxies.txt file should have one proxy per line in format: <code>ip:port</code> or <code>username:password@ip:port</code></p>
+                </div>
+
+                <h4 class="font-bold mb-2 mt-4">3. Session Files</h4>
+                <p class="mb-4">Instaloader can save and load sessions to avoid logging in every time:</p>
+                <pre class="language-python"><code>import instaloader
+
+L = instaloader.Instaloader()
+
+# Load session if it exists
+try:
+    L.load_session_from_file(USERNAME, "session_file")
+    print("Loaded session from file")
+except FileNotFoundError:
+    # No session file, login
+    L.login(USERNAME, PASSWORD)
+    L.save_session_to_file("session_file")
+    print("Logged in and saved session")
+
+# Now you can download without logging in again
+L.download_profile(target_profile)</code></pre>
+
+                <p class="mb-4">This helps avoid some rate limiting since Instagram sees it as the same session continuing.</p>
+            </section>
+
+            <section id="other-errors" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">Other Issues I Hit</h2>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Login Required Error</h3>
+                <p class="mb-4">Sometimes Instagram will just start demanding login even for public profiles.</p>
+                <p class="mb-4"><strong>Workaround:</strong></p>
+                <ul class="list-disc ml-6 mb-4">
+                    <li>Log in with your account</li>
+                    <li>Use session files (see above)</li>
+                    <li>Switch to a different IP/proxy</li>
+                    <li>Wait a few hours and try again</li>
+                </ul>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">"User Not Found"</h3>
+                <p class="mb-4">Either the username is wrong, the account is private, or you've been temporarily blocked.</p>
+                <p class="mb-4">Try the same profile in a browser. If it loads there but not in Instaloader, you're probably blocked.</p>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Two-Factor Authentication</h3>
+                <p class="mb-4">If your account has 2FA, Instaloader will ask for the code when you log in:</p>
+                <pre class="language-python"><code>import instaloader
+
+L = instaloader.Instaloader()
+
+# This will prompt for 2FA code if needed
+L.interactive_login(USERNAME)</code></pre>
+
+                <p class="mb-4">The session is saved after this so you only need to do it once.</p>
+            </section>
+
+            <section id="best-practices" class="mt-12 bg-gray-50 p-6 rounded-lg">
+                <h2 class="text-2xl font-bold mb-4 text-gray-900">What Works for Me</h2>
+                <p class="mb-4">After dealing with all the errors, here's what I do:</p>
+                <ul class="list-disc ml-6 space-y-2">
+                    <li><strong>Use session files</strong> - Login once, reuse the session</li>
+                    <li><strong>Add delays</strong> - 5-10 seconds minimum between downloads</li>
+                    <li><strong>Rotate proxies</strong> - Especially if downloading a lot</li>
+                    <li><strong>Don't push it</strong> - If you get 429, stop and wait</li>
+                    <li><strong>Download in batches</strong> - Don't try to get everything at once</li>
+                </ul>
+
+                <p class="mb-4 mt-6">Also worth noting: Instagram's limits change. Something that works today might not work tomorrow. They've been getting stricter about scraping.</p>
+            </section>
+
+            <section id="advanced" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">Some Advanced Stuff</h2>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Download Stories</h3>
+                <p class="mb-4">Stories disappear after 24 hours so you need to download them more frequently:</p>
+                <pre class="language-python"><code>import instaloader
+
+L = instaloader.Instaloader()
+L.login(USERNAME, PASSWORD)  # Required for stories
+
+# Download stories from a profile
+for story in L.get_stories(userids=[L.check_profile_id(target_profile)]):
+    for item in story:
+        L.download_storyitem(item, target=target_profile)</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Get Metadata Without Downloading</h3>
+                <p class="mb-4">If you just want info about posts (likes, comments, etc.) without downloading files:</p>
+                <pre class="language-python"><code>import instaloader
+
+L = instaloader.Instaloader()
+
+profile = instaloader.Profile.from_username(L.context, target_profile)
+
+for post in profile.get_posts():
+    print(f"Likes: {post.likes}")
+    print(f"Comments: {post.comments}")
+    print(f"URL: {post.url}")
+    print(f"Date: {post.date_local}")
+    print(f"Caption: {post.caption[:100]}...")
+    print("-" * 50)</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Download Hashtag Posts</h3>
+                <p class="mb-4">Grab all posts from a specific hashtag:</p>
+                <pre class="language-python"><code>import instaloader
+
+L = instaloader.Instaloader()
+
+# Download posts from a hashtag
+for post in instaloader.NodeIterator(
+    L.context,
+    "9dc1f5ecaa4f41b58931f8f1a53fa24a",
+    lambda d: d['data']['hashtag']['edge_hashtag_to_media'],
+    lambda n: instaloader.Post(L.context, n),
+    {'tag_name': 'python'},
+    f"/graphql/query/query_hash/...",
+    lambda d: d['data']['hashtag']['edge_hashtag_to_media']['page_info']
+):
+    L.download_post(post, target="#python")</code></pre>
+
+                <p class="mb-4">This gets rate limited very fast though. Don't expect to download thousands of posts this way.</p>
+            </section>
+
+            <section id="thoughts" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">Final Thoughts</h2>
+                <p class="mb-4">Instaloader works well for small-scale downloading. A few hundred posts here and there. If you need to download massive amounts, you'll hit Instagram's limits pretty quickly unless you have good proxies and implement proper delays.</p>
+
+                <p class="mb-4">Also worth mentioning: scraping Instagram violates their ToS. Use at your own risk. I only use it for personal projects and don't redistribute the content.</p>
+
+                <p class="mb-4">Link to the project: <a href="https://github.com/instaloader/instaloader" class="text-blue-600 underline" target="_blank">github.com/instaloader/instaloader</a></p>
+                <p class="mb-4">Documentation: <a href="https://instaloader.github.io/" class="text-blue-600 underline" target="_blank">instaloader.github.io</a></p>
+            </section>
+
+        </article>
+
+    </main>
+
+    <footer class="bg-gray-800 text-white py-12">
+        <div class="max-w-4xl mx-auto px-4 text-center">
+            <p class="opacity-70 mb-2">📝 Programming Notes</p>
+            <p class="text-sm opacity-50">
+                Personal learning notes & tutorials. Updated as I explore new technologies.
+            </p>
+        </div>
+    </footer>
+
+    <!-- Code Highlighting -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+</body>
+</html>
