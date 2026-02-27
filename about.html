@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- SEO Meta Tags -->
+    <title>About - Programming Notes</title>
+    <meta name="description" content="About Programming Notes - A collection of coding notes and tutorials from a full-stack developer.">
+    <link rel="canonical" href="https://pnt.jacbex.com/about.html" />
+
+    <!-- Open Graph / Social Media -->
+    <meta property="og:title" content="About - Programming Notes">
+    <meta property="og:description" content="A collection of coding notes and tutorials from a full-stack developer.">
+    <meta property="og:type" content="website">
+
+    <!-- Tailwind CSS for modern UI -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+        .prose code { color: #eb5757; background: #f9f2f2; padding: 2px 4px; border-radius: 4px; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+            <a href="index.html" class="text-xl font-bold text-blue-600">📝 <span class="text-gray-700">Programming Notes</span></a>
+            <div class="space-x-6 hidden md:block">
+                <a href="index.html" class="hover:text-blue-500">Home</a>
+                <a href="about.html" class="hover:text-blue-500">About Us</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="bg-gradient-to-r from-blue-700 to-indigo-800 text-white py-16">
+        <div class="max-w-4xl mx-auto px-4 text-center">
+            <h1 class="text-4xl md:text-5xl font-extrabold mb-4">About</h1>
+            <p class="text-xl opacity-90">A bit about me and this site.</p>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto px-4 py-12 bg-white mt-[-40px] rounded-xl shadow-lg mb-20">
+
+        <article class="prose prose-blue max-w-none">
+
+            <section id="about-me">
+                <h2 class="text-3xl font-bold mb-4">Who Am I?</h2>
+                <p class="mb-4">
+                    I'm a full-stack developer with about 10 years of experience now. Started with PHP and jQuery back in the day, then moved through the usual progression - Node.js, React, some Python, and most recently been working a lot with Go and various AI/ML stuff.
+                </p>
+                <p class="mb-4">
+                    Worked at a few startups, spent time at a bigger company, and did some freelancing on the side. These days I'm mostly interested in building tools that actually save time rather than just adding complexity.
+                </p>
+            </section>
+
+            <section id="this-site" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">What Is This Site?</h2>
+                <p class="mb-4">
+                    This is basically my public notebook. Whenever I spend time figuring something out - whether it's a new library, a weird bug, or just something I know I'll forget - I write it up here.
+                </p>
+                <p class="mb-4">
+                    The idea is twofold: writing things down helps me remember them, and maybe it'll save someone else a few hours of googling the same thing later.
+                </p>
+                <p class="mb-4">
+                    Don't expect a consistent posting schedule or anything. I update this when I actually have something to say, which could be twice a week or twice a month depending on what I'm working on.
+                </p>
+            </section>
+
+            <section id="tech-stack" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">Stuff I Work With</h2>
+                <p class="mb-4">Currently using quite a bit, but the main ones are:</p>
+                <div class="grid md:grid-cols-2 gap-6 my-6">
+                    <div class="bg-gray-50 p-6 rounded-lg">
+                        <h3 class="font-bold text-lg mb-3">Backend</h3>
+                        <ul class="space-y-2">
+                            <li>Go (mostly these days)</li>
+                            <li>Python (scripts, ML stuff)</li>
+                            <li>Node.js (still have some projects)</li>
+                            <li>PostgreSQL / MySQL</li>
+                            <li>Redis</li>
+                        </ul>
+                    </div>
+                    <div class="bg-gray-50 p-6 rounded-lg">
+                        <h3 class="font-bold text-lg mb-3">Frontend</h3>
+                        <ul class="space-y-2">
+                            <li>React / Next.js</li>
+                            <li>Vue.js (occasionally)</li>
+                            <li>Tailwind CSS</li>
+                            <li>TypeScript (trying to use it more)</li>
+                        </ul>
+                    </div>
+                    <div class="bg-gray-50 p-6 rounded-lg">
+                        <h3 class="font-bold text-lg mb-3">Infrastructure</h3>
+                        <ul class="space-y-2">
+                            <li>Docker</li>
+                            <li>AWS (EC2, S3, RDS mostly)</li>
+                            <li>Linux servers</li>
+                            <li>GitHub Actions</li>
+                        </ul>
+                    </div>
+                    <div class="bg-gray-50 p-6 rounded-lg">
+                        <h3 class="font-bold text-lg mb-3">Currently Learning</h3>
+                        <ul class="space-y-2">
+                            <li>LLM integration (RAG, agents)</li>
+                            <li>More advanced Go patterns</li>
+                            <li>System design (always improving)</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <section id="projects" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">Side Projects</h2>
+                <p class="mb-4">I tend to start more projects than I finish, but here are some things I've built:</p>
+                <ul class="list-disc ml-6 space-y-2 mb-4">
+                    <li><strong>API aggregation service</strong> - Combines data from multiple sources, built with Go</li>
+                    <li><strong>Developer tools</strong> - Various CLI scripts for automating tedious tasks</li>
+                    <li><strong>This site</strong> - Static HTML, nothing fancy</li>
+                </ul>
+                <p class="mb-4">Most of my code is on GitHub, but I don't link everything here since a lot of it is experimental or messy.</p>
+            </section>
+
+            <section id="philosophy" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">How I Work</h2>
+                <p class="mb-4">
+                    After 10 years, I've learned that the "perfect" solution often isn't worth the extra complexity. I'd rather ship something simple that works than spend weeks architecting the ideal system.
+                </p>
+                <p class="mb-4">
+                    That said, I do care about code quality. Clean code, good tests (when I have time), and documentation matter. Just not at the expense of actually building things.
+                </p>
+                <p class="mb-4">
+                    I'm also big on practical learning. Tutorial projects are fine, but nothing beats building something real and dealing with actual problems that come up.
+                </p>
+            </section>
+
+            <section id="contact" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">Get In Touch</h2>
+                <p class="mb-4">If you want to reach out about anything - a post here, a project, or just to say hi - you can find me on:</p>
+                <div class="bg-blue-50 border-l-4 border-blue-500 p-4 my-6">
+                    <ul class="space-y-2">
+                        <li><strong>GitHub:</strong> Check the footer for the link</li>
+                        <li><strong>Email:</strong> Use the contact page</li>
+                        <li><strong>Twitter/X:</strong> Occasionally active</li>
+                    </ul>
+                </div>
+                <p class="mb-4">I don't do consulting or freelancing much these days, but I'm always up for interesting conversations about tech.</p>
+            </section>
+
+        </article>
+
+    </main>
+
+    <footer class="bg-gray-800 text-white py-12">
+        <div class="max-w-4xl mx-auto px-4 text-center">
+            <p class="opacity-70 mb-2">📝 Programming Notes</p>
+            <p class="text-sm opacity-50">
+                Personal learning notes & tutorials. Updated as I explore new technologies.
+            </p>
+        </div>
+    </footer>
+
+</body>
+</html>

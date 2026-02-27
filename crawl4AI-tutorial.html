@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- SEO Meta Tags -->
+    <title>Crawl4AI Notes: Converting Websites to Markdown for LLMs</title>
+    <meta name="description" content="Notes on using Crawl4AI to scrape websites and convert them to markdown format for LLM applications. Includes installation examples and common issues I ran into.">
+    <meta name="keywords" content="Crawl4AI, web scraping, Python, markdown conversion, LLM, RAG">
+    <link rel="canonical" href="https://pnt.jacbex.com/crawl4ai-tutorial.html" />
+
+    <!-- Open Graph / Social Media -->
+    <meta property="og:title" content="Crawl4AI Notes - Web Scraping for LLMs">
+    <meta property="og:description" content="My notes on using Crawl4AI to convert websites to markdown format. Some examples and issues I encountered.">
+    <meta property="og:type" content="article">
+
+    <!-- Tailwind CSS for modern UI -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Code Highlighting (Prism.js) -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+
+    <!-- Structured Data (Schema.org) for Google -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "Crawl4AI Notes: Converting Websites to Markdown for LLMs",
+      "description": "Notes on using Crawl4AI to scrape websites and convert them to markdown format for LLM applications.",
+      "author": {
+        "@type": "Person",
+        "name": "Programming Notes"
+      },
+      "proficiencyLevel": "Intermediate"
+    }
+    </script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+        .prose code { color: #eb5757; background: #f9f2f2; padding: 2px 4px; border-radius: 4px; }
+        .ad-placeholder { background: #f3f4f6; border: 2px dashed #d1d5db; text-align: center; padding: 20px; margin: 20px 0; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+            <a href="index.html" class="text-xl font-bold text-blue-600">📝 <span class="text-gray-700">Programming Notes</span></a>
+            <div class="space-x-6 hidden md:block">
+                <a href="index.html" class="hover:text-blue-500">Home</a>
+                <a href="about.html" class="hover:text-blue-500">About Us</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="bg-gradient-to-r from-blue-700 to-indigo-800 text-white py-16">
+        <div class="max-w-4xl mx-auto px-4 text-center">
+            <h1 class="text-4xl md:text-5xl font-extrabold mb-4">Crawl4AI: Converting Websites to Markdown</h1>
+            <p class="text-xl opacity-90">Some notes from my experiments with Crawl4AI for scraping web content as markdown.</p>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto px-4 py-12 bg-white mt-[-40px] rounded-xl shadow-lg mb-20">
+        
+        <article class="prose prose-blue max-w-none">
+            
+            <section id="introduction">
+                <h2 class="text-3xl font-bold mb-4">Background</h2>
+                <p class="mb-4">
+                    I've been working on a project that needs to scrape web content and feed it into an LLM. Tried a bunch of options - BeautifulSoup, Scrapy, even paid services like Firecrawl. Eventually found <a href="https://github.com/unclecode/crawl4ai" class="text-blue-600 underline" target="_blank">Crawl4AI</a> and it's been working pretty well for my use case.
+                </p>
+                <p class="mb-4">
+                    The main thing I like is that it outputs clean markdown by default. With BeautifulSoup you get raw HTML and have to clean it up yourself. Crawl4AI handles navigation, ads, and other noise automatically.
+                </p>
+                <p class="mb-4">
+                    It's built on top of Playwright so it can handle JavaScript-heavy sites. Downside is you need to install browser binaries which adds some overhead.
+                </p>
+            </section>
+
+            <section id="installation" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">Installation</h2>
+                <p class="mb-4">Pretty straightforward with pip. The thing that tripped me up initially was forgetting to install the browser binaries separately.</p>
+
+                <pre class="language-bash"><code>pip install crawl4ai
+playwright install chromium</code></pre>
+
+                <p class="mb-4 mt-6">The browser download is around 150-200MB so it might take a bit depending on your connection. When I ran this on a server with slow internet, it timed out a few times.</p>
+
+                <p class="mb-4">After installation, you can verify it works:</p>
+                <pre class="language-python"><code>python -c "import crawl4ai; print('OK')"</code></pre>
+
+                <p class="mb-4">If you're on Windows and having issues, try temporarily disabling your antivirus or adding Python to the exclusions list. The Playwright download sometimes gets flagged.</p>
+            </section>
+
+            <section id="basic-usage" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">Basic Usage</h2>
+                <p class="mb-4">The async version is what you want to use. It's significantly faster than the sync version, especially when crawling multiple pages.</p>
+
+                <pre class="language-python"><code>import asyncio
+from crawl4ai import AsyncWebCrawler
+
+async def main():
+    async with AsyncWebCrawler(verbose=True) as crawler:
+        result = await crawler.arun(url="https://www.example.com")
+        print(result.markdown)
+
+if __name__ == "__main__":
+    asyncio.run(main())</code></pre>
+
+                <p class="mb-4 mt-6">The result object has a few useful properties:</p>
+                <pre class="language-python"><code>result.markdown        # Clean markdown output
+result.html            # Raw HTML
+result.cleaned_html    # HTML with noise removed
+result.links           # List of extracted links
+result.media           # Images and media files
+result.successful      # Boolean
+result.status_code     # HTTP status code</code></pre>
+
+                <p class="mb-4">I usually just use result.markdown since that's what gets fed into the LLM. The cleaned_html is sometimes useful for debugging.</p>
+            </section>
+
+            <section id="gpt4" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">Using with LLMs</h2>
+                <p class="mb-4">Once you have the markdown, you can pass it directly to an LLM. Here's a simple example with OpenAI:</p>
+
+                <pre class="language-python"><code>import asyncio
+from crawl4ai import AsyncWebCrawler
+from openai import OpenAI
+
+client = OpenAI()
+
+async def crawl_and_summarize(url):
+    async with AsyncWebCrawler(verbose=True) as crawler:
+        result = await crawler.arun(url=url)
+        scraped_markdown = result.markdown
+
+        response = client.chat.completions.create(
+            model="gpt-4o",
+            messages=[
+                {"role": "system", "content": "Summarize the given content."},
+                {"role": "user", "content": scraped_markdown[:8000]}  # Truncate if needed
+            ]
+        )
+
+        return response.choices[0].message.content
+
+summary = asyncio.run(crawl_and_summarize("https://example.com"))
+print(summary)</code></pre>
+
+                <p class="mb-4 mt-6">For RAG applications, I've been using ChromaDB to store the embeddings:</p>
+
+                <pre class="language-python"><code>import chromadb
+
+client = chromadb.Client()
+collection = chroma_client.create_collection("docs")
+
+async def crawl_and_index(url):
+    async with AsyncWebCrawler(verbose=True) as crawler:
+        result = await crawler.arun(url=url)
+        chunks = [result.markdown[i:i+1000] for i in range(0, len(result.markdown), 1000)]
+
+        for i, chunk in enumerate(chunks):
+            embedding = client.embeddings.create(
+                model="text-embedding-3-small",
+                input=chunk
+            ).data[0].embedding
+
+            collection.add(
+                embeddings=[embedding],
+                documents=[chunk],
+                ids=[f"{url}_{i}"]
+            )</code></pre>
+
+                <p class="mb-4">One thing to watch out for is token limits. Some pages have a ton of content and you'll need to chunk them before sending to the LLM. I've been using 1000 character chunks which seems to work okay.</p>
+            </section>
+
+            <section id="advanced-features" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">Some Advanced Stuff I Found Useful</h2>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">CSS Selectors</h3>
+                <p class="mb-4">If you only want a specific part of the page, use css_selector:</p>
+                <pre class="language-python"><code>result = await crawler.arun(
+    url="https://example.com",
+    css_selector="article.main-content"
+)</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">JavaScript Execution</h3>
+                <p class="mb-4">Some sites load content dynamically. You can run custom JS:</p>
+                <pre class="language-python"><code>result = await crawler.arun(
+    url="https://example.com",
+    js_code=[
+        "document.querySelectorAll('.ad-banner').forEach(el => el.remove());",
+        "window.scrollTo(0, document.body.scrollHeight);"
+    ],
+    wait_for="networkidle"
+)</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Rate Limiting</h3>
+                <p class="mb-4">Got blocked a few times when crawling too fast. Added a delay between requests:</p>
+                <pre class="language-python"><code>async def crawl_with_limit(urls, delay=2):
+    async with AsyncWebCrawler(verbose=True) as crawler:
+        for url in urls:
+            result = await crawler.arun(url=url)
+            yield result
+            await asyncio.sleep(delay)</code></pre>
+            </section>
+
+            <section id="troubleshooting" class="mt-12 bg-gray-50 p-6 rounded-lg">
+                <h2 class="text-2xl font-bold mb-4 text-gray-900">Issues I Ran Into</h2>
+
+                <h3 class="text-xl font-bold mb-3 mt-6 text-gray-800">Empty Results</h3>
+                <p class="mb-2">Happened when the site loads content via JavaScript. Fixed by adding wait_for parameter:</p>
+                <pre class="language-python"><code>result = await crawler.arun(
+    url="https://example.com",
+    wait_for="networkidle"
+)</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6 text-gray-800">403 Errors / Bot Detection</h3>
+                <p class="mb-2">Some sites will block you. Things that helped:</p>
+                <ul class="list-disc ml-6 mb-4">
+                    <li>Add delays between requests (1-2 seconds minimum)</li>
+                    <li>Set a realistic user agent</li>
+                    <li>Use headless=False for testing</li>
+                    <li>For production, you'll probably need proxies</li>
+                </ul>
+
+                <h3 class="text-xl font-bold mb-3 mt-6 text-gray-800">Memory Leaks</h3>
+                <p class="mb-2">When crawling a lot of pages, the browser instance can eat up memory. Make sure to close it properly:</p>
+                <pre class="language-python"><code>async with AsyncWebCrawler(verbose=True) as crawler:
+    # do your crawling
+    pass
+# Browser closes automatically here</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6 text-gray-800">Slow Performance</h3>
+                <p class="mb-2">Turn off verbose mode once you know it's working:</p>
+                <pre class="language-python"><code>AsyncWebCrawler(verbose=False)</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6 text-gray-800">General Advice</h3>
+                <ul class="list-disc ml-6">
+                    <li>Check robots.txt before crawling</li>
+                    <li>Don't hammer servers with requests</li>
+                    <li>Cache results when possible</li>
+                    <li>Handle exceptions properly - network stuff fails more than you'd expect</li>
+                </ul>
+            </section>
+
+            <section id="thoughts" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">Random Thoughts</h2>
+                <p class="mb-4">Overall, Crawl4AI has been working well for me. The markdown output is pretty clean and it handles JavaScript sites without much fuss.</p>
+
+                <p class="mb-4">If you're doing simple scraping and don't need JavaScript, BeautifulSoup is still faster and lighter. But for anything dynamic or when you need LLM-ready output, Crawl4AI saves a lot of time.</p>
+
+                <p class="mb-4">Haven't tried Firecrawl (the paid alternative) since Crawl4AI does what I need for free. Might be worth looking into if you're doing this at scale and need better reliability.</p>
+
+                <p class="mb-4">Link to the project: <a href="https://github.com/unclecode/crawl4ai" class="text-blue-600 underline" target="_blank">github.com/unclecode/crawl4ai</a></p>
+            </section>
+
+        </article>
+
+    </main>
+
+    <footer class="bg-gray-800 text-white py-12">
+        <div class="max-w-4xl mx-auto px-4 text-center">
+            <p class="opacity-70 mb-2">📝 Programming Notes</p>
+            <p class="text-sm opacity-50">
+                Personal learning notes & tutorials. Updated as I explore new technologies.
+            </p>
+        </div>
+    </footer>
+
+    <!-- Code Highlighting Script -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+</body>
+</html>

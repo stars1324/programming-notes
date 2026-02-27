@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- SEO Meta Tags -->
+    <title>Programming Notes - Coding Tutorials & Developer Notes</title>
+    <meta name="description" content="A collection of programming notes and tutorials from a full-stack developer with 10 years of experience. Topics include web development, AI/ML, Go, Python, and more.">
+    <meta name="keywords" content="programming notes, coding tutorials, web development, Go, Python, React, full-stack developer">
+    <link rel="canonical" href="https://pnt.jacbex.com/">
+
+    <!-- Open Graph / Social Media -->
+    <meta property="og:title" content="Programming Notes">
+    <meta property="og:description" content="Coding notes and tutorials from a full-stack developer.">
+    <meta property="og:type" content="website">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+        .card-hover { transition: transform 0.2s, box-shadow 0.2s; }
+        .card-hover:hover { transform: translateY(-4px); box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
+            <a href="index.html" class="text-xl font-bold text-blue-600">📝 <span class="text-gray-700">Programming Notes</span></a>
+            <div class="space-x-6 hidden md:block">
+                <a href="index.html" class="hover:text-blue-500">Home</a>
+                <a href="about.html" class="hover:text-blue-500">About</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="bg-gradient-to-r from-blue-700 to-indigo-800 text-white py-20">
+        <div class="max-w-4xl mx-auto px-4 text-center">
+            <h1 class="text-4xl md:text-5xl font-extrabold mb-4">Programming Notes</h1>
+            <p class="text-xl opacity-90 mb-8">A collection of coding notes, tutorials, and random things I've learned over 10 years of building software.</p>
+            <p class="text-lg opacity-75">Web development, AI/ML, Go, Python, and whatever else I'm working on.</p>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-6xl mx-auto px-4 py-12">
+
+        <!-- Recent Posts Section -->
+        <section class="mb-16">
+            <h2 class="text-3xl font-bold mb-8">Recent Notes</h2>
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+                <!-- Crawl4AI Card -->
+                <article class="bg-white rounded-lg shadow-md overflow-hidden card-hover">
+                    <div class="p-6">
+                        <span class="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded mb-3">Python</span>
+                        <span class="inline-block bg-green-100 text-green-800 text-xs px-2 py-1 rounded mb-3 ml-2">Web Scraping</span>
+                        <h3 class="text-xl font-bold mb-3">
+                            <a href="crawl4AI-tutorial.html" class="hover:text-blue-600">Crawl4AI: Converting Websites to Markdown</a>
+                        </h3>
+                        <p class="text-gray-600 mb-4">Notes on using Crawl4AI to scrape websites and convert them to markdown format for LLM applications. Includes installation examples and common issues.</p>
+                        <p class="text-sm text-gray-500">Feb 2026</p>
+                    </div>
+                </article>
+
+                <!-- Placeholder for future posts -->
+                <article class="bg-white rounded-lg shadow-md overflow-hidden card-hover border-2 border-dashed border-gray-300">
+                    <div class="p-6 text-center text-gray-400">
+                        <p class="text-lg mb-2">More coming soon...</p>
+                        <p class="text-sm">I update when I actually have something useful to share</p>
+                    </div>
+                </article>
+
+                <article class="bg-white rounded-lg shadow-md overflow-hidden card-hover border-2 border-dashed border-gray-300">
+                    <div class="p-6 text-center text-gray-400">
+                        <p class="text-lg mb-2">More coming soon...</p>
+                        <p class="text-sm">Check back later or subscribe to updates</p>
+                    </div>
+                </article>
+
+            </div>
+        </section>
+
+        <!-- Topics Section -->
+        <section class="mb-16">
+            <h2 class="text-3xl font-bold mb-8">Topics I Write About</h2>
+            <div class="grid md:grid-cols-3 gap-6">
+                <div class="bg-gradient-to-br from-blue-50 to-blue-100 p-6 rounded-lg">
+                    <h3 class="text-xl font-bold mb-3 text-blue-900">Backend Development</h3>
+                    <ul class="space-y-2 text-blue-800">
+                        <li>Go / Golang</li>
+                        <li>Python</li>
+                        <li>Node.js</li>
+                        <li>API Design</li>
+                        <li>Database Design</li>
+                    </ul>
+                </div>
+                <div class="bg-gradient-to-br from-purple-50 to-purple-100 p-6 rounded-lg">
+                    <h3 class="text-xl font-bold mb-3 text-purple-900">Frontend Development</h3>
+                    <ul class="space-y-2 text-purple-800">
+                        <li>React / Next.js</li>
+                        <li>TypeScript</li>
+                        <li>Tailwind CSS</li>
+                        <li>Vue.js</li>
+                        <li>Web Performance</li>
+                    </ul>
+                </div>
+                <div class="bg-gradient-to-br from-green-50 to-green-100 p-6 rounded-lg">
+                    <h3 class="text-xl font-bold mb-3 text-green-900">AI & ML</h3>
+                    <ul class="space-y-2 text-green-800">
+                        <li>LLM Integration</li>
+                        <li>RAG Systems</li>
+                        <li>Vector Databases</li>
+                        <li>AI Agents</li>
+                        <li>Web Scraping for AI</li>
+                    </ul>
+                </div>
+                <div class="bg-gradient-to-br from-orange-50 to-orange-100 p-6 rounded-lg">
+                    <h3 class="text-xl font-bold mb-3 text-orange-900">Infrastructure</h3>
+                    <ul class="space-y-2 text-orange-800">
+                        <li>Docker</li>
+                        <li>AWS</li>
+                        <li>Linux</li>
+                        <li>CI/CD</li>
+                        <li>Monitoring</li>
+                    </ul>
+                </div>
+                <div class="bg-gradient-to-br from-red-50 to-red-100 p-6 rounded-lg">
+                    <h3 class="text-xl font-bold mb-3 text-red-900">Tools & Productivity</h3>
+                    <ul class="space-y-2 text-red-800">
+                        <li>CLI Tools</li>
+                        <li>Automation Scripts</li>
+                        <li>Developer Workflow</li>
+                        <li>Git Tips</li>
+                        <li>Vim/Neovim</li>
+                    </ul>
+                </div>
+                <div class="bg-gradient-to-br from-teal-50 to-teal-100 p-6 rounded-lg">
+                    <h3 class="text-xl font-bold mb-3 text-teal-900">System Design</h3>
+                    <ul class="space-y-2 text-teal-800">
+                        <li>Scalability</li>
+                        <li>Microservices</li>
+                        <li>Caching Strategies</li>
+                        <li>Message Queues</li>
+                        <li>Real-world Architectures</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- About Section -->
+        <section class="mb-16">
+            <div class="bg-white rounded-lg shadow-md p-8">
+                <h2 class="text-3xl font-bold mb-4">About This Site</h2>
+                <p class="text-gray-700 mb-4">
+                    I've been writing code for about 10 years now. This site is where I document things I learn, problems I solve, and random thoughts about software development.
+                </p>
+                <p class="text-gray-700 mb-4">
+                    The goal isn't to build a personal brand or anything like that. I just write things down because it helps me remember them, and maybe someone else will find it useful too.
+                </p>
+                <p class="text-gray-700 mb-6">
+                    Don't expect a regular posting schedule. I update this when I actually have something to say, which could be frequently or not at all depending on what I'm working on.
+                </p>
+                <a href="about.html" class="inline-block bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition">
+                    More About Me →
+                </a>
+            </div>
+        </section>
+
+        <!-- Connect Section -->
+        <section class="text-center py-12">
+            <h2 class="text-3xl font-bold mb-4">Get In Touch</h2>
+            <p class="text-gray-600 mb-8">Found something useful? Want to chat about tech? Feel free to reach out.</p>
+            <div class="flex justify-center space-x-4">
+                <a href="https://github.com" target="_blank" class="bg-gray-800 text-white px-6 py-3 rounded-lg hover:bg-gray-900 transition">
+                    GitHub
+                </a>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-gray-800 text-white py-12">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="grid md:grid-cols-3 gap-8 mb-8">
+                <div>
+                    <h3 class="font-bold text-lg mb-4">Programming Notes</h3>
+                    <p class="text-gray-400 text-sm">A collection of coding notes and tutorials from a full-stack developer.</p>
+                </div>
+                <div>
+                    <h3 class="font-bold text-lg mb-4">Quick Links</h3>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="index.html" class="hover:text-white">Home</a></li>
+                        <li><a href="about.html" class="hover:text-white">About</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-bold text-lg mb-4">Connect</h3>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="https://github.com" target="_blank" class="hover:text-white">GitHub</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 pt-8 text-center text-gray-400 text-sm">
+                <p>© 2026 Programming Notes. Built with simple HTML & Tailwind CSS.</p>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>
