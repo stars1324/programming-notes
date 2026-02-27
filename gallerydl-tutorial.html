@@ -8,7 +8,7 @@
     <title>Gallery-dl Tutorial: Mass Download High-Res Images from Pixiv, Instagram, and Pinterest</title>
     <meta name="description" content="Struggling to save high-resolution images from Pixiv, Instagram, or Pinterest? Learn how to bulk download entire albums with original quality using gallery-dl. Includes Cookie configuration for restricted content.">
     <meta name="keywords" content="gallery-dl, image downloader, Pixiv download, Instagram downloader, Pinterest scraper, bulk image download, high-res images, cookie configuration">
-    <link rel="canonical" href="https://pnt.jacbex.com/gallerydl-tutorial.html" />
+    <link rel="canonical" href="https://pnt.jacbex.com/gallerydl-tutorial.html">
 
     <!-- Open Graph / Social Media -->
     <meta property="og:title" content="Gallery-dl - Mass Download High-Res Images from Pixiv, Instagram, Pinterest">
@@ -54,7 +54,7 @@
             <a href="index.html" class="text-xl font-bold text-blue-600">📝 <span class="text-gray-700">Programming Notes</span></a>
             <div class="space-x-6 hidden md:block">
                 <a href="index.html" class="hover:text-blue-500">Home</a>
-                <a href="about.html" class="hover:text-blue-500">About Us</a>
+                <a href="about.html" class="hover:text-blue-500">About</a>
             </div>
         </div>
     </nav>
@@ -167,7 +167,7 @@ gallery-dl "https://www.pinterest.com/username/board-name/"</code></pre>
       "cookies": "~/cookies/instagram.txt"
     }
   }
-}</pre></pre>
+}</code></pre>
 
             <p class="mt-6 text-gray-600 text-sm">
                 Or use browser cookies directly (simpler):
@@ -178,7 +178,7 @@ gallery-dl "https://www.pinterest.com/username/board-name/"</code></pre>
       "cookies": "chrome"
     }
   }
-}</pre></pre>
+}</code></pre>
 
             <p class="text-sm text-gray-500 mt-2">
                 Supported: chrome, chromium, firefox, safari, opera
@@ -203,7 +203,7 @@ gallery-dl --range 51-100 "URL"</code></pre>
       "filename": "{artist_id}_{id}_{title}.{extension}"
     }
   }
-}</pre></pre>
+}</code></pre>
 
             <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">Issues I ran into</h2>
 
@@ -218,7 +218,7 @@ gallery-dl --range 51-100 "URL"</code></pre>
     "filename": "{mangle:.50}.{extension}",
     "path-replace": "_"
   }
-}</pre></pre>
+}</code></pre>
 
                 <p class="font-semibold text-gray-800 mb-2 mt-6">Getting rate limited</p>
                 <p class="text-sm text-gray-600 mb-3">Pixiv started blocking after ~200 downloads. Added delays:</p>
@@ -229,7 +229,7 @@ gallery-dl --range 51-100 "URL"</code></pre>
   "downloader": {
     "parallel": 1
   }
-}</pre></pre>
+}</code></pre>
 
                 <p class="font-semibold text-gray-800 mb-2 mt-6">Instagram images still low res</p>
                 <p class="text-sm text-gray-600 mb-3">Needed to explicitly enable original quality:</p>
@@ -240,7 +240,7 @@ gallery-dl --range 51-100 "URL"</code></pre>
       "videos": true
     }
   }
-}</pre></pre>
+}</code></pre>
             </div>
 
             <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">Supported sites</h2>
