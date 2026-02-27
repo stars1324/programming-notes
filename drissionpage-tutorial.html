@@ -164,7 +164,7 @@ page.get('https://example.com')
             </section>
 
             <section id="installation" class="mt-12">
-                <h2 class="text-3xl font-bold mb-4">Installation</h2>
+                <h2 class="text-3xl font-bold mb-4">Setting up DrissionPage</h2>
                 <p class="mb-4">DrissionPage is easier to install than Selenium since you don't need to manage separate browser drivers:</p>
 
                 <pre class="language-bash"><code>pip install DrissionPage</code></pre>
@@ -186,7 +186,7 @@ python -c "from DrissionPage import ChromiumPage; p = ChromiumPage()"</code></pr
             </section>
 
             <section id="basic-usage" class="mt-12">
-                <h2 class="text-3xl font-bold mb-4">Basic Usage</h2>
+                <h2 class="text-3xl font-bold mb-4">Writing your first script</h2>
                 <p class="mb-4">DrissionPage's API is simpler than Selenium. Here's the core pattern:</p>
 
                 <pre class="language-python"><code>from DrissionPage import ChromiumPage
@@ -219,7 +219,7 @@ element = page.ele('css:.dynamic-content', timeout=10)</code></pre>
             </section>
 
             <section id="cloudflare-bypass" class="mt-12">
-                <h2 class="text-3xl font-bold mb-4">Bypassing Cloudflare: Real Examples</h2>
+                <h2 class="text-3xl font-bold mb-4">Real examples: bypassing Cloudflare</h2>
                 <p class="mb-4">This is where DrissionPage really shines. Let me walk through two real scenarios I tested.</p>
 
                 <h3 class="text-xl font-bold mb-3 mt-6">Example 1: E-commerce Price Monitoring</h3>
@@ -296,7 +296,7 @@ print(results)</code></pre>
             </section>
 
             <section id="advanced-features" class="mt-12">
-                <h2 class="text-3xl font-bold mb-4">Advanced Anti-Detection Techniques</h2>
+                <h2 class="text-3xl font-bold mb-4">More anti-detection tricks</h2>
 
                 <h3 class="text-xl font-bold mb-3 mt-6">Session Persistence</h3>
                 <p class="mb-4">DrissionPage can save and restore browser sessions, which helps avoid repeated challenges:</p>
@@ -360,7 +360,7 @@ page = ChromiumPage(browser_args=[
             </section>
 
             <section id="troubleshooting" class="mt-12 bg-gray-50 p-6 rounded-lg">
-                <h2 class="text-2xl font-bold mb-4 text-gray-900">Troubleshooting: Real Issues from GitHub</h2>
+                <h2 class="text-2xl font-bold mb-4 text-gray-900">Problems from GitHub issues</h2>
                 <p class="mb-4">Here are actual problems developers encountered with DrissionPage and how to fix them:</p>
 
                 <h3 class="text-xl font-bold mb-3 mt-6 text-gray-800">Issue #1: "Element not found after page load"</h3>
@@ -468,7 +468,7 @@ element.click()</code></pre>
             </section>
 
             <section id="best-practices" class="mt-12">
-                <h2 class="text-3xl font-bold mb-4">Best Practices to Stay Undetected</h2>
+                <h2 class="text-3xl font-bold mb-4">Staying under the radar</h2>
 
                 <ul class="list-disc ml-6 mb-4">
                     <li><strong>Respect rate limits:</strong> Even with DrissionPage, don't hammer servers. Add delays between requests.</li>
@@ -491,7 +491,7 @@ element.click()</code></pre>
             </section>
 
             <section id="thoughts" class="mt-12">
-                <h2 class="text-3xl font-bold mb-4">Final Thoughts</h2>
+                <h2 class="text-3xl font-bold mb-4">My take</h2>
                 <p class="mb-4">DrissionPage has become my go-to for web scraping. The fact that it bypasses Cloudflare without any special configuration is huge - it just works.</p>
 
                 <p class="mb-4">The API is cleaner than Selenium, it's faster, and it doesn't get detected as easily. For anyone struggling with bot detection issues, it's worth switching.</p>

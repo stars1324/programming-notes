@@ -81,7 +81,7 @@
             </section>
 
             <section id="installation" class="mt-12">
-                <h2 class="text-3xl font-bold mb-4">Installation</h2>
+                <h2 class="text-3xl font-bold mb-4">Getting it installed</h2>
                 <p class="mb-4">Pretty straightforward with pip. The thing that tripped me up initially was forgetting to install the browser binaries separately.</p>
 
                 <pre class="language-bash"><code>pip install crawl4ai
@@ -96,7 +96,7 @@ playwright install chromium</code></pre>
             </section>
 
             <section id="basic-usage" class="mt-12">
-                <h2 class="text-3xl font-bold mb-4">Basic Usage</h2>
+                <h2 class="text-3xl font-bold mb-4">How to use it</h2>
                 <p class="mb-4">The async version is what you want to use. It's significantly faster than the sync version, especially when crawling multiple pages.</p>
 
                 <pre class="language-python"><code>import asyncio
@@ -123,7 +123,7 @@ result.status_code     # HTTP status code</code></pre>
             </section>
 
             <section id="gpt4" class="mt-12">
-                <h2 class="text-3xl font-bold mb-4">Using with LLMs</h2>
+                <h2 class="text-3xl font-bold mb-4">Feeding scraped content to LLMs</h2>
                 <p class="mb-4">Once you have the markdown, you can pass it directly to an LLM. Here's a simple example with OpenAI:</p>
 
                 <pre class="language-python"><code>import asyncio

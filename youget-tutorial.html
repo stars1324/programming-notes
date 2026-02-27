@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- SEO Meta Tags -->
+    <title>You-Get Tutorial: Download 4K Videos from 100+ Sites via Command Line</title>
+    <meta name="description" content="Struggling to download videos from YouTube, Netflix, or region-locked sites? Learn how to use You-Get with proxy settings to bypass geo-restrictions and download 4K videos from 100+ sites.">
+    <meta name="keywords" content="you-get, video downloader, YouTube download, Netflix download, 4K video download, proxy video download, bypass geo-restriction, video scraping">
+    <link rel="canonical" href="https://pnt.jacbex.com/youget-tutorial.html">
+
+    <!-- Open Graph / Social Media -->
+    <meta property="og:title" content="You-Get - Download 4K Videos from 100+ Sites via Command Line">
+    <meta property="og:description" content="Bypass geo-restrictions and download videos from YouTube, Netflix, and 100+ sites. Includes proxy configuration for region-locked content.">
+    <meta property="og:type" content="article">
+
+    <!-- Tailwind CSS for modern UI -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Code Highlighting (Prism.js) -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+
+    <!-- Structured Data (Schema.org) for Google -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "You-Get Tutorial: Download 4K Videos from 100+ Sites via Command Line",
+      "description": "Complete guide to downloading videos from YouTube, Netflix, and other sites using You-Get. Includes proxy configuration for bypassing geo-restrictions.",
+      "author": {
+        "@type": "Person",
+        "name": "Programming Notes"
+      },
+      "proficiencyLevel": "Beginner",
+      "keywords": ["video downloader", "YouTube", "Netflix", "proxy", "geo-restriction"]
+    }
+    </script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+        .prose code { color: #eb5757; background: #f9f2f2; padding: 2px 4px; border-radius: 4px; }
+        .comparison-table { border-collapse: separate; border-spacing: 0; }
+        .comparison-table th, .comparison-table td { padding: 12px 16px; text-align: left; }
+        .comparison-table th { background: #f3f4f6; font-weight: 600; }
+        .comparison-table tr:not(:last-child) td { border-bottom: 1px solid #e5e7eb; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+            <a href="index.html" class="text-xl font-bold text-blue-600">📝 <span class="text-gray-700">Programming Notes</span></a>
+            <div class="space-x-6 hidden md:block">
+                <a href="index.html" class="hover:text-blue-500">Home</a>
+                <a href="about.html" class="hover:text-blue-500">About</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="bg-gradient-to-r from-teal-600 to-cyan-700 text-white py-16">
+        <div class="max-w-4xl mx-auto px-4 text-center">
+            <h1 class="text-4xl md:text-5xl font-extrabold mb-4">You-Get: Download 4K Videos from 100+ Sites via Command Line</h1>
+            <p class="text-xl opacity-90">Bypass geo-restrictions and download videos from YouTube, Netflix, and more with proxy configuration.</p>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto px-4 py-12 bg-white mt-[-40px] rounded-xl shadow-lg mb-20">
+
+        <article class="prose prose-blue max-w-none">
+
+            <p class="mb-6 text-lg text-gray-700 leading-relaxed">
+                I needed to download videos from various sites for content creation - YouTube for reference, some regional streaming platforms, a few social media sites. Most tools either didn't work or had quality limits.
+            </p>
+
+            <p class="mb-6 text-gray-700 leading-relaxed">
+                Tried a bunch of options. Browser extensions were hit or miss. Online download sites were sketchy and slow. youtube-dl worked but required constant updates. yt-dlp is great but the CLI syntax got complicated for simple tasks.
+            </p>
+
+            <p class="mb-8 text-gray-700 leading-relaxed">
+                Found <a href="https://github.com/soimort/you-get" class="text-blue-600 underline">you-get</a>. It's a Python command-line tool that handles 100+ sites out of the box. The main advantage is simplicity - just pass the URL and it figures out the best quality available.
+            </p>
+
+            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">Supported sites</h2>
+
+            <p class="mb-4 text-gray-700">The <code>--list</code> flag shows everything. Main ones I've used:</p>
+
+            <ul class="list-disc pl-6 mb-6 space-y-1 text-gray-700">
+                <li><strong>Video platforms:</strong> YouTube, Vimeo, Dailymotion</li>
+                <li><strong>Streaming:</strong> Netflix (with some caveats), Bilibili</li>
+                <li><strong>Social:</strong> Instagram, Twitter/X, TikTok</li>
+                <li><strong>Japanese sites:</strong> Niconico, Bilibili</li>
+                <li><strong>Misc:</strong> Imgur albums, SoundCloud (audio)</li>
+            </ul>
+
+            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">Getting started</h2>
+
+            <pre class="language-bash"><code>pip install you-get</code></pre>
+
+            <p class="mt-4 text-gray-600 text-sm">
+                Or on macOS: <code>brew install you-get</code>
+            </p>
+
+            <p class="mt-4 text-gray-600 text-sm">
+                You also need FFmpeg or aria2 for some sites:
+            </p>
+            <pre class="language-bash"><code># macOS
+brew install ffmpeg aria2
+
+# Ubuntu/Debian
+sudo apt install ffmpeg aria2</code></pre>
+
+            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">Downloading your first video</h2>
+
+            <p class="mb-4 text-gray-700">Just pass the URL:</p>
+
+            <pre class="language-bash"><code># YouTube - downloads best quality available
+you-get "https://www.youtube.com/watch?v=xxxxx"
+
+# Bilibili
+you-get "https://www.bilibili.com/video/BVxxxxx"
+
+# Instagram video
+you-get "https://www.instagram.com/p/xxxxx/"</code></pre>
+
+            <p class="mt-6 mb-4 text-gray-700">It automatically detects the best quality and downloads to the current directory.</p>
+
+            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">Quality options</h2>
+
+            <p class="mb-4 text-gray-700">See what's available first:</p>
+
+            <pre class="language-bash"><code>you-get -i "https://www.youtube.com/watch?v=xxxxx"
+
+# Output:
+#    - format:        mp4
+#      container:     mp4
+#      quality:       1920x1080
+#      size:          156.5 MiB
+#      # download-with: you-get --format=mp4 [URL]
+#
+#    - format:        webm
+#      container:     webm
+#      quality:       3840x2160
+#      size:          456.2 MiB
+#      # download-with: you-get --format=webm [URL]</code></pre>
+
+            <p class="mt-6 mb-4 text-gray-700">Then download specific format:</p>
+            <pre class="language-bash"><code>you-get --format=webm "https://www.youtube.com/watch?v=xxxxx"</code></pre>
+
+            <p class="mt-6 mb-4 text-gray-700">Or force highest quality:</p>
+            <pre class="language-bash"><code>you-get "https://www.youtube.com/watch?v=xxxxx" --format=best</code></pre>
+
+            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">Bypassing geo-restrictions with proxies</h2>
+
+            <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 my-6">
+                <p class="text-yellow-800 text-sm">This is the important part. Some content is region-locked or blocked in certain countries. You need to route through a proxy to access it.</p>
+            </div>
+
+            <p class="mb-4 text-gray-700">You-get supports HTTP/HTTPS/SOCKS proxies:</p>
+
+            <p class="font-semibold text-gray-800 mt-6 mb-2">HTTP Proxy</p>
+            <pre class="language-bash"><code>you-get -x 127.0.0.1:7890 "https://www.youtube.com/watch?v=xxxxx"</code></pre>
+
+            <p class="font-semibold text-gray-800 mt-6 mb-2">SOCKS5 Proxy (like Shadowsocks/V2Ray)</p>
+            <pre class="language-bash"><code>you-get -x 127.0.0.1:1080 "https://www.youtube.com/watch?v=xxxxx"</code></pre>
+
+            <p class="font-semibold text-gray-800 mt-6 mb-2">With authentication</p>
+            <pre class="language-bash"><code>you-get -x username:password@proxy-server.com:8080 "URL"</code></pre>
+
+            <p class="font-semibold text-gray-800 mt-6 mb-2">Set as environment variable (so you don't type it every time)</p>
+            <pre class="language-bash"><code># Add to ~/.bashrc or ~/.zshrc
+export HTTP_PROXY=http://127.0.0.1:7890
+export HTTPS_PROXY=http://127.0.0.1:7890
+export ALL_PROXY=socks5://127.0.0.1:1080
+
+# Then use normally
+you-get "URL"</code></pre>
+
+            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">Real-world use cases</h2>
+
+            <p class="font-semibold text-gray-800 mt-6 mb-2">YouTube blocked in your region</p>
+            <pre class="language-bash"><code># Route through a proxy in an allowed country
+you-get -x proxy-server.com:8080 "https://www.youtube.com/watch?v=xxxxx"</code></pre>
+
+            <p class="font-semibold text-gray-800 mt-6 mb-2">Bilibili requiring mainland China IP</p>
+            <pre class="language-bash"><code># Use a China-based proxy
+you-get -x china-proxy.com:8080 "https://www.bilibili.com/video/BVxxxxx"</code></pre>
+
+            <p class="font-semibold text-gray-800 mt-6 mb-2">Netflix (experimental)</p>
+            <pre class="language-bash"><code># Netflix uses DRM, so this doesn't always work
+# But for some content:
+you-get -x 127.0.0.1:7890 "https://www.netflix.com/watch/xxxxx"
+
+# You might need additional tools for DRM-protected content</code></pre>
+
+            <p class="font-semibold text-gray-800 mt-6 mb-2">Slow download speeds</p>
+            <pre class="language-bash"><code"># Use aria2 for multi-threaded downloads
+you-get --aria2 "URL"
+
+# Or limit connections if getting throttled
+you-get --aria2-args "-x 4 -s 4" "URL"</code></pre>
+
+            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">More command-line options</h2>
+
+            <p class="mb-4 text-gray-700">Download to specific directory:</p>
+            <pre class="language-bash"><code>you-get -o ~/Downloads/Videos "URL"</code></pre>
+
+            <p class="mt-6 mb-4 text-gray-700">Keep original filename:</p>
+            <pre class="language-bash"><code>you-get -O original "URL"</code></pre>
+
+            <p class="mt-6 mb-4 text-gray-700">Download playlist:</p>
+            <pre class="language-bash"><code>you-get "https://www.youtube.com/playlist?list=xxxxx"</code></pre>
+
+            <p class="mt-6 mb-4 text-gray-700">Skip existing files (resume interrupted downloads):</p>
+            <pre class="language-bash"><code>you-get --skip-existing-files "URL"</code></pre>
+
+            <p class="mt-6 mb-4 text-gray-700">Show info without downloading:</p>
+            <pre class="language-bash"><code>you-get -i "URL"</code></pre>
+
+            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">Problems I hit</h2>
+
+            <div class="bg-gray-50 p-6 rounded-lg mt-6">
+                <p class="font-semibold text-gray-800 mb-2">"URL not supported" error</p>
+                <p class="text-sm text-gray-600 mb-3">The site might not be supported or the URL format changed. Check if it's in the supported sites list with <code>you-get --list</code>.</p>
+
+                <p class="font-semibold text-gray-800 mb-2 mt-6">"Address cannot be resolved" or connection timeout</p>
+                <p class="text-sm text-gray-600 mb-3">Site is blocked in your region or DNS issues. First try with proxy:</p>
+                <pre class="language-bash"><code># Test proxy connection first
+curl -x 127.0.0.1:7890 "https://www.youtube.com"
+
+# Then use with you-get
+you-get -x 127.0.0.1:7890 "URL"</code></pre>
+
+                <p class="font-semibold text-gray-800 mb-2 mt-6">Download starts but crawls at 10KB/s</p>
+                <p class="text-sm text-gray-600 mb-3">Site is throttling. Try different approaches:</p>
+                <pre class="language-bash"><code># Use aria2 for multi-threading
+you-get --aria2 "URL"
+
+# Or try a different proxy server
+you-get -x different-proxy.com:8080 "URL"</code></pre>
+
+                <p class="font-semibold text-gray-800 mb-2 mt-6">FFmpeg not found errors</p>
+                <p class="text-sm text-gray-600 mb-3">Some sites require FFmpeg to merge video/audio streams:</p>
+                <pre class="language-bash"><code># macOS
+brew install ffmpeg
+
+# Linux
+sudo apt install ffmpeg</code></pre>
+
+                <p class="font-semibold text-gray-800 mb-2 mt-6">"HTTP Error 403: Forbidden"</p>
+                <p class="text-sm text-gray-600 mb-3">Site is blocking automated downloads. Try:</p>
+                <pre class="language-bash"><code># Add user agent header
+you-get --http-header "User-Agent: Mozilla/5.0..." "URL"
+
+# Or use cookies from your browser
+# Export cookies first, then:
+you-get --cookies ~/.config/you-get/cookies.txt "URL"</code></pre>
+            </div>
+
+            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">When you need cookies</h2>
+
+            <p class="mb-4 text-gray-700">Some content requires login. Export cookies from your browser:</p>
+
+            <pre class="language-bash"><code># Use a browser extension to export cookies.txt
+# Then:
+you-get --cookies ~/cookies/website.txt "URL"</code></pre>
+
+            <p class="text-gray-600 text-sm mt-4">
+                "Get cookies.txt LOCALLY" extension for Chrome/Edge works well for this.
+            </p>
+
+            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">Important notes</h2>
+
+            <ul class="list-disc pl-6 space-y-2 text-gray-700 mb-6">
+                <li>Respect copyright and terms of service</li>
+                <li>Don't redistribute downloaded content without permission</li>
+                <li>Some sites actively fight downloaders - expect breakage</li>
+                <li>DRM-protected content (like most Netflix content) can't be downloaded directly</li>
+                <li>Proxy setup might be needed depending on your location</li>
+            </ul>
+
+            <p class="mt-8 text-gray-500 text-sm">
+                You-Get repo: <a href="https://github.com/soimort/you-get" class="text-blue-600 underline">github.com/soimort/you-get</a>
+            </p>
+
+            <p class="mt-2 text-gray-500 text-sm">
+                For more advanced use cases, <a href="https://github.com/yt-dlp/yt-dlp" class="text-blue-600 underline">yt-dlp</a> is a more actively maintained fork of youtube-dl.
+            </p>
+
+        </article>
+
+    </main>
+
+    <footer class="bg-gray-800 text-white py-12">
+        <div class="max-w-4xl mx-auto px-4 text-center">
+            <p class="opacity-70 mb-2">📝 Programming Notes</p>
+            <p class="text-sm opacity-50">
+                Personal learning notes & tutorials. Updated as I explore new technologies.
+            </p>
+        </div>
+    </footer>
+
+    <!-- Code Highlighting Script -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+</body>
+</html>

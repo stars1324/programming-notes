@@ -113,7 +113,7 @@
                 That's the difference - gallery-dl pulls the exact file the artist uploaded. No browser compression applied.
             </p>
 
-            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">Installation</h2>
+            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">Setting it up</h2>
 
             <pre class="language-bash"><code>pip install gallery-dl</code></pre>
 
@@ -121,7 +121,7 @@
                 Or on macOS: <code>brew install gallery-dl</code>
             </p>
 
-            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">Basic usage</h2>
+            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">How to use it</h2>
 
             <p class="mb-4 text-gray-700">Just paste the URL:</p>
 
@@ -141,7 +141,7 @@ gallery-dl "https://www.pinterest.com/username/board-name/"</code></pre>
 │   └── 8473291_1_p1.png
 └── artist_67890/</code></pre>
 
-            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">Cookies (for restricted content)</h2>
+            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">Handling login-required content</h2>
 
             <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 my-6">
                 <p class="text-yellow-800 text-sm">Some content requires login - R-18 content on Pixiv, private Instagram accounts, etc. This is the part that confused me initially.</p>
@@ -184,7 +184,7 @@ gallery-dl "https://www.pinterest.com/username/board-name/"</code></pre>
                 Supported: chrome, chromium, firefox, safari, opera
             </p>
 
-            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">Options I use</h2>
+            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">Useful command-line options</h2>
 
             <p class="mb-4 text-gray-700">Filter by resolution:</p>
             <pre class="language-bash"><code>gallery-dl --filter "width >= 1920" "URL"</code></pre>
@@ -205,7 +205,7 @@ gallery-dl --range 51-100 "URL"</code></pre>
   }
 }</code></pre>
 
-            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">Issues I ran into</h2>
+            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">Things that broke</h2>
 
             <div class="bg-gray-50 p-6 rounded-lg mt-6">
                 <p class="font-semibold text-gray-800 mb-2">403 Forbidden with cookies configured</p>
@@ -243,7 +243,7 @@ gallery-dl --range 51-100 "URL"</code></pre>
 }</code></pre>
             </div>
 
-            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">Supported sites</h2>
+            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">What sites work</h2>
 
             <p class="mb-4 text-gray-700">The <code>--list-extractors</code> flag shows everything. Main ones I've used:</p>
 
@@ -255,7 +255,7 @@ gallery-dl --range 51-100 "URL"</code></pre>
                 <li><strong>Misc:</strong> Imgur, Flickr, Tumblr</li>
             </ul>
 
-            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">Notes</h2>
+            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">Final notes</h2>
 
             <ul class="list-disc pl-6 space-y-2 text-gray-700 mb-6">
                 <li>Don't hammer servers - use reasonable delays between requests</li>
