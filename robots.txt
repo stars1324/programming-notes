@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+
+Disallow: /admin/
+Disallow: /.git/
+Disallow: /.idea/
+
+Sitemap: https://pnt.jacbex.com/sitemap.xml
