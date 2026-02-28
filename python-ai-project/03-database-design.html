@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- SEO Meta Tags -->
+    <title>SQLite Database Design for Python Web Scrapers</title>
+    <meta name="description" content="How I designed and implemented SQLite storage for a movie scraper. Schema design, batch inserts, and common SQL queries.">
+    <meta name="keywords" content="Python SQLite, database schema design, SQL batch insert, web scraper database, JSON in SQLite">
+    <meta name="author" content="Programming Notes">
+
+    <link rel="canonical" href="https://pnt.jacbex.com/python-ai-project/03-database-design.html" />
+
+    <!-- Open Graph / Social Media -->
+    <meta property="og:title" content="SQLite Database Design for Python Web Scrapers">
+    <meta property="og:description" content="Schema design and implementation for movie data storage.">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://pnt.jacbex.com/python-ai-project/03-database-design.html">
+    <meta property="article:published_time" content="2026-02-28">
+    <meta property="article:author" content="Programming Notes">
+    <meta property="og:image" content="https://pnt.jacbex.com/python-ai-project/thumb.jpg">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Code Highlighting -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "SQLite Database Design for Python Web Scrapers",
+      "author": {
+        "@type": "Person",
+        "name": "Programming Notes"
+      },
+      "datePublished": "2026-02-28"
+    }
+    </script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+        .prose code { color: #eb5757; background: #f9f2f2; padding: 2px 4px; border-radius: 4px; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+            <a href="../index.html" class="text-xl font-bold text-blue-600">📝 <span class="text-gray-700">Programming Notes</span></a>
+            <div class="space-x-6 hidden md:block">
+                <a href="../index.html" class="hover:text-blue-500">Home</a>
+                <a href="../about.html" class="hover:text-blue-500">About</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="bg-gradient-to-r from-blue-700 to-indigo-800 text-white py-16">
+        <div class="max-w-4xl mx-auto px-4 text-center">
+            <h1 class="text-4xl md:text-5xl font-extrabold mb-4">SQLite Database Design</h1>
+            <p class="text-xl opacity-90">Storing and querying scraped movie data</p>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto px-4 py-12 bg-white mt-[-40px] rounded-xl shadow-lg mb-20">
+
+        <article class="prose prose-blue max-w-none">
+
+            <section id="introduction">
+                <h2 class="text-3xl font-bold mb-4">Why I needed a database</h2>
+                <p class="mb-4">
+                    Now that we can fetch and parse movie data, need somewhere to store it. SQLite works well - no server to set up, single file database.
+                </p>
+            </section>
+
+            <section id="why-sqlite" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">Why SQLite</h2>
+                <ul class="list-disc ml-6 mb-4">
+                    <li><strong>Zero configuration:</strong> No server setup</li>
+                    <li><strong>Single file:</strong> Database is just one file</li>
+                    <li><strong>SQL support:</strong> Full SQL features</li>
+                    <li><strong>Built into Python:</strong> No extra dependencies</li>
+                </ul>
+
+                <p class="mb-4">
+                    For 250 movies, SQLite is plenty. If you're dealing with millions, consider PostgreSQL.
+                </p>
+            </section>
+
+            <section id="schema" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">Database schema</h2>
+                <pre class="language-sql"><code>CREATE TABLE movies (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    rank INTEGER NOT NULL UNIQUE,
+    title TEXT NOT NULL,
+    director TEXT,
+    actors TEXT,        -- JSON array
+    year INTEGER,
+    country TEXT,
+    genres TEXT,        -- JSON array
+    rating REAL,
+    vote_count INTEGER,
+    quote TEXT,
+    ai_summary TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Indexes for common queries
+CREATE INDEX idx_rank ON movies(rank);
+CREATE INDEX idx_rating ON movies(rating);
+CREATE INDEX idx_year ON movies(year);
+CREATE INDEX idx_country ON movies(country);</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Design decisions</h3>
+                <p class="mb-4"><strong>JSON for arrays:</strong> SQLite doesn't have native arrays. Storing actors and genres as JSON strings works fine for read-heavy workloads.</p>
+                <p class="mb-4"><strong>UNIQUE on rank:</strong> Each movie has a unique rank (1-250). Prevents duplicates if we re-scrape.</p>
+                <p class="mb-4"><strong>Indexes:</strong> Added indexes on frequently queried columns.</p>
+            </section>
+
+            <section id="database-class" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">Database class</h2>
+                <pre class="language-python"><code>import sqlite3
+import json
+from pathlib import Path
+from datetime import datetime
+
+class Database:
+    def __init__(self, db_path: str = "data/movies.db"):
+        self.db_path = db_path
+        self.connection = None
+        self._connect()
+        self._create_tables()
+
+    def _connect(self):
+        """Create database connection and directory"""
+        Path(self.db_path).parent.mkdir(parents=True, exist_ok=True)
+
+        self.connection = sqlite3.connect(self.db_path)
+        self.connection.row_factory = sqlite3.Row  # Access columns by name
+
+    def _create_tables(self):
+        """Create tables if they don't exist"""
+        create_sql = """
+        CREATE TABLE IF NOT EXISTS movies (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            rank INTEGER NOT NULL UNIQUE,
+            title TEXT NOT NULL,
+            director TEXT,
+            actors TEXT,
+            year INTEGER,
+            country TEXT,
+            genres TEXT,
+            rating REAL,
+            vote_count INTEGER,
+            quote TEXT,
+            ai_summary TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+
+        CREATE INDEX IF NOT EXISTS idx_rank ON movies(rank);
+        CREATE INDEX IF NOT EXISTS idx_rating ON movies(rating);
+        CREATE INDEX IF NOT EXISTS idx_year ON movies(year);
+        CREATE INDEX IF NOT EXISTS idx_country ON movies(country);
+        """
+
+        self.connection.executescript(create_sql)
+        self.connection.commit()</code></pre>
+            </section>
+
+            <section id="inserting-data" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">Inserting data</h2>
+                <pre class="language-python"><code>def insert_movie(self, movie: Dict[str, Any]) -> bool:
+    """Insert a single movie record"""
+
+    insert_sql = """
+    INSERT OR REPLACE INTO movies (
+        rank, title, director, actors, year, country, genres,
+        rating, vote_count, quote, ai_summary, updated_at
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    """
+
+    try:
+        # Convert lists to JSON
+        actors_json = json.dumps(movie.get('actors', []), ensure_ascii=False)
+        genres_json = json.dumps(movie.get('genres', []), ensure_ascii=False)
+
+        self.connection.execute(insert_sql, (
+            movie.get('rank'),
+            movie.get('title'),
+            movie.get('director'),
+            actors_json,
+            movie.get('year'),
+            movie.get('country'),
+            genres_json,
+            movie.get('rating'),
+            movie.get('vote_count'),
+            movie.get('quote'),
+            movie.get('ai_summary'),
+            datetime.now().isoformat()
+        ))
+
+        self.connection.commit()
+        return True
+
+    except sqlite3.Error as e:
+        print(f"Error inserting movie: {e}")
+        self.connection.rollback()
+        return False</code></pre>
+
+                <p class="mb-4 mt-6">
+                    <code class="bg-gray-100 px-2 py-1 rounded">INSERT OR REPLACE</code> updates the record if rank exists. Useful for re-scraping.
+                </p>
+            </section>
+
+            <section id="batch-insert" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">Batch insert</h2>
+                <p class="mb-4">Inserting 250 movies one by one is slow. Used a single transaction instead:</p>
+                <pre class="language-python"><code>def insert_movies_batch(self, movies: List[Dict[str, Any]]) -> int:
+    """Insert multiple movies in a single transaction"""
+
+    insert_sql = """
+    INSERT OR REPLACE INTO movies (
+        rank, title, director, actors, year, country, genres,
+        rating, vote_count, quote, ai_summary, updated_at
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    """
+
+    success_count = 0
+    cursor = self.connection.cursor()
+
+    try:
+        for movie in movies:
+            actors_json = json.dumps(movie.get('actors', []), ensure_ascii=False)
+            genres_json = json.dumps(movie.get('genres', []), ensure_ascii=False)
+
+            try:
+                cursor.execute(insert_sql, (
+                    movie.get('rank'),
+                    movie.get('title'),
+                    movie.get('director'),
+                    actors_json,
+                    movie.get('year'),
+                    movie.get('country'),
+                    genres_json,
+                    movie.get('rating'),
+                    movie.get('vote_count'),
+                    movie.get('quote'),
+                    movie.get('ai_summary'),
+                    datetime.now().isoformat()
+                ))
+                success_count += 1
+            except sqlite3.Error as e:
+                print(f"Failed to insert {movie.get('rank')}: {e}")
+
+        # Commit all at once
+        self.connection.commit()
+        return success_count
+
+    except sqlite3.Error as e:
+        print(f"Batch insert failed: {e}")
+        self.connection.rollback()
+        return success_count</code></pre>
+
+                <p class="mb-4 mt-6">
+                    Single commit at the end is way faster than committing after each insert. Learned this the hard way - initial implementation took 30+ seconds, now takes less than 1.
+                </p>
+            </section>
+
+            <section id="querying" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">Querying data</h2>
+                <pre class="language-python"><code>def get_all_movies(self) -> List[Dict[str, Any]]:
+    """Retrieve all movies ordered by rank"""
+    sql = "SELECT * FROM movies ORDER BY rank ASC"
+    cursor = self.connection.execute(sql)
+    rows = cursor.fetchall()
+    return [self._row_to_dict(row) for row in rows]
+
+def get_movie_by_rank(self, rank: int) -> Optional[Dict[str, Any]]:
+    """Get a single movie by rank"""
+    sql = "SELECT * FROM movies WHERE rank = ?"
+    cursor = self.connection.execute(sql, (rank,))
+    row = cursor.fetchone()
+    return self._row_to_dict(row) if row else None
+
+def _row_to_dict(self, row: sqlite3.Row) -> Dict[str, Any]:
+    """Convert database row to dictionary, parse JSON fields"""
+    movie = dict(row)
+
+    # Parse JSON back to Python objects
+    try:
+        if movie.get('actors'):
+            movie['actors'] = json.loads(movie['actors'])
+        if movie.get('genres'):
+            movie['genres'] = json.loads(movie['genres'])
+    except json.JSONDecodeError as e:
+        print(f"Error parsing JSON: {e}")
+
+    return movie</code></pre>
+            </section>
+
+            <section id="advanced-queries" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">Advanced queries</h2>
+                <pre class="language-python"><code>def get_top_directors(self, limit: int = 10) -> List[tuple]:
+    """Get directors with most movies in top 250"""
+    sql = """
+    SELECT director, COUNT(*) as movie_count
+    FROM movies
+    WHERE director IS NOT NULL AND director != ''
+    GROUP BY director
+    ORDER BY movie_count DESC
+    LIMIT ?
+    """
+    return self.connection.execute(sql, (limit,)).fetchall()
+
+def get_genre_distribution(self) -> List[tuple]:
+    """Count movies by genre using json_each"""
+    sql = """
+    SELECT genre, COUNT(*) as count
+    FROM (
+        SELECT json_each.value as genre
+        FROM movies, json_each(movies.genres)
+        WHERE json_valid(movies.genres)
+    )
+    GROUP BY genre
+    ORDER BY count DESC
+    """
+    return self.connection.execute(sql).fetchall()</code></pre>
+            </section>
+
+            <section id="context-manager" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">Context manager</h2>
+                <p class="mb-4">Made the database class a context manager for proper cleanup:</p>
+                <pre class="language-python"><code>def close(self):
+    """Close the database connection"""
+    if self.connection:
+        self.connection.close()
+
+def __enter__(self):
+    """Context manager entry"""
+    return self
+
+def __exit__(self, exc_type, exc_val, exc_tb):
+    """Context manager exit"""
+    self.close()
+
+# Usage
+with Database() as db:
+    movies = db.get_all_movies()
+    print(f"Total movies: {len(movies)}")
+# Connection automatically closed</code></pre>
+            </section>
+
+        </article>
+
+    </main>
+
+    <footer class="bg-gray-800 text-white py-12">
+        <div class="max-w-4xl mx-auto px-4 text-center">
+            <p class="opacity-70 mb-2">📝 Programming Notes</p>
+            <p class="text-sm opacity-50">Personal learning notes. Updated as I explore new technologies.</p>
+        </div>
+    </footer>
+
+    <!-- Code Highlighting Script -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js"></script>
+</body>
+</html>

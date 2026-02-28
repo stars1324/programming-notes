@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- SEO Meta Tags -->
+    <title>Data Visualization with Matplotlib for Python</title>
+    <meta name="description" content="Creating charts and graphs for movie data analysis using matplotlib. Year distribution, top directors, genre analysis, and rating histograms.">
+    <meta name="keywords" content="Python matplotlib tutorial, data visualization charts, movie data analysis, matplotlib examples, Python graphs">
+    <meta name="author" content="Programming Notes">
+
+    <link rel="canonical" href="https://pnt.jacbex.com/python-ai-project/04-data-visualization.html" />
+
+    <!-- Open Graph / Social Media -->
+    <meta property="og:title" content="Data Visualization with Matplotlib">
+    <meta property="og:description" content="Creating charts for movie data analysis.">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://pnt.jacbex.com/python-ai-project/04-data-visualization.html">
+    <meta property="article:published_time" content="2026-02-28">
+    <meta property="article:author" content="Programming Notes">
+    <meta property="og:image" content="https://pnt.jacbex.com/python-ai-project/thumb.jpg">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Code Highlighting -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "Data Visualization with Matplotlib for Python",
+      "author": {
+        "@type": "Person",
+        "name": "Programming Notes"
+      },
+      "datePublished": "2026-02-28"
+    }
+    </script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+        .prose code { color: #eb5757; background: #f9f2f2; padding: 2px 4px; border-radius: 4px; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+            <a href="../index.html" class="text-xl font-bold text-blue-600">📝 <span class="text-gray-700">Programming Notes</span></a>
+            <div class="space-x-6 hidden md:block">
+                <a href="../index.html" class="hover:text-blue-500">Home</a>
+                <a href="../about.html" class="hover:text-blue-500">About</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="bg-gradient-to-r from-blue-700 to-indigo-800 text-white py-16">
+        <div class="max-w-4xl mx-auto px-4 text-center">
+            <h1 class="text-4xl md:text-5xl font-extrabold mb-4">Data Visualization with Matplotlib</h1>
+            <p class="text-xl opacity-90">Creating charts from movie data</p>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto px-4 py-12 bg-white mt-[-40px] rounded-xl shadow-lg mb-20">
+
+        <article class="prose prose-blue max-w-none">
+
+            <section id="introduction">
+                <h2 class="text-3xl font-bold mb-4">After storing the data</h2>
+                <p class="mb-4">
+                    Data is in the database. Now let's visualize it - see trends and patterns that aren't obvious from raw numbers.
+                </p>
+            </section>
+
+            <section id="setup" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">Setup</h2>
+                <pre class="language-python"><code>import matplotlib.pyplot as plt
+import matplotlib
+from collections import Counter
+
+# Configure for Chinese character support
+matplotlib.rcParams['font.sans-serif'] = ['Arial Unicode MS', 'SimHei']
+matplotlib.rcParams['axes.unicode_minus'] = False
+
+# Set style
+plt.style.use('seaborn-v0_8-darkgrid')
+
+# Chart configuration
+FIGURE_SIZE = (12, 8)
+DPI = 300</code></pre>
+
+                <p class="mb-4 mt-6">Chinese characters were an issue initially. Had to configure fonts properly or they showed as squares.</p>
+            </section>
+
+            <section id="year-chart" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">Year distribution</h2>
+                <p class="mb-4">Line chart showing how many movies from each year made it to Top 250:</p>
+                <pre class="language-python"><code>from pathlib import Path
+
+def create_year_distribution_chart(movies, output_dir: str):
+    """Line chart showing movie count by year"""
+
+    years = [m.get('year') for m in movies if m.get('year')]
+    year_counts = Counter(years)
+    sorted_years = sorted(year_counts.items())
+
+    fig, ax = plt.subplots(figsize=FIGURE_SIZE)
+
+    years_list = [y[0] for y in sorted_years]
+    counts_list = [y[1] for y in sorted_years]
+
+    ax.plot(years_list, counts_list, marker='o', linewidth=2, markersize=6)
+    ax.fill_between(years_list, counts_list, alpha=0.3)
+
+    ax.set_xlabel('Release Year', fontsize=12, fontweight='bold')
+    ax.set_ylabel('Number of Movies', fontsize=12, fontweight='bold')
+    ax.set_title('Douban Top 250: Movie Distribution by Year', fontsize=14, fontweight='bold')
+    ax.grid(True, alpha=0.3)
+
+    plt.xticks(rotation=45, ha='right')
+    plt.tight_layout()
+
+    output_path = Path(output_dir) / 'year_distribution.png'
+    plt.savefig(output_path, dpi=DPI, bbox_inches='tight')
+    plt.close()
+
+    return str(output_path)</code></pre>
+            </section>
+
+            <section id="directors-chart" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">Top directors</h2>
+                <p class="mb-4">Horizontal bar chart:</p>
+                <pre class="language-python"><code>def create_top_directors_chart(movies, output_dir: str, top_n: int = 10):
+    """Bar chart for top directors"""
+
+    directors = [m.get('director') for m in movies if m.get('director')]
+    director_counts = Counter(directors)
+    top_directors = director_counts.most_common(top_n)
+
+    fig, ax = plt.subplots(figsize=FIGURE_SIZE)
+
+    director_names = [d[0] for d in top_directors]
+    movie_counts = [d[1] for d in top_directors]
+
+    # Color gradient
+    colors = plt.cm.viridis(range(len(director_names)))
+
+    bars = ax.barh(director_names, movie_counts, color=colors)
+
+    # Add value labels
+    for i, bar in enumerate(bars):
+        width = bar.get_width()
+        ax.text(width + 0.1, bar.get_y() + bar.get_height() / 2,
+               f'{int(width)}', ha='left', va='center', fontsize=10)
+
+    ax.set_xlabel('Number of Movies in Top 250', fontsize=12, fontweight='bold')
+    ax.set_ylabel('Director', fontsize=12, fontweight='bold')
+    ax.set_title(f'Top {top_n} Directors in Douban Top 250', fontsize=14, fontweight='bold')
+    ax.grid(axis='x', alpha=0.3)
+
+    ax.invert_yaxis()
+    plt.tight_layout()
+
+    output_path = Path(output_dir) / 'top_directors.png'
+    plt.savefig(output_path, dpi=DPI, bbox_inches='tight')
+    plt.close()
+
+    return str(output_path)</code></pre>
+            </section>
+
+            <section id="genre-chart" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">Genre distribution</h2>
+                <pre class="language-python"><code>def create_genre_distribution_chart(movies, output_dir: str):
+    """Pie chart showing genre distribution"""
+
+    # Extract all genres (movies can have multiple)
+    all_genres = []
+    for movie in movies:
+        genres = movie.get('genres', [])
+        if isinstance(genres, list):
+            all_genres.extend(genres)
+
+    genre_counts = Counter(all_genres)
+
+    fig, ax = plt.subplots(figsize=FIGURE_SIZE)
+
+    genres = list(genre_counts.keys())
+    counts = list(genre_counts.values())
+
+    colors = plt.cm.Set3(range(len(genres)))
+    explode = [0.05 if count > 30 else 0 for count in counts]
+
+    wedges, texts, autotexts = ax.pie(
+        counts,
+        labels=genres,
+        autopct='%1.1f%%',
+        startangle=90,
+        colors=colors,
+        explode=explode,
+        shadow=True
+    )
+
+    # Enhance text
+    for text in texts:
+        text.set_fontsize(11)
+    for autotext in autotexts:
+        autotext.set_color('white')
+        autotext.set_fontsize(10)
+        autotext.set_fontweight('bold')
+
+    ax.set_title('Genre Distribution in Douban Top 250', fontsize=14, fontweight='bold')
+    ax.legend(wedges, [f'{g}: {c}' for g, c in zip(genres, counts)],
+             title="Genre (Count)",
+             loc="center left",
+             bbox_to_anchor=(1, 0, 0.5, 1))
+
+    plt.tight_layout()
+
+    output_path = Path(output_dir) / 'genre_distribution.png'
+    plt.savefig(output_path, dpi=DPI, bbox_inches='tight')
+    plt.close()
+
+    return str(output_path)</code></pre>
+            </section>
+
+            <section id="chart-generator" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">Chart generator</h2>
+                <pre class="language-python"><code>class ChartGenerator:
+    def __init__(self, output_dir: str = "analysis/output"):
+        self.output_dir = Path(output_dir)
+        self.output_dir.mkdir(parents=True, exist_ok=True)
+
+    def generate_all_charts(self, movies) -> Dict[str, str]:
+        """Generate all charts and return file paths"""
+
+        results = {
+            'year_distribution': create_year_distribution_chart(movies, self.output_dir),
+            'top_directors': create_top_directors_chart(movies, self.output_dir),
+            'genre_distribution': create_genre_distribution_chart(movies, self.output_dir),
+            'rating_distribution': create_rating_distribution_chart(movies, self.output_dir)
+        }
+
+        return results</code></pre>
+            </section>
+
+            <section id="lessons" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">What I learned</h2>
+                <ul class="list-disc ml-6 mb-4">
+                    <li>High DPI (300) makes charts look professional</li>
+                    <li>Chinese fonts need special handling</li>
+                    <li>Tight layout prevents label cutoff</li>
+                    <li>Color gradients make charts more readable</li>
+                    <li>Saving as PNG is more portable than PDF</li>
+                </ul>
+            </section>
+
+        </article>
+
+    </main>
+
+    <footer class="bg-gray-800 text-white py-12">
+        <div class="max-w-4xl mx-auto px-4 text-center">
+            <p class="opacity-70 mb-2">📝 Programming Notes</p>
+            <p class="text-sm opacity-50">Personal learning notes. Updated as I explore new technologies.</p>
+        </div>
+    </footer>
+
+    <!-- Code Highlighting Script -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+</body>
+</html>

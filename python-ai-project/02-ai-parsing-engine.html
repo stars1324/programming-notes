@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- SEO Meta Tags -->
+    <title>Using DeepSeek AI to Parse Unstructured Web Data</title>
+    <meta name="description" content="My experience using DeepSeek API for intelligent data parsing. Prompt design, error handling, and cost optimization for LLM-powered web scraping.">
+    <meta name="keywords" content="DeepSeek API tutorial, AI data parsing, LLM prompt engineering, Python OpenAI SDK, web scraping with AI">
+    <meta name="author" content="Programming Notes">
+
+    <link rel="canonical" href="https://pnt.jacbex.com/python-ai-project/02-ai-parsing-engine.html" />
+
+    <!-- Open Graph / Social Media -->
+    <meta property="og:title" content="Using DeepSeek AI for Data Parsing">
+    <meta property="og:description" content="Prompt design and implementation for LLM-powered data parsing.">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://pnt.jacbex.com/python-ai-project/02-ai-parsing-engine.html">
+    <meta property="article:published_time" content="2026-02-28">
+    <meta property="article:author" content="Programming Notes">
+    <meta property="og:image" content="https://pnt.jacbex.com/python-ai-project/thumb.jpg">
+    <meta name="twitter:card" content="summary_large_image">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Code Highlighting -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "Using DeepSeek AI to Parse Unstructured Web Data",
+      "description": "My experience using DeepSeek API for intelligent data parsing.",
+      "author": {
+        "@type": "Person",
+        "name": "Programming Notes"
+      },
+      "datePublished": "2026-02-28",
+      "proficiencyLevel": "Intermediate",
+      "keywords": ["DeepSeek", "AI", "LLM", "prompt engineering", "Python"]
+    }
+    </script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+        .prose code { color: #eb5757; background: #f9f2f2; padding: 2px 4px; border-radius: 4px; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+            <a href="../index.html" class="text-xl font-bold text-blue-600">📝 <span class="text-gray-700">Programming Notes</span></a>
+            <div class="space-x-6 hidden md:block">
+                <a href="../index.html" class="hover:text-blue-500">Home</a>
+                <a href="../about.html" class="hover:text-blue-500">About</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="bg-gradient-to-r from-blue-700 to-indigo-800 text-white py-16">
+        <div class="max-w-4xl mx-auto px-4 text-center">
+            <h1 class="text-4xl md:text-5xl font-extrabold mb-4">Using DeepSeek AI for Data Parsing</h1>
+            <p class="text-xl opacity-90">Parsing unstructured text with LLM instead of regex</p>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto px-4 py-12 bg-white mt-[-40px] rounded-xl shadow-lg mb-20">
+
+        <article class="prose prose-blue max-w-none">
+
+            <section id="introduction">
+                <h2 class="text-3xl font-bold mb-4">The problem I was trying to solve</h2>
+                <p class="mb-4">
+                    Part 1 got us raw HTML with unstructured movie info. Now need to parse that info_text into structured data.
+                </p>
+            </section>
+
+            <section id="why-not-regex" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">Why not regex?</h2>
+                <p class="mb-4">Here's what I was dealing with:</p>
+                <pre class="language-text">导演: 克里斯托弗·诺兰 / 主演: 莱昂纳多·迪卡普里奥 / 2010年 / 美国 / 动作 / 科幻</pre>
+
+                <p class="mb-4">Problem is the format varies:</p>
+                <ul class="list-disc ml-6 mb-4">
+                    <li>Sometimes director comes first, sometimes not</li>
+                    <li>Actor names might be in English or Chinese</li>
+                    <li>Some fields are missing entirely</li>
+                    <li>Delimiters vary (/ vs commas vs spaces)</li>
+                </ul>
+
+                <p class="mb-4">With regex, I'd need dozens of patterns to cover all cases. With AI, just tell it what to extract.</p>
+            </section>
+
+            <section id="deepseek-setup" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">DeepSeek setup</h2>
+                <p class="mb-4">DeepSeek is compatible with OpenAI's API. Used the <code class="bg-gray-100 px-2 py-1 rounded">openai</code> Python library:</p>
+                <pre class="language-python"><code>from openai import OpenAI
+import os
+
+client = OpenAI(
+    api_key=os.getenv("DEEPSEEK_API_KEY"),
+    base_url="https://api.deepseek.com"
+)
+
+# Test
+response = client.chat.completions.create(
+    model="deepseek-chat",
+    messages=[{"role": "user", "content": "Say hello"}]
+)
+print(response.choices[0].message.content)</code></pre>
+
+                <p class="mb-4 mt-6">Worked on first try. DeepSeek's free tier has been generous enough for my testing.</p>
+            </section>
+
+            <section id="prompt-design" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">Prompt design</h2>
+                <p class="mb-4">The prompt matters a lot. Here's what worked:</p>
+                <pre class="language-python"><code>SYSTEM_PROMPT = """You are a data extraction assistant.
+Extract movie information from text and return as valid JSON."""
+
+USER_PROMPT = """Extract from this text:
+{text}
+
+Return ONLY JSON in this format:
+{
+    "director": "string",
+    "actors": ["actor1", "actor2"],
+    "year": 2000,
+    "country": "string",
+    "genres": ["genre1", "genre2"]
+}
+
+If a field is missing, use null or []."""</code></pre>
+
+                <p class="mb-4 mt-6">Key things that helped:</p>
+                <ul class="list-disc ml-6 mb-4">
+                    <li>Specify JSON output explicitly</li>
+                    <li>Define fallback values for missing fields</li>
+                    <li>Use low temperature (0.1) for consistent output</li>
+                </ul>
+            </section>
+
+            <section id="ai-engine" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">The AI engine</h2>
+                <pre class="language-python"><code>import json
+from openai import OpenAI
+from typing import Dict, Any, Optional
+
+class AIEngine:
+    def __init__(self):
+        self.client = OpenAI(
+            api_key=os.getenv("DEEPSEEK_API_KEY"),
+            base_url="https://api.deepseek.com"
+        )
+        self.model = "deepseek-chat"
+
+    def parse_movie_info(self, info_text: str) -> Optional[Dict[str, Any]]:
+        """Parse unstructured movie text into structured JSON"""
+
+        user_prompt = f"""Extract from this text:
+{info_text}
+
+Return ONLY JSON:
+{{
+    "director": "string",
+    "actors": ["actor1", "actor2"],
+    "year": 2000,
+    "country": "string",
+    "genres": ["genre1", "genre2"]
+}}"""
+
+        try:
+            response = self.client.chat.completions.create(
+                model=self.model,
+                messages=[
+                    {"role": "system", "content": "You are a data extraction assistant. Return valid JSON."},
+                    {"role": "user", "content": user_prompt}
+                ],
+                temperature=0.1,
+                response_format={"type": "json_object"},
+                timeout=30
+            )
+
+            content = response.choices[0].message.content
+            return json.loads(content)
+
+        except Exception as e:
+            print(f"Error parsing: {e}")
+            return None</code></pre>
+
+                <p class="mb-4 mt-6">The <code class="bg-gray-100 px-2 py-1 rounded">response_format={"type": "json_object"}</code> forces JSON output. Saved me from writing JSON validation logic.</p>
+            </section>
+
+            <section id="edge-cases" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">Handling edge cases</h2>
+                <p class="mb-4">Real data is messy. Added validation:</p>
+                <pre class="language-python"><code>def parse_movie_info(self, info_text: str) -> Optional[Dict[str, Any]]:
+    # ... API call ...
+
+    # Validate and clean response
+    required_fields = ['director', 'actors', 'year', 'country', 'genres']
+    result = {}
+
+    for field in required_fields:
+        if field in data:
+            value = data[field]
+
+            # Type conversions
+            if field == 'actors' and not isinstance(value, list):
+                value = [value] if value else []
+            elif field == 'genres' and not isinstance(value, list):
+                value = [value] if value else []
+            elif field == 'year':
+                try:
+                    value = int(value)
+                except (ValueError, TypeError):
+                    value = None
+
+            result[field] = value
+        else:
+            result[field] = None
+
+    return result</code></pre>
+            </section>
+
+            <section id="batch-processing" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">Batch processing</h2>
+                <p class="mb-4">Processing 250 movies one by one takes time. Added progress tracking:</p>
+                <pre class="language-python"><code>def parse_movie_batch(self, movies: list) -> list:
+    """Parse a batch of movies with progress tracking"""
+    processed = []
+    total = len(movies)
+
+    for idx, movie in enumerate(movies, 1):
+        print(f"Processing {idx}/{total}: {movie.get('title', 'Unknown')}")
+
+        info_text = movie.get('info_text', '')
+        parsed = self.parse_movie_info(info_text)
+
+        if parsed:
+            movie.update(parsed)
+        else:
+            # Set defaults if parsing failed
+            movie.update({
+                'director': None,
+                'actors': [],
+                'year': None,
+                'country': None,
+                'genres': []
+            })
+
+        processed.append(movie)
+
+    return processed</code></pre>
+            </section>
+
+            <section id="retry-logic" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">Retry logic</h2>
+                <p class="mb-4">APIs fail sometimes. Added retries with exponential backoff:</p>
+                <pre class="language-python"><code>import time
+
+def _call_api_with_retry(self, prompt: str, max_retries: int = 3):
+    """Call API with retry logic"""
+
+    for attempt in range(max_retries):
+        try:
+            response = self.client.chat.completions.create(
+                model=self.model,
+                messages=[...],
+                timeout=30
+            )
+            return response.choices[0].message.content
+
+        except Timeout:
+            print(f"Timeout on attempt {attempt + 1}")
+            if attempt < max_retries - 1:
+                time.sleep(2 ** attempt)  # Exponential backoff
+                continue
+
+        except Exception as e:
+            print(f"Error: {e}")
+            if attempt == max_retries - 1:
+                return None
+
+    return None</code></pre>
+            </section>
+
+            <section id="cost-optimization" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">Cost optimization</h2>
+                <p class="mb-4">API calls add up. Things that helped:</p>
+                <ul class="list-disc ml-6 mb-4">
+                    <li><strong>Cache results:</strong> Added <code class="bg-gray-100 px-2 py-1 rounded">@lru_cache</code> to avoid duplicate calls</li>
+                    <li><strong>DeepSeek:</strong> Cheaper than GPT-4 for this use case</li>
+                    <li><strong>Fallback:</strong> For simple cases, regex still works</li>
+                </ul>
+            </section>
+
+            <section id="lessons" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">What I learned</h2>
+                <ul class="list-disc ml-6 mb-4">
+                    <li>DeepSeek works well for structured extraction</li>
+                    <li>JSON mode is reliable - got valid JSON every time</li>
+                    <li>Low temperature (0.1) keeps output consistent</li>
+                    <li>Caching is essential when processing batches</li>
+                    <li>Rate limits happen faster than expected</li>
+                </ul>
+
+                <p class="mb-4">
+                    One thing I haven't figured out - batch processing. DeepSeek doesn't support it yet. If anyone knows a workaround, let me know.
+                </p>
+            </section>
+
+        </article>
+
+    </main>
+
+    <footer class="bg-gray-800 text-white py-12">
+        <div class="max-w-4xl mx-auto px-4 text-center">
+            <p class="opacity-70 mb-2">📝 Programming Notes</p>
+            <p class="text-sm opacity-50">Personal learning notes. Updated as I explore new technologies.</p>
+        </div>
+    </footer>
+
+    <!-- Code Highlighting Script -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+</body>
+</html>

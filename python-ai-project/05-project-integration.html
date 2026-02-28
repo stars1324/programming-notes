@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- SEO Meta Tags -->
+    <title>Building a Python CLI Application - Project Integration</title>
+    <meta name="description" content="Putting all components together - CLI with argparse, error handling, logging, and best practices for Python projects.">
+    <meta name="keywords" content="Python argparse tutorial, CLI application, error handling, Python logging, project structure">
+    <meta name="author" content="Programming Notes">
+
+    <link rel="canonical" href="https://pnt.jacbex.com/python-ai-project/05-project-integration.html" />
+
+    <!-- Open Graph / Social Media -->
+    <meta property="og:title" content="Building a Python CLI Application">
+    <meta property="og:description" content="CLI with argparse, error handling, and best practices.">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://pnt.jacbex.com/python-ai-project/05-project-integration.html">
+    <meta property="article:published_time" content="2026-02-28">
+    <meta property="article:author" content="Programming Notes">
+    <meta property="og:image" content="https://pnt.jacbex.com/python-ai-project/thumb.jpg">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Code Highlighting -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "Building a Python CLI Application - Project Integration",
+      "author": {
+        "@type": "Person",
+        "name": "Programming Notes"
+      },
+      "datePublished": "2026-02-28"
+    }
+    </script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+        .prose code { color: #eb5757; background: #f9f2f2; padding: 2px 4px; border-radius: 4px; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+            <a href="../index.html" class="text-xl font-bold text-blue-600">📝 <span class="text-gray-700">Programming Notes</span></a>
+            <div class="space-x-6 hidden md:block">
+                <a href="../index.html" class="hover:text-blue-500">Home</a>
+                <a href="../about.html" class="hover:text-blue-500">About</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="bg-gradient-to-r from-blue-700 to-indigo-800 text-white py-16">
+        <div class="max-w-4xl mx-auto px-4 text-center">
+            <h1 class="text-4xl md:text-5xl font-extrabold mb-4">Building a Python CLI Application</h1>
+            <p class="text-xl opacity-90">Putting everything together</p>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto px-4 py-12 bg-white mt-[-40px] rounded-xl shadow-lg mb-20">
+
+        <article class="prose prose-blue max-w-none">
+
+            <section id="introduction">
+                <h2 class="text-3xl font-bold mb-4">Final piece</h2>
+                <p class="mb-4">
+                    Final part - combining all pieces into a working CLI application.
+                </p>
+            </section>
+
+            <section id="cli" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">CLI with argparse</h2>
+                <pre class="language-python"><code>import argparse
+import sys
+import logging
+
+from core.spider import DoubanSpider
+from core.ai_engine import AIEngine
+from core.database import Database
+from analysis.charts import ChartGenerator
+from utils.logger import get_logger
+
+logger = get_logger(__name__)
+
+
+def main():
+    """Main entry point for the spider"""
+
+    parser = argparse.ArgumentParser(
+        description='Douban AI Spider - Intelligent Movie Data Crawler',
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Examples:
+  %(prog)s                    # Run full pipeline
+  %(prog)s --test             # Test mode (1 page)
+  %(prog)s --skip-scrape      # Use existing database
+  %(prog)s --skip-ai          # Skip AI parsing
+  %(prog)s --pages 5          # Scrape 5 pages only
+        """
+    )
+
+    # Action options
+    parser.add_argument('--skip-scrape', action='store_true',
+                       help='Skip web scraping (use existing database)')
+    parser.add_argument('--skip-ai', action='store_true',
+                       help='Skip AI parsing (store raw data only)')
+    parser.add_argument('--skip-charts', action='store_true',
+                       help='Skip chart generation')
+
+    # Configuration options
+    parser.add_argument('--pages', type=int, default=10,
+                       help='Number of pages to scrape (default: 10)')
+    parser.add_argument('--test', action='store_true',
+                       help='Run in test mode (scrape only 1 page)')
+
+    # Special commands
+    parser.add_argument('--info', action='store_true',
+                       help='Show database information')
+    parser.add_argument('--clear', action='store_true',
+                       help='Clear all data from database')
+
+    args = parser.parse_args()
+
+    # Handle special commands
+    if args.info:
+        return show_database_info()
+    if args.clear:
+        return clear_database()
+
+    # Run main pipeline
+    return run_pipeline(args)</code></pre>
+            </section>
+
+            <section id="pipeline" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">Pipeline execution</h2>
+                <pre class="language-python"><code>def run_pipeline(args):
+    """Execute the complete spider pipeline"""
+
+    print("=" * 60)
+    print("  Douban AI Spider - Starting")
+    print("=" * 60)
+    print()
+
+    processed_movies = []
+
+    # Step 1: Web Scraping
+    if args.skip_scrape:
+        logger.info("Skipping web scraping")
+        logger.info("Using existing database")
+    else:
+        logger.info("Step 1: Web scraping...")
+
+        pages_to_scrape = 1 if args.test else args.pages
+
+        try:
+            with DoubanSpider() as spider:
+                spider.total_pages = pages_to_scrape
+                raw_movies = spider.fetch_all_pages()
+
+                if not raw_movies:
+                    logger.error("No movies scraped. Exiting.")
+                    return 1
+
+                logger.info(f"Scraped {len(raw_movies)} movies")
+
+                # Step 2: AI Parsing
+                if args.skip_ai:
+                    logger.info("Skipping AI parsing")
+                    processed_movies = raw_movies
+                else:
+                    logger.info("Step 2: AI parsing...")
+
+                    try:
+                        with AIEngine() as ai:
+                            processed_movies = ai.parse_movie_batch(raw_movies)
+
+                        # Clean up unused fields
+                        for movie in processed_movies:
+                            movie.pop('info_text', None)
+                            movie.pop('cover_url', None)
+
+                    except ValueError as e:
+                        logger.error(f"AI Engine failed: {e}")
+                        logger.info("Continuing without AI...")
+
+                        # Set defaults
+                        for movie in raw_movies:
+                            movie.update({
+                                'director': None,
+                                'actors': [],
+                                'year': None,
+                                'country': None,
+                                'genres': []
+                            })
+                            processed_movies.append(movie)
+
+        except Exception as e:
+            logger.error(f"Scraping failed: {e}")
+            return 1
+
+        # Step 3: Database Storage
+        logger.info("Step 3: Storing in database...")
+
+        try:
+            with Database() as db:
+                success_count = db.insert_movies_batch(processed_movies)
+                logger.info(f"Stored {success_count}/{len(processed_movies)} movies")
+
+        except Exception as e:
+            logger.error(f"Database error: {e}")
+            return 1
+
+    # Step 4: Data Visualization
+    if not args.skip_charts:
+        logger.info("Step 4: Generating charts...")
+
+        try:
+            with Database() as db:
+                movies = db.get_all_movies()
+
+                if movies:
+                    generator = ChartGenerator()
+                    results = generator.generate_all_charts(movies)
+
+                    logger.info("Charts generated:")
+                    for chart_type, path in results.items():
+                        if path:
+                            logger.info(f"  ✓ {chart_type}: {path}")
+
+        except Exception as e:
+            logger.error(f"Chart generation failed: {e}")
+
+    print()
+    print("=" * 60)
+    print("  ✓ Completed successfully!")
+    print("=" * 60)
+    print()
+
+    return 0</code></pre>
+            </section>
+
+            <section id="logging" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">Logging setup</h2>
+                <pre class="language-python"><code># utils/logger.py
+import logging
+import sys
+from pathlib import Path
+
+def get_logger(name: str) -> logging.Logger:
+    """Get a configured logger instance"""
+
+    logger = logging.getLogger(name)
+
+    if logger.handlers:
+        return logger
+
+    logger.setLevel(logging.INFO)
+
+    # Console handler
+    console_handler = logging.StreamHandler(sys.stdout)
+    console_handler.setLevel(logging.INFO)
+    console_handler.setFormatter(
+        logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    )
+
+    # File handler
+    log_path = Path("logs/spider.log")
+    log_path.parent.mkdir(parents=True, exist_ok=True)
+
+    file_handler = logging.FileHandler(log_path, encoding='utf-8')
+    file_handler.setLevel(logging.DEBUG)
+    file_handler.setFormatter(
+        logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    )
+
+    logger.addHandler(console_handler)
+    logger.addHandler(file_handler)
+
+    return logger</code></pre>
+            </section>
+
+            <section id="usage" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">Usage examples</h2>
+                <pre class="language-bash"><code># Run full pipeline
+python main.py
+
+# Test mode (1 page only)
+python main.py --test
+
+# Skip scraping, use existing data
+python main.py --skip-scrape
+
+# Skip AI parsing (faster)
+python main.py --skip-ai
+
+# Custom number of pages
+python main.py --pages 5
+
+# View database info
+python main.py --info
+
+# Clear database
+python main.py --clear</code></pre>
+            </section>
+
+            <section id="troubleshooting" class="mt-12 bg-gray-50 p-6 rounded-lg">
+                <h2 class="text-2xl font-bold mb-4 text-gray-900">Common issues</h2>
+
+                <h3 class="text-xl font-bold mb-3 mt-6 text-gray-800">403 Forbidden</h3>
+                <p class="mb-2">Happened when scraping too fast. Fixed by:</p>
+                <ul class="list-disc ml-6 mb-4">
+                    <li>Increase delay in config.py</li>
+                    <li>Check if IP is blocked</li>
+                    <li>Try again later</li>
+                </ul>
+
+                <h3 class="text-xl font-bold mb-3 mt-6 text-gray-800">API Rate Limit</h3>
+                <p class="mb-2">Hit limits with DeepSeek. Fixed by:</p>
+                <ul class="list-disc ml-6 mb-4">
+                    <li>Check API quota</li>
+                    <li>Add caching to avoid duplicate calls</li>
+                    <li>Reduce batch size</li>
+                </ul>
+
+                <h3 class="text-xl font-bold mb-3 mt-6 text-gray-800">Chinese characters not displaying</h3>
+                <p class="mb-2">In charts mostly. Fixed by:</p>
+                <ul class="list-disc ml-6 mb-4">
+                    <li>Install fonts: <code>apt-get install fonts-wqy-zenhei</code></li>
+                    <li>Configure matplotlib font settings</li>
+                </ul>
+
+                <h3 class="text-xl font-bold mb-3 mt-6 text-gray-800">Memory issues</h3>
+                <p class="mb-2">Browser instances eating memory when doing lots of pages. Fixed by restarting browser periodically.</p>
+            </section>
+
+            <section id="extensions" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">Possible improvements</h2>
+                <ul class="list-disc ml-6 mb-4">
+                    <li><strong>Proxy support:</strong> Rotating proxies for large-scale scraping</li>
+                    <li><strong>Incremental updates:</strong> Only fetch new data since last run</li>
+                    <li><strong>Web dashboard:</strong> Flask/FastAPI UI</li>
+                    <li><strong>Export options:</strong> CSV, Excel, JSON export</li>
+                    <li><strong>Docker:</strong> Containerize for deployment</li>
+                </ul>
+            </section>
+
+            <section id="legal" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">Legal note</h2>
+                <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-4">
+                    <p class="mb-0">
+                        <strong>Important:</strong> Respect robots.txt, implement rate limiting, and use scraped data responsibly. This project is for educational purposes only.
+                    </p>
+                </div>
+            </section>
+
+            <section id="summary" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">Summary</h2>
+                <p class="mb-4">Built a complete AI-powered web scraper with:</p>
+                <ul class="list-disc ml-6 mb-4">
+                    <li>HTTP client with anti-scraping measures</li>
+                    <li>LLM-based data parsing</li>
+                    <li>SQLite database</li>
+                    <li>Data visualization</li>
+                    <li>CLI interface</li>
+                    <li>Error handling</li>
+                </ul>
+
+                <p class="mb-4">
+                    Full source code: <a href="https://github.com/stars1324/python-ai-spider" class="text-blue-600 underline" target="_blank">github.com/stars1324/python-ai-spider</a>
+                </p>
+            </section>
+
+        </article>
+
+    </main>
+
+    <footer class="bg-gray-800 text-white py-12">
+        <div class="max-w-4xl mx-auto px-4 text-center">
+            <p class="opacity-70 mb-2">📝 Programming Notes</p>
+            <p class="text-sm opacity-50">Personal learning notes. Updated as I explore new technologies.</p>
+        </div>
+    </footer>
+
+    <!-- Code Highlighting Script -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+</body>
+</html>

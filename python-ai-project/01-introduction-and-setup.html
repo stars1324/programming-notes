@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- SEO Meta Tags -->
+    <title>Building an AI-Powered Web Scraper with Python and DeepSeek</title>
+    <meta name="description" content="How I built a movie data scraper using Python, httpx, and DeepSeek AI to parse unstructured text from web pages. Includes code examples and common issues I encountered.">
+    <meta name="keywords" content="Python web scraping, DeepSeek API, AI parsing, httpx tutorial, BeautifulSoup, LLM data extraction">
+    <meta name="author" content="Programming Notes">
+
+    <link rel="canonical" href="https://pnt.jacbex.com/python-ai-project/01-introduction-and-setup.html" />
+
+    <!-- Open Graph / Social Media -->
+    <meta property="og:title" content="Building an AI-Powered Web Scraper with Python">
+    <meta property="og:description" content="Using DeepSeek AI to parse unstructured web data - my approach and code.">
+    <meta property="og:type" content="article">
+    <meta property="og:image" content="https://pnt.jacbex.com/python-ai-project/thumb.jpg">
+
+    <!-- Tailwind CSS for modern UI -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Code Highlighting (Prism.js) -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+
+    <!-- Structured Data (Schema.org) for Google -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "Building an AI-Powered Web Scraper with Python and DeepSeek",
+      "description": "How I built a movie data scraper using Python, httpx, and DeepSeek AI to parse unstructured text from web pages.",
+      "author": {
+        "@type": "Person",
+        "name": "Programming Notes"
+      },
+      "datePublished": "2026-02-28",
+      "dateModified": "2026-02-28",
+      "proficiencyLevel": "Beginner",
+      "keywords": ["Python", "web scraping", "DeepSeek", "AI", "LLM", "httpx"],
+      "articleSection": "Tutorials",
+      "inLanguage": "en"
+    }
+    </script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+        .prose code { color: #eb5757; background: #f9f2f2; padding: 2px 4px; border-radius: 4px; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+            <a href="../index.html" class="text-xl font-bold text-blue-600">📝 <span class="text-gray-700">Programming Notes</span></a>
+            <div class="space-x-6 hidden md:block">
+                <a href="../index.html" class="hover:text-blue-500">Home</a>
+                <a href="../about.html" class="hover:text-blue-500">About</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="bg-gradient-to-r from-blue-700 to-indigo-800 text-white py-16">
+        <div class="max-w-4xl mx-auto px-4 text-center">
+            <h1 class="text-4xl md:text-5xl font-extrabold mb-4">Building an AI-Powered Web Scraper</h1>
+            <p class="text-xl opacity-90">Using DeepSeek to parse unstructured data from web pages</p>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto px-4 py-12 bg-white mt-[-40px] rounded-xl shadow-lg mb-20">
+
+        <article class="prose prose-blue max-w-none">
+
+            <section id="introduction">
+                <h2 class="text-3xl font-bold mb-4">How it started</h2>
+                <p class="mb-4">
+                    Been working on a web scraper project lately. Wanted to crawl Douban Top 250 movies and extract structured data. The twist is using DeepSeek AI to parse the unstructured movie info instead of regex.
+                </p>
+                <p class="mb-4">
+                    Traditional parsing with regex is fragile - HTML structure changes and everything breaks. LLMs handle format variations much better.
+                </p>
+                <p class="mb-4">
+                    The full project is on GitHub: <a href="https://github.com/stars1324/python-ai-spider" class="text-blue-600 underline" target="_blank">github.com/stars1324/python-ai-spider</a>
+                </p>
+            </section>
+
+            <section id="overview" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">The idea</h2>
+                <p class="mb-4">A movie data scraper that:</p>
+                <ul class="list-disc ml-6 mb-4">
+                    <li>Fetches 250 movies from Douban Top 250</li>
+                    <li>Uses AI (DeepSeek) to parse unstructured info</li>
+                    <li>Stores data in SQLite</li>
+                    <li>Generates charts and statistics</li>
+                </ul>
+            </section>
+
+            <section id="project-structure" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">Project structure</h2>
+                <pre class="language-bash"><code>python-ai-spider/
+├── core/
+│   ├── spider.py          # Web scraping logic
+│   ├── ai_engine.py       # AI parsing engine
+│   └── database.py        # Database operations
+├── utils/
+│   ├── config.py          # Configuration
+│   └── logger.py          # Logging
+├── analysis/
+│   └── charts.py          # Data visualization
+├── data/                  # SQLite database
+├── logs/                  # Log files
+├── main.py                # Entry point
+└── requirements.txt</code></pre>
+            </section>
+
+            <section id="installation" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">Environment setup</h2>
+                <p class="mb-4">Python 3.10+ required. Set up virtual environment:</p>
+                <pre class="language-bash"><code># Clone the repo
+git clone https://github.com/stars1324/python-ai-spider.git
+cd python-ai-spider
+
+# Create virtual environment
+python -m venv venv
+source venv/bin/activate  # Windows: venv\Scripts\activate
+
+# Install dependencies
+pip install -r requirements.txt</code></pre>
+
+                <p class="mb-4 mt-6">Key dependencies:</p>
+                <ul class="list-disc ml-6 mb-4">
+                    <li><strong>httpx</strong> - HTTP client with async support</li>
+                    <li><strong>beautifulsoup4</strong> - HTML parsing</li>
+                    <li><strong>openai</strong> - LLM API client (compatible with DeepSeek)</li>
+                    <li><strong>pandas</strong> - Data analysis</li>
+                    <li><strong>matplotlib</strong> - Visualization</li>
+                </ul>
+            </section>
+
+            <section id="api-setup" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">API setup</h2>
+                <p class="mb-4">Need a DeepSeek API key. Get one from <a href="https://platform.deepseek.com/" class="text-blue-600 underline" target="_blank">platform.deepseek.com</a>. Free tier is enough for this project.</p>
+                <p class="mb-4">Set it as environment variable:</p>
+                <pre class="language-bash"><code># Linux/Mac
+export DEEPSEEK_API_KEY="your-api-key-here"
+
+# Windows (PowerShell)
+$env:DEEPSEEK_API_KEY="your-api-key-here"
+
+# Or create .env file:
+echo "DEEPSEEK_API_KEY=your-api-key-here" > .env</code></pre>
+
+                <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
+                    <p class="mb-0"><strong>Don't commit API keys to git.</strong> Add .env to .gitignore.</p>
+                </div>
+            </section>
+
+            <section id="analyzing-page" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">Analyzing the page</h2>
+                <p class="mb-4">Open <code class="bg-gray-100 px-2 py-1 rounded">https://movie.douban.com/top250</code> in browser. Use DevTools (F12) to inspect HTML structure.</p>
+                <p class="mb-4">Each movie item has an info block with director/actors/year/country/genres. Format varies across movies - some fields might be missing or in different order. That's where AI helps.</p>
+            </section>
+
+            <section id="basic-spider" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">Basic spider</h2>
+                <pre class="language-python"><code>import httpx
+from bs4 import BeautifulSoup
+
+def fetch_page(page_num=1):
+    """Fetch a single page from Douban Top 250"""
+    base_url = "https://movie.douban.com/top250"
+    start = (page_num - 1) * 25
+    url = f"{base_url}?start={start}"
+
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36'
+    }
+
+    response = httpx.get(url, headers=headers, timeout=10)
+
+    if response.status_code == 200:
+        return response.text
+    return None
+
+def parse_movies(html):
+    """Extract movie data from HTML"""
+    soup = BeautifulSoup(html, 'html.parser')
+    items = soup.find_all('div', class_='item')
+
+    movies = []
+    for idx, item in enumerate(items, 1):
+        movie = {
+            'rank': idx,
+            'title': item.find('span', class_='title').text.strip(),
+            'rating': float(item.find('span', class_='rating_num').text),
+            'info_text': item.find('div', class_='bd').find('p', class_='').text.strip()
+        }
+        movies.append(movie)
+
+    return movies</code></pre>
+
+                <p class="mb-4 mt-6">Next part covers using AI to parse the info_text into structured JSON.</p>
+            </section>
+
+            <section id="anti-scraping" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">Anti-scraping</h2>
+                <p class="mb-4">Douban will block aggressive requests. Added:</p>
+                <ul class="list-disc ml-6 mb-4">
+                    <li>Random delays between requests (1-3 seconds)</li>
+                    <li>Rotating User-Agent headers</li>
+                    <li>Error handling and retry logic</li>
+                    <li>Rate limiting</li>
+                </ul>
+                <pre class="language-python"><code>import random
+import time
+
+# Random delay
+time.sleep(random.uniform(1, 3))
+
+# Random user agent
+USER_AGENTS = [
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0.0.0",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) Chrome/120.0.0.0",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:121.0) Firefox/121.0"
+]
+headers = {'User-Agent': random.choice(USER_AGENTS)}</code></pre>
+            </section>
+
+            <section id="troubleshooting" class="mt-12 bg-gray-50 p-6 rounded-lg">
+                <h2 class="text-2xl font-bold mb-4 text-gray-900">Issues I ran into</h2>
+
+                <h3 class="text-xl font-bold mb-3 mt-6 text-gray-800">403 Forbidden</h3>
+                <p class="mb-2">Happened when scraping too fast. Fixed by:</p>
+                <ul class="list-disc ml-6 mb-4">
+                    <li>Increasing delay between requests</li>
+                    <li>Checking if IP is blocked</li>
+                    <li>Trying again later</li>
+                </ul>
+
+                <h3 class="text-xl font-bold mb-3 mt-6 text-gray-800">Chinese characters not displaying</h3>
+                <p class="mb-2">In charts mostly. Fixed by configuring matplotlib fonts:</p>
+                <pre class="language-python"><code>matplotlib.rcParams['font.sans-serif'] = ['Arial Unicode MS', 'SimHei']</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6 text-gray-800">HTML structure changed</h3>
+                <p class="mb-2">Selectors breaking. Fixed by using more generic selectors and role attributes when possible.</p>
+            </section>
+
+            <section id="whats-next" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">What's next</h2>
+                <p class="mb-4">Next part covers setting up DeepSeek API and building the AI parsing engine.</p>
+            </section>
+
+        </article>
+
+    </main>
+
+    <footer class="bg-gray-800 text-white py-12">
+        <div class="max-w-4xl mx-auto px-4 text-center">
+            <p class="opacity-70 mb-2">📝 Programming Notes</p>
+            <p class="text-sm opacity-50">Personal learning notes. Updated as I explore new technologies.</p>
+        </div>
+    </footer>
+
+    <!-- Code Highlighting Script -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-html.min.js"></script>
+</body>
+</html>

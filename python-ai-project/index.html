@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python AI Spider Tutorial Series - Complete Guide</title>
+    <meta name="description" content="Complete tutorial on building an AI-powered web scraper with Python. Learn web scraping, DeepSeek AI integration, SQLite, and matplotlib visualization.">
+    <meta name="keywords" content="Python web scraping, DeepSeek API, SQLite tutorial, matplotlib, AI parsing">
+    <meta name="author" content="Programming Notes">
+
+    <link rel="canonical" href="https://pnt.jacbex.com/python-ai-project/" />
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 text-gray-900">
+
+    <nav class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+            <a href="../index.html" class="text-xl font-bold text-blue-600">📝 <span class="text-gray-700">Programming Notes</span></a>
+            <div class="space-x-6 hidden md:block">
+                <a href="../index.html" class="hover:text-blue-500">Home</a>
+                <a href="../about.html" class="hover:text-blue-500">About</a>
+            </div>
+        </div>
+    </nav>
+
+    <header class="bg-gradient-to-r from-blue-700 to-indigo-800 text-white py-16">
+        <div class="max-w-4xl mx-auto px-4 text-center">
+            <h1 class="text-4xl md:text-5xl font-extrabold mb-4">Python AI Spider Tutorial</h1>
+            <p class="text-xl opacity-90">Building an AI-Powered Web Scraper from Scratch</p>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto px-4 py-12 bg-white mt-[-40px] rounded-xl shadow-lg mb-20">
+
+        <article class="prose prose-blue max-w-none">
+
+            <p class="mb-4">
+                A complete series on building an AI-powered web scraper. We'll crawl Douban Top 250 movies, use DeepSeek AI to parse unstructured data, store it in SQLite, and generate visualizations.
+            </p>
+
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-8">
+                <h3 class="font-bold text-lg mb-3">What You'll Learn</h3>
+                <ul class="list-disc ml-6 mb-0">
+                    <li>Web scraping with httpx and BeautifulSoup</li>
+                    <li>AI-powered data parsing with DeepSeek API</li>
+                    <li>SQLite database design and operations</li>
+                    <li>Data visualization with matplotlib</li>
+                    <li>CLI development with argparse</li>
+                    <li>Error handling and logging best practices</li>
+                </ul>
+            </div>
+
+            <h2 class="text-3xl font-bold mb-6">Tutorial Series</h2>
+
+            <div class="space-y-4">
+                <a href="./01-introduction-and-setup.html" class="block bg-white border rounded-lg p-6 hover:shadow-lg transition-shadow">
+                    <div class="flex items-start">
+                        <div class="bg-blue-600 text-white rounded-full w-10 h-10 flex items-center justify-center font-bold mr-4 flex-shrink-0">1</div>
+                        <div>
+                            <h3 class="text-xl font-bold mb-2">Building an AI-Powered Web Scraper</h3>
+                            <p class="text-gray-600 mb-2">Project overview, environment setup, analyzing HTML structure, and basic spider implementation.</p>
+                            <span class="text-sm text-blue-600">Beginner • 15 min read</span>
+                        </div>
+                    </div>
+                </a>
+
+                <a href="./02-ai-parsing-engine.html" class="block bg-white border rounded-lg p-6 hover:shadow-lg transition-shadow">
+                    <div class="flex items-start">
+                        <div class="bg-blue-600 text-white rounded-full w-10 h-10 flex items-center justify-center font-bold mr-4 flex-shrink-0">2</div>
+                        <div>
+                            <h3 class="text-xl font-bold mb-2">Using DeepSeek AI for Data Parsing</h3>
+                            <p class="text-gray-600 mb-2">DeepSeek API integration, prompt design, error handling, and cost optimization.</p>
+                            <span class="text-sm text-blue-600">Intermediate • 20 min read</span>
+                        </div>
+                    </div>
+                </a>
+
+                <a href="./03-database-design.html" class="block bg-white border rounded-lg p-6 hover:shadow-lg transition-shadow">
+                    <div class="flex items-start">
+                        <div class="bg-blue-600 text-white rounded-full w-10 h-10 flex items-center justify-center font-bold mr-4 flex-shrink-0">3</div>
+                        <div>
+                            <h3 class="text-xl font-bold mb-2">SQLite Database Design</h3>
+                            <p class="text-gray-600 mb-2">Schema design, creating tables, batch operations, and querying data.</p>
+                            <span class="text-sm text-blue-600">Beginner • 15 min read</span>
+                        </div>
+                    </div>
+                </a>
+
+                <a href="./04-data-visualization.html" class="block bg-white border rounded-lg p-6 hover:shadow-lg transition-shadow">
+                    <div class="flex items-start">
+                        <div class="bg-blue-600 text-white rounded-full w-10 h-10 flex items-center justify-center font-bold mr-4 flex-shrink-0">4</div>
+                        <div>
+                            <h3 class="text-xl font-bold mb-2">Data Visualization with Matplotlib</h3>
+                            <p class="text-gray-600 mb-2">Creating charts - year distribution, top directors, genres, ratings.</p>
+                            <span class="text-sm text-blue-600">Beginner • 20 min read</span>
+                        </div>
+                    </div>
+                </a>
+
+                <a href="./05-project-integration.html" class="block bg-white border rounded-lg p-6 hover:shadow-lg transition-shadow">
+                    <div class="flex items-start">
+                        <div class="bg-blue-600 text-white rounded-full w-10 h-10 flex items-center justify-center font-bold mr-4 flex-shrink-0">5</div>
+                        <div>
+                            <h3 class="text-xl font-bold mb-2">Building a Python CLI Application</h3>
+                            <p class="text-gray-600 mb-2">CLI with argparse, error handling, logging, and best practices.</p>
+                            <span class="text-sm text-blue-600">Intermediate • 15 min read</span>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <h2 class="text-3xl font-bold mb-6 mt-12">Project Repository</h2>
+
+            <div class="bg-gray-800 text-white rounded-lg p-6">
+                <p class="mb-4">Complete source code on GitHub:</p>
+                <a href="https://github.com/stars1324/python-ai-spider" target="_blank" class="inline-block bg-white text-gray-900 px-6 py-3 rounded-lg font-bold hover:bg-gray-100 transition-colors">
+                    github.com/stars1324/python-ai-spider
+                </a>
+            </div>
+
+            <h2 class="text-3xl font-bold mb-6 mt-12">Prerequisites</h2>
+
+            <ul class="list-disc ml-6">
+                <li>Python 3.10 or higher</li>
+                <li>Basic Python knowledge</li>
+                <li>DeepSeek API key (free tier available)</li>
+                <li>Familiarity with HTML/CSS (helpful but not required)</li>
+            </ul>
+
+            <h2 class="text-3xl font-bold mb-6 mt-12">What You'll Build</h2>
+
+            <pre class="bg-gray-100 p-4 rounded-lg text-sm">
+Douban AI Spider - Intelligent Movie Data Crawler
+
+Features:
+- Automated crawling of 250 top-rated movies
+- AI-powered parsing of unstructured data
+- SQLite database for data persistence
+- Statistical charts and analysis
+
+Tech Stack:
+- httpx (HTTP client)
+- BeautifulSoup (HTML parsing)
+- OpenAI SDK (LLM integration)
+- SQLite (database)
+- matplotlib (visualization)
+            </pre>
+
+        </article>
+
+    </main>
+
+    <footer class="bg-gray-800 text-white py-12">
+        <div class="max-w-4xl mx-auto px-4 text-center">
+            <p class="opacity-70 mb-2">📝 Programming Notes</p>
+            <p class="text-sm opacity-50">Personal learning notes. Updated as I explore new technologies.</p>
+        </div>
+    </footer>
+
+</body>
+</html>
