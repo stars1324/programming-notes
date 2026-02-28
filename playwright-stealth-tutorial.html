@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- SEO Meta Tags -->
+    <title>Playwright Stealth: Scraping Modern React/Vue Apps Without Getting Blocked</title>
+    <meta name="description" content="Learn how to scrape modern React/Vue single-page applications without detection. Configure playwright-stealth plugin and use Playwright's code recorder to handle dynamic content loading.">
+    <meta name="keywords" content="Playwright stealth, web scraping, React scraping, Vue scraping, SPA scraping, playwright-stealth, bot detection bypass">
+    <link rel="canonical" href="https://pnt.jacbex.com/playwright-stealth-tutorial.html">
+
+    <!-- Open Graph / Social Media -->
+    <meta property="og:title" content="Playwright Stealth - Scraping Modern React/Vue Apps Without Getting Blocked">
+    <meta property="og:description" content="Configure playwright-stealth and use code recorder to scrape dynamic content from SPAs without detection.">
+    <meta property="og:type" content="article">
+
+    <!-- Tailwind CSS for modern UI -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Code Highlighting (Prism.js) -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+
+    <!-- Structured Data (Schema.org) for Google -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "Playwright Stealth: Scraping Modern React/Vue Apps Without Getting Blocked",
+      "description": "Guide to scraping modern single-page applications using Playwright with stealth plugin to avoid bot detection.",
+      "author": {
+        "@type": "Person",
+        "name": "Programming Notes"
+      },
+      "proficiencyLevel": "Intermediate",
+      "keywords": ["Playwright", "stealth", "React", "Vue", "web scraping", "SPA"]
+    }
+    </script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        pre { background: #1e1e1e; color: #d4d4d4; padding: 16px; border-radius: 8px; overflow-x: auto; }
+        code { font-family: 'Monaco', 'Menlo', monospace; font-size: 14px; }
+        .warning-box { background: #fef3c7; border-left: 4px solid #f59e0b; padding: 16px; margin: 20px 0; }
+        .info-box { background: #dbeafe; border-left: 4px solid #3b82f6; padding: 16px; margin: 20px 0; }
+    </style>
+</head>
+<body class="bg-stone-50">
+
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+            <a href="index.html" class="text-xl font-bold text-blue-600">📝 <span class="text-gray-700">Programming Notes</span></a>
+            <div class="space-x-6 hidden md:block">
+                <a href="index.html" class="hover:text-blue-500">Home</a>
+                <a href="about.html" class="hover:text-blue-500">About</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="bg-gradient-to-r from-green-600 to-emerald-700 text-white py-16">
+        <div class="max-w-4xl mx-auto px-4 text-center">
+            <h1 class="text-4xl md:text-5xl font-extrabold mb-4">Playwright Stealth: Scraping Modern React/Vue Apps Without Getting Blocked</h1>
+            <p class="text-xl opacity-90">Handle dynamic content and avoid detection with playwright-stealth and code recorder.</p>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto px-4 py-12 bg-white mt-[-40px] rounded-xl shadow-lg mb-20">
+
+        <article class="prose prose-blue max-w-none">
+
+        <p class="mb-4 leading-relaxed text-gray-700">
+            I spent two weeks trying to scrape a client's React dashboard. Requests returned empty divs. Selenium got blocked immediately. Regular Playwright lasted about 20 requests before hitting a 403.
+        </p>
+
+        <p class="mb-6 leading-relaxed text-gray-700">
+            Eventually figured out the problem: modern SPAs (React, Vue, Angular) render everything client-side, and they've gotten really good at detecting automation. The content you want appears seconds after page load, and if you're using WebDriver, they know.
+        </p>
+
+        <div class="info-box">
+            <p class="text-blue-900 font-semibold mb-2">The solution</p>
+            <p class="text-blue-800">Use Playwright with playwright-stealth (adapted from puppeteer-extra). It patches browser automation traces. Combine it with Playwright's code recorder and you can scrape any SPA without writing selectors manually.</p>
+        </div>
+
+        <h2 class="text-xl font-bold text-gray-900 mt-12 mb-4">Why SPAs break traditional scrapers</h2>
+
+        <div class="bg-white border border-gray-200 rounded-lg p-6 my-6">
+            <p class="font-mono text-sm text-red-600 mb-4"># What requests/BeautifulSoup sees:</p>
+            <p class="font-mono text-sm mb-2">&lt;div id="app"&gt;&lt;/div&gt;</p>
+            <p class="font-mono text-sm mb-2">&lt;div id="root"&gt;&lt;/div&gt;</p>
+            <p class="font-mono text-sm text-gray-500 mb-4"># Content rendered by JavaScript later</p>
+
+            <p class="font-mono text-sm text-green-600 mb-4"># What you actually want:</p>
+            <p class="font-mono text-sm mb-2">&lt;div class="product"&gt;iPhone 15&lt;/div&gt;</p>
+            <p class="font-mono text-sm mb-2">&lt;div class="product"&gt;Samsung S24&lt;/div&gt;</p>
+        </div>
+
+        <p class="text-gray-700 mb-6">
+            The HTML source never contains the product data. It arrives via XHR calls after page load, then gets inserted into the DOM. You need a browser that executes JavaScript.
+        </p>
+
+        <h2 class="text-xl font-bold text-gray-900 mt-12 mb-4">Installing the tools</h2>
+
+        <pre>pip install playwright playwright-stealth
+playwright install chromium</pre>
+
+        <p class="text-gray-600 text-sm mt-4 mb-6">
+            playwright-stealth is a Python port of the puppeteer-extra stealth plugin. It's maintained separately from Playwright itself.
+        </p>
+
+        <h2 class="text-xl font-bold text-gray-900 mt-12 mb-4">Getting stealth to work</h2>
+
+        <p class="text-gray-700 mb-4">Basic setup to avoid detection:</p>
+
+        <pre>from playwright.sync_api import sync_playwright
+from playwright_stealth import stealth_sync
+
+with sync_playwright() as p:
+    browser = p.chromium.launch(headless=False)
+    page = browser.new_page()
+
+    # This patches the browser
+    stealth_sync(page)
+
+    page.goto('https://facebook.com')
+    page.wait_for_selector('.data-loaded')
+
+    content = page.inner_text('.data-loaded')
+    print(content)
+
+    browser.close()</pre>
+
+        <p class="text-gray-600 text-sm mt-4 mb-6">
+            Always test with headless=False first. You can see what's happening and verify stealth is working.
+        </p>
+
+        <h2 class="text-xl font-bold text-gray-900 mt-12 mb-4">How stealth patches the browser</h2>
+
+        <p class="text-gray-700 mb-4">The plugin modifies several things bot detection scripts look for:</p>
+
+        <table class="w-full text-sm my-6 border border-gray-200">
+            <thead class="bg-gray-100">
+                <tr>
+                    <th class="text-left p-3 border-b">Detection vector</th>
+                    <th class="text-left p-3 border-b">What stealth does</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="p-3 border-b"><code>navigator.webdriver</code></td>
+                    <td class="p-3 border-b">Removes the flag (sets to undefined)</td>
+                </tr>
+                <tr>
+                    <td class="p-3 border-b"><code>window.chrome</code></td>
+                    <td class="p-3 border-b">Adds missing chrome object</td>
+                </tr>
+                <tr>
+                    <td class="p-3 border-b"><code>navigator.permissions</code></td>
+                    <td class="p-3 border-b">Mocks permission query responses</td>
+                </tr>
+                <tr>
+                    <td class="p-3 border-b"><code>navigator.plugins</code></td>
+                    <td class="p-3 border-b">Returns fake plugin list</td>
+                </tr>
+                <tr>
+                    <td class="p-3 border-b">WebGL renderer</td>
+                    <td class="p-3 border-b">Masks GPU information</td>
+                </tr>
+                <tr>
+                    <td class="p-3 border-b">CDP traces</td>
+                    <td class="p-3 border-b">Hides Chrome DevTools Protocol indicators</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2 class="text-xl font-bold text-gray-900 mt-12 mb-4">Use the code recorder</h2>
+
+        <p class="text-gray-700 mb-4">This is the killer feature. No more inspecting elements or guessing CSS selectors:</p>
+
+        <pre># Start recording
+playwright codegen https://facebook.com</pre>
+
+        <p class="text-gray-700 mb-4">What happens:</p>
+
+        <ol class="list-decimal pl-6 mb-6 space-y-2 text-gray-700">
+            <li>Browser opens with the site loaded</li>
+            <li>You click around, fill forms, scroll</li>
+            <li>Code generates in the sidebar in real-time</li>
+            <li>Copy and paste when done</li>
+        </ol>
+
+        <p class="text-gray-700 mb-4">Generated output:</p>
+
+        <pre>from playwright.sync_api import Page, expect
+
+def run(page: Page) -> None:
+    page.goto("https://facebook.com/")
+    page.get_by_role("button", name="Load More").click()
+    page.wait_for_selector(".product-card")
+
+    products = page.locator(".product-card").all()
+    for product in products:
+        print(product.inner_text())</pre>
+
+        <div class="warning-box">
+            <p class="text-amber-900 font-semibold mb-2">Why this matters</p>
+            <p class="text-amber-800">The recorder uses role-based selectors (button, link, heading) instead of CSS classes. These don't break when the app rebuilds and class names change.</p>
+        </div>
+
+        <h2 class="text-xl font-bold text-gray-900 mt-12 mb-4">Handling async content</h2>
+
+        <p class="text-gray-700 mb-4">React/Vue apps load data asynchronously. Multiple ways to wait:</p>
+
+        <pre>from playwright.sync_api import sync_playwright
+from playwright_stealth import stealth_sync
+
+with sync_playwright() as p:
+    browser = p.chromium.launch(headless=False)
+    page = browser.new_page()
+    stealth_sync(page)
+
+    page.goto('https://facebook.com')
+
+    # Option 1: Wait for element to appear
+    page.wait_for_selector('.loaded-content')
+
+    # Option 2: Wait for no network requests
+    page.wait_for_load_state('networkidle')
+
+    # Option 3: Wait for specific text
+    page.wait_for_selector('text=Data loaded')
+
+    # Option 4: Wait for API response
+    with page.expect_response('/api/data') as response_info:
+        page.click('button:has-text("Refresh")')
+    response = response_info.value
+
+    # Now scrape
+    items = page.locator('.item').all()
+    print(f"Found {len(items)} items")</pre>
+
+        <p class="text-gray-600 text-sm mt-4 mb-6">
+            I usually use networkidle + selector wait. Belt and suspenders approach.
+        </p>
+
+        <h2 class="text-xl font-bold text-gray-900 mt-12 mb-4">Selecting elements in React apps</h2>
+
+        <p class="text-gray-700 mb-4">Playwright has special React support. These selectors are more stable than CSS:</p>
+
+        <pre># By role (accessible name)
+submit = page.get_by_role('button', name='Submit')
+
+# By test ID (if developers added them)
+element = page.get_by_test_id('submit-button')
+
+# By text content
+title = page.get_by_text('Welcome back')
+
+# Combine filters
+sale_items = page.get_by_role('listitem').filter(
+    has_text='sale'
+)
+
+# React DevTools locator
+from playwright.sync_api import Page
+page.get_by_test_id('user-profile')</pre>
+
+        <h2 class="text-xl font-bold text-gray-900 mt-12 mb-4">Dealing with infinite scroll</h2>
+
+        <p class="text-gray-700 mb-4">Most modern shops use this. Here's a pattern that works:</p>
+
+        <pre>from playwright.sync_api import sync_playwright
+from playwright_stealth import stealth_sync
+import time
+
+def scrape_infinite_scroll(url):
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=False)
+        page = browser.new_page()
+        stealth_sync(page)
+
+        page.goto(url)
+
+        items = set()
+
+        while True:
+            # Wait for items to load
+            page.wait_for_selector('.item')
+            current = page.locator('.item').all_text_contents()
+            new_items = set(current) - items
+
+            if not new_items:
+                break  # Reached the end
+
+            items.update(new_items)
+            print(f"Collected {len(items)} items...")
+
+            # Scroll down to trigger more
+            page.evaluate('window.scrollTo(0, document.body.scrollHeight)')
+            time.sleep(2)
+
+        browser.close()
+        return list(items)</pre>
+
+        <h2 class="text-xl font-bold text-gray-900 mt-12 mb-4">Intercept API responses</h2>
+
+        <p class="text-gray-700 mb-4">Sometimes it's easier to grab the JSON directly:</p>
+
+        <pre>from playwright.sync_api import sync_playwright
+from playwright_stealth import stealth_sync
+
+with sync_playwright() as p:
+    browser = p.chromium.launch(headless=False)
+    page = browser.new_page()
+    stealth_sync(page)
+
+    api_responses = []
+
+    def handle_response(response):
+        if '/api/products' in response.url:
+            api_responses.append(response.json())
+
+    page.on('response', handle_response)
+
+    page.goto('https://facebook.com')
+
+    # Trigger the API call
+    page.click('button:has-text("Load")')
+    page.wait_for_load_state('networkidle')
+
+    # Process the JSON data directly
+    for product in api_responses[0]['results']:
+        print(f"{product['name']}: ${product['price']}")</pre>
+
+        <p class="text-gray-600 text-sm mt-4 mb-6">
+            This skips all the HTML parsing. The data arrives already structured.
+        </p>
+
+        <h2 class="text-xl font-bold text-gray-900 mt-12 mb-4">Errors I encountered</h2>
+
+        <div class="space-y-6">
+            <div class="border border-gray-200 rounded-lg p-4">
+                <p class="font-semibold text-gray-900 mb-2">"Element not found" even with wait_for_selector</p>
+                <p class="text-sm text-gray-600 mb-3">React components render conditionally. The element might be in a loading state:</p>
+                <pre class="text-sm"># Wait for element to be attached AND visible
+page.wait_for_selector('.item', state='attached', state='visible')
+
+# Or wait for it to NOT be loading
+page.wait_for_selector('.content:not(.loading)')</pre>
+            </div>
+
+            <div class="border border-gray-200 rounded-lg p-4">
+                <p class="font-semibold text-gray-900 mb-2">Still getting blocked</p>
+                <p class="text-sm text-gray-600 mb-3">Some sites check more than WebDriver flags:</p>
+                <pre class="text-sm"># Don't use headless mode
+browser = p.chromium.launch(headless=False)
+
+# Set a realistic viewport
+page.set_viewport_size({'width': 1920, 'height': 1080})
+
+# Add user agent
+page = browser.new_context(
+    user_agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
+).new_page()</pre>
+            </div>
+
+            <div class="border border-gray-200 rounded-lg p-4">
+                <p class="font-semibold text-gray-900 mb-2">Content loads but shows loading spinner forever</p>
+                <p class="text-sm text-gray-600 mb-3">Multiple loading states in SPAs:</p>
+                <pre class="text-sm"># Wait for spinner to disappear first
+page.wait_for_selector('.spinner', state='hidden', timeout=15000)
+
+# Then wait for actual content
+page.wait_for_selector('.content', state='visible')</pre>
+            </div>
+
+            <div class="border border-gray-200 rounded-lg p-4">
+                <p class="font-semibold text-gray-900 mb-2">Code recorder uses fragile selectors</p>
+                <p class="text-sm text-gray-600 mb-3">It might generate CSS selectors like `div > div:nth-child(2)`:</p>
+                <pre class="text-sm"># Replace with stable selectors
+page.click('button:has-text("Submit")')
+page.get_by_role('button', name='Submit').click()</pre>
+            </div>
+        </div>
+
+        <h2 class="text-xl font-bold text-gray-900 mt-12 mb-4">Extra stealth measures</h2>
+
+        <p class="text-gray-700 mb-4">For sites with aggressive detection:</p>
+
+        <pre>from playwright.sync_api import sync_playwright
+from playwright_stealth import stealth_sync
+
+with sync_playwright() as p:
+    browser = p.chromium.launch(
+        headless=False,
+        args=[
+            '--disable-blink-features=AutomationControlled',
+            '--disable-infobars',
+        ]
+    )
+
+    context = browser.new_context(
+        viewport={'width': 1920, 'height': 1080},
+        user_agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
+        locale='en-US',
+        timezone_id='America/New_York',
+    )
+
+    page = context.new_page()
+    stealth_sync(page)
+
+    # Scroll gradually like a human would
+    page.goto('https://facebook.com')
+    for i in range(5):
+        page.evaluate(f'window.scrollTo(0, {i * 300})')
+        page.wait_for_timeout(800)</pre>
+
+        <h2 class="text-xl font-bold text-gray-900 mt-12 mb-4">Which approach to use</h2>
+
+        <p class="text-gray-700 mb-4">Not every site needs stealth:</p>
+
+        <ul class="list-disc pl-6 space-y-2 text-gray-700 mb-6">
+            <li><strong>requests + BeautifulSoup</strong> - Static HTML, server-side rendering</li>
+            <li><strong>Regular Playwright</strong> - Simple JS sites without detection</li>
+            <li><strong>Playwright + stealth</strong> - Bot detection, login-protected content</li>
+            <li><strong>Official API</strong> - When available and rate limits work for you</li>
+        </ul>
+
+        <div class="bg-gray-50 border-l-4 border-gray-300 p-4 my-6 italic">
+            <p class="text-gray-700">
+                Writing this down because I know I'll forget the stealth configuration next time I need it. The code recorder alone is worth the setup time - no more guessing selectors or debugging why `element.click()` keeps failing.
+            </p>
+        </div>
+
+    </main>
+
+    <footer class="bg-gray-800 text-white py-12">
+        <div class="max-w-4xl mx-auto px-4 text-center">
+            <p class="opacity-70 mb-2">📝 Programming Notes</p>
+            <p class="text-sm opacity-50">
+                Personal learning notes & tutorials. Updated as I explore new technologies.
+            </p>
+        </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+</body>
+</html>
