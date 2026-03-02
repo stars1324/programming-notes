@@ -25,37 +25,37 @@
         <priority>0.3</priority>
     </url>
     <url>
-        <loc>https://pnt.jacbex.com/crawl4AI-tutorial.html</loc>
+        <loc>https://pnt.jacbex.com/crawl4AI.html</loc>
         <lastmod>2026-02-27</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.9</priority>
     </url>
     <url>
-        <loc>https://pnt.jacbex.com/instaloader-tutorial.html</loc>
+        <loc>https://pnt.jacbex.com/instaloader.html</loc>
         <lastmod>2026-02-27</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.9</priority>
     </url>
     <url>
-        <loc>https://pnt.jacbex.com/scrapegraph-ai-tutorial.html</loc>
+        <loc>https://pnt.jacbex.com/scrapegraph-ai.html</loc>
         <lastmod>2026-02-27</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.9</priority>
     </url>
     <url>
-        <loc>https://pnt.jacbex.com/drissionpage-tutorial.html</loc>
+        <loc>https://pnt.jacbex.com/drissionpage.html</loc>
         <lastmod>2026-02-27</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.9</priority>
     </url>
     <url>
-        <loc>https://pnt.jacbex.com/gallerydl-tutorial.html</loc>
+        <loc>https://pnt.jacbex.com/gallerydl.html</loc>
         <lastmod>2026-02-27</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.9</priority>
     </url>
     <url>
-        <loc>https://pnt.jacbex.com/youget-tutorial.html</loc>
+        <loc>https://pnt.jacbex.com/youget.html</loc>
         <lastmod>2026-02-27</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.9</priority>
@@ -73,7 +73,7 @@
         <priority>0.9</priority>
     </url>
     <url>
-        <loc>https://pnt.jacbex.com/playwright-stealth-tutorial.html</loc>
+        <loc>https://pnt.jacbex.com/playwright-stealth.html</loc>
         <lastmod>2026-02-28</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.9</priority>
@@ -113,5 +113,17 @@
         <lastmod>2026-02-28</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.8</priority>
+    </url>
+    <url>
+        <loc>https://pnt.jacbex.com/n8n.html</loc>
+        <lastmod>2026-03-02</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.9</priority>
+    </url>
+    <url>
+        <loc>https://pnt.jacbex.com/gpt-sovits.html</loc>
+        <lastmod>2026-03-02</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.9</priority>
     </url>
 </urlset>

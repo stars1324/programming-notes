@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- SEO Meta Tags -->
+    <title>GPT-SoVITS Tutorial: Free AI Voice Cloning - Speak Like Anyone</title>
+    <meta name="description" content="Learn how to clone any voice with just 5 seconds of audio using GPT-SoVITS. Step-by-step setup guide for Windows and cloud deployment. Perfect for content creators and VTubers.">
+    <meta name="keywords" content="GPT-SoVITS, AI voice cloning, text-to-speech, voice synthesis, VTuber tutorial, free TTS, AI voice">
+    <link rel="canonical" href="https://pnt.jacbex.com/gpt-sovits.html">
+
+    <!-- Open Graph / Social Media -->
+    <meta property="og:title" content="GPT-SoVITS - Free AI Voice Cloning with 5 Seconds of Audio">
+    <meta property="og:description" content="Clone any voice for free. Step-by-step GPT-SoVITS setup guide with one-click installation package and cloud deployment option.">
+    <meta property="og:type" content="article">
+
+    <!-- Tailwind CSS for modern UI -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Code Highlighting (Prism.js) -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+
+    <!-- Structured Data (Schema.org) for Google -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "GPT-SoVITS Tutorial: Free AI Voice Cloning - Speak Like Anyone",
+      "description": "Complete guide to setting up GPT-SoVITS for AI voice cloning. Includes one-click installer and cloud deployment options.",
+      "author": {
+        "@type": "Person",
+        "name": "Programming Notes"
+      },
+      "proficiencyLevel": "Intermediate"
+    }
+    </script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        pre { background: #1e1e1e; color: #e0e0e0; padding: 16px; border-radius: 8px; overflow-x: auto; font-size: 14px; line-height: 1.5; }
+        code { font-family: 'Monaco', 'Menlo', monospace; }
+        .warning { background: #fef3c7; border-left: 4px solid #f59e0b; padding: 16px; margin: 20px 0; }
+        .info { background: #dbeafe; border-left: 4px solid #3b82f6; padding: 16px; margin: 20px 0; }
+        .comparison { background: #f9fafb; border-radius: 8px; padding: 20px; margin: 20px 0; }
+    </style>
+</head>
+<body class="bg-stone-50">
+
+    <nav class="bg-white border-b border-stone-200 sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto px-4 py-3 flex justify-between items-center">
+            <a href="index.html" class="text-gray-600 hover:text-gray-900">← Back home</a>
+            <div class="flex gap-4">
+                <a href="index.html" class="text-sm text-gray-500 hover:text-gray-700">Home</a>
+                <a href="about.html" class="text-sm text-gray-500 hover:text-gray-700">About</a>
+                <a href="contact.html" class="text-sm text-gray-500 hover:text-gray-700">Contact</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-4xl mx-auto px-4 py-8">
+
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">GPT-SoVITS: Clone Any Voice with 5 Seconds of Audio</h1>
+        <p class="text-gray-500 mb-8">March 2024 · AI Voice</p>
+
+        <div class="prose max-w-none">
+            <p class="text-lg text-gray-700 leading-relaxed mb-6">
+                Started making YouTube videos last month. Needed voiceovers but didn't want to record every time. Looked into hiring voice actors - $50 to $200 per video. That's not sustainable for a small channel.
+            </p>
+
+            <p class="text-gray-700 leading-relaxed mb-6">
+                Tried free TTS tools - sounded robotic. Paid services like ElevenLabs were better but $22/month adds up. Then someone mentioned GPT-SoVITS in a forum. Open-source, free, and the quality is insane.
+            </p>
+
+            <div class="info">
+                <p class="font-semibold text-blue-900 mb-2">The key insight</p>
+                <p class="text-blue-800">You only need 5 seconds of someone's voice. Extract audio from any YouTube video, train the model, and make that person say anything you type. Quality rivals $500 commercial tools.</p>
+            </div>
+
+            <p class="text-gray-700 leading-relaxed mb-6">
+                Problem is the setup is brutal. Official docs are in Chinese, dependencies everywhere, 10GB+ downloads, confusing environment variables. Spent two days getting it working.
+            </p>
+
+            <p class="text-gray-700 leading-relaxed mb-8">
+                So here's what I wish I had: simple setup process with two paths - one-click Windows installer, or cloud option if you don't have a GPU.
+            </p>
+
+            <h2 class="text-xl font-bold text-gray-900 mt-10 mb-4">What you need</h2>
+
+            <div class="comparison">
+                <p class="font-semibold text-gray-900 mb-3">Hardware requirements:</p>
+                <ul class="space-y-2 text-gray-700 mb-4">
+                    <li>• NVIDIA GPU with 6GB+ VRAM (GTX 1060 or better)</li>
+                    <li>• 16GB RAM recommended (8GB minimum)</li>
+                    <li>• 15GB free storage space</li>
+                    <li>• Windows 10/11 (Linux works but more complex)</li>
+                </ul>
+                <p class="text-gray-600 text-sm mt-4">No GPU? Use the cloud option below instead.</p>
+            </div>
+
+            <h2 class="text-xl font-bold text-gray-900 mt-10 mb-4">Option A: Windows portable version (recommended)</h2>
+
+            <p class="text-gray-700 mb-4">This is what worked for me. Someone made a portable version with everything pre-configured:</p>
+
+            <div class="space-y-4">
+                <div>
+                    <p class="font-semibold text-gray-800 mb-2">Step 1: Download</p>
+                    <p class="text-gray-600 text-sm mb-2">Search Google for "GPT-SoVITS portable version" or check community releases. Look for a 7z file around 8GB named something like "GPT-SoVITS_vX.X.X.7z"</p>
+                    <pre class="mt-2">Size: ~8GB compressed
+Contains: Everything pre-configured</pre>
+                </div>
+
+                <div>
+                    <p class="font-semibold text-gray-800 mb-2">Step 2: Extract and run</p>
+                    <p class="text-gray-600 text-sm mb-2">Extract to a folder with short path (no special characters), then double-click "go-web.bat"</p>
+                    <pre class="mt-2">Extract → Open folder → Double-click go-web.bat
+Browser opens at: http://localhost:9872</pre>
+                </div>
+
+                <div>
+                    <p class="font-semibold text-gray-800 mb-2">Step 3: Prepare audio sample</p>
+                    <p class="text-gray-600 text-sm mb-2">Download a YouTube video and extract 5-10 seconds of clear speech:</p>
+                    <pre class="mt-2"># Use yt-dlp to get audio only
+yt-dlp -x "https://www.youtube.com/watch?v=VIDEO_ID" -f bestaudio
+
+# Or use free online audio trimmer
+# Export as WAV: 16kHz, 16-bit, mono</pre>
+                </div>
+
+                <div>
+                    <p class="font-semibold text-gray-800 mb-2">Step 4: Train model</p>
+                    <p class="text-gray-600 text-sm mb-2">In the web interface (界面选择 language if needed):</p>
+                    <pre class="mt-2">1. 点击 "语音训练" (Voice Training)
+2. Upload your WAV file
+3. Set model name in English
+4. Click "开始训练" (Start Training)
+5. Wait 10-30 minutes depending on GPU</pre>
+                </div>
+
+                <div>
+                    <p class="font-semibold text-gray-800 mb-2">Step 5: Generate speech</p>
+                    <p class="text-gray-600 text-sm mb-2">Go to "语音推理" (Voice Inference) section:</p>
+                    <pre class="mt-2">1. Select your trained model from dropdown
+2. Type or paste your text
+3. Click "生成音频" (Generate Audio)
+4. Download the result</pre>
+                </div>
+            </div>
+
+            <h2 class="text-xl font-bold text-gray-900 mt-10 mb-4">Option B: Cloud deployment (no GPU)</h2>
+
+            <p class="text-gray-700 mb-4">Don't have a powerful GPU? Run it on Google Colab's free tier:</p>
+
+            <div class="space-y-4">
+                <div class="border border-gray-200 rounded-lg p-4">
+                    <p class="font-semibold text-gray-900 mb-2">Google Colab method</p>
+                    <p class="text-gray-600 text-sm mb-3">Search for "GPT-SoVITS Colab" - several community notebooks exist:</p>
+                    <pre>1. Open the Colab notebook
+2. Click "Copy to Drive"
+3. Change runtime to GPU (Runtime → Change runtime type → T4)
+4. Run all cells in order
+5. Upload audio when prompted
+6. Generate text directly in browser</pre>
+                    <p class="text-gray-500 text-sm mt-2">Free tier gives you T4 GPU for a few hours per day. Good enough for occasional use.</p>
+                </div>
+
+                <div class="border border-gray-200 rounded-lg p-4">
+                    <p class="font-semibold text-gray-900 mb-2">Hugging Face Spaces</p>
+                    <p class="text-gray-600 text-sm mb-3">Community-hosted versions:</p>
+                    <pre>1. Visit huggingface.co/spaces
+2. Search: "GPT-SoVITS"
+3. Choose a space with GPU (might have queue)
+4. Upload audio → Type text → Download</pre>
+                    <p class="text-gray-500 text-sm mt-2">Slower than local GPU but no setup required.</p>
+                </div>
+            </div>
+
+            <h2 class="text-xl font-bold text-gray-900 mt-10 mb-4">Getting better results</h2>
+
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="border border-gray-200 rounded-lg p-4">
+                    <p class="font-semibold text-gray-900 mb-2">Audio sample quality</p>
+                    <ul class="text-sm text-gray-700 space-y-1">
+                        <li>• Clear speech, no background noise</li>
+                        <li>• 5-10 seconds is enough (more doesn't help)</li>
+                        <li>• Natural tone, not exaggerated</li>
+                        <li>• One person speaking only</li>
+                    </ul>
+                </div>
+
+                <div class="border border-gray-200 rounded-lg p-4">
+                    <p class="font-semibold text-gray-900 mb-2">Text formatting</p>
+                    <pre>Use punctuation for pauses:
+"Hello. This is a test."
+
+Ellipsis for longer pauses:
+"Wait for it... [3 seconds] ... here it is."
+
+Emphasis affects tone:
+"THIS IS LOUD."
+"whisper this"</pre>
+                </div>
+
+                <div class="border border-gray-200 rounded-lg p-4">
+                    <p class="font-semibold text-gray-900 mb-2">Common issues fixed</p>
+                    <ul class="text-sm text-gray-700 space-y-1">
+                        <li>• <strong>Robot voice:</strong> Sample had noise</li>
+                        <li>• <strong>Mispronunciation:</strong> Add phonetics: "[Jee-Pee-Tee]"</li>
+                        <li>• <strong>Artifacts:</strong> Lower sampling rate</li>
+                        <li>• <strong>Training failed:</strong> Close other GPU apps</li>
+                    </ul>
+                </div>
+
+                <div class="border border-gray-200 rounded-lg p-4">
+                    <p class="font-semibold text-gray-900 mb-2">Speed tips</p>
+                    <ul class="text-sm text-gray-700 space-y-1">
+                        <li>• First training: 10-30 minutes</li>
+                        <li>• Subsequent: 5-10 minutes</li>
+                        <li>• Generation: 2-5 seconds per sentence</li>
+                        <li>• GPU usage: ~4GB VRAM during training</li>
+                    </ul>
+                </div>
+            </div>
+
+            <h2 class="text-xl font-bold text-gray-900 mt-10 mb-4">Issues I ran into</h2>
+
+            <div class="space-y-4">
+                <div class="warning">
+                    <p class="font-semibold text-amber-900 mb-2">CUDA out of memory</p>
+                    <p class="text-amber-800 text-sm mb-2">Even with 6GB VRAM:</p>
+                    <pre class="text-sm mt-2">Check GPU usage: nvidia-smi
+Close browser & other GPU apps
+Reduce batch size in settings</pre>
+                </div>
+
+                <div class="warning">
+                    <p class="font-semibold text-amber-900 mb-2">Port 9872 already in use</p>
+                    <p class="text-amber-800 text-sm mb-2">Something is already running on the port:</p>
+                    <pre class="text-sm mt-2">netstat -ano | findstr :9872
+taskkill /PID [PID] /F
+
+# Or change port in config.ini</pre>
+                </div>
+
+                <div class="warning">
+                    <p class="font-semibold text-amber-900 mb-2">Training stuck at 0%</p>
+                    <p class="text-amber-800 text-sm mb-2">GPU not being used:</p>
+                    <pre class="text-sm mt-2">Reinstall PyTorch with CUDA support
+Make sure NVIDIA drivers are up to date
+Check: torch.cuda.is_available()</pre>
+                </div>
+
+                <div class="warning">
+                    <p class="font-semibold text-amber-900 mb-2">Audio has digital noise</p>
+                    <p class="text-amber-800 text-sm mb-2">Try these:</p>
+                    <pre class="text-sm mt-2">Lower sampling rate in settings
+Use cleaner audio sample
+Update to latest version</pre>
+                </div>
+
+                <div class="warning">
+                    <p class="font-semibold text-amber-900 mb-2">Can't process English text</p>
+                    <p class="text-amber-800 text-sm mb-2">Make sure you're using:</p>
+                    <pre class="text-sm mt-2">The multilingual model
+Or download English-specific model
+Check model dropdown in interface</pre>
+                </div>
+            </div>
+
+            <h2 class="text-xl font-bold text-gray-900 mt-10 mb-4">Cost comparison</h2>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm border border-gray-300">
+                    <thead class="bg-gray-100">
+                        <tr>
+                            <th class="text-left p-2 border-b">Tool</th>
+                            <th class="text-left p-2 border-b">Monthly</th>
+                            <th class="text-left p-2 border-b">Yearly</th>
+                            <th class="text-left p-2 border-b">Quality</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="p-2 border-b">GPT-SoVITS</td>
+                            <td class="p-2 border-b text-green-600 font-semibold">$0</td>
+                            <td class="p-2 border-b text-green-600 font-semibold">$0</td>
+                            <td class="p-2 border-b">Excellent</td>
+                        </tr>
+                        <tr>
+                            <td class="p-2 border-b">ElevenLabs</td>
+                            <td class="p-2 border-b">$22</td>
+                            <td class="p-2 border-b">$264</td>
+                            <td class="p-2 border-b">Excellent</td>
+                        </tr>
+                        <tr>
+                            <td class="p-2 border-b">Murf.ai</td>
+                            <td class="p-2 border-b">$26</td>
+                            <td class="p-2 border-b">$312</td>
+                            <td class="p-2 border-b">Good</td>
+                        </tr>
+                        <tr>
+                            <td class="p-2 border-b">Play.ht</td>
+                            <td class="p-2 border-b">$31</td>
+                            <td class="p-2 border-b">$372</td>
+                            <td class="p-2 border-b">Good</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <p class="text-gray-600 text-sm mt-4">
+                First month alone saved me $200 in voice actor fees. Setup time investment: ~3 hours.
+            </p>
+
+            <h2 class="text-xl font-bold text-gray-900 mt-10 mb-4">What I use it for</h2>
+
+            <div class="grid md:grid-cols-2 gap-4">
+                <div class="border-l-4 border-purple-500 pl-4">
+                    <p class="font-semibold text-gray-900">YouTube voiceovers</p>
+                    <p class="text-gray-600 text-sm">Clone my own voice, don't record every time</p>
+                </div>
+                <div class="border-l-4 border-purple-500 pl-4">
+                    <p class="font-semibold text-gray-900">Content dubbing</p>
+                    <p class="text-gray-600 text-sm">Translate videos, keep original voice</p>
+                </div>
+                <div class="border-l-4 border-purple-500 pl-4">
+                    <p class="font-semibold text-gray-900">VTuber avatar</p>
+                    <p class="text-gray-600 text-sm">Consistent character without speaking</p>
+                </div>
+                <div class="border-l-4 border-purple-500 pl-4">
+                    <p class="font-semibold text-gray-900">Audiobooks</p>
+                    <p class="text-gray-600 text-sm">Different voices for different characters</p>
+                </div>
+                <div class="border-l-4 border-purple-500 pl-4">
+                    <p class="font-semibold text-gray-900">Podcast promos</p>
+                    <p class="text-gray-600 text-sm">Generate episode previews</p>
+                </div>
+                <div class="border-l-4 border-purple-500 pl-4">
+                    <p class="font-semibold text-gray-900">Client presentations</p>
+                    <p class="text-gray-600 text-sm">Professional voiceover for slides</p>
+                </div>
+            </div>
+
+            <div class="bg-gray-50 p-6 rounded-lg mt-8">
+                <h3 class="font-bold text-gray-900 mb-2">My take</h3>
+                <p class="text-gray-700 mb-4">
+                    Quality is professional-grade now. I've uploaded 20+ videos with GPT-SoVITS voiceovers - nobody can tell it's AI.
+                </p>
+                <p class="text-gray-700 mb-4">
+                    Cloud option makes it accessible even without a powerful GPU. I run it on Colab when generating voiceovers for client work.
+                </p>
+                <p class="text-gray-700 mb-4">
+                    Setup is frustrating the first time. But once it works, it's: upload audio → type text → download. Much faster than recording myself, and zero ongoing cost.
+                </p>
+
+                <p class="text-gray-500 text-sm mt-4">
+                    GitHub: <a href="https://github.com/RVC-Boss/GPT-SoVITS" class="text-blue-600 underline">github.com/RVC-Boss/GPT-SoVITS</a>
+                </p>
+
+                <p class="text-gray-400 text-xs mt-4 italic">
+                    Note: Use responsibly. Don't clone voices without permission, especially for misleading content or impersonation.
+                </p>
+            </div>
+
+        </div>
+
+    </main>
+
+    <footer class="border-t border-stone-200 mt-12">
+        <div class="max-w-4xl mx-auto px-4 py-8">
+            <p class="text-sm text-gray-500">
+                <a href="index.html" class="hover:text-gray-700">← Back home</a>
+            </p>
+            <p class="text-xs text-gray-400 mt-4">
+                Programming notes · Updated as I learn new things
+            </p>
+        </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+</body>
+</html>
