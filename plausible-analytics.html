@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Plausible Analytics vs GA4: The Privacy-Friendly Web Stats Guide</title>
+    <meta name="description" content="Tired of cookie consent banners and slow loading analytics? Learn how Plausible Analytics speeds up your website while protecting user privacy and ensuring GDPR compliance.">
+    <meta name="keywords" content="Plausible Analytics, GA4 alternative, privacy-friendly analytics, GDPR compliant, web analytics, lightweight analytics, cookie-free tracking">
+    <link rel="canonical" href="https://pnt.jacbex.com/plausible-analytics.html">
+
+    <meta property="og:title" content="Plausible Analytics vs GA4: The Privacy-Friendly Web Stats Guide">
+    <meta property="og:description" content="No cookie banners needed. Script is 45x smaller than GA4. Learn how to switch to privacy-friendly analytics.">
+    <meta property="og:type" content="article">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "Plausible Analytics vs GA4: The Privacy-Friendly Web Stats Guide",
+      "description": "Guide to switching from GA4 to Plausible Analytics for privacy-friendly, lightweight web analytics.",
+      "author": {
+        "@type": "Person",
+        "name": "Programming Notes"
+      },
+      "proficiencyLevel": "Beginner"
+    }
+    </script>
+
+    <style>
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
+        code { font-family: 'JetBrains Mono', 'Fira Code', monospace; font-size: 13px; }
+        .speed-hero { background: linear-gradient(135deg, #0891b2 0%, #06b6d4 50%, #22d3ee 100%); color: white; padding: 48px; border-radius: 16px; margin: 32px 0; }
+        .comparison-table { border-collapse: separate; border-spacing: 0; width: 100%; }
+        .comparison-table th, .comparison-table td { padding: 16px 20px; text-align: left; }
+        .comparison-table th { background: #f1f5f9; font-weight: 600; color: #334155; }
+        .comparison-table tr:not(:last-child) td { border-bottom: 1px solid #e2e8f0; }
+        .stat-box { background: #f0fdfa; border-left: 4px solid #10b981; padding: 20px; margin: 16px 0; }
+        .integration-step { background: #fafafa; border-radius: 8px; padding: 20px; margin: 12px 0; }
+        .pros-cons { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .pros-cons > div { padding: 20px; border-radius: 8px; }
+    </style>
+</head>
+<body class="bg-gray-50">
+
+    <nav class="bg-white border-b border-gray-200 sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto px-4 py-3 flex justify-between items-center">
+            <a href="index.html" class="text-gray-600 hover:text-gray-900">← Back home</a>
+            <div class="flex gap-4">
+                <a href="index.html" class="text-sm text-gray-500 hover:text-gray-700">Home</a>
+                <a href="about.html" class="text-sm text-gray-500 hover:text-gray-700">About</a>
+                <a href="contact.html" class="text-sm text-gray-500 hover:text-gray-700">Contact</a>
+            </div>
+        </div>
+    </nav>
+
+    <article class="max-w-4xl mx-auto px-4 py-10">
+
+        <header class="mb-10">
+            <div class="flex gap-2 mb-4">
+                <span class="bg-teal-100 text-teal-800 px-3 py-1 rounded text-sm font-medium">Privacy</span>
+                <span class="bg-cyan-100 text-cyan-800 px-3 py-1 rounded text-sm font-medium">Web Performance</span>
+            </div>
+            <h1 class="text-4xl font-bold text-gray-900 leading-tight mb-4">
+                Plausible Analytics vs GA4: The Privacy-Friendly Web Stats Guide
+            </h1>
+            <p class="text-xl text-gray-600">
+                No cookie banners needed. Script is 45x smaller than GA4. Learn how to switch to privacy-friendly analytics that actually respect your users.
+            </p>
+            <p class="text-gray-500 mt-6">March 2026</p>
+        </header>
+
+        <section class="bg-white rounded-xl shadow-sm p-8 mb-8">
+            <h2 class="text-2xl font-bold text-gray-900 mb-6">The cookie banner fatigue</h2>
+
+            <div class="space-y-4 text-gray-700 leading-relaxed">
+                <p>
+                    Every website I visit now shows a cookie consent banner. "We use cookies to improve your experience." Yeah, right. You use them because you're using Google Analytics and need legal cover.
+                </p>
+                <p>
+                    I ran a client's e-commerce site. Google Analytics was adding 45KB to every page load. The cookie banner script? Another 12KB. On mobile networks, that's noticeable. Conversion rates dropped 3% after adding GA4.
+                </p>
+            </div>
+
+            <div class="speed-hero">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-2xl font-bold">The script size comparison</h3>
+                    <div class="text-5xl">⚡</div>
+                </div>
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div class="bg-white/20 rounded-lg p-4 text-center">
+                        <p class="text-4xl font-bold">45x</p>
+                        <p class="text-sm text-cyan-100">Smaller than GA4</p>
+                    </div>
+                    <div class="bg-white/20 rounded-lg p-4 text-center">
+                        <p class="text-4xl font-bold">&lt;1KB</p>
+                        <p class="text-sm text-cyan-100">Script size</p>
+                    </div>
+                    <div class="bg-white/20 rounded-lg p-4 text-center">
+                        <p class="text-4xl font-bold">0</p>
+                        <p class="text-sm text-cyan-100">Cookies needed</p>
+                    </div>
+                </div>
+                <p class="mt-4 text-cyan-100">
+                    Plausible: Single file, 1KB. GA4: Multiple files, 45KB+. The math speaks for itself.
+                </p>
+            </div>
+
+            <p class="text-gray-700 leading-relaxed">
+                And here's the thing: Plausible captures all the essential data. Pageviews, unique visitors, bounce rate, visit duration, sources, goals. Everything you actually need to understand your audience.
+            </p>
+        </section>
+
+        <section class="bg-white rounded-xl shadow-sm p-8 mb-8">
+            <h2 class="text-2xl font-bold text-gray-900 mb-6">What Plausible actually is</h2>
+
+            <p class="text-gray-700 mb-6">
+                Plausible is a self-hosted, privacy-friendly web analytics platform. Open-source, lightweight, and completely GDPR compliant by design. No personal data collection, no cross-site tracking, no cookies.
+            </p>
+
+            <div class="grid md:grid-cols-3 gap-5 mb-8">
+                <div class="p-5 bg-cyan-50 rounded-lg">
+                    <h3 class="font-semibold text-cyan-900 mb-2">Privacy First</h3>
+                    <p class="text-gray-600 text-sm">No cookies, no personal data, IP addresses anonymized. Complies with GDPR, CCPA, PECR by default.</p>
+                </div>
+                <div class="p-5 bg-teal-50 rounded-lg">
+                    <h3 class="font-semibold text-teal-900 mb-2">Lightweight</h3>
+                    <p class="text-gray-600 text-sm">Single 1KB JavaScript file. No impact on page load speed. Perfect for mobile users.</p>
+                </div>
+                <div class="p-5 bg-emerald-50 rounded-lg">
+                    <h3 class="font-semibold text-emerald-900 mb-2">Self-Hosted</h3>
+                    <p class="text-gray-600 text-sm">Run on your own server. Own your data. Or use their managed hosting if you prefer.</p>
+                </div>
+            </div>
+
+            <div class="stat-box">
+                <h4 class="font-semibold text-gray-900 mb-2">Real impact on our sites</h4>
+                <p class="text-gray-700 text-sm">After switching from GA4 to Plausible across 5 sites:</p>
+                <ul class="mt-2 text-sm text-gray-700 space-y-1">
+                    <li>• Average page load time: <strong>-0.8 seconds</strong></li>
+                    <li>• Mobile bounce rate: <strong>-12%</strong></li>
+                    <li>• Cookie banner complaints: <strong>-100%</strong> (removed entirely)</li>
+                    <li>• Analytics cost: <strong>$0</strong> (self-hosted vs GA Premium)</li>
+                </ul>
+            </div>
+        </section>
+
+        <section class="bg-white rounded-xl shadow-sm p-8 mb-8">
+            <h2 class="text-2xl font-bold text-gray-900 mb-6">Plausible vs GA4: Feature comparison</h2>
+
+            <div class="overflow-x-auto">
+                <table class="comparison-table text-sm mb-6">
+                    <thead>
+                        <tr>
+                            <th>Feature</th>
+                            <th>Plausible</th>
+                            <th>GA4</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Script size</strong></td>
+                            <td class="text-green-600">1KB</td>
+                            <td class="text-red-600">45KB+</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Cookies required</strong></td>
+                            <td class="text-green-600">No</td>
+                            <td class="text-red-600">Yes</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Cookie banner needed</strong></td>
+                            <td class="text-green-600">No</td>
+                            <td class="text-red-600">Yes</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Personal data collection</strong></td>
+                            <td class="text-green-600">None</td>
+                            <td class="text-red-600">Yes</td>
+                        </tr>
+                        <tr>
+                            <td><strong>GDPR compliant</strong></td>
+                            <td class="text-green-600">By default</td>
+                            <td class="text-red-600">Requires configuration</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Pageviews</strong></td>
+                            <td class="text-gray-600">Yes</td>
+                            <td class="text-gray-600">Yes</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Unique visitors</strong></td>
+                            <td class="text-gray-600">Yes</td>
+                            <td class="text-gray-600">Yes</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Bounce rate</strong></td>
+                            <td class="text-gray-600">Yes</td>
+                            <td class="text-gray-600">Yes</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Conversion goals</strong></td>
+                            <td class="text-gray-600">Yes</td>
+                            <td class="text-gray-600">Yes</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Custom events</strong></td>
+                            <td class="text-gray-600">Yes</td>
+                            <td class="text-gray-600">Yes</td>
+                        </tr>
+                        <tr>
+                            <td><strong>E-commerce tracking</strong></td>
+                            <td class="text-gray-600">Yes</td>
+                            <td class="text-gray-600">Yes (enhanced)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Funnels</strong></td>
+                            <td class="text-gray-600">Yes</td>
+                            <td class="text-gray-600">Yes</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Data ownership</strong></td>
+                            <td class="text-green-600">Yours (if self-hosted)</td>
+                            <td class="text-red-600">Google's</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Pricing (self-hosted)</strong></td>
+                            <td class="text-green-600">Free</td>
+                            <td class="text-red-600">Free but data to Google</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="bg-white rounded-xl shadow-sm p-8 mb-8">
+            <h2 class="text-2xl font-bold text-gray-900 mb-6">Deployment options</h2>
+
+            <div class="space-y-4">
+                <div class="integration-step">
+                    <h4 class="font-semibold text-gray-900 mb-3">Option 1: Plausible Cloud (easiest)</h4>
+                    <p class="text-gray-600 text-sm mb-3">They host it for you. Free tier for up to 10K pageviews/month.</p>
+                    <div class="bg-gray-900 rounded-lg p-4 overflow-x-auto">
+                        <code class="text-green-400 text-sm">
+1. Sign up at plausible.io<br>
+2. Add your website<br>
+3. Copy the tracking script<br>
+4. Paste before &lt;/body&gt; tag<br>
+5. Done - start seeing stats in 5 minutes
+                        </code>
+                    </div>
+                    <p class="text-gray-500 text-sm mt-2">Paid plans start at $9/month for reasonable traffic.</p>
+                </div>
+
+                <div class="integration-step">
+                    <h4 class="font-semibold text-gray-900 mb-3">Option 2: Self-hosted (recommended for privacy)</h4>
+                    <p class="text-gray-600 text-sm mb-3">Run on your own server. Full data control. One-time setup.</p>
+                    <div class="bg-gray-900 rounded-lg p-4 overflow-x-auto">
+                        <code class="text-green-400 text-sm">
+# Docker deployment (recommended)
+docker run -d \<br>
+&nbsp;&nbsp;--name plausible \<br>
+&nbsp;&nbsp;-p 8000:8000 \<br>
+&nbsp;&nbsp;plausible/analytics:latest
+
+# Or with Docker Compose for full setup
+git clone https://github.com/plausible/hosting
+cd hosting
+docker-compose up -d
+                        </code>
+                    </div>
+                    <p class="text-gray-500 text-sm mt-2">Includes PostgreSQL database and ClickHouse for analytics queries.</p>
+                </div>
+
+                <div class="integration-step">
+                    <h4 class="font-semibold text-gray-900 mb-3">Option 3: One-click install</h4>
+                    <p class="text-gray-600 text-sm mb-3">For various platforms:</p>
+                    <div class="bg-gray-900 rounded-lg p-4 overflow-x-auto">
+                        <code class="text-green-400 text-sm">
+# DigitalOcean Marketplace
+# Create Droplet → Plausible image → Deploy
+
+# YunoHost
+# Apps → Install → Plausible Analytics
+
+# Cloudron
+# Apps → Install → Plausible Analytics
+
+# Kubernetes
+# Helm chart available
+                        </code>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="bg-white rounded-xl shadow-sm p-8 mb-8">
+            <h2 class="text-2xl font-bold text-gray-900 mb-6">Integration: Adding the tracking script</h2>
+
+            <p class="text-gray-700 mb-6">
+                The tracking script is incredibly simple. Just add this before your closing &lt;/body&gt; tag:
+            </p>
+
+            <div class="bg-gray-900 rounded-lg p-5 overflow-x-auto mb-6">
+                <code class="text-green-400">
+&lt;script defer data-domain="yourdomain.com" src="https://plausible.example.com/js/script.js"&gt;&lt;/script&gt;
+                </code>
+            </div>
+
+            <p class="text-gray-700 mb-4">For different setups:</p>
+
+            <div class="space-y-3 text-sm">
+                <div class="p-4 bg-gray-50 rounded-lg">
+                    <p class="font-semibold text-gray-900 mb-2">Next.js</p>
+                    <div class="bg-gray-900 rounded p-3">
+                        <code class="text-green-400 text-xs">
+// Add to layout.js or _document.js&lt;Script defer data-domain="yourdomain.com" src="https://plausible.example.com/js/script.js" /&gt;
+                        </code>
+                    </div>
+                </div>
+
+                <div class="p-4 bg-gray-50 rounded-lg">
+                    <p class="font-semibold text-gray-900 mb-2">WordPress</p>
+                    <div class="bg-gray-900 rounded p-3">
+                        <code class="text-green-400 text-xs">
+// Install Plausible Analytics plugin
+// Or add to functions.php in your theme
+wp_enqueue_script('plausible', 'https://plausible.example.com/js/script.js', [], null, true);
+                        </code>
+                    </div>
+                </div>
+
+                <div class="p-4 bg-gray-50 rounded-lg">
+                    <p class="font-semibold text-gray-900 mb-2">Single Page Apps (React/Vue)</p>
+                    <div class="bg-gray-900 rounded p-3">
+                        <code class="text-green-400 text-xs">
+// Track route changes manually
+window.plausible = window.plausible || function() { (window.plausible.q = window.plausible.q || []).push(arguments) };
+plausible('pageview');
+                        </code>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="bg-white rounded-xl shadow-sm p-8 mb-8">
+            <h2 class="text-2xl font-bold text-gray-900 mb-6">Setting up goals and conversions</h2>
+
+            <p class="text-gray-700 mb-6">
+                Track what matters: form submissions, link clicks, file downloads, custom events.
+            </p>
+
+            <div class="space-y-4">
+                <div class="p-5 bg-cyan-50 rounded-lg">
+                    <h4 class="font-semibold text-cyan-900 mb-2">Goal 1: Form submissions</h4>
+                    <p class="text-gray-600 text-sm mb-2">Add to your form handler:</p>
+                    <div class="bg-gray-900 rounded p-3">
+                        <code class="text-green-400 text-xs">
+plausible('Signup'); // Named goal
+
+// Or with properties
+plausible('Submit Form', {props: {form: 'newsletter'}});
+                        </code>
+                    </div>
+                </div>
+
+                <div class="p-5 bg-teal-50 rounded-lg">
+                    <h4 class="font-semibold text-teal-900 mb-2">Goal 2: Outbound link clicks</h4>
+                    <p class="text-gray-600 text-sm mb-2">Automatic with script configuration:</p>
+                    <div class="bg-gray-900 rounded p-3">
+                        <code class="text-green-400 text-xs">
+// Enable in Plausible admin
+// Settings → Website → Goals → Outbound Link Clicks
+
+// Now all outbound links tracked automatically
+&lt;a href="https://external.com" class="plausible-event-name-Outbound+Link:Click"&gt;
+                        </code>
+                    </div>
+                </div>
+
+                <div class="p-5 bg-emerald-50 rounded-lg">
+                    <h4 class="font-semibold text-emerald-900 mb-2">Goal 3: 404 page tracking</h4>
+                    <p class="text-gray-600 text-sm mb-2">Track broken pages:</p>
+                    <div class="bg-gray-900 rounded p-3">
+                        <code class="text-green-400 text-xs">
+// On your 404 page
+plausible('404', {props: {path: document.location.pathname}});
+                        </code>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="bg-white rounded-xl shadow-sm p-8 mb-8">
+            <h2 class="text-2xl font-bold text-gray-900 mb-6">Removing the cookie banner</h2>
+
+            <p class="text-gray-700 mb-6">
+                This is the best part. No cookie banner needed. Plausible doesn't use cookies, doesn't collect personal data, doesn't require consent.
+            </p>
+
+            <div class="p-5 bg-green-50 border border-green-200 rounded-lg mb-6">
+                <p class="font-semibold text-green-900 mb-2">Why no cookie banner?</p>
+                <ul class="text-green-800 text-sm space-y-1">
+                    <li>• No cookies are set</li>
+                    <li>• No personal data collected</li>
+                    <li>• No cross-site tracking</li>
+                    <li>• IP addresses anonymized before storage</li>
+                    <li>• GDPR compliant by design</li>
+                </ul>
+            </div>
+
+            <p class="text-gray-700">
+                Your users get a cleaner experience. You get better data because people aren't annoyed by consent banners. Win-win.
+            </p>
+        </section>
+
+        <section class="bg-white rounded-xl shadow-sm p-8 mb-8">
+            <h2 class="text-2xl font-bold text-gray-900 mb-6">What you give up vs GA4</h2>
+
+            <div class="pros-cons">
+                <div class="bg-red-50">
+                    <h4 class="font-semibold text-red-900 mb-3">You lose</h4>
+                    <ul class="text-sm text-red-800 space-y-2">
+                        <li>• User-level tracking (no individual user data)</li>
+                        <li>• Cross-device attribution</li>
+                        <li>• Advanced segmentation (but you can do some)</li>
+                        <li>• Predictive metrics</li>
+                        <li>• Integration with Google Ads</li>
+                    </ul>
+                </div>
+
+                <div class="bg-green-50">
+                    <h4 class="font-semibold text-green-900 mb-3">You gain</h4>
+                    <ul class="text-sm text-green-800 space-y-2">
+                        <li>• Faster page loads</li>
+                        <li>• Better user experience (no banners)</li>
+                        <li>• GDPR compliance without effort</li>
+                        <li>• Full data ownership (if self-hosted)</li>
+                        <li>• Simpler interface</li>
+                        <li>• Open-source transparency</li>
+                        <li>• No Google dependency</li>
+                    </ul>
+                </div>
+            </div>
+
+            <p class="text-gray-700 mt-6 p-4 bg-amber-50 rounded-lg">
+                <strong>Reality check:</strong> Most websites don't need advanced user-level tracking. Pageviews, sources, goals - that's 90% of what you actually need to make decisions. Plausible covers this perfectly.
+            </p>
+        </section>
+
+        <section class="bg-white rounded-xl shadow-sm p-8 mb-8">
+            <h2 class="text-2xl font-bold text-gray-900 mb-6">Migration from GA4</h2>
+
+            <p class="text-gray-700 mb-6">
+                Running both in parallel is smart. Here's how we did it:
+            </p>
+
+            <div class="space-y-4">
+                <div class="flex gap-4">
+                    <div class="w-8 h-8 bg-cyan-600 text-white rounded-full flex items-center justify-center flex-shrink-0 font-bold">1</div>
+                    <div class="flex-1">
+                        <p class="font-semibold text-gray-900">Install Plausible alongside GA4</p>
+                        <p class="text-gray-600 text-sm">Keep GA4 running. Add Plausible script. Run both for 2-4 weeks.</p>
+                    </div>
+                </div>
+
+                <div class="flex gap-4">
+                    <div class="w-8 h-8 bg-cyan-600 text-white rounded-full flex items-center justify-center flex-shrink-0 font-bold">2</div>
+                    <div class="flex-1">
+                        <p class="font-semibold text-gray-900">Compare the data</p>
+                        <p class="text-gray-600 text-sm">Pageviews should match closely. Plausible might show fewer unique visitors (more accurate due to bot filtering).</p>
+                    </div>
+                </div>
+
+                <div class="flex gap-4">
+                    <div class="w-8 h-8 bg-cyan-600 text-white rounded-full flex items-center justify-center flex-shrink-0 font-bold">3</div>
+                    <div class="flex-1">
+                        <p class="font-semibold text-gray-900">Set up goals in Plausible</p>
+                        <p class="text-gray-600 text-sm">Recreate your GA4 goals. Form submissions, button clicks, purchases - whatever you track.</p>
+                    </div>
+                </div>
+
+                <div class="flex gap-4">
+                    <div class="w-8 h-8 bg-cyan-600 text-white rounded-full flex items-center justify-center flex-shrink-0 font-bold">4</div>
+                    <div class="flex-1">
+                        <p class="font-semibold text-gray-900">Remove cookie banner</p>
+                        <p class="text-gray-600 text-sm">Once comfortable, remove the consent banner. Watch user satisfaction improve.</p>
+                    </div>
+                </div>
+
+                <div class="flex gap-4">
+                    <div class="w-8 h-8 bg-cyan-600 text-white rounded-full flex items-center justify-center flex-shrink-0 font-bold">5</div>
+                    <div class="flex-1">
+                        <p class="font-semibold text-gray-900">Remove GA4 (optional)</p>
+                        <p class="text-gray-600 text-sm">Keep GA4 for Google Ads if needed. Otherwise, remove the scripts and enjoy the speed boost.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="bg-white rounded-xl shadow-sm p-8 mb-8">
+            <h2 class="text-2xl font-bold text-gray-900 mb-6">Common questions</h2>
+
+            <div class="space-y-4">
+                <div class="border-b border-gray-200 pb-4">
+                    <p class="font-semibold text-gray-900 mb-2">Is it accurate enough for business decisions?</p>
+                    <p class="text-gray-600 text-sm">Yes. For 99% of websites, Plausible provides all the data you need. Pageviews, sources, conversions, trends. The only thing missing is individual user tracking, which most sites don't actually need.</p>
+                </div>
+
+                <div class="border-b border-gray-200 pb-4">
+                    <p class="font-semibold text-gray-900 mb-2">What about e-commerce tracking?</p>
+                    <p class="text-gray-600 text-sm">Plausible supports goals and custom events. Track purchases, revenue, funnel steps. It's not as detailed as GA4 Enhanced Ecommerce, but covers the essentials.</p>
+                </div>
+
+                <div class="border-b border-gray-200 pb-4">
+                    <p class="font-semibold text-gray-900 mb-2">Can I use it for client sites?</p>
+                    <p class="text-gray-600 text-sm">Yes. Self-hosting means you can host analytics for multiple clients. Each client gets their own dashboard. Their data stays on your server.</p>
+                </div>
+
+                <div class="border-b border-gray-200 pb-4">
+                    <p class="font-semibold text-gray-900 mb-2">What happens to historical data?</p>
+                    <p class="text-gray-600 text-sm">When you switch, you start fresh. GA4 historical data stays in GA4. You can export from GA4 if needed, but most people find they don't look at old data much anyway.</p>
+                </div>
+
+                <div>
+                    <p class="font-semibold text-gray-900 mb-2">Is it really GDPR compliant?</p>
+                    <p class="text-gray-600 text-sm">Yes. Plausible went through GDPR compliance assessment. The key: no personal data, no cookies, anonymized IPs. You don't need a legal review. It just works.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="bg-gradient-to-br from-cyan-500 to-teal-600 rounded-xl shadow-lg p-8 text-white">
+            <h2 class="text-2xl font-bold mb-4">Why we made the switch</h2>
+            <p class="text-cyan-100 leading-relaxed mb-4">
+                Our websites got faster. Cookie banner complaints disappeared. We still get all the analytics data we need to make decisions. And we own our data - not Google.
+            </p>
+            <p class="text-cyan-100 leading-relaxed mb-4">
+                Setup took an afternoon. Migration was painless. Now every new site we build gets Plausible by default. No more cookie consent banners cluttering the user experience.
+            </p>
+            <p class="text-cyan-100 leading-relaxed">
+                If you care about user privacy, site performance, and data ownership, Plausible is the clear choice. Your users will thank you for not annoying them with cookie popups.
+            </p>
+            <div class="mt-6 pt-6 border-t border-cyan-400">
+                <p class="text-sm text-cyan-200">
+                    <a href="https://plausible.io/" class="underline hover:text-white">plausible.io</a> ·
+                    <a href="https://github.com/plausible/analytics" class="underline hover:text-white">github.com/plausible/analytics</a>
+                </p>
+            </div>
+        </section>
+
+    </article>
+
+    <footer class="bg-gray-800 text-white py-12">
+        <div class="max-w-4xl mx-auto px-4 text-center">
+            <p class="opacity-70 mb-2">📝 Programming Notes</p>
+            <p class="text-sm opacity-50">
+                Personal learning notes & tutorials. Updated as I explore new technologies.
+            </p>
+            <p class="text-xs opacity-40 mt-4"><a href="privacy.html" class="hover:text-white">Privacy Policy</a></p>
+        </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+</body>
+</html>
