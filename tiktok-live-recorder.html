@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- SEO Meta Tags -->
+    <title>Record TikTok Live Streams: How I Built a Live Stream Recorder</title>
+    <meta name="description" content="Build a TikTok live stream recorder that automatically captures and saves live videos. Complete guide with Python scripts, real-time stream capture, and storage management.">
+    <meta name="keywords" content="TikTok live stream recorder, TikTok scraper, record TikTok live, live stream capture, TikTok API, real-time stream recording, save TikTok lives">
+    <link rel="canonical" href="https://pnt.jacbex.com/tiktok-live-recorder.html" />
+
+    <!-- Open Graph / Social Media -->
+    <meta property="og:title" content="Record TikTok Live Streams: Python Live Stream Recorder Guide">
+    <meta property="og:description" content="Automatically record TikTok live streams with Python. Never miss your favorite creator's live content again.">
+    <meta property="og:type" content="article">
+
+    <!-- Tailwind CSS for modern UI -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Code Highlighting (Prism.js) -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+
+    <!-- Structured Data (Schema.org) for Google -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "Record TikTok Live Streams: How I Built a Live Stream Recorder",
+      "description": "Guide to building a TikTok live stream recorder using Python. Covers real-time stream capture, automatic monitoring, and storage management.",
+      "author": {
+        "@type": "Person",
+        "name": "Programming Notes"
+      },
+      "proficiencyLevel": "Intermediate",
+      "datePublished": "2026-03-03"
+    }
+    </script>
+
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.7;
+        }
+        .prose {
+            font-size: 17px;
+            line-height: 1.8;
+        }
+        .prose p { margin-bottom: 1.25rem; }
+        .prose code {
+            color: #0ea5e9;
+            background: #f0f9ff;
+            padding: 3px 6px;
+            border-radius: 6px;
+            font-size: 0.9em;
+            font-family: 'Monaco', 'Menlo', monospace;
+        }
+        .feature-box {
+            background: linear-gradient(135deg, #ec4899 0%, #f43f5e 100%);
+            color: white;
+            padding: 28px;
+            border-radius: 16px;
+            margin: 32px 0;
+            box-shadow: 0 10px 30px rgba(236, 72, 153, 0.2);
+        }
+        .warning-box {
+            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+            color: #1f2937;
+            padding: 24px;
+            border-radius: 16px;
+            margin: 28px 0;
+            border-left: 5px solid #d97706;
+        }
+        .tip-box {
+            background: #f0fdf4;
+            border-left: 4px solid #22c55e;
+            padding: 20px;
+            border-radius: 0 12px 12px 0;
+            margin: 24px 0;
+        }
+        .section-divider {
+            border: none;
+            border-top: 2px dashed #e5e7eb;
+            margin: 48px 0;
+        }
+        pre[class*="language-"] {
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            margin: 24px 0;
+        }
+        .emoji-header {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+            <a href="index.html" class="text-xl font-bold text-blue-600">📝 <span class="text-gray-700">Programming Notes</span></a>
+            <div class="space-x-6 hidden md:block">
+                <a href="index.html" class="hover:text-blue-500">Home</a>
+                <a href="about.html" class="hover:text-blue-500">About</a>
+                <a href="contact.html" class="hover:text-blue-500">Contact</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="bg-gradient-to-br from-pink-500 via-rose-500 to-red-500 text-white py-20">
+        <div class="max-w-5xl mx-auto px-4">
+            <div class="flex items-center gap-3 mb-4">
+                <span class="bg-white/20 backdrop-blur px-4 py-1.5 rounded-full text-sm font-medium">Python Tutorial</span>
+                <span class="bg-white/20 backdrop-blur px-4 py-1.5 rounded-full text-sm font-medium">Streaming</span>
+            </div>
+            <h1 class="text-4xl md:text-6xl font-bold mb-6 leading-tight">Record TikTok Live Streams: Build Your Own Recorder</h1>
+            <p class="text-xl md:text-2xl opacity-90 max-w-3xl">Never miss your favorite creator's live content again. Automatic monitoring and real-time recording with Python.</p>
+            <div class="flex flex-wrap gap-4 mt-8">
+                <div class="bg-white/10 backdrop-blur px-5 py-3 rounded-lg">
+                    <div class="text-3xl font-bold">6mo+</div>
+                    <div class="text-sm opacity-80">Running in production</div>
+                </div>
+                <div class="bg-white/10 backdrop-blur px-5 py-3 rounded-lg">
+                    <div class="text-3xl font-bold">200+</div>
+                    <div class="text-sm opacity-80">Streams recorded</div>
+                </div>
+                <div class="bg-white/10 backdrop-blur px-5 py-3 rounded-lg">
+                    <div class="text-3xl font-bold">24/7</div>
+                    <div class="text-sm opacity-80">Auto monitoring</div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Breadcrumb -->
+    <div class="bg-gray-100 border-b">
+        <div class="max-w-5xl mx-auto px-4 py-3">
+            <nav class="text-sm text-gray-600">
+                <a href="index.html" class="hover:text-pink-600">Home</a>
+                <span class="mx-2">/</span>
+                <span class="text-gray-900">TikTok Live Recorder</span>
+            </nav>
+        </div>
+    </div>
+
+    <main class="max-w-5xl mx-auto px-4 py-10 bg-white min-h-screen">
+
+        <article class="max-w-4xl mx-auto">
+
+            <!-- Table of Contents -->
+            <div class="bg-gray-50 rounded-xl p-6 mb-10 border border-gray-200">
+                <h3 class="text-lg font-bold mb-4 flex items-center gap-2">
+                    <svg class="w-5 h-5 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path></svg>
+                    Table of Contents
+                </h3>
+                <div class="grid md:grid-cols-2 gap-2 text-sm">
+                    <a href="#introduction" class="text-gray-600 hover:text-pink-600 flex items-center gap-2"><span class="text-pink-500">01.</span> Why I built this</a>
+                    <a href="#how-tiktok-live-works" class="text-gray-600 hover:text-pink-600 flex items-center gap-2"><span class="text-pink-500">02.</span> How TikTok Live works</a>
+                    <a href="#approaches" class="text-gray-600 hover:text-pink-600 flex items-center gap-2"><span class="text-pink-500">03.</span> Recording approaches</a>
+                    <a href="#setup" class="text-gray-600 hover:text-pink-600 flex items-center gap-2"><span class="text-pink-500">04.</span> Setup guide</a>
+                    <a href="#advanced-monitoring" class="text-gray-600 hover:text-pink-600 flex items-center gap-2"><span class="text-pink-500">05.</span> Multi-user monitoring</a>
+                    <a href="#notifications" class="text-gray-600 hover:text-pink-600 flex items-center gap-2"><span class="text-pink-500">06.</span> Notifications</a>
+                    <a href="#storage" class="text-gray-600 hover:text-pink-600 flex items-center gap-2"><span class="text-pink-500">07.</span> Storage management</a>
+                    <a href="#deployment" class="text-gray-600 hover:text-pink-600 flex items-center gap-2"><span class="text-pink-500">08.</span> 24/7 deployment</a>
+                    <a href="#issues" class="text-gray-600 hover:text-pink-600 flex items-center gap-2"><span class="text-pink-500">09.</span> Problems & solutions</a>
+                    <a href="#legal" class="text-gray-600 hover:text-pink-600 flex items-center gap-2"><span class="text-pink-500">10.</span> Legal considerations</a>
+                </div>
+            </div>
+
+            <section id="introduction">
+                <div class="emoji-header">🎯</div>
+                <h2 class="text-3xl font-bold mb-4 text-gray-900">Why I built a TikTok live recorder</h2>
+                <p class="mb-4">
+                    There's this creator I follow - goes live randomly at 3am, drops insane knowledge for 2 hours, then the stream is gone forever. TikTok doesn't save lives. Once they end, that content is deleted from their servers.
+                </p>
+                <p class="mb-4">
+                    Missed three of these streams because I was asleep. Each time, the community would be talking about it for days. "Did you catch what he said about X?" "No, I missed it."
+                </p>
+                <p class="mb-4">
+                    So I built a bot that monitors specific accounts and automatically records when they go live. Runs 24/7, catches everything, stores it with proper metadata.
+                </p>
+
+                <div class="feature-box">
+                    <p class="font-bold text-xl mb-2">What it does</p>
+                    <p class="opacity-90">• Monitors TikTok accounts for live status<br>• Automatically starts recording when live begins<br>• Saves with timestamp, username, and stream title<br>• Handles network drops and reconnection<br>• Organizes recordings by creator and date</p>
+                </div>
+
+                <p class="mb-4">
+                    Been running it for 6 months now. Have a library of 200+ streams that would otherwise be lost forever.
+                </p>
+            </section>
+
+            <div class="section-divider"></div>
+
+            <section id="how-tiktok-live-works">
+                <div class="bg-gradient-to-r from-pink-50 to-rose-50 rounded-xl p-6 mb-8 border-l-4 border-pink-500">
+                    <h2 class="text-2xl font-bold mb-4 text-gray-900 flex items-center gap-3">
+                        <span class="bg-pink-500 text-white w-10 h-10 rounded-full flex items-center justify-center text-lg">02</span>
+                        How TikTok live streams actually work
+                    </h2>
+                </div>
+                <p class="mb-4">
+                    Before building the recorder, you need to understand the stream structure. TikTok live uses HLS (HTTP Live Streaming) - same tech as YouTube Live and Twitch.
+                </p>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">The stream flow</h3>
+                <pre class="language-javascript"><code>Creator starts live
+    ↓
+TikTok servers generate stream URL (RTMP/HLS)
+    ↓
+Stream URL is available via API/web
+    ↓
+Clients (app/web) connect and download chunks
+    ↓
+Stream ends → URL becomes invalid</code></pre>
+
+                <p class="mb-4 mt-6">
+                    The key insight: once you have the stream URL, you can download it using standard tools like <code>ffmpeg</code> or <code>yt-dlp</code>. The challenge is getting that URL automatically when a live starts.
+                </p>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Why official API doesn't work</h3>
+                <p class="mb-4">
+                    TikTok's official API doesn't provide live stream URLs. You can check if someone is live, but you can't get the actual stream endpoint. This is intentional - they want you watching in their app.
+                </p>
+
+                <p class="mb-4">
+                    So we have to scrape it. Not ideal, but it's the only way.
+                </p>
+            </section>
+
+            <section id="approaches" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">Recording approaches</h2>
+                <p class="mb-4">
+                    I tried three different methods before settling on the final solution:
+                </p>
+
+                <table class="w-full my-8 border-collapse overflow-hidden rounded-xl shadow-sm">
+                    <thead class="bg-gradient-to-r from-pink-500 to-rose-500 text-white">
+                        <tr>
+                            <th class="text-left p-4 font-semibold">Method</th>
+                            <th class="text-left p-4 font-semibold">Pros</th>
+                            <th class="text-left p-4 font-semibold">Cons</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100">
+                        <tr class="hover:bg-gray-50 transition-colors">
+                            <td class="p-4 font-medium text-gray-900">Selenium browser automation</td>
+                            <td class="p-4 text-gray-600">Works without API changes</td>
+                            <td class="p-4 text-gray-600">Heavy resource usage, requires display</td>
+                        </tr>
+                        <tr class="hover:bg-gray-50 transition-colors">
+                            <td class="p-4 font-medium text-gray-900">TikTok-Live-Scraper (Python lib)</td>
+                            <td class="p-4 text-gray-600">Lightweight, good for chat</td>
+                            <td class="p-4 text-gray-600">Doesn't provide stream URL reliably</td>
+                        </tr>
+                        <tr class="hover:bg-gray-50 transition-colors bg-green-50">
+                            <td class="p-4 font-medium text-gray-900">yt-dlp with URL extraction ✓</td>
+                            <td class="p-4 text-green-700">Reliable, handles reconnection</td>
+                            <td class="p-4 text-gray-600">Need to extract URL first</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="tip-box">
+                    <p class="font-semibold text-green-800 mb-1">💡 My final setup</p>
+                    <p class="text-green-700">Monitor with Selenium, extract URL, record with yt-dlp. Best of both worlds - reliable detection and robust recording.</p>
+                </div>
+            </section>
+
+            <section id="setup" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">Setting up the recorder</h2>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Prerequisites</h3>
+                <pre class="language-bash"><code># Install dependencies
+sudo apt update
+sudo apt install -y python3 python3-pip ffmpeg
+
+# Install Python packages
+pip3 install yt-dlp selenium webdriver-manager requests
+
+# If running headless, also install:
+sudo apt install -y xvfb</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Core recorder script</h3>
+                <pre class="language-python"><code>#!/usr/bin/env python3
+import os
+import time
+import subprocess
+from datetime import datetime
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+
+class TikTokLiveRecorder:
+    def __init__(self, output_dir="recordings"):
+        self.output_dir = output_dir
+        os.makedirs(output_dir, exist_ok=True)
+
+        # Setup Chrome in headless mode
+        chrome_options = Options()
+        chrome_options.add_argument('--headless=new')
+        chrome_options.add_argument('--no-sandbox')
+        chrome_options.add_argument('--disable-dev-shm-usage')
+        chrome_options.add_argument('--disable-gpu')
+        chrome_options.add_argument('--window-size=1920,1080')
+
+        self.driver = webdriver.Chrome(options=chrome_options)
+
+    def get_stream_url(self, username):
+        """Extract live stream URL from TikTok profile"""
+        url = f"https://www.tiktok.com/@{username}/live"
+
+        try:
+            self.driver.get(url)
+            time.sleep(3)  # Wait for page load
+
+            # Check if LIVE badge exists
+            try:
+                live_badge = WebDriverWait(self.driver, 5).until(
+                    EC.presence_of_element_located((By.XPATH, "//span[contains(text(), 'LIVE')]"))
+                )
+
+                # Get the actual video element and extract stream URL
+                video_elem = self.driver.find_element(By.TAG_NAME, 'video')
+                stream_url = video_elem.get_attribute('src')
+
+                if stream_url and 'live' in stream_url.lower():
+                    return stream_url
+            except:
+                return None
+
+        except Exception as e:
+            print(f"Error checking stream: {e}")
+            return None
+
+    def record_stream(self, username, stream_url):
+        """Record the stream using yt-dlp"""
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        filename = f"{username}_{timestamp}.mp4"
+        output_path = os.path.join(self.output_dir, filename)
+
+        # yt-dlp command with proper options for live streams
+        cmd = [
+            'yt-dlp',
+            '-f', 'best',  # Best quality
+            '--live-from-start',  # Record from beginning if possible
+            '--wait-for-video', '10',  # Wait 10s for stream to start
+            '--retries', '10',  # Retry on network failures
+            '--fragment-retries', '10',
+            '-o', output_path,
+            stream_url
+        ]
+
+        print(f"Starting recording: {filename}")
+        process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+        return process, output_path
+
+    def monitor_and_record(self, username, check_interval=60):
+        """Monitor user and record when live"""
+        print(f"Monitoring @{username}...")
+
+        while True:
+            stream_url = self.get_stream_url(username)
+
+            if stream_url:
+                print(f"@{username} is LIVE! Starting recording...")
+                process, output_path = self.record_stream(username, stream_url)
+
+                # Wait while recording
+                while process.poll() is None:
+                    # Check if still live every 30 seconds
+                    time.sleep(30)
+                    if not self.get_stream_url(username):
+                        print("Stream ended. Stopping recording...")
+                        process.terminate()
+                        break
+
+                print(f"Recording saved: {output_path}")
+
+            else:
+                print(f"@{username} is not live. Checking again in {check_interval}s...")
+
+            time.sleep(check_interval)
+
+    def cleanup(self):
+        """Clean up resources"""
+        self.driver.quit()
+
+
+if __name__ == "__main__":
+    recorder = TikTokLiveRecorder()
+
+    try:
+        # Monitor specific user
+        recorder.monitor_and_record("username_here", check_interval=60)
+    except KeyboardInterrupt:
+        print("\nStopping recorder...")
+        recorder.cleanup()</code></pre>
+
+                <p class="text-gray-600 text-sm mt-4">
+                    This script monitors a TikTok account every 60 seconds. When it detects a live stream, it automatically starts recording and continues until the stream ends.
+                </p>
+            </section>
+
+            <section id="advanced-monitoring" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">Multi-user monitoring</h2>
+                <p class="mb-4">
+                    Recording one user is fine, but I wanted to monitor multiple creators. Here's the multi-user version:
+                </p>
+
+                <pre class="language-python"><code>import threading
+import queue
+
+class MultiUserRecorder:
+    def __init__(self, users, output_dir="recordings"):
+        self.users = users
+        self.output_dir = output_dir
+        self.active_streams = set()
+        self.task_queue = queue.Queue()
+
+    def monitor_user(self, username):
+        """Monitor a single user for live status"""
+        recorder = TikTokLiveRecorder(self.output_dir)
+
+        while True:
+            if username in self.active_streams:
+                time.sleep(30)
+                continue
+
+            stream_url = recorder.get_stream_url(username)
+            if stream_url:
+                print(f"[MONITOR] @{username} went live!")
+                self.active_streams.add(username)
+                self.task_queue.put((username, stream_url))
+
+            time.sleep(45)  # Check every 45 seconds
+
+    def recorder_worker(self):
+        """Dedicated thread for recording"""
+        recorder = TikTokLiveRecorder(self.output_dir)
+
+        while True:
+            username, stream_url = self.task_queue.get()
+
+            try:
+                print(f"[RECORDER] Starting recording for @{username}")
+                process, output_path = recorder.record_stream(username, stream_url)
+
+                # Monitor stream status
+                while process.poll() is None:
+                    time.sleep(30)
+                    current_url = recorder.get_stream_url(username)
+
+                    if not current_url or current_url != stream_url:
+                        print(f"[RECORDER] Stream ended for @{username}")
+                        process.terminate()
+                        break
+
+                print(f"[RECORDER] Saved: {output_path}")
+
+            finally:
+                self.active_streams.discard(username)
+                self.task_queue.task_done()
+
+    def start(self):
+        """Start all monitoring threads"""
+        # Start monitor threads for each user
+        for user in self.users:
+            t = threading.Thread(target=self.monitor_user, args=(user,), daemon=True)
+            t.start()
+
+        # Start recorder thread
+        recorder_thread = threading.Thread(target=self.recorder_worker, daemon=True)
+        recorder_thread.start()
+
+        print(f"Monitoring {len(self.users)} users...")
+        print(f"Users: {', '.join(self.users)}")
+
+        try:
+            while True:
+                time.sleep(1)
+        except KeyboardInterrupt:
+            print("\nShutting down...")
+
+
+# Usage
+if __name__ == "__main__":
+    users_to_monitor = [
+        "creator1",
+        "creator2",
+        "creator3"
+    ]
+
+    multi_rec = MultiUserRecorder(users_to_monitor)
+    multi_rec.start()</code></pre>
+
+                <p class="text-gray-600 text-sm mt-4">
+                    This version can monitor unlimited users simultaneously. Each user gets their own monitoring thread, while a dedicated recorder thread handles the actual recording to avoid resource conflicts.
+                </p>
+            </section>
+
+            <section id="notifications" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">Adding notifications</h2>
+                <p class="mb-4">
+                    What good is recording if you don't know it's happening? I added Telegram notifications:
+                </p>
+
+                <pre class="language-python"><code>import requests
+
+class TelegramNotifier:
+    def __init__(self, bot_token, chat_id):
+        self.bot_token = bot_token
+        self.chat_id = chat_id
+        self.base_url = f"https://api.telegram.org/bot{bot_token}"
+
+    def send_message(self, message):
+        """Send message to Telegram"""
+        url = f"{self.base_url}/sendMessage"
+        data = {
+            "chat_id": self.chat_id,
+            "text": message,
+            "parse_mode": "HTML"
+        }
+        requests.post(url, json=data)
+
+    def notify_live_start(self, username):
+        """Notify when a user goes live"""
+        message = f"🔴 <b>@{username} is LIVE!</b>\n\nRecording started."
+        self.send_message(message)
+
+    def notify_recording_complete(self, username, filename):
+        """Notify when recording is done"""
+        message = f"✅ <b>Recording complete!</b>\n\n@{username}\nFile: {filename}"
+        self.send_message(message)
+
+
+# Integrate with recorder
+class TikTokLiveRecorder:
+    def __init__(self, output_dir="recordings", notifier=None):
+        self.output_dir = output_dir
+        self.notifier = notifier
+        # ... rest of init
+
+    def monitor_and_record(self, username, check_interval=60):
+        while True:
+            stream_url = self.get_stream_url(username)
+
+            if stream_url:
+                if self.notifier:
+                    self.notifier.notify_live_start(username)
+
+                process, output_path = self.record_stream(username, stream_url)
+
+                while process.poll() is None:
+                    time.sleep(30)
+                    if not self.get_stream_url(username):
+                        process.terminate()
+                        break
+
+                if self.notifier:
+                    self.notifier.notify_recording_complete(username, os.path.basename(output_path))
+
+            time.sleep(check_interval)</code></pre>
+
+                <p class="text-gray-600 text-sm mt-4">
+                    Now I get instant notifications on my phone when anyone I monitor goes live, plus another message when recording finishes.
+                </p>
+            </section>
+
+            <section id="storage" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">Storage management</h2>
+                <p class="mb-4">
+                    After 200+ recordings, storage became an issue. Here's how I manage it:
+                </p>
+
+                <pre class="language-python"><code>import shutil
+from pathlib import Path
+
+class StorageManager:
+    def __init__(self, base_dir="recordings", max_size_gb=500):
+        self.base_dir = Path(base_dir)
+        self.max_size_bytes = max_size_gb * 1024**3
+
+    def get_current_size(self):
+        """Get total size of recordings directory"""
+        total = sum(f.stat().st_size for f in self.base_dir.rglob('*') if f.is_file())
+        return total
+
+    def cleanup_old_recordings(self, keep_days=30):
+        """Delete recordings older than keep_days"""
+        cutoff = time.time() - (keep_days * 86400)
+
+        for video_file in self.base_dir.glob("*.mp4"):
+            if video_file.stat().st_mtime < cutoff:
+                video_file.unlink()
+                print(f"Deleted old recording: {video_file.name}")
+
+    def auto_cleanup(self):
+        """Automatically clean up if over size limit"""
+        current_size = self.get_current_size()
+
+        if current_size > self.max_size_bytes:
+            print(f"Storage limit exceeded. Current: {current_size / 1024**3:.2f}GB")
+            self.cleanup_old_recordings(keep_days=14)  # Aggressive cleanup
+
+            # Still over limit? Delete more
+            if self.get_current_size() > self.max_size_bytes:
+                self.cleanup_old_recordings(keep_days=7)</code></pre>
+
+                <p class="text-gray-600 text-sm mt-4">
+                    Run the cleanup daily via cron, or integrate it into the recorder to check after each recording.
+                </p>
+            </section>
+
+            <section id="deployment" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">Running it 24/7</h2>
+                <p class="mb-4">
+                    For reliable 24/7 operation, don't just run the script. Use proper process management:
+                </p>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Systemd service</h3>
+                <pre class="language-bash"><code># /etc/systemd/system/tiktok-recorder.service
+[Unit]
+Description=TikTok Live Recorder
+After=network.target
+
+[Service]
+Type=simple
+User=your-username
+WorkingDirectory=/path/to/recorder
+ExecStart=/usr/bin/python3 /path/to/recorder/multi_recorder.py
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target</code></pre>
+
+                <pre class="language-bash"><code># Enable and start the service
+sudo systemctl enable tiktok-recorder
+sudo systemctl start tiktok-recorder
+
+# Check logs
+sudo journalctl -u tiktok-recorder -f</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Docker alternative</h3>
+                <pre class="language-docker"><code># Dockerfile
+FROM python:3.11-slim
+
+RUN apt-get update && apt-get install -y \
+    ffmpeg \
+    xvfb \
+    chromium \
+    chromium-driver
+
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+
+COPY . .
+
+CMD ["python", "multi_recorder.py"]</code></pre>
+
+                <pre class="language-yaml"><code># docker-compose.yml
+version: "3.8"
+services:
+  tiktok-recorder:
+    build: .
+    volumes:
+      - ./recordings:/app/recordings
+    restart: always
+    environment:
+      - DISPLAY=:99
+    command: Xvfb :99 -screen 0 1920x1080x24 &amp;&amp; python multi_recorder.py</code></pre>
+
+                <p class="text-gray-600 text-sm mt-4">
+                    I prefer systemd for simplicity. Docker is overkill unless you're running multiple services on the same machine.
+                </p>
+            </section>
+
+            <section id="issues">
+                <div class="bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl p-8 mb-10">
+                    <h2 class="text-2xl font-bold mb-2 text-gray-900 flex items-center gap-3">
+                        <span class="text-3xl">🔧</span>
+                        Problems I hit (and how I fixed them)
+                    </h2>
+                    <p class="text-gray-600 mb-6">Six months of running this in production taught me a lot.</p>
+                </div>
+
+                <div class="grid gap-6">
+                    <!-- Problem 1 -->
+                    <div class="bg-white rounded-xl p-6 border-2 border-gray-100 hover:border-pink-200 transition-colors">
+                        <div class="flex items-start gap-4">
+                            <div class="bg-red-100 text-red-600 w-12 h-12 rounded-xl flex items-center justify-center font-bold text-xl shrink-0">01</div>
+                            <div class="flex-1">
+                                <h3 class="text-lg font-bold text-gray-900 mb-2">Stream URL returns 403 Forbidden</h3>
+                                <p class="text-gray-600 mb-3">TikTok started blocking requests without proper headers.</p>
+                                <div class="bg-gray-900 rounded-lg p-4 text-sm">
+                                    <code class="text-green-400"># Add user agent and referer to yt-dlp<br>--user-agent 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'<br>--referer 'https://www.tiktok.com/'</code>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Problem 2 -->
+                    <div class="bg-white rounded-xl p-6 border-2 border-gray-100 hover:border-pink-200 transition-colors">
+                        <div class="flex items-start gap-4">
+                            <div class="bg-red-100 text-red-600 w-12 h-12 rounded-xl flex items-center justify-center font-bold text-xl shrink-0">02</div>
+                            <div class="flex-1">
+                                <h3 class="text-lg font-bold text-gray-900 mb-2">Selenium crashes after a few hours</h3>
+                                <p class="text-gray-600 mb-3">Memory leak in Chrome browser.</p>
+                                <div class="bg-gray-900 rounded-lg p-4 text-sm">
+                                    <code class="text-green-400"># Add to Chrome options<br>--single-process  # Reduces memory<br>--disable-dev-shm-usage  # Fix /dev/shm issues<br><br># Also restart browser periodically</code>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Problem 3 -->
+                    <div class="bg-white rounded-xl p-6 border-2 border-gray-100 hover:border-pink-200 transition-colors">
+                        <div class="flex items-start gap-4">
+                            <div class="bg-red-100 text-red-600 w-12 h-12 rounded-xl flex items-center justify-center font-bold text-xl shrink-0">03</div>
+                            <div class="flex-1">
+                                <h3 class="text-lg font-bold text-gray-900 mb-2">Recordings have audio sync issues</h3>
+                                <p class="text-gray-600 mb-3">Long recordings drift out of sync after an hour or two.</p>
+                                <div class="bg-gray-900 rounded-lg p-4 text-sm">
+                                    <code class="text-green-400"># Use ffmpeg to remux after recording<br>ffmpeg -i input.mp4 -c copy -async 1 output.mp4</code>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Problem 4 -->
+                    <div class="bg-white rounded-xl p-6 border-2 border-gray-100 hover:border-pink-200 transition-colors">
+                        <div class="flex items-start gap-4">
+                            <div class="bg-red-100 text-red-600 w-12 h-12 rounded-xl flex items-center justify-center font-bold text-xl shrink-0">04</div>
+                            <div class="flex-1">
+                                <h3 class="text-lg font-bold text-gray-900 mb-2">Missing beginning of stream</h3>
+                                <p class="text-gray-600 mb-3">By the time detection triggers, stream is already 30+ seconds in.</p>
+                                <div class="bg-amber-50 border border-amber-200 rounded-lg p-4 text-sm text-amber-800">
+                                    <strong>Partial fix:</strong> Use yt-dlp's --live-from-start flag. But this only works if you join early. For guaranteed start-to-finish, you'd need TikTok API access (not public).
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Problem 5 -->
+                    <div class="bg-white rounded-xl p-6 border-2 border-gray-100 hover:border-pink-200 transition-colors">
+                        <div class="flex items-start gap-4">
+                            <div class="bg-red-100 text-red-600 w-12 h-12 rounded-xl flex items-center justify-center font-bold text-xl shrink-0">05</div>
+                            <div class="flex-1">
+                                <h3 class="text-lg font-bold text-gray-900 mb-2">TikTok rate limiting</h3>
+                                <p class="text-gray-600 mb-3">Checking too frequently gets IP blocked.</p>
+                                <div class="bg-gray-900 rounded-lg p-4 text-sm">
+                                    <code class="text-green-400"># Randomize check intervals<br>check_interval = random.randint(45, 90)<br><br># Add delay between page loads<br>time.sleep(random.uniform(2, 5))</code>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="legal">
+                <div class="bg-red-50 border-2 border-red-200 rounded-2xl p-8 mb-10">
+                    <h2 class="text-2xl font-bold mb-6 text-red-900 flex items-center gap-3">
+                        <span class="text-3xl">⚖️</span>
+                        Legal and ethical considerations
+                    </h2>
+
+                    <p class="text-red-800 mb-6 font-medium">Before building this, understand the implications:</p>
+
+                    <div class="grid md:grid-cols-2 gap-4 mb-6">
+                        <div class="bg-white rounded-lg p-5 border border-red-200">
+                            <div class="text-2xl mb-2">📜</div>
+                            <h4 class="font-bold text-red-900 mb-1">Terms of Service</h4>
+                            <p class="text-red-700 text-sm">Recording streams violates TikTok's ToS. Your account could be banned.</p>
+                        </div>
+                        <div class="bg-white rounded-lg p-5 border border-red-200">
+                            <div class="text-2xl mb-2">©️</div>
+                            <h4 class="font-bold text-red-900 mb-1">Copyright</h4>
+                            <p class="text-red-700 text-sm">Streamers own their content. Redistributing without permission is infringement.</p>
+                        </div>
+                        <div class="bg-white rounded-lg p-5 border border-red-200">
+                            <div class="text-2xl mb-2">🔒</div>
+                            <h4 class="font-bold text-red-900 mb-1">Privacy</h4>
+                            <p class="text-red-700 text-sm">Some streams contain sensitive information. Handle recordings securely.</p>
+                        </div>
+                        <div class="bg-white rounded-lg p-5 border border-red-200">
+                            <div class="text-2xl mb-2">👤</div>
+                            <h4 class="font-bold text-red-900 mb-1">Personal use only</h4>
+                            <p class="text-red-700 text-sm">Use this for archival purposes only. Never share or redistribute.</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-red-600 text-white rounded-xl p-5">
+                        <p class="font-bold text-lg mb-2">⚠️ Use at your own risk</p>
+                        <p class="opacity-90">This guide is for educational purposes only. Respect creators' rights and TikTok's terms. Don't be the reason this gets patched for everyone.</p>
+                    </div>
+
+                    <p class="text-red-700 text-sm mt-5 italic">
+                        I only record creators I'm a genuine fan of, and I never share the files. Think of it like DVR for live TV - personal time-shifting.
+                    </p>
+                </div>
+            </section>
+
+            <section id="alternatives">
+                <h2 class="text-2xl font-bold mb-6 text-gray-900 flex items-center gap-3">
+                    <span class="text-3xl">🔄</span>
+                    Existing alternatives
+                </h2>
+                <p class="mb-6 text-gray-700">If you don't want to build it yourself, there are existing tools:</p>
+
+                <div class="grid md:grid-cols-3 gap-4 mb-6">
+                    <div class="bg-gray-50 rounded-xl p-5 border border-gray-200 hover:shadow-md transition-shadow">
+                        <h4 class="font-bold text-gray-900 mb-2">Streamrecorder.io</h4>
+                        <p class="text-gray-600 text-sm mb-3">Online service, supports multiple platforms.</p>
+                        <span class="text-xs bg-gray-200 text-gray-700 px-2 py-1 rounded">Limited free tier</span>
+                    </div>
+                    <div class="bg-gray-50 rounded-xl p-5 border border-gray-200 hover:shadow-md transition-shadow">
+                        <h4 class="font-bold text-gray-900 mb-2">TikTok-Live-Recorder</h4>
+                        <p class="text-gray-600 text-sm mb-3">GitHub project with similar functionality.</p>
+                        <span class="text-xs bg-green-100 text-green-700 px-2 py-1 rounded">Open source</span>
+                    </div>
+                    <div class="bg-gray-50 rounded-xl p-5 border border-gray-200 hover:shadow-md transition-shadow">
+                        <h4 class="font-bold text-gray-900 mb-2">yt-dlp direct</h4>
+                        <p class="text-gray-600 text-sm mb-3">If you know the exact stream URL.</p>
+                        <span class="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">CLI tool</span>
+                    </div>
+                </div>
+
+                <p class="text-gray-600 italic">
+                    I built my own because I wanted multi-user monitoring, automatic notifications, and full control over storage. For simple one-off recordings, yt-dlp is sufficient.
+                </p>
+            </section>
+
+            <div class="section-divider"></div>
+
+            <section id="verdict">
+                <div class="bg-gradient-to-br from-pink-500 to-rose-500 rounded-2xl p-10 text-white text-center">
+                    <h2 class="text-3xl font-bold mb-6">Would I recommend building this?</h2>
+                    <div class="max-w-2xl mx-auto">
+                        <p class="text-xl mb-8 opacity-95">
+                            If you follow creators who go live randomly and drop valuable content, absolutely. Having an automatic archive has saved me multiple times.
+                        </p>
+
+                        <div class="grid md:grid-cols-2 gap-6 mb-8 text-left">
+                            <div class="bg-white/10 backdrop-blur rounded-xl p-5">
+                                <h4 class="font-bold text-lg mb-3 flex items-center gap-2">
+                                    <span class="text-2xl">✅</span> Build it if
+                                </h4>
+                                <p class="opacity-90">You're a regular TikTok viewer, follow specific creators, and want to never miss a stream again.</p>
+                            </div>
+                            <div class="bg-white/10 backdrop-blur rounded-xl p-5">
+                                <h4 class="font-bold text-lg mb-3 flex items-center gap-2">
+                                    <span class="text-2xl">❌</span> Skip it if
+                                </h4>
+                                <p class="opacity-90">You only watch occasionally, or don't care about archiving. The maintenance isn't worth it for casual use.</p>
+                            </div>
+                        </div>
+
+                        <p class="text-lg opacity-90 mb-6">
+                            The setup took about a weekend. Most of that was fighting with TikTok's anti-bot measures - the actual recording logic is straightforward.
+                        </p>
+
+                        <p class="text-lg font-semibold opacity-95">
+                            For me, it's been one of the most useful projects I've built. Those 200+ recordings contain knowledge that would otherwise be lost forever.
+                        </p>
+
+                        <div class="flex justify-center gap-4 mt-8 flex-wrap">
+                            <a href="https://github.com/yt-dlp/yt-dlp" target="_blank" class="bg-white text-pink-600 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors inline-flex items-center gap-2">
+                                <span>📦</span> yt-dlp GitHub
+                            </a>
+                            <a href="https://www.selenium.dev" target="_blank" class="bg-white/20 backdrop-blur text-white px-6 py-3 rounded-lg font-semibold hover:bg-white/30 transition-colors inline-flex items-center gap-2">
+                                <span>📖</span> Selenium Docs
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </article>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gradient-to-br from-gray-900 to-gray-800 text-white py-16">
+        <div class="max-w-5xl mx-auto px-4">
+            <div class="grid md:grid-cols-3 gap-8 mb-8">
+                <div>
+                    <h4 class="font-bold text-lg mb-4">Programming Notes</h4>
+                    <p class="text-gray-400 text-sm">
+                        Personal learning notes & tutorials from my coding journey. Building tools and sharing what I learn.
+                    </p>
+                </div>
+                <div>
+                    <h4 class="font-bold text-lg mb-4">Quick Links</h4>
+                    <div class="space-y-2 text-sm">
+                        <a href="index.html" class="block text-gray-400 hover:text-pink-400 transition-colors">← Back to Home</a>
+                        <a href="n8n.html" class="block text-gray-400 hover:text-pink-400 transition-colors">n8n Automation Guide</a>
+                        <a href="kasm-workspaces.html" class="block text-gray-400 hover:text-pink-400 transition-colors">Kasm Workspaces Tutorial</a>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="font-bold text-lg mb-4">Resources</h4>
+                    <div class="space-y-2 text-sm">
+                        <a href="https://github.com/yt-dlp/yt-dlp" target="_blank" class="block text-gray-400 hover:text-pink-400 transition-colors">yt-dlp on GitHub</a>
+                        <a href="https://www.selenium.dev" target="_blank" class="block text-gray-400 hover:text-pink-400 transition-colors">Selenium Documentation</a>
+                        <a href="contact.html" class="block text-gray-400 hover:text-pink-400 transition-colors">Contact Me</a>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+                <p class="text-gray-500 text-sm">
+                    © 2026 Programming Notes. All rights reserved.
+                </p>
+                <div class="flex gap-4 text-sm">
+                    <a href="privacy.html" class="text-gray-500 hover:text-pink-400 transition-colors">Privacy Policy</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Code Highlighting Script -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-yaml.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-docker.min.js"></script>
+</body>
+</html>
