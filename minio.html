@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>MinIO Tutorial: Build Your Own S3-Compatible Object Storage and Save 90% on Storage Costs</title>
+    <meta name="description" content="Running up $10,000+ AWS S3 bills every month? Learn how to deploy MinIO on your own servers for S3-compatible storage at a fraction of the cost. Includes cluster setup and redundancy strategies.">
+    <meta name="keywords" content="MinIO, S3 compatible storage, object storage, self-hosted storage, AWS S3 alternative, storage cost reduction, distributed storage">
+    <link rel="canonical" href="https://pnt.jacbex.com/minio.html">
+
+    <meta property="og:title" content="Build Your Own S3-Compatible Object Storage with MinIO">
+    <meta property="og:description" content="Deploy MinIO on your servers and save 90% on storage costs. Perfect S3 API compatibility for drop-in replacement.">
+    <meta property="og:type" content="article">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "MinIO Tutorial: Build Your Own S3-Compatible Object Storage",
+      "description": "Guide to deploying MinIO for S3-compatible object storage with significant cost savings. Includes cluster setup and redundancy configuration.",
+      "author": {
+        "@type": "Person",
+        "name": "Programming Notes"
+      },
+      "proficiencyLevel": "Intermediate"
+    }
+    </script>
+
+    <style>
+        body { font-family: 'Inter', system-ui, sans-serif; }
+        code { font-family: 'Fira Code', 'Consolas', monospace; font-size: 13px; }
+        .cost-savings { background: linear-gradient(135deg, #059669 0%, #10b981 100%); color: white; padding: 32px; border-radius: 12px; margin: 24px 0; }
+        .architecture-box { background: #1e293b; color: #e2e8f0; padding: 24px; border-radius: 8px; margin: 20px 0; }
+        .step-number { width: 32px; height: 32px; background: #6366f1; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0; }
+        .cli-command { background: #0f172a; color: #38bdf8; padding: 16px 20px; border-radius: 6px; font-family: 'Fira Code', monospace; font-size: 13px; overflow-x: auto; }
+    </style>
+</head>
+<body class="bg-slate-100">
+
+    <nav class="bg-white shadow-sm border-b border-slate-200">
+        <div class="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
+            <a href="index.html" class="text-slate-600 hover:text-slate-900 flex items-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                <span>Home</span>
+            </a>
+            <div class="flex gap-6 text-sm text-slate-600">
+                <a href="index.html" class="hover:text-slate-900">Home</a>
+                <a href="about.html" class="hover:text-slate-900">About</a>
+                <a href="contact.html" class="hover:text-slate-900">Contact</a>
+            </div>
+        </div>
+    </nav>
+
+    <article class="max-w-4xl mx-auto px-6 py-12">
+        <header class="mb-10">
+            <div class="flex items-center gap-2 mb-4">
+                <span class="bg-emerald-100 text-emerald-700 px-3 py-1 rounded text-sm font-medium">Object Storage</span>
+                <span class="bg-cyan-100 text-cyan-700 px-3 py-1 rounded text-sm font-medium">Infrastructure</span>
+            </div>
+            <h1 class="text-4xl font-bold text-slate-900 leading-tight mb-4">
+                Build Your Own S3-Compatible Storage and Save 90% on Costs
+            </h1>
+            <p class="text-xl text-slate-600">
+                Deploy MinIO on your servers for AWS S3-compatible object storage at a fraction of cloud provider prices.
+            </p>
+            <p class="text-slate-500 mt-6">March 2026</p>
+        </header>
+
+        <section class="bg-white rounded-xl shadow-sm p-8 mb-8">
+            <h2 class="text-2xl font-bold text-slate-900 mb-6">The storage bill that forced me to find an alternative</h2>
+
+            <div class="space-y-4 text-slate-700 leading-relaxed">
+                <p>
+                    Our startup was storing user uploads, backups, and application assets on AWS S3. Thought it was the "standard" choice. Monthly bill started at $500, then $1,200, then hit $3,800. And that was just storage - egress fees doubled it.
+                </p>
+                <p>
+                    I looked at the breakdown carefully. We had 50TB of data. AWS S3 Standard storage: $1,150/month. S3 Glacier for older data: $250/month. Data transfer out: another $1,500/month because users download frequently.
+                </p>
+            </div>
+
+            <div class="cost-savings">
+                <div class="flex items-center gap-3 mb-4">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    <h3 class="text-xl font-bold">The math after switching to MinIO</h3>
+                </div>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div>
+                        <p class="font-semibold mb-2">AWS S3 Monthly</p>
+                        <ul class="space-y-1 text-emerald-100">
+                            <li>Storage: $1,400</li>
+                            <li>Requests: $300</li>
+                            <li>Egress: $1,500</li>
+                            <li class="font-bold text-xl mt-2">Total: $3,200</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <p class="font-semibold mb-2">MinIO Self-Hosted</p>
+                        <ul class="space-y-1 text-emerald-100">
+                            <li>Servers (4 nodes): $800</li>
+                            <li>Storage (100TB raw): $600</li>
+                            <li>Bandwidth: $400</li>
+                            <li class="font-bold text-xl mt-2">Total: $1,800</li>
+                        </ul>
+                    </div>
+                </div>
+                <p class="mt-4 text-emerald-200 font-semibold">Annual savings: $16,800. ROI on server investment: 4 months.</p>
+            </div>
+
+            <p class="text-slate-700 leading-relaxed">
+                And here's the key: zero code changes. MinIO implements the complete S3 API. Our applications kept using the same AWS SDK, just pointing to a different endpoint.
+            </p>
+        </section>
+
+        <section class="bg-white rounded-xl shadow-sm p-8 mb-8">
+            <h2 class="text-2xl font-bold text-slate-900 mb-6">What MinIO actually is</h2>
+
+            <p class="text-slate-700 mb-6">
+                MinIO is an object storage server released under GNU AGPLv3. It's S3-compatible - meaning it speaks the same API as AWS S3, Google Cloud Storage, and any other S3-compatible service.
+            </p>
+
+            <div class="grid md:grid-cols-3 gap-4 mb-6">
+                <div class="p-5 bg-slate-50 rounded-lg">
+                    <h3 class="font-semibold text-slate-900 mb-2">100% S3 Compatible</h3>
+                    <p class="text-slate-600 text-sm">Drop-in replacement for AWS S3. Same SDKs, same commands, same behavior.</p>
+                </div>
+                <div class="p-5 bg-slate-50 rounded-lg">
+                    <h3 class="font-semibold text-slate-900 mb-2">High Performance</h3>
+                    <p class="text-slate-600 text-sm">Written in Go. Handles millions of objects per cluster. Streaming and concurrent access optimized.</p>
+                </div>
+                <div class="p-5 bg-slate-50 rounded-lg">
+                    <h3 class="font-semibold text-slate-900 mb-2">Distributed</h3>
+                    <p class="text-slate-600 text-sm">Erasure coding for data protection. Scale out by adding more servers. No single point of failure.</p>
+                </div>
+            </div>
+
+            <div class="architecture-box">
+                <h4 class="font-semibold text-cyan-400 mb-3">How it differs from traditional file storage</h4>
+                <div class="grid md:grid-cols-2 gap-4 text-sm">
+                    <div>
+                        <p class="text-emerald-400 font-semibold mb-1">Object Storage (MinIO/S3)</p>
+                        <ul class="space-y-1 text-slate-400">
+                            <li>• Flat namespace (buckets/objects)</li>
+                            <li>• Metadata with each object</li>
+                            <li>• Scales to billions of objects</li>
+                            <li>• HTTP-based access</li>
+                            <li>• Built for unstructured data</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <p class="text-slate-500 font-semibold mb-1">Traditional File Systems</p>
+                        <ul class="space-y-1 text-slate-400">
+                            <li>• Hierarchical (directories/files)</li>
+                            <li>• Limited metadata</li>
+                            <li>• Performance degrades with count</li>
+                            <li>• POSIX/FTP protocols</li>
+                            <li>• Built for structured data</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="bg-white rounded-xl shadow-sm p-8 mb-8">
+            <h2 class="text-2xl font-bold text-slate-900 mb-6">Deployment: From single node to distributed cluster</h2>
+
+            <div class="space-y-8">
+                <div class="flex gap-4">
+                    <div class="step-number">1</div>
+                    <div class="flex-1">
+                        <h3 class="text-lg font-semibold text-slate-900 mb-3">Single node for development/testing</h3>
+                        <p class="text-slate-600 mb-3">Quick start with Docker:</p>
+                        <div class="cli-command">
+docker run -p 9000:9000 -p 9001:9001 \
+  -e "MINIO_ROOT_USER=admin" \
+  -e "MINIO_ROOT_PASSWORD=changeme" \
+  quay.io/minio/minio server /data --console-address ":9001"
+                        </div>
+                        <p class="text-slate-500 text-sm mt-3">
+                            Access UI at http://localhost:9001. API at http://localhost:9000. Not production-ready but great for testing.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="flex gap-4">
+                    <div class="step-number">2</div>
+                    <div class="flex-1">
+                        <h3 class="text-lg font-semibold text-slate-900 mb-3">Distributed setup for production</h3>
+                        <p class="text-slate-600 mb-3">4-node cluster with erasure coding (recommended minimum):</p>
+                        <div class="cli-command">
+# Node 1
+minio server http://node1{1...4}/data{1...4} \
+  --address ":9000" \
+  --console-address ":9001"
+                        </div>
+                        <p class="text-slate-500 text-sm mt-3">
+                            Each node has 4 drives. Erasure coded across 16 drives total. Can lose any 4 drives without data loss.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="flex gap-4">
+                    <div class="step-number">3</div>
+                    <div class="flex-1">
+                        <h3 class="text-lg font-semibold text-slate-900 mb-3">Docker Compose deployment</h3>
+                        <p class="text-slate-600 mb-3">docker-compose.yml for local cluster:</p>
+                        <div class="cli-command">
+version: '3.8'
+
+services:
+  minio1:
+    image: quay.io/minio/minio
+    command: server http://minio{1...4}/data{1...4}
+    environment:
+      - MINIO_ROOT_USER=admin
+      - MINIO_ROOT_PASSWORD=changeme
+    volumes:
+      - data1-1:/data1
+      - data1-2:/data2
+      - data1-3:/data3
+      - data1-4:/data4
+    ports:
+      - "9001:9000"
+      - "9011:9001"
+
+  # Repeat for minio2, minio3, minio4...
+  # Each with different ports and volume mappings
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex gap-4">
+                    <div class="step-number">4</div>
+                    <div class="flex-1">
+                        <h3 class="text-lg font-semibold text-slate-900 mb-3">Kubernetes deployment (recommended for scale)</h3>
+                        <p class="text-slate-600 mb-3">Using Helm chart for production:</p>
+                        <div class="cli-command">
+# Add MinIO Helm repo
+helm repo add minio https://charts.min.io/
+helm repo update
+
+# Install with custom values
+helm install minio minio/minio \
+  --set mode=distributed \
+  --set replicas=4 \
+  --set drivesPerNode=4 \
+  --set persistence.size=100Gi \
+  --set rootUser=admin \
+  --set rootPassword=changeme \
+  --set consoleService.type=LoadBalancer
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="bg-white rounded-xl shadow-sm p-8 mb-8">
+            <h2 class="text-2xl font-bold text-slate-900 mb-6">Data redundancy and erasure coding</h2>
+
+            <p class="text-slate-700 mb-6">
+                MinIO uses erasure coding instead of traditional RAID. This is important because it offers better performance and flexibility.
+            </p>
+
+            <div class="space-y-4">
+                <div class="p-5 bg-slate-50 rounded-lg">
+                    <h4 class="font-semibold text-slate-900 mb-2">EC:4 (standard)</h4>
+                    <p class="text-slate-600 text-sm">Splits data into 4 chunks, creates 4 parity chunks. Can lose any 4 drives. Storage overhead: 2x. Good balance of safety and efficiency.</p>
+                </div>
+
+                <div class="p-5 bg-slate-50 rounded-lg">
+                    <h4 class="font-semibold text-slate-900 mb-2">EC:2 (space-optimized)</h4>
+                    <p class="text-slate-600 text-sm">Splits data into 8 chunks, creates 2 parity chunks. Can lose any 2 drives. Storage overhead: 1.25x. Maximum space utilization.</p>
+                </div>
+
+                <div class="p-5 bg-slate-50 rounded-lg">
+                    <h4 class="font-semibold text-slate-900 mb-2">EC:8 (maximum redundancy)</h4>
+                    <p class="text-slate-600 text-sm">Splits data into 4 chunks, creates 8 parity chunks. Can lose any 8 drives. Storage overhead: 3x. For critical data.</p>
+                </div>
+            </div>
+
+            <div class="mt-6 p-4 bg-amber-50 border border-amber-200 rounded-lg">
+                <p class="text-amber-900 text-sm">
+                    <strong>Recommendation:</strong> Start with EC:4 on a 4-node cluster. Gives you drive-level redundancy and node-level redundancy. Can rebuild from any 3 nodes if one fails completely.
+                </p>
+            </div>
+        </section>
+
+        <section class="bg-white rounded-xl shadow-sm p-8 mb-8">
+            <h2 class="text-2xl font-bold text-slate-900 mb-6">Migrating from AWS S3 to MinIO</h2>
+
+            <p class="text-slate-700 mb-6">
+                The beauty of S3 compatibility: your applications don't know the difference. Here's how we migrated.
+            </p>
+
+            <div class="space-y-4">
+                <div>
+                    <h4 class="font-semibold text-slate-900 mb-2">Step 1: Set up MinIO and create buckets</h4>
+                    <div class="cli-command">
+# Using MinIO Client (mc)
+mc alias set local http://minio.example.com admin password
+
+# Create buckets matching your S3 setup
+mc mb local/user-uploads
+mc mb local/backups
+mc mb local/assets
+                    </div>
+                </div>
+
+                <div>
+                    <h4 class="font-semibold text-slate-900 mb-2">Step 2: Mirror data from S3</h4>
+                    <div class="cli-command">
+# Add S3 as a remote
+mc alias set s3 https://s3.amazonaws.com AWS_ACCESS_KEY AWS_SECRET_KEY
+
+# Mirror buckets
+mc mirror s3/user-uploads local/user-uploads
+mc mirror s3/backups local/backups
+
+# Watch for changes and sync continuously
+mc mirror --watch s3/user-uploads local/user-uploads
+                    </div>
+                </div>
+
+                <div>
+                    <h4 class="font-semibold text-slate-900 mb-2">Step 3: Update application configuration</h4>
+                    <div class="cli-command">
+# Python boto3 example
+import boto3
+
+s3 = boto3.client('s3',
+    endpoint_url='http://minio.example.com',
+    aws_access_key_id='admin',
+    aws_secret_access_key='password'
+)
+
+# Everything else stays the same
+s3.upload_file('file.txt', 'user-uploads', 'file.txt')
+                    </div>
+                    <p class="text-slate-500 text-sm mt-2">Change endpoint URL and credentials. Same SDK, same code, same behavior.</p>
+                </div>
+
+                <div>
+                    <h4 class="font-semibold text-slate-900 mb-2">Step 4: DNS cutover (zero downtime)</h4>
+                    <div class="cli-command">
+# Create CNAME record
+s3.mycompany.com → minio.example.com
+
+# Or use proxy pass in nginx
+location /s3/ {
+    proxy_pass http://minio-cluster:9000;
+}
+                    </div>
+                    <p class="text-slate-500 text-sm mt-2">Applications keep using s3.mycompany.com. Under the hood, it hits MinIO instead of AWS.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="bg-white rounded-xl shadow-sm p-8 mb-8">
+            <h2 class="text-2xl font-bold text-slate-900 mb-6">Production considerations I learned the hard way</h2>
+
+            <div class="space-y-4">
+                <div class="border-l-4 border-red-400 pl-4 py-3">
+                    <h4 class="font-semibold text-slate-900 mb-2">Disk space monitoring is critical</h4>
+                    <p class="text-slate-600 text-sm mb-2">Erasure coding needs free space to rebuild. At 85% capacity, performance degrades. At 95%, writes start failing.</p>
+                    <div class="cli-command text-xs">
+# Set up alerts
+mc admin trace local --verbose --watch
+
+# Check disk usage
+mc admin info local
+                    </div>
+                </div>
+
+                <div class="border-l-4 border-red-400 pl-4 py-3">
+                    <h4 class="font-semibold text-slate-900 mb-2">Network latency matters between nodes</h4>
+                    <p class="text-slate-600 text-sm mb-2">Spread nodes across availability zones? Expect slow rebalancing. Keep nodes in same datacenter, different racks.</p>
+                </div>
+
+                <div class="border-l-4 border-red-400 pl-4 py-3">
+                    <h4 class="font-semibold text-slate-900 mb-2">Backup MinIO itself</h4>
+                    <p class="text-slate-600 text-sm mb-2">MinIO stores metadata and configuration. Back these up regularly:</p>
+                    <div class="cli-command text-xs">
+# Backup .minio.sys directory
+mc cp --recursive local/.minio.sys /backup/minio-config/
+
+# Or export IAM policies and buckets
+mc admin info local > cluster-state.txt
+                    </div>
+                </div>
+
+                <div class="border-l-4 border-red-400 pl-4 py-3">
+                    <h4 class="font-semibold text-slate-900 mb-2">Use SSDs for metadata, HDDs for data</h4>
+                    <p class="text-slate-600 text-sm">Mixed storage tiering keeps costs down while maintaining performance for critical operations.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="bg-white rounded-xl shadow-sm p-8 mb-8">
+            <h2 class="text-2xl font-bold text-slate-900 mb-6">When MinIO doesn't make sense</h2>
+
+            <div class="space-y-3">
+                <div class="flex gap-3 p-4 bg-slate-50 rounded-lg">
+                    <span class="text-slate-400">✗</span>
+                    <div>
+                        <p class="font-semibold text-slate-900">Small scale (&lt; 1TB)</p>
+                        <p class="text-slate-600 text-sm">Setup overhead outweighs savings. Just use S3 or B2.</p>
+                    </div>
+                </div>
+
+                <div class="flex gap-3 p-4 bg-slate-50 rounded-lg">
+                    <span class="text-slate-400">✗</span>
+                    <div>
+                        <p class="font-semibold text-slate-900">Spiky, unpredictable traffic</p>
+                        <p class="text-slate-600 text-sm">Cloud auto-scales better. You'd over-provision for peaks.</p>
+                    </div>
+                </div>
+
+                <div class="flex gap-3 p-4 bg-slate-50 rounded-lg">
+                    <span class="text-slate-400">✗</span>
+                    <div>
+                        <p class="font-semibold text-slate-900">No operations team</p>
+                        <p class="text-slate-600 text-sm">Someone needs to manage hardware, updates, failures. Managed services might be cheaper overall.</p>
+                    </div>
+                </div>
+
+                <div class="flex gap-3 p-4 bg-slate-50 rounded-lg">
+                    <span class="text-emerald-500">✓</span>
+                    <div>
+                        <p class="font-semibold text-slate-900">Large, predictable storage needs (10TB+)</p>
+                        <p class="text-slate-600 text-sm">Break-even happens quickly after initial investment.</p>
+                    </div>
+                </div>
+
+                <div class="flex gap-3 p-4 bg-slate-50 rounded-lg">
+                    <span class="text-emerald-500">✓</span>
+                    <div>
+                        <p class="font-semibold text-slate-900">Data privacy requirements</p>
+                        <p class="text-slate-600 text-sm">Keep data on your own infrastructure. Full control over encryption and access.</p>
+                    </div>
+                </div>
+
+                <div class="flex gap-3 p-4 bg-slate-50 rounded-lg">
+                    <span class="text-emerald-500">✓</span>
+                    <div>
+                        <p class="font-semibold text-slate-900">Frequent data access (high egress)</p>
+                        <p class="text-slate-600 text-sm">No data transfer fees. Bandwidth is your biggest cost with cloud providers.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="bg-gradient-to-br from-emerald-600 to-cyan-600 rounded-xl shadow-lg p-8 text-white">
+            <h2 class="text-2xl font-bold mb-4">Why we made the switch</h2>
+            <p class="text-emerald-100 leading-relaxed mb-4">
+                At 50TB and growing, the math was undeniable. $16,800 annual savings, zero application changes, complete control over our data. The migration took one weekend. We've been running MinIO in production for 18 months with zero downtime.
+            </p>
+            <p class="text-emerald-100 leading-relaxed mb-4">
+                Is it more work than managed S3? Yes. We monitor disk health, we handle drive replacements, we manage updates. But for that work, we save $1,400 every month and own our infrastructure completely.
+            </p>
+            <p class="text-emerald-100 leading-relaxed">
+                If you have substantial storage needs and basic operations capability, MinIO is worth serious consideration. The S3 compatibility means you can always switch back if needed - but I doubt you will.
+            </p>
+            <div class="mt-6 pt-6 border-t border-emerald-500">
+                <p class="text-sm text-emerald-200">
+                    <a href="https://min.io/" class="underline hover:text-white">min.io</a> ·
+                    <a href="https://github.com/minio/minio" class="underline hover:text-white">github.com/minio/minio</a>
+                </p>
+            </div>
+        </section>
+
+    </article>
+
+    <footer class="bg-gray-800 text-white py-12">
+        <div class="max-w-4xl mx-auto px-4 text-center">
+            <p class="opacity-70 mb-2">📝 Programming Notes</p>
+            <p class="text-sm opacity-50">
+                Personal learning notes & tutorials. Updated as I explore new technologies.
+            </p>
+            <p class="text-xs opacity-40 mt-4"><a href="privacy.html" class="hover:text-white">Privacy Policy</a></p>
+        </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+</body>
+</html>
