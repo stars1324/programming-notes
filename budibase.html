@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Budibase Tutorial: Build Internal Business Tools Without Coding - Inventory Management Example</title>
+    <meta name="description" content="Need an internal admin panel but can't code? Learn how to build a complete inventory management system with Budibase in one afternoon. Connects to your existing database, no developers required.">
+    <meta name="keywords" content="Budibase, low-code platform, internal tools, inventory management, business apps, no-code, admin panel, database UI">
+    <link rel="canonical" href="https://pnt.jacbex.com/budibase.html">
+
+    <meta property="og:title" content="Build Business Apps in Minutes: Budibase Tutorial for Non-Developers">
+    <meta property="og:description" content="Create an inventory management system in one afternoon. Connect Budibase to your existing database without writing code.">
+    <meta property="og:type" content="article">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "Budibase Tutorial: Build Internal Business Tools Without Coding",
+      "description": "Step-by-step guide to building an inventory management system using Budibase low-code platform. Includes database connection and UI building.",
+      "author": {
+        "@type": "Person",
+        "name": "Programming Notes"
+      },
+      "proficiencyLevel": "Beginner"
+    }
+    </script>
+
+    <style>
+        body { font-family: 'Segoe UI', system-ui, sans-serif; }
+        code { font-family: 'Consolas', 'Monaco', monospace; font-size: 13px; }
+        .code-block { background: #2d2d3a; color: #e0e0e0; padding: 20px; border-radius: 6px; overflow-x: auto; line-height: 1.6; }
+        .highlight-box { background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); color: white; padding: 24px; border-radius: 8px; margin: 24px 0; }
+        .comparison { display: flex; gap: 16px; margin: 20px 0; }
+        .compare-col { flex: 1; background: #f8fafc; border-radius: 8px; padding: 20px; }
+        .timeline-item { border-left: 3px solid #6366f1; padding-left: 20px; margin-bottom: 24px; position: relative; }
+        .timeline-item::before { content: ''; width: 12px; height: 12px; background: #6366f1; border-radius: 50%; position: absolute; left: -7px; top: 4px; }
+    </style>
+</head>
+<body class="bg-gray-100">
+
+    <nav class="bg-white shadow-sm border-b border-gray-200">
+        <div class="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
+            <a href="index.html" class="text-gray-600 hover:text-gray-900 flex items-center gap-2">
+                <span class="text-xl">←</span>
+                <span>Back to home</span>
+            </a>
+            <div class="flex gap-6 text-sm">
+                <a href="index.html" class="text-gray-500 hover:text-gray-700">Home</a>
+                <a href="about.html" class="text-gray-500 hover:text-gray-700">About</a>
+                <a href="contact.html" class="text-gray-500 hover:text-gray-700">Contact</a>
+            </div>
+        </div>
+    </nav>
+
+    <article class="max-w-5xl mx-auto px-6 py-12">
+        <header class="mb-12">
+            <div class="flex items-center gap-3 mb-4">
+                <span class="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full text-sm font-medium">Low-Code Platform</span>
+                <span class="bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-sm font-medium">Internal Tools</span>
+            </div>
+            <h1 class="text-4xl font-bold text-gray-900 leading-tight mb-4">
+                Build an Inventory Management System in One Afternoon: No Coding Required
+            </h1>
+            <p class="text-xl text-gray-600 leading-relaxed">
+                Create business apps without coding. Connect Budibase to your existing database and build internal tools in hours, not months.
+            </p>
+            <p class="text-gray-500 mt-6">March 2026</p>
+        </header>
+
+        <div class="bg-white rounded-xl shadow-sm p-8 mb-8">
+            <h2 class="text-2xl font-bold text-gray-900 mb-6">The spreadsheet problem</h2>
+            <div class="space-y-4 text-gray-700 leading-relaxed">
+                <p>
+                    Our warehouse team tracked inventory in spreadsheets. Three people maintaining different versions, constant merge conflicts, someone accidentally deleting rows. They needed a proper system but couldn't wait 3 months for IT to build something.
+                </p>
+                <p>
+                    I looked into hiring a developer. Quotes ranged from $5,000 to $15,000 for a basic inventory system. Timeline: 2-3 months minimum. Meanwhile the spreadsheet chaos continued.
+                </p>
+            </div>
+
+            <div class="highlight-box">
+                <h3 class="text-lg font-bold mb-2">What I built instead</h3>
+                <p class="text-indigo-100">
+                    Complete inventory dashboard in 4 hours. Product catalog, stock levels, supplier info, low stock alerts. Connected to our existing PostgreSQL database. Team started using it the next day.
+                </p>
+            </div>
+
+            <p class="text-gray-700 leading-relaxed">
+                The key difference with Budibase: it connects to your existing data. Most low-code tools want you to import everything into their database. Budibase just builds a UI on top of what you already have.
+            </p>
+        </div>
+
+        <section class="bg-white rounded-xl shadow-sm p-8 mb-8">
+            <h2 class="text-2xl font-bold text-gray-900 mb-6">Why Budibase over other low-code tools</h2>
+
+            <div class="grid md:grid-cols-3 gap-6">
+                <div class="p-6 bg-gray-50 rounded-lg">
+                    <div class="w-10 h-10 bg-indigo-500 rounded-lg flex items-center justify-center text-white mb-4">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4"></path></svg>
+                    </div>
+                    <h3 class="font-semibold text-gray-900 mb-2">Connects to your database</h3>
+                    <p class="text-gray-600 text-sm">PostgreSQL, MySQL, MongoDB, REST APIs. Use what you already have instead of migrating.</p>
+                </div>
+
+                <div class="p-6 bg-gray-50 rounded-lg">
+                    <div class="w-10 h-10 bg-purple-500 rounded-lg flex items-center justify-center text-white mb-4">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                    </div>
+                    <h3 class="font-semibold text-gray-900 mb-2">Self-hosted</h3>
+                    <p class="text-gray-600 text-sm">Run on your own servers. Data never leaves your network. Critical for sensitive business data.</p>
+                </div>
+
+                <div class="p-6 bg-gray-50 rounded-lg">
+                    <div class="w-10 h-10 bg-pink-500 rounded-lg flex items-center justify-center text-white mb-4">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
+                    </div>
+                    <h3 class="font-semibold text-gray-900 mb-2">Pre-built components</h3>
+                    <p class="text-gray-600 text-sm">Tables, forms, charts, calendars. Drag, drop, connect to data. No HTML/CSS knowledge needed.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="bg-white rounded-xl shadow-sm p-8 mb-8">
+            <h2 class="text-2xl font-bold text-gray-900 mb-6">Getting Budibase running</h2>
+
+            <div class="comparison">
+                <div class="compare-col">
+                    <h3 class="font-semibold text-gray-900 mb-3">Option 1: Budibase Cloud</h3>
+                    <p class="text-gray-600 text-sm mb-4">Fastest way to start. No installation needed.</p>
+                    <div class="code-block text-sm">
+<pre>1. Go to budibase.com
+2. Sign up for free account
+3. Create new app
+4. Connect your data source
+5. Start building</pre>
+                    </div>
+                    <p class="text-gray-500 text-sm mt-3">Free tier: 3 apps. Good for testing.</p>
+                </div>
+
+                <div class="compare-col">
+                    <h3 class="font-semibold text-gray-900 mb-3">Option 2: Self-hosted</h3>
+                    <p class="text-gray-600 text-sm mb-4">For production or sensitive data.</p>
+                    <div class="code-block text-sm">
+<pre># Clone and run with Docker
+git clone https://github.com/Budibase/budibase.git
+cd budibase
+docker-compose up -d
+
+# Access at http://localhost:10000</pre>
+                    </div>
+                    <p class="text-gray-500 text-sm mt-3">Runs everything locally on your infrastructure.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="bg-white rounded-xl shadow-sm p-8 mb-8">
+            <h2 class="text-2xl font-bold text-gray-900 mb-6">How I built the inventory system</h2>
+
+            <div class="timeline-item">
+                <h3 class="text-lg font-semibold text-gray-900 mb-2">Connect the database</h3>
+                <p class="text-gray-600 mb-3">Budibase connects directly to our existing PostgreSQL database:</p>
+                <div class="code-block text-sm">
+<pre>Data Source: PostgreSQL
+Host: inventory.company.internal
+Port: 5432
+Database: warehouse_db
+User: budibase_readonly (created with limited permissions)
+
+Selected tables:
+- products
+- categories
+- suppliers
+- stock_movements</pre>
+                </div>
+                <p class="text-gray-500 text-sm mt-3">No data migration needed. Budibase reads directly from production database.</p>
+            </div>
+
+            <div class="timeline-item">
+                <h3 class="text-lg font-semibold text-gray-900 mb-2">Build the product catalog view</h3>
+                <p class="text-gray-600 mb-3">Main screen showing all products with search and filtering:</p>
+                <div class="code-block text-sm">
+<pre>Table component connected to "products" table
+
+Display columns:
+- Product name
+- SKU
+- Current stock
+- Reorder level
+- Category (relationship)
+- Supplier (relationship)
+- Last updated
+
+Features added:
+- Search by name/SKU
+- Filter by category
+- Sort by stock level
+- Click row to view details
+- Edit button for updates</pre>
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <h3 class="text-lg font-semibold text-gray-900 mb-2">Create detail views and forms</h3>
+                <p class="text-gray-600 mb-3">Individual product screens with related data:</p>
+                <div class="code-block text-sm">
+<pre>Product Details screen:
+- Form fields for editing
+- Related purchase history
+- Stock movement log
+- Supplier information
+- Save/Cancel buttons
+
+Add Product screen:
+- Same form reused
+- Required field validation
+- Dropdown menus for relationships
+- Auto-populate timestamps</pre>
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <h3 class="text-lg font-semibold text-gray-900 mb-2">Set up low stock alerts</h3>
+                <p class="text-gray-600 mb-3">Dashboard for items needing attention:</p>
+                <div class="code-block text-sm">
+<pre>Query filter: stock <= reorder_level
+
+Visual indicators:
+- Red background: Critical (0-5 units)
+- Yellow: Warning (6-10 units)
+- Shows days until out of stock
+
+Actions:
+- "Create Purchase Order" button
+- Email notifications to managers
+- Daily summary report</pre>
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <h3 class="text-lg font-semibold text-gray-900 mb-2">Configure user permissions</h3>
+                <p class="text-gray-600 mb-3">Different access levels for different roles:</p>
+                <div class="code-block text-sm">
+<pre>Warehouse Staff:
+- View products
+- Update stock quantities
+- Cannot edit prices/suppliers
+
+Managers:
+- Full product editing
+- Approve purchase orders
+- View all reports
+
+Admins:
+- User management
+- System settings
+- Full access</pre>
+                </div>
+            </div>
+        </section>
+
+        <section class="bg-white rounded-xl shadow-sm p-8 mb-8">
+            <h2 class="text-2xl font-bold text-gray-900 mb-6">4 hours vs 3 months: What actually got built</h2>
+
+            <div class="comparison">
+                <div class="compare-col">
+                    <h3 class="font-semibold text-green-700 mb-4 flex items-center gap-2">
+                        <span class="text-green-500">✓</span> With Budibase (4 hours)
+                    </h3>
+                    <ul class="space-y-2 text-sm text-gray-700">
+                        <li class="flex gap-2"><span class="text-green-500">✓</span> Product catalog with search and filters</li>
+                        <li class="flex gap-2"><span class="text-green-500">✓</span> Real-time stock level tracking</li>
+                        <li class="flex gap-2"><span class="text-green-500">✓</span> Low stock alerts dashboard</li>
+                        <li class="flex gap-2"><span class="text-green-500">✓</span> Add/edit product forms</li>
+                        <li class="flex gap-2"><span class="text-green-500">✓</span> Role-based access control</li>
+                        <li class="flex gap-2"><span class="text-green-500">✓</span> Mobile-responsive design</li>
+                        <li class="flex gap-2"><span class="text-green-500">✓</span> Connected to existing database</li>
+                        <li class="flex gap-2"><span class="text-green-500">✓</span> Deployed and in use next day</li>
+                    </ul>
+                </div>
+
+                <div class="compare-col">
+                    <h3 class="font-semibold text-red-700 mb-4 flex items-center gap-2">
+                        <span class="text-red-500">✗</span> Hiring a developer (2-3 months)
+                    </h3>
+                    <ul class="space-y-2 text-sm text-gray-700">
+                        <li class="flex gap-2"><span class="text-red-500">✗</span> $5,000-$15,000 initial cost</li>
+                        <li class="flex gap-2"><span class="text-red-500">✗</span> Ongoing maintenance fees</li>
+                        <li class="flex gap-2"><span class="text-red-500">✗</span> Dependency on one person</li>
+                        <li class="flex gap-2"><span class="text-red-500">✗</span> Changes take weeks to prioritize</li>
+                        <li class="flex gap-2"><span class="text-red-500">✗</span> Deployment complexity</li>
+                        <li class="flex gap-2"><span class="text-red-500">✗</span> Developer might not understand workflow</li>
+                        <li class="flex gap-2"><span class="text-red-500">✗</span> Communication overhead</li>
+                        <li class="flex gap-2"><span class="text-red-500">✗</span> Long timeline affects operations</li>
+                    </ul>
+                </div>
+            </div>
+
+            <p class="text-gray-700 mt-6 p-4 bg-indigo-50 rounded-lg">
+                <strong>The real advantage:</strong> When the warehouse team said "can we add expiration date tracking", I added it in 20 minutes. No Jira tickets, no sprint planning, no waiting.
+            </p>
+        </section>
+
+        <section class="bg-white rounded-xl shadow-sm p-8 mb-8">
+            <h2 class="text-2xl font-bold text-gray-900 mb-6">What else you can build with Budibase</h2>
+
+            <div class="grid md:grid-cols-2 gap-4">
+                <div class="p-5 border border-gray-200 rounded-lg hover:border-indigo-300 transition">
+                    <h4 class="font-semibold text-gray-900 mb-2">Customer portal</h4>
+                    <p class="text-gray-600 text-sm">Let clients view orders, track shipments, update profiles. Connected directly to your customer database.</p>
+                </div>
+
+                <div class="p-5 border border-gray-200 rounded-lg hover:border-indigo-300 transition">
+                    <h4 class="font-semibold text-gray-900 mb-2">Employee directory</h4>
+                    <p class="text-gray-600 text-sm">Searchable staff list with skills, departments, contact info. Syncs with HR database automatically.</p>
+                </div>
+
+                <div class="p-5 border border-gray-200 rounded-lg hover:border-indigo-300 transition">
+                    <h4 class="font-semibold text-gray-900 mb-2">Project tracker</h4>
+                    <p class="text-gray-600 text-sm">Kanban boards, Gantt charts, time tracking. Replace generic tools with something tailored to your workflow.</p>
+                </div>
+
+                <div class="p-5 border border-gray-200 rounded-lg hover:border-indigo-300 transition">
+                    <h4 class="font-semibold text-gray-900 mb-2">CRM dashboard</h4>
+                    <p class="text-gray-600 text-sm">Customer info, interaction history, sales pipeline. Built on your actual data, not a closed SaaS.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="bg-white rounded-xl shadow-sm p-8 mb-8">
+            <h2 class="text-2xl font-bold text-gray-900 mb-6">Issues that slowed me down</h2>
+
+            <div class="space-y-4">
+                <div class="border-l-4 border-amber-400 pl-4 py-2">
+                    <h4 class="font-semibold text-gray-900">Database connection refused</h4>
+                    <p class="text-gray-600 text-sm mb-2">Firewall was blocking external connections.</p>
+                    <div class="code-block text-xs mt-2">
+<pre># PostgreSQL config fix
+listen_addresses = '*'
+
+# In pg_hba.conf, allow Budibase server IP
+host    all    budibase_user    10.0.0.50/32    md5
+
+# Create limited-permission user
+CREATE USER budibase_user WITH PASSWORD 'xxx';
+GRANT SELECT ON ALL TABLES IN SCHEMA public TO budibase_user;</pre>
+                    </div>
+                </div>
+
+                <div class="border-l-4 border-amber-400 pl-4 py-2">
+                    <h4 class="font-semibold text-gray-900">Large tables were slow</h4>
+                    <p class="text-gray-600 text-sm mb-2">Products table with 100,000+ rows lagged.</p>
+                    <div class="code-block text-xs mt-2">
+<pre># Added database indexes
+CREATE INDEX idx_product_name ON products(name);
+CREATE INDEX idx_product_category ON products(category_id);
+
+# Enabled pagination in table settings
+# Page size: 50 rows</pre>
+                    </div>
+                </div>
+
+                <div class="border-l-4 border-amber-400 pl-4 py-2">
+                    <h4 class="font-semibold text-gray-900">Custom feature needed</h4>
+                    <p class="text-gray-600 text-sm mb-2">Wanted barcode scanning functionality.</p>
+                    <div class="code-block text-xs mt-2">
+<pre>Solution: Used custom JavaScript component
+Alternative: Created database view with computed fields
+Workaround: Webhook to external barcode API</pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl shadow-lg p-8 text-white">
+            <h2 class="text-2xl font-bold mb-4">Who should use this</h2>
+            <p class="text-indigo-100 leading-relaxed mb-4">
+                Business owners, operations managers, anyone drowning in spreadsheets but unable to justify hiring developers. If you can think through a workflow logically, you can build it in Budibase.
+            </p>
+            <p class="text-indigo-100 leading-relaxed mb-4">
+                First app takes a day. Second app takes half a day. By the third, you're building internal tools in hours. Your developers will start asking "how did you build that so fast?"
+            </p>
+            <p class="text-indigo-100 leading-relaxed">
+                The best part: when someone requests a new feature, you can add it yourself instead of waiting months for IT to prioritize it.
+            </p>
+            <div class="mt-6 pt-6 border-t border-indigo-400">
+                <p class="text-sm text-indigo-200">
+                    <a href="https://budibase.com/" class="underline hover:text-white">budibase.com</a> ·
+                    <a href="https://github.com/Budibase/budibase" class="underline hover:text-white">github.com/Budibase/budibase</a>
+                </p>
+            </div>
+        </section>
+
+    </article>
+
+    <footer class="bg-gray-800 text-white py-12">
+        <div class="max-w-4xl mx-auto px-4 text-center">
+            <p class="opacity-70 mb-2">📝 Programming Notes</p>
+            <p class="text-sm opacity-50">
+                Personal learning notes & tutorials. Updated as I explore new technologies.
+            </p>
+            <p class="text-xs opacity-40 mt-4"><a href="privacy.html" class="hover:text-white">Privacy Policy</a></p>
+        </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+</body>
+</html>
