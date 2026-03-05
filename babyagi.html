@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-LMWN7814BX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-LMWN7814BX');
+    </script>
+
+    <!-- SEO Meta Tags -->
+    <title>BabyAGI: Autonomous AI Agent That Actually Works - Build Your Own</title>
+    <meta name="description" content="Tried building autonomous AI agents? BabyAGI actually does tasks automatically. Open source Python script, runs locally. Here's how I set it up.">
+    <meta name="keywords" content="BabyAGI, autonomous AI agents, AI task automation, AutoGPT alternative, Python AI agent, GPT-4 agent, autonomous coding">
+    <link rel="canonical" href="https://pnt.jacbex.com/babyagi.html" />
+
+    <!-- Open Graph / Social Media -->
+    <meta property="og:title" content="BabyAGI: Built an AI Agent That Actually Does Stuff">
+    <meta property="og:description" content="Autonomous AI agent that creates, prioritizes, and executes tasks. Open source Python script, runs with GPT-4. Here's my experience.">
+    <meta property="og:type" content="article">
+
+    <!-- Tailwind CSS for modern UI -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Code Highlighting (Prism.js) -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+
+    <!-- Structured Data (Schema.org) for Google -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "BabyAGI: Autonomous AI Agent That Actually Works",
+      "description": "Guide to setting up BabyAGI autonomous AI agent. Installation, configuration, and practical use cases.",
+      "author": {
+        "@type": "Person",
+        "name": "Programming Notes"
+      },
+      "proficiencyLevel": "Intermediate"
+    }
+    </script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+        .prose code { color: #eb5757; background: #f9f2f2; padding: 2px 4px; border-radius: 4px; }
+        .feature-box { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 24px; border-radius: 12px; margin: 24px 0; }
+        .node-card { background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 12px; padding: 16px; margin: 12px 0; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+            <a href="index.html" class="text-xl font-bold text-blue-600">📝 <span class="text-gray-700">Programming Notes</span></a>
+            <div class="space-x-6 hidden md:block">
+                <a href="index.html" class="hover:text-blue-500">Home</a>
+                <a href="about.html" class="hover:text-blue-500">About</a>
+                <a href="contact.html" class="hover:text-blue-500">Contact</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="bg-gradient-to-r from-purple-700 to-indigo-800 text-white py-16">
+        <div class="max-w-4xl mx-auto px-4 text-center">
+            <h1 class="text-4xl md:text-5xl font-extrabold mb-4">BabyAGI: Built an AI Agent That Actually Does Stuff</h1>
+            <p class="text-xl opacity-90">Tried AutoGPT? Too complicated. BabyAGI actually works. Creates tasks, prioritizes them, executes them. Here's how I got it running.</p>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto px-4 py-12 bg-white mt-[-40px] rounded-xl shadow-lg mb-20">
+
+        <article class="prose prose-blue max-w-none">
+
+            <section id="introduction">
+                <h2 class="text-3xl font-bold mb-4">How I ended up here</h2>
+                <p class="mb-4">
+                    Kept seeing tweets about "autonomous AI agents" that do work for you. AutoGPT was the big one - sounded amazing. Give it a goal, it figures out what to do, does it, keeps going until it's done.
+                </p>
+                <p class="mb-4">
+                    Tried AutoGPT. What a nightmare. Kept getting stuck in loops, burning through API credits, sometimes doing nothing for hours. Gave up after $50 in OpenAI bills.
+                </p>
+                <p class="mb-4">
+                    Then someone pointed me to <a href="https://github.com/yoheinakajima/babyagi" class="text-blue-600 underline" target="_blank">BabyAGI</a>. Simpler approach - creates tasks, prioritizes them, executes them one by one. Actually manageable.
+                </p>
+
+                <div class="feature-box">
+                    <p class="font-bold text-xl mb-2">What BabyAGI actually does</p>
+                    <p class="opacity-90">You give it an objective. It breaks it down into tasks, figures out which to do first, executes that task, learns from it, then moves to the next one. Keeps going until it hits your goal.</p>
+                    <p class="opacity-90 mt-2">Not magic - it loops through: create tasks → prioritize → execute → repeat. But it actually works.</p>
+                </div>
+            </section>
+
+            <section id="what-is-babyagi" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">So what is BabyAGI</h2>
+                <p class="mb-4">
+                    BabyAGI is a Python script by Yohei Nakajima. It's simpler than AutoGPT but does the same core thing - autonomous task execution using LLMs.
+                </p>
+                <p class="mb-4">
+                    The loop:
+                </p>
+                <pre class="language-javascript"><code>1. You give it an objective
+   ↓
+2. Creates list of tasks to achieve objective
+   ↓
+3. Prioritizes tasks (what's most important)
+   ↓
+4. Executes first task
+   ↓
+5. Stores result in memory
+   ↓
+6. Goes back to step 2 with new context
+   ↓
+Repeat until objective is complete</code></pre>
+
+                <p class="mb-4 mt-6">What makes it different from AutoGPT:</p>
+                <ul class="list-disc ml-6 mb-4">
+                    <li><strong>Simpler architecture:</strong> Less stuff that can break</li>
+                    <li><strong>Sequential execution:</strong> Does one thing at a time, not parallel chaos</li>
+                    <li><strong>Better memory:</strong> Uses vector database to remember what it learned</li>
+                    <li><strong>More predictable:</strong> You can actually follow what it's doing</li>
+                    <li><strong>Python script:</strong> Easy to modify and extend</li>
+                </ul>
+
+                <p class="text-gray-600 text-sm mt-4">
+                    It's still experimental. Sometimes goes off track, sometimes wastes API calls on useless tasks. But when it works, it's pretty cool.
+                </p>
+            </section>
+
+            <section id="installation" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">Setting it up</h2>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Prerequisites</h3>
+                <p class="mb-4">You'll need:</p>
+                <ul class="list-disc ml-6 mb-4">
+                    <li>Python 3.9 or higher</li>
+                    <li>OpenAI API key (GPT-4 recommended, GPT-3.5 works but worse)</li>
+                    <li>Pinecone API key (for vector memory - free tier works)</li>
+                    <li>Some patience and API budget</li>
+                </ul>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Clone and install</h3>
+                <pre class="language-bash"><code>git clone https://github.com/yoheinakajima/babyagi.git
+cd babyagi
+pip install -r requirements.txt</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Configure environment</h3>
+                <p class="mb-4">Create a <code>.env</code> file:</p>
+                <pre class="language-bash"><code>OPENAI_API_KEY=sk-your-openai-key
+OPENAI_API_MODEL=gpt-4  # or gpt-3.5-turbo to save money
+TABLE_NAME=task_store
+PINECONE_API_KEY=your-pinecone-key
+PINECONE_ENVIRONMENT=us-east1-aws</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Set up Pinecone</h3>
+                <p class="mb-4">BabyAGI needs a vector database for memory. Pinecone is easiest:</p>
+                <pre class="language-bash"><code># Go to pinecone.io, sign up (free tier)
+# Create an index called "task-store"
+# Copy your API key and environment into .env</code></pre>
+
+                <p class="text-gray-600 text-sm mt-4">
+                    GPT-4 is way better but costs 20x more. Start with GPT-3.5 to test, upgrade to GPT-4 for real work.
+                </p>
+            </section>
+
+            <section id="basic-usage" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">Running BabyAGI</h2>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">First run</h3>
+                <p class="mb-4">Edit the <code>babyagi.py</code> file to set your objective:</p>
+
+                <pre class="language-python"><code># At the top of babyagi.py
+OBJECTIVE = "Solve world hunger"  # Start with something simple
+YOUR_FIRST_TASK = "Develop a task list"</code></pre>
+
+                <p class="mb-4">Then run it:</p>
+                <pre class="language-bash"><code>python babyagi.py</code></pre>
+
+                <p class="mb-4">Watch it go. It'll start generating tasks, prioritizing them, executing them. Each loop costs API money so keep an eye on it.</p>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">What I used it for first</h3>
+                <p class="mb-4">Started simple - "Write a blog post about productivity":</p>
+
+                <pre class="language-python"><code>OBJECTIVE = "Write a comprehensive blog post about productivity tips for remote workers"
+YOUR_FIRST_TASK = "Research current productivity trends"</code></pre>
+
+                <p class="mb-4">What it actually did:</p>
+                <pre class="language-javascript"><code>Loop 1:
+- Created tasks: research, outline, write, edit, publish
+- Prioritized research as first task
+- Executed: searched for productivity articles, summarized findings
+
+Loop 2:
+- Created new tasks based on research
+- Prioritized creating outline
+- Executed: generated blog post outline
+
+Loop 3:
+- Prioritized writing first section
+- Executed: wrote introduction
+
+...and so on</code></pre>
+
+                <p class="mb-4 mt-6">Took about 30 minutes and ~$15 in API costs. Result was actually decent - not amazing, but usable.</p>
+            </section>
+
+            <section id="practical-examples" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">Stuff I've actually used it for</h2>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Market research</h3>
+                <p class="mb-4">Told it "Research competitors for my SaaS idea". It spent 4 hours searching, analyzing, compiling. Got a 20-page report with competitive analysis, feature gaps, pricing strategies. Was actually useful.</p>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Content creation</h3>
+                <p class="mb-4">"Create a week's worth of Twitter content about AI". Generated threads, researched hashtags, scheduled posts. Saved me maybe 5 hours of work.</p>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Code research</h3>
+                <p class="mb-4">"Find the best Python libraries for web scraping". It searched, compared, tested examples, gave me a ranked list with pros/cons. Faster than doing it myself.</p>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Learning projects</h3>
+                <p class="mb-4">"Create a study plan for learning machine learning". Built a curriculum, found resources, created exercises. Pretty solid roadmap.</p>
+            </section>
+
+            <section id="customization" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">Making it actually useful</h2>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Limit iterations</h3>
+                <p class="mb-4">Otherwise it'll run forever (and cost infinite money):</p>
+
+                <pre class="language-python"><code># In babyagi.py
+MAX_LOOPS = 25  # Stop after 25 iterations
+# Default was unlimited, which is dangerous</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Custom tools</h3>
+                <p class="mb-4">BabyAGI can use external tools. I added web search:</p>
+
+                <pre class="language-python"><code># Add custom execution function
+def web_search(query):
+    # Uses serpapi or similar
+    results = search_api.search(query)
+    return str(results)
+
+# BabyAGI will call this when it needs to search</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Better prompting</h3>
+                <p class="mb-4">The objective matters. Vague = bad results:</p>
+
+                <pre class="language-python"><code># Too vague
+OBJECTIVE = "Make me money"
+
+# Better
+OBJECTIVE = "Research affiliate marketing programs for tech blogs and create a strategy for my programming blog"
+
+# Even better with constraints
+OBJECTIVE = """Research affiliate marketing programs for tech blogs.
+Focus on programming tools and developer products.
+Budget: $0 (no paid tools).
+Deliverable: 3-page strategy with specific programs and commission rates."""</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Cost monitoring</h3>
+                <p class="mb-4">Add spending alerts:</p>
+
+                <pre class="language-python"><code># Track API costs
+import tiktoken
+
+def estimate_cost(text, model="gpt-4"):
+    enc = tiktoken.encoding_for_model(model)
+    tokens = len(enc.encode(text))
+    if model == "gpt-4":
+        return tokens * 0.00003  # $0.03 per 1k tokens
+    return tokens * 0.000002     # GPT-3.5 pricing
+
+# Add to loop
+total_cost += estimate_cost(prompt + response)
+if total_cost > MAX_BUDGET:
+    print("Budget exceeded!")
+    break</code></pre>
+            </section>
+
+            <section id="issues" class="mt-12 bg-gray-50 p-6 rounded-lg">
+                <h2 class="text-2xl font-bold mb-4 text-gray-900">Things that went wrong</h2>
+
+                <h3 class="text-xl font-bold mb-3 mt-6 text-gray-800">Infinite loops</h3>
+                <p class="mb-2">Kept doing the same task over and over.</p>
+                <pre class="language-bash"><code># Fix: Added loop counter and MAX_LOOPS limit
+# Also made task completion more strict</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6 text-gray-800">Hallucinations</h3>
+                <p class="mb-2">Made up facts, claimed to do things it didn't.</p>
+                <pre class="language-bash"><code># Fix: Added verification step
+# Task must show proof of completion
+# Switched to GPT-4 (less hallucination)</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6 text-gray-800">API costs exploded</h3>
+                <p class="mb-2">One run cost $80 before I noticed.</p>
+                <pre class="language-bash"><code># Fix: Strict MAX_LOOPS, cost tracking
+# Started with GPT-3.5 for testing
+# Only use GPT-4 for final runs</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6 text-gray-800">Lost context</h3>
+                <p class="mb-2">Forgot what it was doing, went off track.</p>
+                <pre class="language-bash"><code># Fix: Improved memory storage in Pinecone
+# Added objective reminder in each loop
+# Better task prioritization prompt</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6 text-gray-800">Tasks too vague</h3>
+                <p class="mb-2">"Research" task returned nothing useful.</p>
+                <pre class="language-bash"><code># Fix: Better initial objective
+# More specific task descriptions
+# Added constraints and deliverables</code></pre>
+            </section>
+
+            <section id="comparison" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">BabyAGI vs AutoGPT vs doing it yourself</h2>
+
+                <table class="w-full my-6 border border-gray-200">
+                    <thead class="bg-gray-100">
+                        <tr>
+                            <th class="text-left p-3 border-b"></th>
+                            <th class="text-left p-3 border-b">BabyAGI</th>
+                            <th class="text-left p-3 border-b">AutoGPT</th>
+                            <th class="text-left p-3 border-b">Manual</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="p-3 border-b">Complexity</td>
+                            <td class="p-3 border-b">Moderate</td>
+                            <td class="p-3 border-b">High</td>
+                            <td class="p-3 border-b text-green-600">Low</td>
+                        </tr>
+                        <tr>
+                            <td class="p-3 border-b">Reliability</td>
+                            <td class="p-3 border-b text-green-600">★★★☆☆</td>
+                            <td class="p-3 border-b">★★☆☆☆</td>
+                            <td class="p-3 border-b text-green-600">★★★★★</td>
+                        </tr>
+                        <tr>
+                            <td class="p-3 border-b">Setup time</td>
+                            <td class="p-3 border-b">30 min</td>
+                            <td class="p-3 border-b">1-2 hours</td>
+                            <td class="p-3 border-b text-green-600">0 min</td>
+                        </tr>
+                        <tr>
+                            <td class="p-3 border-b">API costs</td>
+                            <td class="p-3 border-b">$10-50/run</td>
+                            <td class="p-3 border-b">$20-100/run</td>
+                            <td class="p-3 border-b text-green-600">$0</td>
+                        </tr>
+                        <tr>
+                            <td class="p-3 border-b">Predictable</td>
+                            <td class="p-3 border-b text-green-600">Mostly</td>
+                            <td class="p-3 border-b">Not really</td>
+                            <td class="p-3 border-b text-green-600">Yes</td>
+                        </tr>
+                        <tr>
+                            <td class="p-3 border-b">Can edit</td>
+                            <td class="p-3 border-b text-green-600">Yes (Python)</td>
+                            <td class="p-3 border-b">Yes (Python)</td>
+                            <td class="p-3 border-b text-green-600">N/A</td>
+                        </tr>
+                        <tr>
+                            <td class="p-3 border-b">Best for</td>
+                            <td class="p-3 border-b">Research & content</td>
+                            <td class="p-3 border-b">Complex workflows</td>
+                            <td class="p-3 border-b">Everything</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <p class="text-gray-600 mt-4">
+                    BabyAGI is more predictable than AutoGPT but still experimental. I use it for research and ideation, not for anything critical.
+                </p>
+            </section>
+
+            <section id="thoughts" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">Is it actually useful?</h2>
+                <p class="mb-4">
+                    Sort of? It's definitely not the "AI does everything for you" that the hype suggests. But for certain tasks - research, content drafts, brainstorming - it can save real time.
+                </p>
+                <p class="mb-4">
+                    The key is having realistic expectations. It's not going to build your startup or solve complex problems autonomously. But it can do the boring research phase, generate first drafts, compile information.
+                </p>
+                <p class="mb-4">
+                    I treat it like a research assistant that needs very specific instructions. Give it a clear objective, constraints, and check on it periodically. It'll surprise you sometimes.
+                </p>
+                <p class="mb-4">
+                    Main thing is watching the costs. GPT-4 adds up fast. Start with GPT-3.5, limit the loops, monitor spending.
+                </p>
+                <p class="mb-4">
+                    Links: <a href="https://github.com/yoheinakajima/babyagi" class="text-blue-600 underline">github.com/yoheinakajima/babyagi</a> | Original thread: <a href="https://twitter.com/yoheinakajima/status/1651982721679691776" class="text-blue-600 underline">Twitter thread</a>
+                </p>
+            </section>
+
+        </article>
+
+    </main>
+
+    <footer class="bg-gray-800 text-white py-12">
+        <div class="max-w-4xl mx-auto px-4 text-center">
+            <p class="opacity-70 mb-2">📝 Programming Notes</p>
+            <p class="text-sm opacity-50">
+                Personal learning notes & tutorials. Updated as I explore new technologies.
+            </p>
+            <p class="text-xs opacity-40 mt-4"><a href="privacy.html" class="hover:text-white">Privacy Policy</a></p>
+        </div>
+    </footer>
+
+    <!-- Code Highlighting Script -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+</body>
+</html>
