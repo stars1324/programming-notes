@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-LMWN7814BX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-LMWN7814BX');
+    </script>
+
+    <!-- SEO Meta Tags -->
+    <title>AppFlowy: The Notion Alternative That Actually Respects Your Privacy</title>
+    <meta name="description" content="Tired of Notion's privacy concerns and data locked in their cloud? AppFlowy is an open-source alternative that runs locally. Here's how I switched my entire workspace.">
+    <meta name="keywords" content="AppFlowy, Notion alternative, open source knowledge base, local note-taking app, privacy-focused notes, AppFlowy desktop install">
+    <link rel="canonical" href="https://pnt.jacbex.com/appflowy.html" />
+
+    <!-- Open Graph / Social Media -->
+    <meta property="og:title" content="AppFlowy: Finally, a Notion Alternative That Doesn't Hold Your Data Hostage">
+    <meta property="og:description" content="Open-source, privacy-focused workspace. Runs locally, supports offline access, and exports your data. Here's my complete setup guide.">
+    <meta property="og:type" content="article">
+
+    <!-- Tailwind CSS for modern UI -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Code Highlighting (Prism.js) -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+
+    <!-- Structured Data (Schema.org) for Google -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "AppFlowy: The Notion Alternative That Actually Respects Your Privacy",
+      "description": "Guide to switching from Notion to AppFlowy for privacy-focused, local-first note-taking and knowledge management.",
+      "author": {
+        "@type": "Person",
+        "name": "Programming Notes"
+      },
+      "proficiencyLevel": "Beginner"
+    }
+    </script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+        .prose code { color: #eb5757; background: #f9f2f2; padding: 2px 4px; border-radius: 4px; }
+        .feature-box { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 24px; border-radius: 12px; margin: 24px 0; }
+        .node-card { background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 12px; padding: 16px; margin: 12px 0; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+            <a href="index.html" class="text-xl font-bold text-blue-600">📝 <span class="text-gray-700">Programming Notes</span></a>
+            <div class="space-x-6 hidden md:block">
+                <a href="index.html" class="hover:text-blue-500">Home</a>
+                <a href="about.html" class="hover:text-blue-500">About</a>
+                <a href="contact.html" class="hover:text-blue-500">Contact</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="bg-gradient-to-r from-purple-700 to-indigo-800 text-white py-16">
+        <div class="max-w-4xl mx-auto px-4 text-center">
+            <h1 class="text-4xl md:text-5xl font-extrabold mb-4">AppFlowy: The Notion Alternative That Actually Respects Your Privacy</h1>
+            <p class="text-xl opacity-90">Tired of Notion's privacy concerns and data locked in their cloud? AppFlowy is open-source, runs locally, and exports your data. Here's how I switched my entire workspace.</p>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto px-4 py-12 bg-white mt-[-40px] rounded-xl shadow-lg mb-20">
+
+        <article class="prose prose-blue max-w-none">
+
+            <section id="introduction">
+                <h2 class="text-3xl font-bold mb-4">Why I left Notion</h2>
+                <p class="mb-4">
+                    Used Notion for everything - notes, docs, project planning, knowledge base. Was pretty happy with it until I started thinking about data privacy.
+                </p>
+                <p class="mb-4">
+                    All my stuff living on someone else's servers. If Notion goes down, gets hacked, or changes their terms - I'm screwed. Exporting is possible but it's a mess, and importing into other tools basically doesn't work.
+                </p>
+                <p class="mb-4">
+                    Looked for alternatives. Found <a href="https://appflowy.io" class="text-blue-600 underline" target="_blank">AppFlowy</a> - open-source, local-first, supports offline access. Sounded like what I needed.
+                </p>
+
+                <div class="feature-box">
+                    <p class="font-bold text-xl mb-2">What convinced me to switch</p>
+                    <p class="opacity-90">All my data lives on my machine - SQLite files I can actually access. Offline access works without thinking about it. Exports to standard formats that actually work with other tools.</p>
+                    <p class="opacity-90 mt-2">And the interface is surprisingly similar to Notion. The learning curve was like two days.</p>
+                </div>
+            </section>
+
+            <section id="what-is-appflowy" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">So what is AppFlowy</h2>
+                <p class="mb-4">
+                    AppFlowy is an open-source workspace for notes, docs, and knowledge bases. It's designed as a privacy-focused, local-first alternative to Notion. Your data lives in SQLite databases on your machine, not in someone else's cloud.
+                </p>
+                <p class="mb-4">
+                    The key features:
+                </p>
+                <ul class="list-disc ml-6 mb-4">
+                    <li><strong>Local-first:</strong> Data stored in SQLite files on your machine</li>
+                    <li><strong>Offline access:</strong> Works without internet - full functionality</li>
+                    <li><strong>Notion-like UI:</strong> Familiar blocks, pages, databases</li>
+                    <li><strong>Real-time collaboration:</strong> Share workspaces with others</li>
+                    <li><strong>Database views:</strong> Tables, Kanban, calendar, gallery</li>
+                    <li><strong>Open-source:</strong> Fully auditable code, community plugins</li>
+                    <li><strong>Cross-platform:</strong> Desktop (Mac/Windows/Linux), mobile, web</li>
+                    <li><strong>Encryptable sync:</strong> Optional cloud sync with end-to-end encryption</li>
+                </ul>
+
+                <p class="mb-4 mt-6">Why it's different from Notion:</p>
+                <ul class="list-disc ml-6 mb-4">
+                    <li>You own your data - SQLite files you can access directly</li>
+                    <li>Works offline - no internet needed for full functionality</li>
+                    <li>No vendor lock-in - exports to Markdown, CSV, JSON</li>
+                    <li>Privacy-focused - no account tracking, no telemetry</li>
+                    <li>Open development roadmap - community drives features</li>
+                </ul>
+
+                <p class="text-gray-600 text-sm mt-4">
+                    It's not a 1:1 Notion clone - some features are still missing. But for 90% of what I do, it works perfectly.
+                </p>
+            </section>
+
+            <section id="installation" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">Getting AppFlowy running</h2>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Desktop app (recommended)</h3>
+                <p class="mb-4">Simplest option - download the desktop app:</p>
+
+                <pre class="language-bash"><code># Download from website
+# https://appflowy.io/downloads
+
+# Supports:
+# - macOS (Intel and Apple Silicon)
+# - Windows (portable version available)
+# - Linux (AppImage, deb package)</code></pre>
+
+                <p class="mb-4 mt-6">Just install it like any other app. No account required - starts with a local workspace immediately.</p>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Build from source</h3>
+                <p class="mb-4">For developers or custom builds:</p>
+
+                <pre class="language-bash"><code># Clone the repository
+git clone https://github.com/AppFlowy-IO/AppFlowy.git
+cd AppFlowy
+
+# Install Rust and Flutter dependencies
+# See docs for platform-specific setup
+
+# Build and run
+cargo run --bin appflowy --features dart_frb
+# Flutter will download and build the frontend</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Docker (for servers)</h3>
+                <pre class="language-bash"><code># Run AppFlowy in Docker
+docker run -d \
+  --name appflowy \
+  -p 80:80 \
+  -v appflowy_data:/app/data \
+  appflowyio/appflowy:latest</code></pre>
+
+                <p class="text-gray-600 text-sm mt-4">
+                    Desktop app is the way to go for most users. Docker's good if you want to self-host a web version.
+                </p>
+            </section>
+
+            <section id="setup" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">Setting up your workspace</h2>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">First launch</h3>
+                <p class="mb-4">When you first open AppFlowy, it creates a local workspace. You'll see:</p>
+
+                <pre class="language-bash"><code># Sidebar navigation
+- Workspace (root)
+  - Pages
+    - Getting Started (default page)
+  - Settings
+
+# Everything is local
+# Data stored in:
+# ~/Library/Application Support/AppFlowy/data/ (macOS)
+# ~/.appflowy/data/ (Linux)
+# C:\Users\<user>\.appflowy\data\ (Windows)</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Importing from Notion</h3>
+                <p class="mb-4">AppFlowy has a built-in importer:</p>
+
+                <pre class="language-bash"><code># 1. Click "Import Data" in sidebar
+# 2. Select "Notion"
+# 3. Two options:
+
+# Option A: NotionExport (easier)
+# - Use NotionExport tool to export your workspace
+# - Upload the zip file to AppFlowy
+# - Preserves pages, databases, formatting
+
+# Option B: Manual import
+# - Copy-paste content from Notion
+# - AppFlowy tries to maintain structure
+# - Better for smaller workspaces</code></pre>
+
+                <p class="mb-4 mt-6">My experience: The NotionExport approach worked surprisingly well. Pages, databases, even nested content came through correctly.</p>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Organizing your workspace</h3>
+                <p class="mb-4">AppFlowy uses a similar block-based system:</p>
+
+                <pre class="language-bash"><code># Create pages with different content blocks
+- Text / Headings
+- To-do lists
+- Bulleted / Numbered lists
+- Toggle lists
+- Code blocks (with syntax highlighting)
+- Callouts
+- Quotes
+- Dividers
+- Images / Files
+- Databases (inline or full-page)
+- Linked databases</code></pre>
+
+                <p class="text-gray-600 text-sm mt-4">
+                    Same mental model as Notion, so the transition is pretty painless.
+                </p>
+            </section>
+
+            <section id="databases" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">Using databases</h2>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Creating a database</h3>
+                <p class="mb-4">AppFlowy supports relational databases similar to Notion:</p>
+
+                <pre class="language-bash"><code># Create new page → Choose "Database"
+
+# Database properties:
+- Text (short and long text fields)
+- Number (integers, decimals)
+- Select (single choice dropdown)
+- Multi-select (multiple choice tags)
+- Date (with time option)
+- Checkbox (boolean)
+- URL
+- Email
+- Phone
+- Files
+- Relations (link to other databases)</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Database views</h3>
+                <p class="mb-4">Different ways to visualize data:</p>
+
+                <pre class="language-bash"><code>Same database can have multiple views:
+
+- Table (default spreadsheet view)
+- Board (Kanban - great for task management)
+- Calendar (shows dates on calendar)
+- Gallery (grid view with image previews)
+
+# Switch between views instantly
+# Each view can have different filters and sorts</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Relations between databases</h3>
+                <p class="mb-4">Link databases together:</p>
+
+                <pre class="language-bash"><code># Example: Projects database
+# - Project Name (text)
+# - Status (select: Planning, In Progress, Done)
+# - Assignee (relation to People database)
+# - Due Date (date)
+
+# People database
+# - Name (title)
+# - Email (email)
+# - Skills (multi-select)
+# - Projects (relation back to Projects)</code></pre>
+
+                <p class="text-gray-600 text-sm mt-4">
+                    Relations work like foreign keys in SQL databases. Self-referencing too - great for hierarchical data.
+                </p>
+            </section>
+
+            <section id="practical-uses" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">What I use AppFlowy for</h2>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Personal knowledge base</h3>
+                <p class="mb-4">All my notes, documentation, how-tos in one place:</p>
+
+                <pre class="language-bash"><code># Quick capture (default page)
+- Daily notes
+- Meeting notes
+- Random thoughts
+
+# Organized with:
+- Tags for categorization
+- Links between related pages
+- Full-text search across everything</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Project planning</h3>
+                <p class="mb-4">Track projects with databases and Kanban boards:</p>
+
+                <pre class="language-bash"><code># Projects database with views:
+- Table view: Overview of all projects
+- Board view: Kanban by status
+- Calendar view: Timeline of deadlines
+
+# Each project page linked to database entry
+- Notes, docs, tasks all in one place</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Documentation</h3>
+                <p class="mb-4">Technical docs, SOPs, runbooks:</p>
+
+                <pre class="language-bash"><code"># Code snippets with syntax highlighting
+- Architecture diagrams (as images)
+- Step-by-step procedures
+- Environment variable documentation
+- On-call runbooks
+
+# All offline-accessible
+- Search works without internet</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">CRM-lite</h3>
+                <p class="mb-4">Track contacts and opportunities:</p>
+
+                <pre class="language-bash"><code># People database
+- Name, contact info
+- Tags (client, lead, friend)
+- Notes history
+- Last contacted date
+
+# Companies database
+- Company details
+- Associated contacts (relation)
+- Deal stage (select)
+- Revenue (number)</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Content calendar</h3>
+                <p class="mb-4">Plan and track content creation:</p>
+
+                <pre class="language-bash"><code"># Content database
+- Title
+- Type (blog, video, social)
+- Status (Idea, Draft, Published)
+- Publish Date (date)
+- Platform (select)
+- Link (URL)
+
+# Calendar view shows publishing schedule
+- Table view for sorting and filtering</code></pre>
+            </section>
+
+            <section id="collaboration" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">Collaboration and sync</h2>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Real-time collaboration</h3>
+                <p class="mb-4">Work with others in real-time:</p>
+
+                <pre class="language-bash"><code># Share a page or entire workspace
+# - Generate share link (if using AppFlowy Cloud)
+# - Invite with email (if using self-hosted with auth)
+# - Set permissions: View, Comment, Edit
+
+# Real-time cursor showing
+- See who's viewing
+- See what they're working on
+- Comments and mentions</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">AppFlowy Cloud sync</h3>
+                <p class="mb-4">Optional cloud sync with encryption:</p>
+
+                <pre class="language-bash"><code># Enable AppFlowy Cloud
+# - Create account at cloud.appflowy.io
+# - Login from desktop app
+# - Choose workspace to sync
+
+# Features:
+- End-to-end encryption
+- Selective sync (specific folders or files)
+- Real-time sync across devices
+- Conflict resolution</code></pre>
+
+                <p class="mb-4 mt-6">I use local-only. No need for cloud sync, and I like knowing my data never leaves my machines.</p>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Self-hosted sync server</h3>
+                <p class="mb-4">Run your own sync server:</p>
+
+                <pre class="language-bash"><code># For full control, host your own sync server
+# - More complex setup
+# - Requires infrastructure
+# - Complete data sovereignty
+
+# Only needed for team environments
+# Personal use: local-only is simpler</code></pre>
+            </section>
+
+            <section id="advanced" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">Advanced features</h2>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Templates</h3>
+                <p class="mb-4">Create reusable page templates:</p>
+
+                <pre class="language-bash"><code># Save page as template
+# - Structure, blocks, content all saved
+# - Use to quickly create similar pages
+# - Great for repeated documents
+
+# My templates:
+- Meeting notes
+- Project documentation
+- SOP template
+- Weekly review</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Keyboard shortcuts</h3>
+                <p class="mb-4">Speed up your workflow:</p>
+
+                <pre class="language-bash"><code># Essential shortcuts:
+Ctrl/Cmd + /    : Command palette
+Ctrl/Cmd + K    : Inline code block
+Ctrl/Cmd + B    : Bold
+Ctrl/Cmd + I    : Italic
+Ctrl/Cmd + U    : Underline
+Ctrl/Cmd + S    : Save (auto-save anyway)
+Tab            : Indent
+Shift + Tab    : Outdent
+@               : Mention person/page
+#               : Create heading</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Slash commands</h3>
+                <p class="mb-4">Type @ for quick actions:</p>
+
+                <pre class="language-bash"><code>@ /        : Heading level 1
+@ todo      : Toggle list
+@ bullet    : Bullet list
+@ date      : Date picker
+@ time      : Time
+@ code      : Code block
+@ quote     : Quote block
+@ divider   : Horizontal line
+@ callout   : Callout box
+@ table     : Table
+@ database  : Inline database</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Backlinks</h3>
+                <p class="mb-4">See what links to current page:</p>
+
+                <pre class="language-bash"><code"># In sidebar: "Linked References"
+# Shows all pages that link to current page
+- Backlinks from text references
+- Database relations
+- Manual links
+
+# Great for building knowledge networks
+- See connections between notes</code></pre>
+            </section>
+
+            <section id="issues" class="mt-12 bg-gray-50 p-6 rounded-lg">
+                <h2 class="text-2xl font-bold mb-4 text-gray-900">Problems I hit</h2>
+
+                <h3 class="text-xl font-bold mb-3 mt-6 text-gray-800">Import issues</h3>
+                <p class="mb-2">Some content didn't import correctly from Notion.</p>
+                <pre class="language-bash"><code"># Fixed by
+1. Using NotionExport tool instead of manual import
+2. Cleaning up weird formatting manually
+3. Re-creating some complex databases from scratch
+4. Importing images separately (they don't always embed)</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6 text-gray-800">Database relation issues</h3>
+                <p class="mb-2">Relations not working as expected.</p>
+                <pre class="language-bash"><code"># Fixed by
+1. Making sure relation types match (self vs external)
+2. Re-creating relation if corrupted
+3. Checking that both databases have the relation field
+4. Reading docs on relation behavior (it's not identical to Notion)</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6 text-gray-800">Sync conflicts</h3>
+                <p class="mb-2">When using cloud sync, conflicts happened.</p>
+                <pre class="language-bash"><code"># Fixed by
+1. Editing same page from multiple devices
+2. Conflicted version gets created
+3. Review both versions, merge changes
+4. Keep one, delete other
+
+# Avoid by editing from one main device
+# Or being careful about concurrent edits</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6 text-gray-800">Missing features</h3>
+                <p class="mb-2">Notion features I missed initially.</p>
+                <pre class="language-bash"><code"># Gaps I noticed:
+- API integrations (limited but exists)
+- Webhooks (not yet implemented)
+- Advanced formula logic (getting better)
+- Some automations (in development)
+
+# Workarounds:
+- Use external tools for automations
+- Export data, process externally, re-import
+- Check roadmap - features being added constantly</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6 text-gray-800">Performance with large databases</h3>
+                <p class="mb-2">Large databases became slow.</p>
+                <pre class="language-bash"><code"># Fixed by
+1. Archiving old entries to separate database
+2. Using filters to show only active records
+3. Splitting massive databases into smaller ones
+4. Performance is improving with updates</code></pre>
+            </section>
+
+            <section id="comparison" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">AppFlowy vs Notion vs others</h2>
+
+                <table class="w-full my-6 border border-gray-200">
+                    <thead class="bg-gray-100">
+                        <tr>
+                            <th class="text-left p-3 border-b"></th>
+                            <th class="text-left p-3 border-b">AppFlowy</th>
+                            <th class="text-left p-3 border-b">Notion</th>
+                            <th class="text-left p-3 border-b">Obsidian</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="p-3 border-b">Data location</td>
+                            <td class="p-3 border-b text-green-600">Local</td>
+                            <td class="p-3 border-bottom">Cloud</td>
+                            <td class="p-3 border-bottom text-green-600">Local</td>
+                        </tr>
+                        <tr>
+                            <td class="p-3 border-b">Offline access</td>
+                            <td class="p-3 border-bottom text-green-600">Full</td>
+                            <td class="p-3 border-bottom">Limited</td>
+                            <td class="p-3 border-bottom text-green-600">Full</td>
+                        </tr>
+                        <tr>
+                            <td class="p-3 border-b">Data export</td>
+                            <td class="p-3 border-bottom text-green-600">Standard formats</td>
+                            <td class="p-3 border-bottom">Proprietary</td>
+                            <td class="p-3 border-bottom text-green-600">Markdown</td>
+                        </tr>
+                        <tr>
+                            <td class="p-3 border-b">Databases</td>
+                            <td class="p-3 border-bottom text-green-600">Yes</td>
+                            <td class="p-3 border-bottom text-green-600">Yes</td>
+                            <td class="p-3 border-bottom">Plugins only</td>
+                        </tr>
+                        <tr>
+                            <td class="p-3 border-b">Real-time collab</td>
+                            <td class="p-3 border-bottom text-green-600">Yes</td>
+                            <td class="p-3 border-bottom text-green-600">Yes</td>
+                            <td class="p-3 border-bottom">Limited</td>
+                        </tr>
+                        <tr>
+                            <td class="p-3 border-b">Cost</td>
+                            <td class="p-3 border-bottom text-green-600">Free</td>
+                            <td class="p-3 border-bottom">Free tier, then $$$</td>
+                            <td class="p-3 border-bottom text-green-600">Free</td>
+                        </tr>
+                        <tr>
+                            <td class="p-3 border-b">Privacy</td>
+                            <td class="p-3 border-bottom text-green-600">By design</td>
+                            <td class="p-3 border-bottom">Privacy concerns</td>
+                            <td class="p-3 border-bottom text-green-600">You control it</td>
+                        </tr>
+                        <tr>
+                            <td class="p-3 border-b">Learning curve</td>
+                            <td class="p-3 border-bottom">Low (if you know Notion)</td>
+                            <td class="p-3 border-bottom text-green-600">Low</td>
+                            <td class="p-3 border-bottom">Medium</td>
+                        </tr>
+                        <tr>
+                            <td class="p-3 border-bottom">Best for</td>
+                            <td class="p-3 border-bottom">Privacy-focused users</td>
+                            <td class="p-3 border-bottom">General users</td>
+                            <td class="p-3 border-bottom">Power users</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <p class="text-gray-600 mt-4">
+                    AppFlowy is the sweet spot if you want Notion's interface with local-first, privacy-focused storage. Obsidian is more flexible but requires more setup. Notion is easiest but has privacy concerns.
+                </p>
+            </section>
+
+            <section id="thoughts" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">Would I recommend it?</h2>
+                <p class="mb-4">
+                    Absolutely. Switched my entire workspace from Notion to AppFlowy about 6 months ago. Haven't looked back.
+                </p>
+                <p class="mb-4">
+                    The peace of mind knowing my data lives on my machine is huge. No worrying about service outages, company getting acquired, or terms changing. My data is under my control.
+                </p>
+                <p class="mb-4">
+                    Offline access is a game changer. Work on planes, in coffee shops with bad WiFi, anywhere. Everything just works.
+                </p>
+                <p class="mb-4">
+                    Import from Notion was easier than expected. Most of my content came through correctly. The 10% that didn't was easy enough to fix manually.
+                </p>
+                <p class="mb-4">
+                    It's not perfect - some Notion features are still missing, and occasionally there are bugs. But the core functionality is solid, and it's actively being developed.
+                </p>
+                <p class="mb-4">
+                    If you care about data privacy, want offline access, or just want to own your data, AppFlowy is the best Notion alternative I've found.
+                </p>
+                <p class="mb-4">
+                    Links: <a href="https://appflowy.io" class="text-blue-600 underline">appflowy.io</a> | GitHub: <a href="https://github.com/AppFlowy-IO/AppFlowy" class="text-blue-600 underline">github.com/AppFlowy-IO/AppFlowy</a> | Docs: <a href="https://docs.appflowy.io" class="text-blue-600 underline">docs.appflowy.io</a>
+                </p>
+            </section>
+
+        </article>
+
+    </main>
+
+    <footer class="bg-gray-800 text-white py-12">
+        <div class="max-w-4xl mx-auto px-4 text-center">
+            <p class="opacity-70 mb-2">📝 Programming Notes</p>
+            <p class="text-sm opacity-50">
+                Personal learning notes & tutorials. Updated as I explore new technologies.
+            </p>
+            <p class="text-xs opacity-40 mt-4"><a href="privacy.html" class="hover:text-white">Privacy Policy</a></p>
+        </div>
+    </footer>
+
+    <!-- Code Highlighting Script -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+</body>
+</html>
