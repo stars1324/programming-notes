@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-LMWN7814BX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-LMWN7814BX');
+    </script>
+
+    <!-- SEO Meta Tags -->
+    <title>Nginx Proxy Manager: SSL Certificates Made Easy - Home Lab Reverse Proxy</title>
+    <meta name="description" content="Managing SSL certificates manually sucks. Nginx Proxy Manager gives you free HTTPS, reverse proxy, and load balancing with a web UI. Here's my home lab setup.">
+    <meta name="keywords" content="Nginx Proxy Manager, NPM, reverse proxy, SSL certificates, Let's Encrypt, home lab, HTTPS setup, reverse proxy guide">
+    <link rel="canonical" href="https://pnt.jacbex.com/nginx-proxy-manager.html" />
+
+    <!-- Open Graph / Social Media -->
+    <meta property="og:title" content="Nginx Proxy Manager: Finally, SSL Certificates That Don't Suck">
+    <meta property="og:description" content="Free HTTPS for your home lab with automatic SSL renewal. Web UI for reverse proxy instead of editing nginx configs.">
+    <meta property="og:type" content="article">
+
+    <!-- Tailwind CSS for modern UI -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Code Highlighting (Prism.js) -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+
+    <!-- Structured Data (Schema.org) for Google -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "Nginx Proxy Manager: SSL Certificates Made Easy",
+      "description": "Guide to using Nginx Proxy Manager for reverse proxy and SSL certificate management in home labs.",
+      "author": {
+        "@type": "Person",
+        "name": "Programming Notes"
+      },
+      "proficiencyLevel": "Intermediate"
+    }
+    </script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+        .prose code { color: #eb5757; background: #f9f2f2; padding: 2px 4px; border-radius: 4px; }
+        .feature-box { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 24px; border-radius: 12px; margin: 24px 0; }
+        .node-card { background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 12px; padding: 16px; margin: 12px 0; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+            <a href="index.html" class="text-xl font-bold text-blue-600">📝 <span class="text-gray-700">Programming Notes</span></a>
+            <div class="space-x-6 hidden md:block">
+                <a href="index.html" class="hover:text-blue-500">Home</a>
+                <a href="about.html" class="hover:text-blue-500">About</a>
+                <a href="contact.html" class="hover:text-blue-500">Contact</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="bg-gradient-to-r from-purple-700 to-indigo-800 text-white py-16">
+        <div class="max-w-4xl mx-auto px-4 text-center">
+            <h1 class="text-4xl md:text-5xl font-extrabold mb-4">Nginx Proxy Manager: Finally, SSL Certificates That Don't Suck</h1>
+            <p class="text-xl opacity-90">Managing reverse proxies and SSL manually? Forget it. Nginx Proxy Manager gives you free HTTPS with a web UI. Here's how I set up my home lab.</p>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto px-4 py-12 bg-white mt-[-40px] rounded-xl shadow-lg mb-20">
+
+        <article class="prose prose-blue max-w-none">
+
+            <section id="introduction">
+                <h2 class="text-3xl font-bold mb-4">Why I needed this</h2>
+                <p class="mb-4">
+                    Have a home lab with multiple services - Plex, Jellyfin, Home Assistant, various dashboards, a couple of self-hosted apps. Was accessing them via IP:port like http://192.168.1.100:8090.
+                </p>
+                <p class="mb-4">
+                    Wanted proper domain names and HTTPS. Looked into getting SSL certificates - meant dealing with certbot, DNS challenges, nginx config files, renewals that fail. Sounded like a nightmare.
+                </p>
+                <p class="mb-4">
+                    Then someone mentioned <a href="https://nginxproxymanager.com" class="text-blue-600 underline" target="_blank">Nginx Proxy Manager</a> (NPM). Web UI for nginx, automatic Let's Encrypt certificates, one-click reverse proxy setup.
+                </p>
+
+                <div class="feature-box">
+                    <p class="font-bold text-xl mb-2">What NPM actually does</p>
+                    <p class="opacity-90">Web-based nginx management. Create proxy hosts, generate SSL certificates, set up access controls - all through a browser. No editing config files manually.</p>
+                    <p class="opacity-90 mt-2">Best part: SSL certificates auto-renew. Never deal with expired certificates again.</p>
+                </div>
+            </section>
+
+            <section id="what-is-npm" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">So what is Nginx Proxy Manager</h2>
+                <p class="mb-4">
+                    It's a Docker container that runs nginx and provides a web UI for managing it. Built on top of nginx but adds features like:
+                </p>
+                <ul class="list-disc ml-6 mb-4">
+                    <li><strong>Web UI:</strong> No more editing nginx.conf files</li>
+                    <li><strong>Free SSL:</strong> Automatic Let's Encrypt certificates</li>
+                    <li><strong>Multiple domains:</strong> Manage all your services from one place</li>
+                    <li><strong>Access lists:</strong> Password protect services easily</li>
+                    <li><strong>Load balancing:</strong> Distribute traffic across multiple servers</li>
+                    <li><strong>Custom locations:</strong> Proxy specific paths to different services</li>
+                    <li><strong>WebSocket support:</strong> Works out of the box</li>
+                    <li><strong>Rate limiting:</strong> Protect against abuse</li>
+                </ul>
+
+                <p class="mb-4 mt-6">Why it's better than raw nginx:</p>
+                <ul class="list-disc ml-6 mb-4">
+                    <li>Don't need to learn nginx syntax</li>
+                    <li>SSL certificate handling is automatic</li>
+                    <li>See all your proxies in one dashboard</li>
+                    <li>Easier to debug - logs in the UI</li>
+                    <li>Can share access with team members</li>
+                </ul>
+
+                <p class="text-gray-600 text-sm mt-4">
+                    Underneath it's still nginx. You can drop into config files if you need something advanced. But 95% of use cases work through the UI.
+                </p>
+            </section>
+
+            <section id="installation" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">Getting NPM running</h2>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Prerequisites</h3>
+                <p class="mb-4">You'll need:</p>
+                <ul class="list-disc ml-6 mb-4">
+                    <li>Docker installed</li>
+                    <li>A domain name (or subdomains) pointed to your server</li>
+                    <li>Ports 80, 443, and 81 available</li>
+                    <li>Basic understanding of what reverse proxy does</li>
+                </ul>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Docker Compose setup</h3>
+                <p class="mb-4">Create a docker-compose.yml:</p>
+
+                <pre class="language-yaml"><code>version: '3'
+services:
+  app:
+    image: 'jc21/nginx-proxy-manager:latest'
+    restart: unless-stopped
+    ports:
+      - '80:80'   # HTTP
+      - '443:443' # HTTPS
+      - '81:81'   # Management UI
+    volumes:
+      - ./data:/data
+      - ./letsencrypt:/etc/letsencrypt
+    environment:
+      - TZ=America/New_York</code></pre>
+
+                <p class="mb-4 mt-6">Then start it:</p>
+
+                <pre class="language-bash"><code>docker compose up -d</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">First login</h3>
+                <p class="mb-4">Go to http://your-server-ip:81</p>
+
+                <p class="mb-4">Default credentials:</p>
+                <pre class="text"><code>Email: admin@example.com
+Password: changeme</code></pre>
+
+                <p class="mb-4">Change them immediately. Then you're ready to add proxies.</p>
+
+                <p class="text-gray-600 text-sm mt-4">
+                    Port 81 is for the management UI. Ports 80 and 443 are for the actual proxy traffic.
+                </p>
+            </section>
+
+            <section id="basic-setup" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">Setting up your first proxy</h2>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Example: Plex server</h3>
+                <p class="mb-4">Let's say Plex runs on http://192.168.1.100:32400. Want to access it via https://plex.yourdomain.com</p>
+
+                <p class="mb-4">In NPM UI:</p>
+
+                <pre class="language-bash"><code># 1. Click "Hosts" → "Add Proxy Host"
+
+# 2. Fill in details:
+Domain Names: plex.yourdomain.com
+Scheme: http
+Forward Hostname/IP: 192.168.1.100
+Forward Port: 32400
+
+# 3. Enable SSL
+Select "Request a new SSL Certificate"
+Email: your@email.com
+Agree to Let's Encrypt TOS
+Enable "Force SSL" (redirect HTTP to HTTPS)
+
+# 4. Click "Save"</code></pre>
+
+                <p class="mb-4 mt-6">That's it. NPM handles the rest.</p>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">What happens behind the scenes</h3>
+                <p class="mb-4">NPM automatically:</p>
+                <ul class="list-disc ml-6 mb-4">
+                    <li>Creates nginx config for your proxy</li>
+                    <li>Requests SSL certificate from Let's Encrypt</li>
+                    <li>Sets up HTTP-01 challenge on port 80</li>
+                    <li>Configures SSL certificate</li>
+                    <li>Enables HTTPS redirect</li>
+                    <li>Will auto-renew certificate before expiry</li>
+                </ul>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Accessing local services</h3>
+                <p class="mb-4">For services on your local network, you'll need:</p>
+
+                <pre class="language-bash"><code># Point DNS A record to your public IP
+# Or use local DNS (Pi-hole, AdGuard Home)
+
+# For local access without going through internet:
+# Add entry to /etc/hosts or use local DNS</code></pre>
+            </section>
+
+            <section id="ssl-certificates" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">Managing SSL certificates</h2>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">DNS Challenge (for local networks)</h3>
+                <p class="mb-4">If you're using local IPs or don't want to open ports, use DNS challenge:</p>
+
+                <pre class="language-bash"><code># In SSL Certificate settings:
+Select "DNS Challenge"
+
+# Choose your DNS provider (Cloudflare, Google, etc.)
+Add API credentials
+
+# Pros:
+- Works for local IPs
+- Can use wildcard certificates (*.yourdomain.com)
+- Doesn't require port 80 to be open
+
+# Cons:
+- Need API access to DNS provider
+- Slightly more complex setup</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Wildcard certificates</h3>
+                <p class="mb-4">Cover all subdomains with one certificate:</p>
+
+                <pre class="language-bash"><code># Domain Names: *.yourdomain.com
+# Select DNS Challenge
+# One cert covers everything:
+# - plex.yourdomain.com
+# - home.yourdomain.com
+# - anything.yourdomain.com</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Custom certificates</h3>
+                <p class="mb-4">Have your own SSL cert? Upload it:</p>
+
+                <pre class="language-bash"><code># SSL Certificates → Add Custom Certificate
+# Upload certificate and key
+# Use for any proxy host</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Certificate renewal</h3>
+                <p class="mb-4">NPM auto-renews Let's Encrypt certs. Check status:</p>
+
+                <pre class="language-bash"><code># Dashboard → SSL Certificates
+# See expiry dates
+# Manually renew if needed
+# View renewal logs</code></pre>
+            </section>
+
+            <section id="advanced" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">Advanced configuration</h2>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Access lists</h3>
+                <p class="mb-4">Password protect services:</p>
+
+                <pre class="language-bash"><code># Proxy Host → Access List
+# Create new list:
+Name: Internal Only
+Auth: Basic Authentication
+Username: admin
+Password: your-password
+
+# Assign to proxy host
+# Now requires username/password to access</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Custom locations</h3>
+                <p class="mb-4">Proxy specific paths to different services:</p>
+
+                <pre class="language-bash"><code># Example: /api to backend, / to frontend
+Domain: api.yourdomain.com
+
+# Location: /
+Forward: http://frontend:3000
+
+# Location: /api
+Forward: http://backend:8000
+
+# Useful for SPA + API setups</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">WebSocket support</h3>
+                <p class="mb-4">Enable WebSockets (needed for some apps):</p>
+
+                <pre class="language-bash"><code># Proxy Host → Advanced → Custom Nginx Configuration
+# Enable WebSockets support
+
+# NPM adds the necessary nginx config
+# Works for Home Assistant, WebSocket apps, etc.</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Load balancing</h3>
+                <p class="mb-4">Distribute traffic across multiple servers:</p>
+
+                <pre class="language-bash"><code># Add multiple upstream hosts
+Forward Host 1: 192.168.1.100:3000
+Forward Host 2: 192.168.1.101:3000
+Forward Host 3: 192.168.1.102:3000
+
+# NPM load balances across them
+# Automatically removes dead servers</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Rate limiting</h3>
+                <p class="mb-4">Protect against abuse:</p>
+
+                <pre class="language-bash"><code># Proxy Host → Advanced → Rate Limiting
+# Enable: 100 requests per 10 seconds
+# Block client for 60 seconds when exceeded
+
+# Good for public-facing services</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Custom nginx config</h3>
+                <p class="mb-4">Need something custom? Drop into raw nginx:</p>
+
+                <pre class="language-nginx"><code># Proxy Host → Advanced → Custom Nginx Configuration
+# Add custom nginx directives
+
+# Example: increase upload size
+client_max_body_size 100M;
+
+# Example: custom headers
+add_header X-Frame-Options "SAMEORIGIN";
+add_header X-Content-Type-Options "nosniff";</code></pre>
+            </section>
+
+            <section id="practical-examples" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">Real stuff I proxy with NPM</h2>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Home Assistant</h3>
+                <pre class="language-bash"><code># Domain: home.yourdomain.com
+# Forward: http://192.168.1.50:8123
+# WebSocket: Enabled
+# SSL: Let's Encrypt
+# Access: Basic auth + trusted networks</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Media servers</h3>
+                <pre class="language-bash"><code># Plex: plex.yourdomain.com → 192.168.1.100:32400
+# Jellyfin: jellyfin.yourdomain.com → 192.168.1.101:8096
+# All with SSL, accessible from anywhere</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Self-hosted apps</h3>
+                <pre class="language-bash"><code># Nextcloud: cloud.yourdomain.com
+# Vaultwarden: vault.yourdomain.com
+# Paperless-ngx: docs.yourdomain.com
+# Grafana: stats.yourdomain.com
+
+# All behind HTTPS, auto-renewing certs</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Development</h3>
+                <pre class="language-bash"><code># Local dev: dev1.yourdomain.com → localhost:3000
+# Testing: test.yourdomain.com → localhost:3001
+# Wildcard cert covers all subdomains</code></pre>
+            </section>
+
+            <section id="issues" class="mt-12 bg-gray-50 p-6 rounded-lg">
+                <h2 class="text-2xl font-bold mb-4 text-gray-900">Problems I hit</h2>
+
+                <h3 class="text-xl font-bold mb-3 mt-6 text-gray-800">SSL certificate fails</h3>
+                <p class="mb-2">Let's Encrypt keeps failing.</p>
+                <pre class="language-bash"><code># Fixed by
+1. Checking DNS actually points to server (dig command)
+2. Making sure port 80 is open and reachable
+3. Using DNS challenge instead for local IPs
+4. Checking firewall isn't blocking connections</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6 text-gray-800">502 Bad Gateway</h3>
+                <p class="mb-2">Proxy not reaching backend service.</p>
+                <pre class="language-bash"><code># Fixed by
+1. Verifying backend service is actually running
+2. Checking IP and port are correct
+3. Making sure backend allows connections from proxy IP
+4. Checking firewall rules between proxy and backend</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6 text-gray-800">WebSocket connections drop</h3>
+                <p class="mb-2">Real-time apps disconnecting.</p>
+                <pre class="language-bash"><code># Fixed by
+1. Enabling WebSocket support in NPM proxy host
+2. Increasing timeout values
+3. Checking for any nginx custom config breaking WebSockets</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6 text-gray-800">Too many redirects</h3>
+                <p class="mb-2">Infinite redirect loop.</p>
+                <pre class="language-bash"><code># Fixed by
+1. Disabling "Force SSL" if app already handles HTTPS
+2. Checking app isn't redirecting to http
+3. Making sure scheme (http/https) matches backend</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6 text-gray-800">Certificate renewal fails</h3>
+                <p class="mb-2">Let's Encrypt expires unexpectedly.</p>
+                <pre class="language-bash"><code># Fixed by
+1. Checking DNS provider API credentials still valid
+2. Verifying port 80 is still accessible
+3. Checking certificate logs for specific error
+4. Manually renewing to see actual failure reason</code></pre>
+            </section>
+
+            <section id="security" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">Security best practices</h2>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Network isolation</h3>
+                <p class="mb-4">Keep management UI secure:</p>
+
+                <pre class="language-bash"><code># Don't expose port 81 to internet
+# Use SSH tunnel to access:
+ssh -L 8888:localhost:81 user@server
+# Then access locally: http://localhost:8888
+
+# Or use VPN/ZeroTrust to access</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Regular updates</h3>
+                <p class="mb-4">Keep NPM updated:</p>
+
+                <pre class="language-bash"><code># Watch for new versions
+docker pull jc21/nginx-proxy-manager:latest
+docker compose up -d  # recreates container with new image
+
+# Test on non-production first
+# NPM updates can change behavior</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Backup configs</h3>
+                <p class="mb-4">Save your NPM data:</p>
+
+                <pre class="language-bash"><code># Backup the data directory
+tar -czf npm-backup-$(date +%Y%m%d).tar.gz data/
+
+# Store somewhere safe
+# Can restore to new server if needed</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Access control</h3>
+                <p class="mb-4">Don't expose everything publicly:</p>
+
+                <pre class="language-bash"><code># Use access lists for sensitive services
+# Restrict to trusted networks (VPN, local IPs)
+# Use strong passwords for basic auth
+# Consider IP whitelists for critical services</code></pre>
+            </section>
+
+            <section id="comparison" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">NPM vs alternatives</h2>
+
+                <table class="w-full my-6 border border-gray-200">
+                    <thead class="bg-gray-100">
+                        <tr>
+                            <th class="text-left p-3 border-b"></th>
+                            <th class="text-left p-3 border-b">NPM</th>
+                            <th class="text-left p-3 border-b">Raw Nginx</th>
+                            <th class="text-left p-3 border-b">Traefik</th>
+                            <th class="text-left p-3 border-b">Caddy</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="p-3 border-b">Ease of use</td>
+                            <td class="p-3 border-b text-green-600">★★★★★</td>
+                            <td class="p-3 border-b">★★☆☆☆</td>
+                            <td class="p-3 border-b">★★★☆☆</td>
+                            <td class="p-3 border-b">★★★★☆</td>
+                        </tr>
+                        <tr>
+                            <td class="p-3 border-b">Web UI</td>
+                            <td class="p-3 border-b text-green-600">Yes</td>
+                            <td class="p-3 border-b">No</td>
+                            <td class="p-3 border-b text-green-600">Yes</td>
+                            <td class="p-3 border-b">No</td>
+                        </tr>
+                        <tr>
+                            <td class="p-3 border-b">SSL auto-renew</td>
+                            <td class="p-3 border-b text-green-600">Yes</td>
+                            <td class="p-3 border-b">Manual</td>
+                            <td class="p-3 border-b text-green-600">Yes</td>
+                            <td class="p-3 border-b text-green-600">Yes</td>
+                        </tr>
+                        <tr>
+                            <td class="p-3 border-b">Learning curve</td>
+                            <td class="p-3 border-bottom">Low</td>
+                            <td class="p-3 border-bottom">High</td>
+                            <td class="p-3 border-bottom">Medium</td>
+                            <td class="p-3 border-bottom">Low</td>
+                        </tr>
+                        <tr>
+                            <td class="p-3 border-b">Flexibility</td>
+                            <td class="p-3 border-b">Good</td>
+                            <td class="p-3 border-b text-green-600">Excellent</td>
+                            <td class="p-3 border-b text-green-600">Excellent</td>
+                            <td class="p-3 border-b">Good</td>
+                        </tr>
+                        <tr>
+                            <td class="p-3 border-b">Docker native</td>
+                            <td class="p-3 border-b text-green-600">Yes</td>
+                            <td class="p-3 border-b">No</td>
+                            <td class="p-3 border-b text-green-600">Yes</td>
+                            <td class="p-3 border-b text-green-600">Yes</td>
+                        </tr>
+                        <tr>
+                            <td class="p-3 border-b">Best for</td>
+                            <td class="p-3 border-bottom">Home labs, simple setups</td>
+                            <td class="p-3 border-bottom">Complex needs, full control</td>
+                            <td class="p="3 border-bottom">Container orchestration</td>
+                            <td class="p-3 border-bottom">Automated setups</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <p class="text-gray-600 mt-4">
+                    NPM is the sweet spot for home labs and simple deployments. Easy enough for beginners, powerful enough for most use cases.
+                </p>
+            </section>
+
+            <section id="thoughts" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">Would I recommend it?</h2>
+                <p class="mb-4">
+                    Definitely. I've been running NPM for 2 years now. Managing 15+ services through it. SSL certificates auto-renew without me thinking about it.
+                </p>
+                <p class="mb-4">
+                    The web UI saves so much time. Used to spend hours editing nginx configs, testing, reloading. Now click a few buttons, done.
+                </p>
+                <p class="mb-4">
+                    DNS challenge with wildcard certificates is a game changer. One cert covers all my subdomains. Add new service, create new proxy, instant HTTPS.
+                </p>
+                <p class="mb-4">
+                    It's not perfect - sometimes you need to drop into custom config for advanced stuff. But for 95% of use cases, the UI handles everything.
+                </p>
+                <p class="mb-4">
+                    If you're self-hosting anything and want HTTPS without the headache, NPM is the answer.
+                </p>
+                <p class="mb-4">
+                    Links: <a href="https://nginxproxymanager.com" class="text-blue-600 underline">nginxproxymanager.com</a> | GitHub: <a href="https://github.com/NginxProxyManager/nginx-proxy-manager" class="text-blue-600 underline">github.com/NginxProxyManager</a> | Docs: <a href="https://nginxproxymanager.com/guide/" class="text-blue-600 underline">nginxproxymanager.com/guide/</a>
+                </p>
+            </section>
+
+        </article>
+
+    </main>
+
+    <footer class="bg-gray-800 text-white py-12">
+        <div class="max-w-4xl mx-auto px-4 text-center">
+            <p class="opacity-70 mb-2">📝 Programming Notes</p>
+            <p class="text-sm opacity-50">
+                Personal learning notes & tutorials. Updated as I explore new technologies.
+            </p>
+            <p class="text-xs opacity-40 mt-4"><a href="privacy.html" class="hover:text-white">Privacy Policy</a></p>
+        </div>
+    </footer>
+
+    <!-- Code Highlighting Script -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-nginx.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-yaml.min.js"></script>
+</body>
+</html>

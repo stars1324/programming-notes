@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-LMWN7814BX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-LMWN7814BX');
+    </script>
+
+    <!-- SEO Meta Tags -->
+    <title>Portainer: Manage Docker Containers Without Touching Terminal</title>
+    <meta name="description" content="Tired of managing Docker with CLI? Portainer gives you a web UI to manage containers, images, volumes, and networks across multiple servers. Here's my setup.">
+    <meta name="keywords" content="Portainer, Docker management UI, Docker containers, Portainer agent, Docker web interface, container management">
+    <link rel="canonical" href="https://pnt.jacbex.com/portainer.html" />
+
+    <!-- Open Graph / Social Media -->
+    <meta property="og:title" content="Portainer: Finally, Docker Management That Doesn't Suck">
+    <meta property="og:description" content="Web UI for Docker. Manage containers across multiple servers from one dashboard. Deploy apps, view logs, restart services - all in browser.">
+    <meta property="og:type" content="article">
+
+    <!-- Tailwind CSS for modern UI -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Code Highlighting (Prism.js) -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+
+    <!-- Structured Data (Schema.org) for Google -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "Portainer: Manage Docker Containers Without Touching Terminal",
+      "description": "Guide to using Portainer for Docker container management. Installation, agent setup, and practical usage.",
+      "author": {
+        "@type": "Person",
+        "name": "Programming Notes"
+      },
+      "proficiencyLevel": "Beginner"
+    }
+    </script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+        .prose code { color: #eb5757; background: #f9f2f2; padding: 2px 4px; border-radius: 4px; }
+        .feature-box { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 24px; border-radius: 12px; margin: 24px 0; }
+        .node-card { background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 12px; padding: 16px; margin: 12px 0; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+            <a href="index.html" class="text-xl font-bold text-blue-600">📝 <span class="text-gray-700">Programming Notes</span></a>
+            <div class="space-x-6 hidden md:block">
+                <a href="index.html" class="hover:text-blue-500">Home</a>
+                <a href="about.html" class="hover:text-blue-500">About</a>
+                <a href="contact.html" class="hover:text-blue-500">Contact</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="bg-gradient-to-r from-purple-700 to-indigo-800 text-white py-16">
+        <div class="max-w-4xl mx-auto px-4 text-center">
+            <h1 class="text-4xl md:text-5xl font-extrabold mb-4">Portainer: Finally, Docker Management That Doesn't Suck</h1>
+            <p class="text-xl opacity-90">Managing containers with CLI? Forget it. Portainer gives you a web UI to manage Docker across multiple servers. Deploy, monitor, restart - all from browser.</p>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto px-4 py-12 bg-white mt-[-40px] rounded-xl shadow-lg mb-20">
+
+        <article class="prose prose-blue max-w-none">
+
+            <section id="introduction">
+                <h2 class="text-3xl font-bold mb-4">Why I needed this</h2>
+                <p class="mb-4">
+                    Have a bunch of Docker containers running across multiple servers - home lab, VPS, testing environments. Was SSHing into each server, running docker commands, trying to remember which container was on which server.
+                </p>
+                <p class="mb-4">
+                    Want to restart a container? SSH in, find the right server, remember the exact docker command. Check logs? Same deal. See resource usage? Run docker stats on every server.
+                </p>
+                <p class="mb-4">
+                    Then someone mentioned <a href="https://www.portainer.io" class="text-blue-600 underline" target="_blank">Portainer</a>. Web UI for Docker. Manage all your containers, images, volumes, networks from one dashboard. Sounded too good to be true.
+                </p>
+
+                <div class="feature-box">
+                    <p class="font-bold text-xl mb-2">What Portainer actually does</p>
+                    <p class="opacity-90">Web-based Docker management. Deploy containers, view logs, restart services, manage volumes and networks - all through browser. Connect multiple Docker hosts, manage everything from one place.</p>
+                    <p class="opacity-90 mt-2">Free for most use cases. Open-source core with paid enterprise features.</p>
+                </div>
+            </section>
+
+            <section id="what-is-portainer" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">So what is Portainer</h2>
+                <p class="mb-4">
+                    Portainer is a lightweight management UI for Docker. It runs as a container itself and connects to your Docker engines, giving you full control through a web interface.
+                </p>
+                <p class="mb-4">
+                    What it can do:
+                </p>
+                <ul class="list-disc ml-6 mb-4">
+                    <li><strong>Container management:</strong> Start, stop, restart, remove containers</li>
+                    <li><strong>Image management:</strong> Pull, build, prune images</li>
+                    <li><strong>Volumes & networks:</strong> Create, manage, delete storage and networking</li>
+                    <li><strong>Logs viewer:</strong> View and filter logs in real-time</li>
+                    <li><strong>Console access:</strong> Shell into containers from browser</li>
+                    <li><strong>Stack deployment:</strong> Deploy docker-compose stacks via UI</li>
+                    <li><strong>Multi-host:</strong> Manage multiple Docker servers from one dashboard</li>
+                    <li><strong>User management:</strong> Team access with role-based permissions</li>
+                </ul>
+
+                <p class="mb-4 mt-6">Why it's better than CLI:</p>
+                <ul class="list-disc ml-6 mb-4">
+                    <li>See everything at a glance - no typing commands</li>
+                    <li>Visualize resource usage - CPU, memory, network</li>
+                    <li>Manage multiple servers from one place</li>
+                    <li>Team collaboration - share access without sharing SSH</li>
+                    <li>Quick troubleshooting - logs and console in browser</li>
+                </ul>
+
+                <p class="text-gray-600 text-sm mt-4">
+                    It doesn't replace Docker CLI for everything, but for day-to-day management, it's way faster and easier.
+                </p>
+            </section>
+
+            <section id="installation" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">Getting Portainer running</h2>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Quick install with Docker</h3>
+                <p class="mb-4">Simplest way - run it as a container:</p>
+
+                <pre class="language-bash"><code># Create volume for data
+docker volume create portainer_data
+
+# Run Portainer
+docker run -d \
+  -p 9443:9443 \
+  --name portainer \
+  --restart=unless-stopped \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  -v portainer_data:/data \
+  cr.portainer/portainer-ce:latest</code></pre>
+
+                <p class="mb-4 mt-6">Access at https://localhost:9443 (note the https).</p>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">First setup</h3>
+                <p class="mb-4">Create admin password, then you're in. The UI will show your local Docker environment automatically.</p>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Docker Compose method</h3>
+                <pre class="language-yaml"><code>version: '3'
+services:
+  portainer:
+    image: cr.portainer/portainer-ce:latest
+    container_name: portainer
+    restart: unless-stopped
+    ports:
+      - "9443:9443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_data:/data
+    networks:
+      - portainer_network
+
+volumes:
+  portainer_data:
+
+networks:
+  portainer_network:
+    driver: bridge</code></pre>
+
+                <p class="text-gray-600 text-sm mt-4">
+                    The docker.sock mount is crucial - it gives Portainer access to manage your Docker containers.
+                </p>
+            </section>
+
+            <section id="agents" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">Managing multiple servers</h2>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Setting up Portainer Agent</h3>
+                <p class="mb-4">To manage remote Docker hosts, install the Portainer Agent:</p>
+
+                <pre class="language-bash"><code># On each remote server, run:
+docker run -d \
+  -p 9001:9001 \
+  --name portainer-agent \
+  --restart=unless-stopped \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  -v /var/lib/docker/volumes:/var/lib/docker/volumes \
+  cr.portainer/agent:latest</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Connect agent to Portainer</h3>
+                <p class="mb-4">In Portainer UI:</p>
+
+                <pre class="language-bash"><code># 1. Go to "Environments" → "Add environment"
+# 2. Choose "Docker Standalone"
+# 3. Name it: "Home Lab Server"
+# 4. Environment URL: agent-server-ip:9001
+# 5. Click "Connect"</code></pre>
+
+                <p class="mb-4 mt-6">Now you can manage that remote server from the main Portainer dashboard.</p>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">My setup</h3>
+                <p class="mb-4">Here's how I organize multiple servers:</p>
+
+                <pre class="language-bash"><code># Main Portainer instance on VPS
+# - URL: portainer.mydomain.com
+# - Manages: all other servers
+
+# Home lab server
+# - Name: "Home Lab"
+# - URL: 192.168.1.100:9001
+# - Runs: Plex, Jellyfin, Home Assistant
+
+# Production VPS
+# - Name: "Production"
+# - URL: prod-server-ip:9001
+# - Runs: Customer-facing apps
+
+# Testing server
+# - Name: "Testing"
+# - URL: test-server-ip:9001
+# - Runs: Experimental stuff</code></pre>
+
+                <p class="text-gray-600 text-sm mt-4">
+                    All visible in one dashboard. Switch between environments with a click.
+                </p>
+            </section>
+
+            <section id="usage" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">Day-to-day usage</h2>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Managing containers</h3>
+                <p class="mb-4">From the Containers page:</p>
+
+                <pre class="language-bash"><code># See all containers across all environments
+# Start/stop/restart with one click
+# View logs in real-time with filtering
+# Access container console directly in browser
+# Inspect container details and metadata</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Deploying stacks</h3>
+                <p class="mb-4">Upload docker-compose.yml through the UI:</p>
+
+                <pre class="language-yaml"><code># In Portainer:
+# 1. Go to "Stacks" → "Add stack"
+# 2. Name it: "my-app"
+# 3. Upload docker-compose.yml or paste content
+# 4. Click "Deploy the stack"
+
+# Example stack:
+version: "3.8"
+services:
+  web:
+    image: nginx:latest
+    ports:
+      - "80:80"
+    restart: unless-stopped</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Managing images</h3>
+                <p class="mb-4">Pull, prune, and manage Docker images:</p>
+
+                <pre class="language-bash"><code># Pull new images
+# View image details and layers
+# Clean up unused images (one-click prune)
+# Build images from Dockerfiles
+
+# Way easier than docker CLI for cleaning up</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Volumes and networks</h3>
+                <p class="mb-4">Manage storage and networking:</p>
+
+                <pre class="language-bash"><code># Browse volume contents
+# Create, delete, manage volumes
+# Inspect network configurations
+# See which containers are using what
+
+# Great for troubleshooting storage issues</code></pre>
+            </section>
+
+            <section id="practical-examples" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">Real stuff I use Portainer for</h2>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Quick troubleshooting</h3>
+                <p class="mb-4">Container acting weird? Check logs in Portainer instead of SSHing:</p>
+
+                <pre class="language-bash"><code># 1. Open container logs in browser
+# 2. Filter by keyword (e.g., "ERROR")
+# 3. See real-time updates
+# 4. Restart if needed - one click
+
+# No need to find which server it's on</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Deploying updates</h3>
+                <p class="mb-4">Update container images through the UI:</p>
+
+                <pre class="language-bash"><code># Container → Edit → Duplicate
+# Change image tag (e.g., :latest to :v2.0)
+# Pull latest image
+# Remove old container
+# Done</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Resource monitoring</h3>
+                <p class="mb-4">See what's eating resources:</p>
+
+                <pre class="language-bash"><code># Dashboard shows CPU, memory, network for all containers
+# Identify resource hogs quickly
+# See which containers need more resources
+# Plan capacity upgrades</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Team collaboration</h3>
+                <p class="mb-4">Give team members access without giving SSH:</p>
+
+                <pre class="language-bash"><code># Create user accounts
+# Assign to environments (with restrictions)
+# Set role: read-only or standard user
+# Team can manage their own containers
+# No need to share server credentials</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Backup and restore</h3>
+                <p class="mb-4">Portainer settings and configurations:</p>
+
+                <pre class="language-bash"><code># Settings → Backup Portainer
+# Download backup file
+# Contains: users, endpoints, stacks, configs
+# Restore to new Portainer instance if needed</code></pre>
+            </section>
+
+            <section id="advanced" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">Advanced features</h2>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Registry management</h3>
+                <p class="mb-4">Connect to Docker registries:</p>
+
+                <pre class="language-bash"><code># Add Docker Hub, GitLab, GHCR, private registries
+# Browse images without using docker CLI
+# One-click deploy from registry to container</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Templates</h3>
+                <p class="mb-4">Deploy popular apps with one click:</p>
+
+                <pre class="language-bash"><code># Templates → Custom Templates
+# Add URL to template file
+# Deploy with pre-filled configurations
+
+# Or use built-in templates:
+# - Nginx
+# - MySQL
+# - PostgreSQL
+# - Redis
+# - Many more</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Webhook notifications</h3>
+                <p class="mb-4">Get notified about events:</p>
+
+                <pre class="language-bash"><code># Settings → Webhooks
+# Configure endpoints for events:
+# - Container stops unexpectedly
+# - Image update available
+# - Resource usage threshold exceeded
+
+# Send to Slack, Discord, etc.</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Authentication</h3>
+                <p class="mb-4">Secure access to Portainer:</p>
+
+                <pre class="language-bash"><code># Use OAuth/OIDC for login
+# - Google
+# - GitHub
+# - Microsoft
+# - Custom OIDC provider
+
+# Enable 2FA for extra security
+# Configure IP whitelist for admin access</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Helm support (Kubernetes)</h3>
+                <p class="mb-4">Manage Kubernetes clusters too:</p>
+
+                <pre class="language-bash"><code># Add Kubernetes endpoint
+# Deploy Helm charts through UI
+# Manage namespaces and deployments
+# Same interface for Docker and K8s</code></pre>
+            </section>
+
+            <section id="issues" class="mt-12 bg-gray-50 p-6 rounded-lg">
+                <h2 class="text-2xl font-bold mb-4 text-gray-900">Problems I hit</h2>
+
+                <h3 class="text-xl font-bold mb-3 mt-6 text-gray-800">Agent can't connect</h3>
+                <p class="mb-2">Portainer shows agent as "down".</p>
+                <pre class="language-bash"><code># Fixed by
+1. Checking firewall allows port 9001
+2. Verifying agent container is running
+3. Using IP address instead of hostname (DNS issues)
+4. Checking docker.sock is mounted correctly</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6 text-gray-800">Lost access after update</h3>
+                <p class="mb-2">Portainer update broke something.</p>
+                <pre class="language-bash"><code># Fixed by
+1. Restoring from backup (have backups!)
+2. Or recreating container from scratch (data in volume persists)
+3. Checking Portainer logs for specific error</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6 text-gray-800">Container shows wrong status</h3>
+                <p class="mb-2">Portainer says stopped but Docker says running.</p>
+                <pre class="language-bash"><code># Fixed by
+1. Refreshing the page (cache issue)
+2. Reconnecting the environment
+3. Restarting Portainer container itself</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6 text-gray-800">Can't access container console</h3>
+                <p class="mb-2">Console button doesn't work.</p>
+                <pre class="language-bash"><code># Fixed by
+1. Checking if image supports shell (some minimal images don't)
+2. Trying different shell (/bin/bash, /bin/sh)
+3. Verifying container is running
+4. Checking if exec is supported in environment</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6 text-gray-800">Performance issues</h3>
+                <p class="mb-2">Portainer becomes slow with many containers.</p>
+                <pre class="language-bash"><code># Fixed by
+1. Increasing resources for Portainer container
+2. Reducing refresh interval
+3. Archiving old environments not in use
+4. Using filters to show only active containers</code></pre>
+            </section>
+
+            <section id="comparison" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">Portainer vs alternatives</h2>
+
+                <table class="w-full my-6 border border-gray-200">
+                    <thead class="bg-gray-100">
+                        <tr>
+                            <th class="text-left p-3 border-b"></th>
+                            <th class="text-left p-3 border-b">Portainer</th>
+                            <th class="text-left p-3 border-b">Docker CLI</th>
+                            <th class="text-left p-3 border-b">Rancher</th>
+                            <th class="text-left p-3 border-b">Yacht</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="p-3 border-b">Ease of use</td>
+                            <td class="p-3 border-b text-green-600">★★★★★</td>
+                            <td class="p-3 border-b">★★★☆☆</td>
+                            <td class="p-3 border-b">★★★☆☆</td>
+                            <td class="p-3 border-bottom">★★★★☆</td>
+                        </tr>
+                        <tr>
+                            <td class="p-3 border-b">Web UI</td>
+                            <td class="p-3 border-b text-green-600">Yes</td>
+                            <td class="p-3 border-b">No</td>
+                            <td class="p-3 border-b text-green-600">Yes</td>
+                            <td class="p-3 border-bottom">Yes</td>
+                        </tr>
+                        <tr>
+                            <td class="p-3 border-b">Multi-host</td>
+                            <td class="p-3 border-b text-green-600">Yes</td>
+                            <td class="p-3 border-bottom">Manual</td>
+                            <td class="p-3 border-bottom text-green-600">Yes</td>
+                            <td class="p-3 border-bottom">Limited</td>
+                        </tr>
+                        <tr>
+                            <td class="p-3 border-b">Resource usage</td>
+                            <td class="p-3 border-bottom">Light</td>
+                            <td class="p-3 border-bottom text-green-600">None</td>
+                            <td class="p-3 border-bottom">Heavy</td>
+                            <td class="p-3 border-bottom text-green-600">Light</td>
+                        </tr>
+                        <tr>
+                            <td class="p-3 border-b">Team features</td>
+                            <td class="p-3 border-bottom text-green-600">Good</td>
+                            <td class="p-3 border-bottom">None</td>
+                            <td class="p-3 border-bottom text-green-600">Excellent</td>
+                            <td class="p-3 border-bottom">Basic</td>
+                        </tr>
+                        <tr>
+                            <td class="p-3 border-b">Learning curve</td>
+                            <td class="p-3 border-bottom">Low</td>
+                            <td class="p-3 border-bottom">Medium</td>
+                            <td class="p-3 border-bottom">High</td>
+                            <td class="p-3 border-bottom">Low</td>
+                        </tr>
+                        <tr>
+                            <td class="p-3 border-b">Best for</td>
+                            <td class="p-3 border-bottom">Docker management</td>
+                            <td class="p-3 border-bottom">Scripting/automation</td>
+                            <td class="p-3 border-bottom">Kubernetes</td>
+                            <td class="p-3 border-bottom">Home labs</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <p class="text-gray-600 mt-4">
+                    Portainer is the sweet spot for Docker management. Easier than CLI, lighter than Rancher, more features than Yacht.
+                </p>
+            </section>
+
+            <section id="thoughts" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">Would I recommend it?</h2>
+                <p class="mb-4">
+                    Absolutely. I use Portainer every day. Managing 50+ containers across 4 servers. Before Portainer, I'd spend way too much time SSHing into servers and running docker commands.
+                </p>
+                <p class="mb-4">
+                    The multi-server management is the killer feature. See everything in one dashboard, switch environments with a click. No need to remember which container is on which server.
+                </p>
+                <p class="mb-4">
+                    Logs viewer is super useful - see what's happening in real-time, filter by keyword. Way faster than docker logs with grep.
+                </p>
+                <p class="mb-4">
+                    Team access is nice too. Give colleagues access to manage their own containers without giving them full server access.
+                </p>
+                <p class="mb-4">
+                    It's free for most use cases. Only need paid version if you have huge teams or need enterprise features.
+                </p>
+                <p class="mb-4">
+                    If you're running more than a few Docker containers, Portainer pays off immediately in time saved.
+                </p>
+                <p class="mb-4">
+                    Links: <a href="https://www.portainer.io" class="text-blue-600 underline">portainer.io</a> | GitHub: <a href="https://github.com/portainer/portainer" class="text-blue-600 underline">github.com/portainer/portainer</a> | Docs: <a href="https://docs.portainer.io" class="text-blue-600 underline">docs.portainer.io</a>
+                </p>
+            </section>
+
+        </article>
+
+    </main>
+
+    <footer class="bg-gray-800 text-white py-12">
+        <div class="max-w-4xl mx-auto px-4 text-center">
+            <p class="opacity-70 mb-2">📝 Programming Notes</p>
+            <p class="text-sm opacity-50">
+                Personal learning notes & tutorials. Updated as I explore new technologies.
+            </p>
+            <p class="text-xs opacity-40 mt-4"><a href="privacy.html" class="hover:text-white">Privacy Policy</a></p>
+        </div>
+    </footer>
+
+    <!-- Code Highlighting Script -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-yaml.min.js"></script>
+</body>
+</html>

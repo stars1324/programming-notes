@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-LMWN7814BX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-LMWN7814BX');
+    </script>
+
+    <!-- SEO Meta Tags -->
+    <title>Coolify: Self-Hosted Heroku Alternative - Deploy Apps on Your Own VPS</title>
+    <meta name="description" content="Tried paying $50/month for Heroku? Coolify lets you deploy apps on your own VPS for free. Open source, supports Docker, databases, static sites. Here's how I set it up.">
+    <meta name="keywords" content="Coolify, self-hosted Heroku, deploy apps on VPS, Docker deployment, open source PaaS, Vercel alternative, Netlify alternative">
+    <link rel="canonical" href="https://pnt.jacbex.com/coolify.html" />
+
+    <!-- Open Graph / Social Media -->
+    <meta property="og:title" content="Coolify: Finally, Deploy Apps Like Heroku But on Your Own Server">
+    <meta property="og:description" content="Open-source PaaS that runs on your VPS. Deploy Docker apps, databases, and static sites. No more monthly hosting fees.">
+    <meta property="og:type" content="article">
+
+    <!-- Tailwind CSS for modern UI -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Code Highlighting (Prism.js) -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+
+    <!-- Structured Data (Schema.org) for Google -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "Coolify: Self-Hosted Heroku Alternative - Deploy Apps on VPS",
+      "description": "Guide to using Coolify for self-hosted application deployment on VPS. Includes installation, configuration, and deployment examples.",
+      "author": {
+        "@type": "Person",
+        "name": "Programming Notes"
+      },
+      "proficiencyLevel": "Intermediate"
+    }
+    </script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+        .prose code { color: #eb5757; background: #f9f2f2; padding: 2px 4px; border-radius: 4px; }
+        .feature-box { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 24px; border-radius: 12px; margin: 24px 0; }
+        .node-card { background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 12px; padding: 16px; margin: 12px 0; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+            <a href="index.html" class="text-xl font-bold text-blue-600">📝 <span class="text-gray-700">Programming Notes</span></a>
+            <div class="space-x-6 hidden md:block">
+                <a href="index.html" class="hover:text-blue-500">Home</a>
+                <a href="about.html" class="hover:text-blue-500">About</a>
+                <a href="contact.html" class="hover:text-blue-500">Contact</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="bg-gradient-to-r from-purple-700 to-indigo-800 text-white py-16">
+        <div class="max-w-4xl mx-auto px-4 text-center">
+            <h1 class="text-4xl md:text-5xl font-extrabold mb-4">Coolify: Finally, Deploy Apps Like Heroku But on Your Own Server</h1>
+            <p class="text-xl opacity-90">Tired of paying $50+/month for Heroku? Coolify gives you the same push-to-deploy experience on your own VPS. Open source, free, actually works.</p>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto px-4 py-12 bg-white mt-[-40px] rounded-xl shadow-lg mb-20">
+
+        <article class="prose prose-blue max-w-none">
+
+            <section id="introduction">
+                <h2 class="text-3xl font-bold mb-4">Why I switched from Heroku</h2>
+                <p class="mb-4">
+                    Had a few side projects running on Heroku. Nothing massive - a couple of Node.js apps, a Python API, a static site. Was paying like $50/month for the privilege.
+                </p>
+                <p class="mb-4">
+                    Looked at the bill and thought "this is ridiculous". I already have a VPS that costs $5/month. Why am I paying Heroku 10x that for worse performance?
+                </p>
+                <p class="mb-4">
+                    Problem was, setting up deployments on bare VPS is annoying. Docker compose, SSL certificates, reverse proxy, auto-restarts - lots of moving parts.
+                </p>
+                <p class="mb-4">
+                    Then found <a href="https://coolify.io" class="text-blue-600 underline" target="_blank">Coolify</a>. Open source, self-hosted PaaS. Give it a GitHub repo, it handles the rest. Basically Heroku but on your own server.
+                </p>
+
+                <div class="feature-box">
+                    <p class="font-bold text-xl mb-2">What I'm saving now</p>
+                    <p class="opacity-90">Heroku: $50-100/month depending on apps<br>
+                    Coolify on my own VPS: $5/month<br>
+                    <strong>Saved: $45-95/month</strong></p>
+                    <p class="opacity-90 mt-2">And I get better performance, more control, and can deploy unlimited apps.</p>
+                </div>
+            </section>
+
+            <section id="what-is-coolify" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">So what is Coolify</h2>
+                <p class="mb-4">
+                    Coolify is an open-source PaaS (Platform as a Service) that you run on your own server. Think of it as a self-hosted Heroku, Vercel, or Netlify all in one.
+                </p>
+                <p class="mb-4">
+                    What it does:
+                </p>
+                <ul class="list-disc ml-6 mb-4">
+                    <li><strong>Connects to GitHub:</strong> Push code, it auto-deploys</li>
+                    <li><strong>Handles Docker:</strong> Builds containers from your code</li>
+                    <li><strong>SSL certificates:</strong> Auto-generates HTTPS with Let's Encrypt</li>
+                    <li><strong>Databases:</strong> One-click PostgreSQL, MySQL, MongoDB, Redis</li>
+                    <li><strong>Static sites:</strong> Deploy Next.js, Vite, Hugo with zero config</li>
+                    <li><strong>Preview deployments:</strong> Automatic preview URLs for pull requests</li>
+                    <li><strong>Auto-scaling:</strong> Scales resources based on needs</li>
+                    <li><strong>Multiple servers:</strong> Deploy to different VPS from one dashboard</li>
+                </ul>
+
+                <p class="mb-4 mt-6">Why it's better than rolling your own:</p>
+                <ul class="list-disc ml-6 mb-4">
+                    <li>Web UI instead of editing YAML files</li>
+                    <li>Handles all the networking stuff automatically</li>
+                    <li>Built-in monitoring and logs</li>
+                    <li>Team collaboration with role-based access</li>
+                    <li>Updates itself with one click</li>
+                </ul>
+
+                <p class="text-gray-600 text-sm mt-4">
+                    It's not just for deployment - it manages the whole lifecycle. Databases, cron jobs, background workers, SSL - everything in one place.
+                </p>
+            </section>
+
+            <section id="installation" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">Getting Coolify running</h2>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Prerequisites</h3>
+                <p class="mb-4">You'll need:</p>
+                <ul class="list-disc ml-6 mb-4">
+                    <li>A VPS (DigitalOcean, Hetzner, Linode - whatever)</li>
+                    <li>Ubuntu 20.04+ or Debian 11+ (other distros work but these are tested)</li>
+                    <li>At least 2GB RAM (4GB recommended)</li>
+                    <li>A domain name pointed to your server</li>
+                    <li>Basic knowledge of SSH and terminal</li>
+                </ul>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">One-line install</h3>
+                <p class="mb-4">Easiest way - run their install script:</p>
+
+                <pre class="language-bash"><code>curl -fsSL https://cdn.coollabs.io/coolify/install.sh | bash</code></pre>
+
+                <p class="mb-4 mt-6">That's literally it. It installs Docker, Coolify, and everything needed.</p>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Manual install (if you prefer)</h3>
+                <pre class="language-bash"><code># Install Docker
+curl -fsSL https://get.docker.com | sh
+
+# Clone Coolify
+git clone https://github.com/coollabsio/coolify.git
+cd coolify
+
+# Copy environment file
+cp .env.example .env
+
+# Edit .env and set your domain
+# APP_URL=https://coolify.your-domain.com
+
+# Start it
+docker compose up -d</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">First setup</h3>
+                <p class="mb-4">Go to your domain, create an admin account, connect your GitHub/GitLab. Done.</p>
+
+                <p class="text-gray-600 text-sm mt-4">
+                    The whole process takes maybe 10 minutes. Most of that is DNS propagating.
+                </p>
+            </section>
+
+            <section id="deployment" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">Deploying your first app</h2>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">From GitHub</h3>
+                <p class="mb-4">Simplest workflow:</p>
+
+                <pre class="language-bash"><code># 1. Push your code to GitHub
+git push origin main
+
+# 2. In Coolify, click "New Resource"
+# 3. Select "From GitHub"
+# 4. Choose your repo
+# 5. Click "Deploy"
+
+# Coolify detects your stack (Node, Python, etc.)
+# Builds it, runs it on a subdomain
+# https://your-app.coolify.your-domain.com</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">With configuration</h3>
+                <p class="mb-4">Most apps need some config:</p>
+
+                <pre class="language-yaml"><code># coolify.yaml in your repo root
+version: "1.0"
+services:
+  - name: "my-app"
+    type: "dockerfile"
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 3000:3000
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=${DATABASE_URL}
+    databases:
+      - type: "postgresql"
+      name: "my-db"</code></pre>
+
+                <p class="mb-4 mt-6">Or just use the web UI to set environment variables. Either works.</p>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Different app types</h3>
+
+                <p class="mb-4">**Node.js app:**</p>
+                <pre class="language-bash"><code># Just push your repo
+# Coolify detects package.json
+# Runs npm install, npm build, npm start automatically</code></pre>
+
+                <p class="mb-4">**Python app:**</p>
+                <pre class="language-bash"><code># Add requirements.txt
+# Coolify runs pip install
+# Set your start command: python app.py or gunicorn app:app</code></pre>
+
+                <p class="mb-4">**Static site (Next.js, Vite, Hugo):**</p>
+                <pre class="language-bash"><code># Select "Static Site" as type
+# Coolify builds and serves via nginx
+# Auto-optimizes assets</code></pre>
+
+                <p class="mb-4">**Dockerfile:**</p>
+                <pre class="language-bash"><code># Put Dockerfile in repo
+# Coolify builds image from it
+# All the flexibility of Docker, none of the deployment headache</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Custom domains</h3>
+                <p class="mb-4">Point any domain to your app:</p>
+
+                <pre class="language-bash"><code># In Coolify dashboard:
+# 1. Go to your app
+# 2. Click "Domains"
+# 3. Add custom domain: app.yourdomain.com
+# 4. Point DNS to your server
+# 5. Coolify handles SSL automatically</code></pre>
+            </section>
+
+            <section id="databases" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">Managing databases</h2>
+                <p class="mb-4">
+                    This is where Coolify really shines compared to DIY deployment.
+                </p>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">One-click databases</h3>
+                <pre class="language-bash"><code># In Coolify, click "New Resource" → "Database"
+# Choose: PostgreSQL, MySQL, MongoDB, Redis
+
+# That's it.
+# It creates the database, exposes it internally
+# Auto-backups, SSL, connection strings ready</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Connecting apps to databases</h3>
+                <pre class="language-bash"><code># In your app settings, link the database
+# Coolify sets DATABASE_URL automatically
+
+# Or copy connection string from database settings
+# Format: postgresql://user:pass@db:5432/dbname</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Backups</h3>
+                <p class="mb-4">Built-in automated backups:</p>
+
+                <pre class="language-bash"><code># Database → Settings → Backups
+# Enable auto-backups (daily/weekly)
+# Store on S3 or locally
+# One-click restore when needed</code></pre>
+            </section>
+
+            <section id="practical-examples" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">Stuff I deploy on Coolify</h2>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Next.js app with PostgreSQL</h3>
+                <p class="mb-4">Full-stack app with database:</p>
+
+                <pre class="language-bash"><code># 1. Create PostgreSQL database in Coolify
+# 2. Deploy Next.js app from GitHub
+# 3. Link database to app
+# 4. Set DATABASE_URL env var
+# 5. Build completes, app is live
+
+# Preview deployments for every PR
+# Production deploy on main branch merge</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Python API with Redis</h3>
+                <p class="mb-4">FastAPI with caching:</p>
+
+                <pre class="language-bash"><code># Coolfile in repo
+version: "1.0"
+services:
+  - name: "api"
+    type: "dockerfile"
+    ports:
+      - 8000:8000
+    environment:
+      - REDIS_URL=${REDIS_URL}
+    resources:
+      - type: "redis"
+        name: "cache"</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Multiple static sites</h3>
+                <p class="mb-4">Blogs, docs, landing pages:</p>
+
+                <pre class="language-bash"><code># Deploy Hugo blog
+# Deploy Vite docs site
+# Deploy Next.js marketing site
+# All on one $5 VPS
+# With automatic SSL and CDN</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Background workers</h3>
+                <p class="mb-4">Separate worker processes:</p>
+
+                <pre class="language-bash"><code># Main app handles web requests
+# Worker processes jobs in background
+
+# In Coolify, deploy same repo twice
+# One as "web", one as "worker"
+# Different start commands, share database</code></pre>
+            </section>
+
+            <section id="advanced" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">Advanced stuff</h2>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Multiple servers</h3>
+                <p class="mb-4">Deploy to different VPS from one dashboard:</p>
+
+                <pre class="language-bash"><code># Add new server in Coolify
+# Run install script on second VPS
+# It appears in dashboard
+# Deploy apps to whichever server has capacity
+
+# I have: Hetzner (cheap, EU), DigitalOcean (backup, US)</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Resource limits</h3>
+                <p class="mb-4">Prevent one app from hogging everything:</p>
+
+                <pre class="language-bash"><code># App Settings → Resources
+# Set CPU and memory limits
+# Example: 0.5 CPU, 512MB RAM
+
+# Keeps runaway apps in check
+# Ensures fair resource allocation</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Health checks</h3>
+                <p class="mb-4">Auto-restart failing apps:</p>
+
+                <pre class="language-bash"><code># App Settings → Health Check
+# Set endpoint: /health or /
+# Coolify checks every minute
+# Restarts if failing
+
+# Uptime monitoring included</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Cron jobs</h3>
+                <p class="mb-4">Schedule recurring tasks:</p>
+
+                <pre class="language-bash"><code># App → New Resource → Cron Job
+# Set schedule: 0 0 * * * (daily at midnight)
+# Run command: npm run backup
+# Or hit endpoint: curl https://app.com/api/cleanup</code></pre>
+            </section>
+
+            <section id="issues" class="mt-12 bg-gray-50 p-6 rounded-lg">
+                <h2 class="text-2xl font-bold mb-4 text-gray-900">Stuff that went wrong</h2>
+
+                <h3 class="text-xl font-bold mb-3 mt-6 text-gray-800">Build failures</h3>
+                <p class="mb-2">Apps failing to build for no obvious reason.</p>
+                <pre class="language-bash"><code># Fixed by
+1. Checking build logs (actually read them)
+2. Making sure all dependencies in requirements.txt/package.json
+3. Adding .dockerignore to exclude node_modules
+4. Using smaller base images to avoid memory issues</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6 text-gray-800">SSL not generating</h3>
+                <p class="mb-2">Let's Encrypt failing on custom domains.</p>
+                <pre class="language-bash"><code># Fixed by
+1. Waiting for DNS to fully propagate (can take time)
+2. Making sure port 80/443 not blocked by firewall
+3. Checking CNAME not A record for subdomains
+4. Rate limiting - waited an hour and retried</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6 text-gray-800">Out of memory</h3>
+                <p class="mb-2">Too many apps on small VPS.</p>
+                <pre class="language-bash"><code># Fixed by
+1. Setting resource limits per app
+2. Moving to larger VPS (still cheaper than Heroku)
+3. Spreading apps across multiple servers
+4. Removing unused databases</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6 text-gray-800">Slow builds</h3>
+                <p class="mb-2">Every deploy taking 10+ minutes.</p>
+                <pre class="language-bash"><code># Fixed by
+1. Using build cache (enabled in app settings)
+2. Optimizing Dockerfile (fewer layers)
+3. Using smaller base images (alpine instead of full)
+4. Building on local CI, pushing images to registry</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6 text-gray-800">Database migration fails</h3>
+                <p class="mb-2">New deployments breaking database.</p>
+                <pre class="language-bash"><code># Fixed by
+1. Running migrations manually first
+2. Adding pre-deploy hook in Coolify
+3. Using database backups to test migrations locally
+4. Rollback functionality (Coolify keeps last 5 versions)</code></pre>
+            </section>
+
+            <section id="comparison" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">Coolify vs alternatives</h2>
+
+                <table class="w-full my-6 border border-gray-200">
+                    <thead class="bg-gray-100">
+                        <tr>
+                            <th class="text-left p-3 border-b"></th>
+                            <th class="text-left p-3 border-b">Coolify</th>
+                            <th class="text-left p-3 border-b">Heroku</th>
+                            <th class="text-left p-3 border-b">Vercel</th>
+                            <th class="text-left p-3 border-b">DIY Docker</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="p-3 border-b">Cost</td>
+                            <td class="p-3 border-b text-green-600">$5-20/month</td>
+                            <td class="p-3 border-b">$50-500/month</td>
+                            <td class="p-3 border-b">$20+/month</td>
+                            <td class="p-3 border-b text-green-600">$5-20/month</td>
+                        </tr>
+                        <tr>
+                            <td class="p-3 border-b">Setup time</td>
+                            <td class="p-3 border-b">10 min</td>
+                            <td class="p-3 border-b text-green-600">0 min</td>
+                            <td class="p-3 border-b text-green-600">0 min</td>
+                            <td class="p-3 border-b">Hours/Days</td>
+                        </tr>
+                        <tr>
+                            <td class="p-3 border-b">Self-hosted</td>
+                            <td class="p-3 border-b text-green-600">Yes</td>
+                            <td class="p-3 border-b">No</td>
+                            <td class="p-3 border-b">No</td>
+                            <td class="p-3 border-b text-green-600">Yes</td>
+                        </tr>
+                        <tr>
+                            <td class="p-3 border-b">Databases</td>
+                            <td class="p-3 border-b text-green-600">Free</td>
+                            <td class="p-3 border-b">$$$ add-ons</td>
+                            <td class="p-3 border-b">External only</td>
+                            <td class="p-3 border-b text-green-600">Free</td>
+                        </tr>
+                        <tr>
+                            <td class="p-3 border-b">SSL included</td>
+                            <td class="p-3 border-b text-green-600">Yes</td>
+                            <td class="p-3 border-b text-green-600">Yes</td>
+                            <td class="p-3 border-b text-green-600">Yes</td>
+                            <td class="p-3 border-b">Manual setup</td>
+                        </tr>
+                        <tr>
+                            <td class="p-3 border-b">Preview deployments</td>
+                            <td class="p-3 border-b text-green-600">Yes</td>
+                            <td class="p-3 border-b">Paid add-on</td>
+                            <td class="p-3 border-b text-green-600">Yes</td>
+                            <td class="p-3 border-b">Manual setup</td>
+                        </tr>
+                        <tr>
+                            <td class="p-3 border-b">Control</td>
+                            <td class="p-3 border-b text-green-600">Full</td>
+                            <td class="p-3 border-b">Limited</td>
+                            <td class="p-3 border-b">Limited</td>
+                            <td class="p-3 border-b text-green-600">Full</td>
+                        </tr>
+                        <tr>
+                            <td class="p-3 border-b">Best for</td>
+                            <td class="p-3 border-b">Cost-conscious devs</td>
+                            <td class="p-3 border-b">Rapid prototyping</td>
+                            <td class="p-3 border-b">Frontend apps</td>
+                            <td class="p-3 border-b">Control freaks</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <p class="text-gray-600 mt-4">
+                    Coolify hits the sweet spot - way cheaper than managed services, way easier than pure DIY.
+                </p>
+            </section>
+
+            <section id="thoughts" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">Would I recommend it?</h2>
+                <p class="mb-4">
+                    Absolutely. I migrated 7 apps from Heroku to Coolify. Went from paying ~$75/month to $5/month. That's $840/year saved.
+                </p>
+                <p class="mb-4">
+                    Setup took an afternoon. Most of that was figuring out my own apps' configurations. Coolify itself was simple.
+                </p>
+                <p class="mb-4">
+                    The web UI is great. I can see all my apps, check logs, restart stuff, manage databases - all from one place. No SSHing into servers to debug.
+                </p>
+                <p class="mb-4">
+                    Auto-deploys from GitHub work flawlessly. Push to main, it builds, it deploys. Preview URLs for PRs make reviews so much easier.
+                </p>
+                <p class="mb-4">
+                    If you're paying more than $20/month for hosting and have basic Docker knowledge, Coolify pays for itself in like a week.
+                </p>
+                <p class="mb-4">
+                    Links: <a href="https://coolify.io" class="text-blue-600 underline">coolify.io</a> | GitHub: <a href="https://github.com/coollabsio/coolify" class="text-blue-600 underline">github.com/coollabsio/coolify</a> | Docs: <a href="https://coolify.io/docs" class="text-blue-600 underline">coolify.io/docs</a>
+                </p>
+            </section>
+
+        </article>
+
+    </main>
+
+    <footer class="bg-gray-800 text-white py-12">
+        <div class="max-w-4xl mx-auto px-4 text-center">
+            <p class="opacity-70 mb-2">📝 Programming Notes</p>
+            <p class="text-sm opacity-50">
+                Personal learning notes & tutorials. Updated as I explore new technologies.
+            </p>
+            <p class="text-xs opacity-40 mt-4"><a href="privacy.html" class="hover:text-white">Privacy Policy</a></p>
+        </div>
+    </footer>
+
+    <!-- Code Highlighting Script -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-yaml.min.js"></script>
+</body>
+</html>

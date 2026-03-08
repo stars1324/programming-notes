@@ -188,7 +188,25 @@
     </url>
     <url>
         <loc>https://pnt.jacbex.com/whisper.html</loc>
-        <lastmod>2026-03-05</lastmod>
+        <lastmod>2026-03-09</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.9</priority>
+    </url>
+    <url>
+        <loc>https://pnt.jacbex.com/coolify.html</loc>
+        <lastmod>2026-03-09</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.9</priority>
+    </url>
+    <url>
+        <loc>https://pnt.jacbex.com/nginx-proxy-manager.html</loc>
+        <lastmod>2026-03-09</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.9</priority>
+    </url>
+    <url>
+        <loc>https://pnt.jacbex.com/portainer.html</loc>
+        <lastmod>2026-03-09</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.9</priority>
     </url>
