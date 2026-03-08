@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-LMWN7814BX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-LMWN7814BX');
+    </script>
+
+    <!-- SEO Meta Tags -->
+    <title>Logseq: Privacy-First Knowledge Base That Actually Works Offline</title>
+    <meta name="description" content="Tried Obsidian but wanted something more structured? Logseq gives you the best of both worlds - outliner editor, graph view, local-first privacy. Here's my setup guide.">
+    <meta name="keywords" content="Logseq, privacy-first knowledge base, outliner, PKM, note-taking app, bidirectional linking, Logseq sync tutorial, local notes">
+    <link rel="canonical" href="https://pnt.jacbex.com/logseq.html" />
+
+    <!-- Open Graph / Social Media -->
+    <meta property="og:title" content="Logseq: Privacy-First Knowledge Base with Graph View">
+    <meta property="og:description" content="Local-first PKM tool with outliner interface and graph view. Bidirectional linking, offline access, and encrypted sync.">
+    <meta property="og:type" content="article">
+
+    <!-- Tailwind CSS for modern UI -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Code Highlighting (Prism.js) -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+
+    <!-- Structured Data (Schema.org) for Google -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "Logseq: Privacy-First Knowledge Base That Actually Works Offline",
+      "description": "Guide to using Logseq for privacy-focused personal knowledge management with graph views and bidirectional linking.",
+      "author": {
+        "@type": "Person",
+        "name": "Programming Notes"
+      },
+      "proficiencyLevel": "Beginner"
+    }
+    </script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+        .prose code { color: #eb5757; background: #f9f2f2; padding: 2px 4px; border-radius: 4px; }
+        .feature-box { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 24px; border-radius: 12px; margin: 24px 0; }
+        .node-card { background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 12px; padding: 16px; margin: 12px 0; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+            <a href="index.html" class="text-xl font-bold text-blue-600">📝 <span class="text-gray-700">Programming Notes</span></a>
+            <div class="space-x-6 hidden md:block">
+                <a href="index.html" class="hover:text-blue-500">Home</a>
+                <a href="about.html" class="hover:text-blue-500">About</a>
+                <a href="contact.html" class="hover:text-blue-500">Contact</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="bg-gradient-to-r from-purple-700 to-indigo-800 text-white py-16">
+        <div class="max-w-4xl mx-auto px-4 text-center">
+            <h1 class="text-4xl md:text-5xl font-extrabold mb-4">Logseq: Privacy-First Knowledge Base That Actually Works Offline</h1>
+            <p class="text-xl opacity-90">Tried Obsidian but wanted something more structured? Logseq gives you outliner editing, graph views, local storage. Here's how I built my second brain.</p>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto px-4 py-12 bg-white mt-[-40px] rounded-xl shadow-lg mb-20">
+
+        <article class="prose prose-blue max-w-none">
+
+            <section id="introduction">
+                <h2 class="text-3xl font-bold mb-4">How I ended up here</h2>
+                <p class="mb-4">
+                    Started with Obsidian for personal knowledge management. Loved the local-first approach and markdown files. But found it unstructured for my taste. Just pages and pages of text, hard to see connections.
+                </p>
+                <p class="mb-4">
+                    Wanted something with more structure - databases, proper metadata, graph visualization. Looked at Roam Research - powerful but proprietary, expensive, and cloud-only.
+                </p>
+                <p class="mb-4">
+                    Then found <a href="https://logseq.com" class="text-blue-600 underline" target="_blank">Logseq</a>. Open-source, local-first like Obsidian, but with outliner interface like Roam. Graph view, databases, PDF annotation - the works.
+                </p>
+
+                <div class="feature-box">
+                    <p class="font-bold text-xl mb-2">What convinced me to switch</p>
+                    <p class="opacity-90">Outliner interface means structured thinking by default. Every bullet becomes a node in the graph. Visual connections between ideas are obvious. My second brain actually feels like a brain now.</p>
+                    <p class="opacity-90 mt-2">Best part: All local files in SQLite. Fast, searchable, and I own it completely.</p>
+                </div>
+            </section>
+
+            <section id="what-is-logseq" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">So what is Logseq</h2>
+                <p class="mb-4">
+                    Logseq is a privacy-first knowledge management system (PKM) tool. It stores your notes as SQLite files locally, so you own your data. But unlike Obsidian's markdown files, it uses an outliner interface - everything is structured bullets.
+                </p>
+                <p class="mb-4">
+                    The key features:
+                </p>
+                <ul class="list-disc ml-6 mb-4">
+                    <li><strong>Outliner interface:</strong> Bullet-point editing by default, everything is structured</li>
+                    <li><strong>Graph view:</strong> Visualize connections between notes as nodes and edges</li>
+                    <li><strong>Bidirectional linking:</strong> [[page links]] that work both ways automatically</li>
+                    <li><strong>Block-based:</strong> Each bullet is a block that can be moved anywhere</li>
+                    <li><strong>Databases:</strong> SQL databases within your notes for structured data</li>
+li><strong>PDF annotation:</strong> Highlight and comment on PDFs within Logseq</li>
+                    <li><strong>Offline-first:</strong> Works completely offline, sync is optional</li>
+                    <li><strong>Cross-platform:</strong> Desktop (Mac/Windows/Linux), mobile, web</li>
+                    <li><strong>Plugin ecosystem:</strong> Community plugins extend functionality</li>
+                </ul>
+
+                <p class="mb-4 mt-6">Why it's different from other PKM tools:</p>
+                <ul class="list-disc ml-6 mb-4">
+                    <li>Outliner vs document editor - forces structured thinking</li>
+                    <li>Built-in databases - not an afterthought or plugin</li>
+                    <li>Graph view - actually useful, not just eye candy</li>
+                    <li>SQLite storage - faster and more powerful than markdown files</li>
+                    <li>Blocks are content-addressable - can be referenced anywhere</li>
+                </ul>
+
+                <p class="text-gray-600 text-sm mt-4">
+                    It's like if Roam Research and Obsidian had a baby, but with better architecture and privacy.
+                </p>
+            </section>
+
+            <section id="installation" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">Getting Logseq running</h2>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Desktop app</h3>
+                <p class="mb-4">Download from the official website:</p>
+
+                <pre class="language-bash"><code># Download from https://logseq.com
+# Supports macOS, Windows, Linux
+
+# Install and launch
+# Creates local graph at:
+# ~/Logseq/Desktop/ (macOS/Linux)
+# C:\Users\<user>\AppData\Logseq\ (Windows)</code></pre>
+
+                <p class="mb-4 mt-6">First run asks you to create a graph - that's your knowledge base. Everything lives in SQLite files in that directory.</p>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Mobile apps</h3>
+                <pre class="language-bash"><code># iOS: App Store
+# Android: Google Play or F-Droid (FOSS version)
+
+# Sync with desktop app via:
+# - Local network sync (same WiFi)
+# - Cloud sync (end-to-end encrypted)
+# - iCloud (experimental)</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Self-hosting</h3>
+                <p class="mb-4">Run your own sync server:</p>
+
+                <pre class="language-bash"><code># Use Docker for self-hosted sync
+docker run -d \
+  --name logseq-server \
+  -p 12315:12315 \
+  -v logseq_data:/root/logseq/data \
+  logseq/logseq</code></pre>
+
+                <p class="text-gray-600 text-sm mt-4">
+                    Desktop app is all you need for personal use. Self-hosting only makes sense for teams or specific privacy requirements.
+                </p>
+            </section>
+
+            <section id="basics" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">Basic usage</h2>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Creating notes</h3>
+                <p class="mb-4">Everything in Logseq starts with a bullet:</p>
+
+                <pre class="text"><code># Hit enter to create new bullet
+* This is a note about PKM tools
+**Logseq** is an outliner
+* Each bullet is a block
+* Press Tab to indent, Shift+Tab to unindent</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Block types</h3>
+                <p class="mb-4">Different types of content blocks:</p>
+
+                <pre class="language-bash"><code>/code        : Code block with syntax highlighting
+/todolist   : Todo list with checkboxes
+/list       : Bullet list
+/ordered     : Numbered list
+/h1-h6       : Headings
+/quote       : Block quote
+/page        : Create new page and link
+/alias       : Create redirect/shortcut</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Bidirectional linking</h3>
+                <p class="mb-4">Create connections between notes:</p>
+
+                <pre class="text"><code># Type [[ to create link
+[[Another Page]] shows up as blue link
+
+# Click to navigate there
+# Creates backlink automatically
+# Both pages show relationship</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Slash commands</h3>
+                <p class="mb-4">Type commands to insert blocks:</p>
+
+                <pre class="language-bash"><code># Just type these to create blocks:
+/block       : Insert content block
+/heading     : Create heading
+/query       : Search your knowledge base
+/keyword     : Add keywords/tags
+/pdf         : Import PDF file
+/graph       : Open graph view</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Properties and metadata</h3>
+                <p class="mb-4">Add structured data to blocks:</p>
+
+                <pre class="text"><code># Right-click block → Properties
+# Add custom properties:
+- Status (select: Todo, Doing, Done)
+- Priority (select: High, Medium, Low)
+- Due Date (date picker)
+- Tags (multi-select)
+- Your custom fields</code></pre>
+            </section>
+
+            <section id="graph-view" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">The graph view is actually useful</h2>
+                <p class="mb-4">
+                    Most PKM tools have graph views but they feel gimmicky. Logseq's graph is genuinely useful.
+                </p>
+
+                <p class="mb-4">
+                    Open it with /graph - see your entire knowledge base as a network. Notes are nodes, links are edges. Zoom in, explore connections you forgot about.
+                </p>
+
+                <pre class="text"><code># What the graph shows:
+- Nodes: Every bullet/block
+- Edges: Links between blocks
+- Colors: Based on tags, file types, or properties
+- Size: Based on number of connections
+- Filters: Show only specific tags or dates
+
+# Practical uses I found:
+- Discover related ideas I hadn't connected
+- Find orphan notes that aren't linked to anything
+- See clusters of related topics
+- Visualize research threads over time</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Linked references</h3>
+                <p class="mb-4">See what links to the current page:</p>
+
+                <pre class="text"><code># Sidebar → "Linked References"
+# Shows all pages that link here
+- Backlinks from text references
+- Database relations
+- Manual links
+
+# Great for:
+- Finding orphan content
+- Seeing how ideas connect
+- Building knowledge graphs</code></pre>
+            </section>
+
+            <section id="databases" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">Databases in Logseq</h2>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Creating a database</h3>
+                <p class="mb-4">SQL database embedded in your notes:</p>
+
+                <pre class="text"><code># /database command
+# Name your database: "Books to Read"
+
+# Add properties:
+- Title (title property, default text)
+- Author (text)
+- Rating (number 1-5)
+- Status (select: Want to Read, Reading, Completed)
+- Tags (multi-select)
+- Date Added (date)
+- Notes (text)</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Creating database entries</h3>
+                <p class="mb-4">Quick-add from anywhere:</p>
+
+                <pre class="text"><code># Type [[Database Name]] to create entry
+[[Books to Read]]
+# Cursor appears, you can fill fields
+# Hit enter to save
+
+# Or right-click block → Create database entry</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Database views</h3>
+                <p class="mb-4">View your data in different ways:</p>
+
+                <pre class="text"><code># Table view: Sort, filter, search
+# Card view: Visual cards with custom properties
+- Great for books, tasks, people
+
+# Built-in queries:
+- Show all items with property X
+- Show items created in last N days
+- Show items with tag Y</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Advanced database features</h3>
+                <p class="mb-4">Logseq has SQL built in:</p>
+
+                <pre class="text"><code># /query command opens SQL query box
+
+# Example queries:
+# Show all books by rating
+SELECT * FROM 'Books to Read'
+WHERE rating >= 4
+ORDER BY rating DESC
+
+# Show incomplete tasks
+SELECT * FROM Tasks
+WHERE status != 'Done'
+ORDER BY due_date
+
+# Results appear as table view
+# Click to jump to source block</code></pre>
+            </section>
+
+            <section id="sync" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">Setting up sync</h2>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Local network sync</h3>
+                <p class="mb-4">Fast sync over WiFi - no internet needed:</p>
+
+                <pre class="language-bash"><code># Desktop app Settings → Sync
+# Enable "Local network sync"
+# Both devices on same WiFi
+# They find each other automatically
+# End-to-end encrypted
+
+# Pros:
+# - Fast (local WiFi)
+# - No internet needed
+# - Free and unlimited
+# - Privacy-focused (E2E encrypted)
+
+# Cons:
+# - Devices must be on same network
+# - No access when apart</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Cloud sync</h3>
+                <p class="mb-4">Encrypted sync through official servers:</p>
+
+                <pre class="language-bash"><code># Create account at https://sync.logseq.io
+# Login from desktop app
+# Enable cloud sync
+# Data is encrypted before sending
+# Decrypts on your devices
+
+# Pricing:
+# - Free tier: Limited sync (check current pricing)
+# - Paid tier: Unlimited sync
+
+# Pros:
+# - Works from anywhere
+# - Automatic backup
+# - Multiple devices
+
+# Cons:
+# - Requires internet
+# - Monthly cost for premium
+# - Trust in their servers</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Self-hosted sync</h3>
+                <p class="mb-4">Run your own sync server:</p>
+
+                <pre class="language-bash"><code># Host your own sync server
+# Full control over data
+# Can be self-hosted for free
+# More complex setup
+
+# Good for:
+# - Teams wanting full control
+# - Privacy-critical data
+# - Avoiding third-party services</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Sync conflict resolution</h3>
+                <p class="mb-4">When both devices edited same content:</p>
+
+                <pre class="language-bash"><code># Logseq shows conflict
+# Compare both versions side-by-side
+# Choose which to keep, or merge
+# Handles nested blocks intelligently
+
+# Rare for me (mostly use one main device)
+# When it happens, resolution is straightforward</code></pre>
+            </section>
+
+            <section id="practical-uses" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">What I use Logseq for</h2>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Research notes</h3>
+                <p class="mb-4">All my research, organized by project:</p>
+
+                <pre class="text"><code># Research graph databases:
+- Machine Learning Research
+- Web Dev Resources
+- API Documentation
+- Architecture Patterns
+
+# Properties:
+- Status (Reading, Tested, Implemented)
+- Relevance (High, Medium, Low)
+- Date Added
+- Tags (#ml, #frontend, #backend)
+- Notes (what I learned)
+
+# Graph view shows connections between resources
+- Find related research I'd forgotten
+- See how ideas evolved over time</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Task management</h3>
+                <p class="mb-4">Daily tasks and project tracking:</p>
+
+                <pre class="text"><code># Tasks database
+* [ ] Write documentation [[Project X]]
+* [x] Review pull requests
+* [ ] Update dependencies
+* [ ] Plan sprint
+
+# Nested bullets for subtasks
+* [ ] Epic feature
+    * [ ] Backend API
+    * [ ] Frontend UI
+    * [ ] Tests
+
+# Properties:
+- Priority, Assignee, Due Date
+- Tags (bug, feature, chore)
+- Links to related docs
+
+# Can create database view for Kanban board
+# Drag between columns</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Reading list</h3>
+                <p class="mb-4">Books to read, articles to review:</p>
+
+                <pre class="text"><code># Books database
+* Designing Data-Intensive Applications
+  * Author: @Martin Kleppmann
+  * Rating: ⭐⭐⭐⭐⭐
+  * Status: Completed
+* [[The Pragmatic Programmer]]
+
+# Properties:
+- Author
+- Category (Technical, Fiction, Biography)
+- Status (Want to Read, Reading, Completed)
+- Rating (1-5)
+- Date Finished
+- Notes (my takeaways)
+
+# Can filter by:
+- Category
+- Status
+- Rating
+- Author</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Zettelkasten</h3>
+                <p class="mb-4">Atomic notes with permanent identifiers:</p>
+
+                <pre class="text"><code># Each note gets unique ID
+# Based on content and timestamp
+# Never changes, always accessible
+
+# Create atomic notes:
+- One idea per note
+- Link related notes with [[ ]]
+- Build knowledge graph over time
+
+# Graph view shows emergent connections
+# Discover relationships I hadn't noticed
+# See clusters of related ideas</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Meeting notes</h3>
+                <p class="mb-4">Structured meeting notes with action items:</p>
+
+                <pre class="text"><code>* Meeting with [[Design Team]] - 2026-03-09
+
+* Attendees: @alice, @bob, @charlie
+**Agenda**: Review Q1 roadmap
+
+* [ ] Review Q1 deliverables
+* [ ] Discuss Q2 priorities
+* [ ] Resource planning
+
+* Outcomes:
+**[[Project X]] delayed by 2 weeks**
+**Budget approved** for new initiative
+* Action items:
+    - @alice to update timeline
+    - @bob to prepare budget breakdown
+    - @charlie to communicate changes
+
+# Properties:
+- Type: Weekly team sync
+- Tags: #design, #planning
+- Related projects: [[Project X]], [[Budget 2026]]</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Code snippets</h3>
+                <p class="mb-4">Store code snippets with syntax highlighting:</p>
+
+                <pre class="text"><code>/python
+def quicksort(arr):
+    if len(arr) <= 1:
+        return arr
+    pivot = arr[0]
+    less = [x for x in arr[1:] if x < pivot]
+    greater = [x for x in arr[1:] if x >= pivot]
+    return quicksort(less) + [pivot] + quicksort(greater)
+
+# Usage note: Use for educational purposes only
+# Production code: Use built-in sort()
+# From: [[Algorithms Book]]
+# Tags: #python, #sorting</code></pre>
+            </section>
+
+            <section id="advanced" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">Advanced features</h2>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">PDF annotation</h3>
+                <p class="mb-4">Highlight and comment on PDFs:</p>
+
+                <pre class="language-bash"><code># Upload PDF to Logseq
+# Opens in sidebar
+# Highlight text
+# Add comments and notes
+# Create pages from highlights
+
+# Use cases:
+- Research papers (highlight key findings)
+- Technical docs (note important sections)
+- Meeting notes (share annotated docs)</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Plugins</h3>
+                <p class="mb-4">Extend Logseq with community plugins:</p>
+
+                <pre class="language-bash"><code># Install plugins from marketplace
+# Settings → Plugins → Marketplace
+
+# Popular plugins:
+- Calendar integration
+- GitHub sync
+- Jira integration
+- Zotero citations
+- Backup tools
+- Custom themes
+
+# Or write your own plugins
+# JavaScript and Clojure supported</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Custom queries</h3>
+                <p class="mb-4">Advanced search with SQL:</p>
+
+                <pre class="language-bash"><code># /query → Advanced query
+
+# Complex example:
+SELECT blocks.*
+FROM blocks
+WHERE blocks.content LIKE '%machine learning%'
+  AND blocks.properties->>'type' = 'article'
+ORDER BY blocks.created_at DESC
+LIMIT 50
+
+# Results as block references
+# Click to jump to source
+# Shows context and connections</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Journals and dailies</h3>
+                <p class="mb-4">Daily notes with automatic date pages:</p>
+
+                <pre class="text"><code># Journal pages are auto-created
+# Type /journal or /daily
+# Creates page for today's date
+# Great for daily standup notes
+
+# Use with templates:
+- Morning routine
+- Evening reflection
+- Daily goals
+- Habit tracking</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6">Flashcards</h3>
+                <p class="mb-4">Built-in spaced repetition:</p>
+
+                <ul class="list-disc ml-6 mb-4">
+                    <li>Create cards from blocks</li>
+                    <li>Set interval (days, weeks, months)</li>
+                    <li>Review cards on schedule</li>
+                    <li>Track your retention</li>
+                </ul>
+            </section>
+
+            <section id="comparison" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">Logseq vs alternatives</h2>
+
+                <table class="w-full my-6 border border-gray-200">
+                    <thead class="bg-gray-100">
+                        <tr>
+                            <th class="text-left p-3 border-b"></th>
+                            <th class="text-left p-3 border-b">Logseq</th>
+                            <th class="text-left p-3 border-b">Obsidian</th>
+                            <th class="text-left p-3 border-b">Roam Research</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="p-3 border-b">Interface</td>
+                            <td class="p-3 border-bottom">Outliner</td>
+                            <td class="p-3 border-bottom">Markdown</td>
+                            <td class="p-3 border-bottom text-green-600">Outliner</td>
+                        </tr>
+                        <tr>
+                            <td class="p-3 border-b">Storage</td>
+                            <td class="p-3 border-bottom">SQLite</td>
+                            <td class="p-3 border-bottom">Markdown files</td>
+                            <td class="p-3 border-bottom">Cloud</td>
+                        </tr>
+                        <tr>
+                            <td class="p-3 border-b">Graph view</td>
+                            class="p-3 border-bottom text-green-600">Excellent</td>
+                            <td class="p-3 border-bottom">Plugins only</td>
+                            <td class="p-3 border-bottom text-green-600">Excellent</td>
+                        </tr>
+                        <tr>
+                            <td class="p-3 border-b">Databases</td>
+                            <td class="p-3 border-bottom text-green-600">Built-in</td>
+                            <td class="p-3 border-bottom">Plugins only</td>
+                            <td class="p-3 border-bottom text-green-600">Built-in</td>
+                        </tr>
+                        <tr>
+                            <td class="p-3 border-b">Offline</td>
+                            <td class="p-3 border-bottom text-green-600">Full</td>
+                            <td class="p-3 border-bottom text-green-600">Full</td>
+                            <td class="p-3 border-bottom">Limited</td>
+                        </tr>
+                        <tr>
+                            <td class="p-3 border-b">Sync</td>
+                            <td class="p-3 border-bottom">Multiple options</td>
+                            <td class="p-3 border-bottom">Plugins only</td>
+                            <td class="p-3 border-bottom">Cloud only</td>
+                        </tr>
+                        <tr>
+                            <td class="p-3 border-b">Price</td>
+                            <td class="p-3 border-bottom text-green-600">Free</td>
+td>
+                            <td class="p-3 border-bottom text-green-600">Free</td>
+                            <td class="p-3 border-bottom">$15/month</td>
+                        </tr>
+                        <tr>
+                            <td class="p-3 border-b">Best for</td>
+                            <td class="p-3 border-bottom">Structured thinkers</td>
+                            <td class="p-3 border-bottom">Writers</td>
+                            <td class="p-3 border-bottom">Researchers</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <p class="text-gray-600 mt-4">
+                    Logseq is the sweet spot if you like structured thinking and graph visualization. Obsidian is simpler but less structured. Roam is powerful but expensive and cloud-only.
+                </p>
+            </section>
+
+            <section id="issues" class="mt-12 bg-gray-50 p-6 rounded-lg">
+                <h2 class="text-2xl font-bold mb-4 text-gray-900">Problems I hit</h2>
+
+                <h3 class="text-xl font-bold mb-3 mt-6 text-gray-800">Sync conflicts</h3>
+                <p class="mb-2">Same content edited on multiple devices.</p>
+                <pre class="language-bash"><code"># Fixed by
+1. Using mainly one device as "source of truth"
+2. Being careful about concurrent edits
+3. Reviewing conflicts when they occur
+4. Using local-only mode mostly</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6 text-gray-800">Performance with large graphs</h3>
+                <p class="mb-2">Graph becomes slow with thousands of notes.</p>
+                <pre class="language-bash"><code"># Fixed by
+1. Archiving old notes to separate graph
+2. Using filters to show relevant content
+3. Limiting graph view to specific tags
+4. Performance is improving with updates</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6 text-gray-800">Mobile app limitations</h3>
+                <p class="mb-2">Mobile app is less feature-rich.</p>
+                <pre class="language-bash"><code"># Workarounds:
+1. Use desktop for complex operations
+2. Mobile is fine for viewing, basic editing
+3. Full sync works on mobile
+4. Desktop app is where features ship first</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6 text-gray-800">Learning curve</h3>
+                <p class="mb-2">Outliner interface takes getting used to.</p>
+                <pre class="language-bash"><code"># Fixed by
+1. Committing to it for 2 weeks
+2. Watching tutorials on outliner usage
+3. Reading their docs thoroughly
+4. Building new habits around outliner thinking</code></pre>
+
+                <h3 class="text-xl font-bold mb-3 mt-6 text-gray-800">Migration from other tools</h3>
+                <p class="mb-2">Importing from Obsidian or Notion.</p>
+                <pre class="language-bash"><code"># For Obsidian:
+1. Use Logseq's Obsidian import plugin
+2. Maintains markdown structure as code blocks
+3. Frontmatter becomes properties
+4. Links convert to [[bracket links]]
+
+# For Notion:
+1. Use NotionExport tool
+2. Import to Logseq
+3. Pages become pages, databases become databases
+4. Some manual cleanup may be needed</code></pre>
+            </section>
+
+            <section id="thoughts" class="mt-12">
+                <h2 class="text-3xl font-bold mb-4">Would I recommend it?</h2>
+                <p class="mb-4">
+                    Definitely. Switched from Obsidian to Logseq 8 months ago. Haven't looked back. The outliner interface forces structured thinking in a way that markdown files don't.
+                </p>
+                <p class="mb-4">
+                    Graph view changed how I work. Instead of searching through text files, I explore my knowledge graph visually. Often discover connections I'd forgotten about.
+                </p>
+                <p class="mb-4">
+                    Built-in databases are actually useful, not tacked on. I track books, tasks, research, meetings - all with proper queries and filtering.
+                </p>
+                <p class="mb-4">
+                    Privacy-first design matters. My entire second brain lives on my machines. Sync is encrypted. I control my data completely.
+                </p>
+                <p class="mb-4">
+                    Learning curve is real - outliner thinking takes practice. But once it clicks, it's powerful for structured thinking.
+                </p>
+                <p class="mb-4">
+                    If you're building a personal knowledge base and care about privacy, graph visualization, or structured notes - Logseq is the best tool I've found.
+                </p>
+                <p class="mb-4">
+                    Links: <a href="https://logseq.com" class="text-blue-600 underline">logseq.com</a> | GitHub: <a href="https://github.com/logseq/logseq" class="text-blue-600 underline">github.com/logseq/logseq</a> | Docs: <a href="https://docs.logseq.com" class="text-blue-600 underline">docs.logseq.com</a>
+                </p>
+            </section>
+
+        </article>
+
+    </main>
+
+    <footer class="bg-gray-800 text-white py-12">
+        <div class="max-w-4xl mx-auto px-4 text-center">
+            <p class="opacity-70 mb-2">📝 Programming Notes</p>
+            <p class="text-sm opacity-50">
+                Personal learning notes & tutorials. Updated as I explore new technologies.
+            </p>
+            <p class="text-xs opacity-40 mt-4"><a href="privacy.html" class="hover:text-white">Privacy Policy</a></p>
+        </div>
+    </footer>
+
+    <!-- Code Highlighting Script -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+</body>
+</html>

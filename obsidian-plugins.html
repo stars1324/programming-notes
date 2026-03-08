@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-LMWN7814BX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-LMWN7814BX');
+    </script>
+
+    <!-- SEO Meta Tags -->
+    <title>Best Obsidian Plugins: Built a Zettelkasten That Actually Works</title>
+    <meta name="description" content="Struggled with building a second brain until I found these Obsidian plugins. Here's my complete Zettelkasten setup with the best plugins for knowledge management.">
+    <meta name="keywords" content="Obsidian plugins, best Obsidian plugins, Obsidian Zettelkasten guide, personal knowledge management, PKM, Obsidian setup, note-taking workflow">
+    <link rel="canonical" href="https://pnt.jacbex.com/obsidian-plugins.html" />
+
+    <!-- Open Graph / Social Media -->
+    <meta property="og:title" content="Best Obsidian Plugins for Zettelkasten">
+    <meta property="og:description" content="Complete guide to building a Zettelkasten with Obsidian. Plugin recommendations, setup workflow, and real usage examples.">
+    <meta property="og:type" content="article">
+
+    <!-- Tailwind CSS for modern UI -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Code Highlighting (Prism.js) -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+
+    <!-- Structured Data (Schema.org) for Google -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "Best Obsidian Plugins: Built a Zettelkasten That Actually Works",
+      "description": "Guide to setting up Obsidian with the best plugins for personal knowledge management and Zettelkasten workflow.",
+      "author": {
+        "@type": "Person",
+        "name": "Programming Notes"
+      },
+      "proficiencyLevel": "Beginner"
+    }
+    </script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+        .prose code { color: #eb5757; background: #f9f2f2; padding: 2px 4px; border-radius: 4px; }
+        .plugin-card { background: #f8fafc; border-left: 4px solid #7c3aed; padding: 20px; margin: 16px 0; border-radius: 8px; }
+        .feature-box { background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%); color: white; padding: 24px; border-radius: 12px; margin: 24px 0; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+            <a href="index.html" class="text-xl font-bold text-blue-600">📝 <span class="text-gray-700">Programming Notes</span></a>
+            <div class="space-x-6 hidden md:block">
+                <a href="index.html" class="hover:text-blue-500">Home</a>
+                <a href="about.html" class="hover:text-blue-500">About</a>
+                <a href="contact.html" class="hover:text-blue-500">Contact</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="bg-gradient-to-r from-violet-700 to-purple-800 text-white py-16">
+        <div class="max-w-4xl mx-auto px-4 text-center">
+            <h1 class="text-4xl md:text-5xl font-extrabold mb-4">Best Obsidian Plugins: Built a Zettelkasten That Actually Works</h1>
+            <p class="text-xl opacity-90">Tried every note-taking app out there. Obsidian + the right plugins finally made my second brain functional. Here's my complete setup.</p>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto px-4 py-12 bg-white mt-[-40px] rounded-xl shadow-lg mb-20">
+
+        <article class="prose prose-blue max-w-none">
+
+            <section id="introduction">
+                <h2 class="text-3xl font-bold mb-4">My journey to a working Zettelkasten</h2>
+                <p class="mb-4">
+                    Been obsessed with building a "second brain" for years. Tried Evernote, Notion, Roam Research, even physical index cards. None of them stuck. Either too complex, too slow, or just didn't fit how I think.
+                </p>
+                <p class="mb-4">
+                    Started using <a href="https://obsidian.md" class="text-blue-600 underline" target="_blank">Obsidian</a> a couple years ago. Loved the local-first approach - plain Markdown files on my disk. No vendor lock-in, fast as hell, and free.
+                </p>
+                <p class="mb-4">
+                    But here's the thing: vanilla Obsidian is pretty barebones. It's powerful, sure, but you need to <strong>curate your plugin setup</strong> to make it truly shine for Zettelkasten workflows.
+                </p>
+                <p class="mb-4">
+                    After tons of experimentation, I've settled on a plugin stack that actually works. Not just "cool plugins" - plugins that I use every single day to manage my knowledge base.
+                </p>
+
+                <div class="feature-box">
+                    <p class="font-bold text-xl mb-2">Why Obsidian for Zettelkasten</p>
+                    <p class="opacity-90">Local Markdown files mean your knowledge base is future-proof. Plugins extend functionality without breaking the core. Community builds tools that actual knowledge workers use, not what product managers think we need.</p>
+                </div>
+            </section>
+
+            <section id="core-plugins">
+                <h2 class="text-3xl font-bold mb-4 mt-8">Essential plugins I can't live without</h2>
+                <p class="mb-4">Let's start with the absolute must-haves. These are installed in every vault I create.</p>
+
+                <div class="plugin-card">
+                    <h3 class="text-xl font-bold mb-2">1. Dataview - Query your notes like a database</h3>
+                    <p class="mb-3">This plugin changed everything. Turns your Markdown files into a queryable database. Want to see all book notes from 2024? Done. Need a table of all incomplete tasks? Easy.</p>
+                    <p class="mb-3"><strong>Real use case:</strong> I maintain a "Books Read" note with metadata. Dataview automatically generates tables sorted by rating, date, or topic.</p>
+                    <pre><code class="language-markdown">```dataview
+TABLE from "books"
+WHERE contains(tags, "read")
+SORT rating DESC
+```</code></pre>
+                    <p class="text-sm text-gray-600 mt-2">That's it. No manual updates needed.</p>
+                </div>
+
+                <div class="plugin-card">
+                    <h3 class="text-xl font-bold mb-2">2. Templater - Dynamic templates on steroids</h3>
+                    <p class="mb-3">Built-in templates are fine. Templater is next-level. Supports dynamic variables, JavaScript execution, file creation automation.</p>
+                    <p class="mb-3"><strong>My daily note template:</strong></p>
+                    <pre><code class="language-markdown"># {{date:YYYY-MM-DD}}
+
+## Tasks
+- [ ] {{date:YYYY-MM-DD}} Task 1
+- [ ] {{date:YYYY-MM-DD}} Task 2
+
+## Journal
+<!-- Cursor starts here --></code></pre>
+                    <p class="text-sm text-gray-600 mt-2">Hotkey opens today's note, pre-filled with date and structure. No repetitive typing.</p>
+                </div>
+
+                <div class="plugin-card">
+                    <h3 class="text-xl font-bold mb-2">3. Advanced Tables - Markdown tables that don't suck</h3>
+                    <p class="mb-3">Markdown tables are painful to edit manually. This plugin adds Excel-like navigation. Tab between cells, format columns, add rows with shortcuts.</p>
+                    <p class="mb-3"><strong>Time saved:</strong> Probably hours per week. I use tables for project tracking, book lists, research summaries - anything tabular.</p>
+                    <p class="text-sm text-gray-600">Pro tip: Bind Tab/Shift+Tab for cell navigation. Feels like a spreadsheet.</p>
+                </div>
+
+                <div class="plugin-card">
+                    <h3 class="text-xl font-bold mb-2">4. Obsidian Git - Version control for your vault</h3>
+                    <p class="mb-3">Automatic Git commits every time you close Obsidian. Push to GitHub, GitLab, or private repo. Never lose your knowledge base again.</p>
+                    <p class="mb-3"><strong>My setup:</strong> Commits every 10 minutes, pushes on exit. Can revert to yesterday's version if I mess something up. Peace of mind.</p>
+                    <pre><code class="language-bash"># .gitignore for Obsidian
+.obsidian/
+.obsidian-plugins/
+.DS_Store</code></pre>
+                </div>
+
+                <div class="plugin-card">
+                    <h3 class="text-xl font-bold mb-2">5. QuickAdd - Capture ideas fast</h3>
+                    <p class="mb-3">System-wide hotkey to capture ideas into specific notes. I hit Ctrl+Shift+N anywhere on my computer, type a quick thought, and it lands in my Inbox note for processing later.</p>
+                    <p class="mb-3"><strong>Why it matters:</strong> Speed of capture = quantity of ideas captured. If it takes 10 seconds to log a thought, you'll skip it. If it takes 2 seconds, you'll capture everything.</p>
+                </div>
+            </section>
+
+            <section id="zettelkasten-plugins">
+                <h2 class="text-3xl font-bold mb-4 mt-8">Plugins specifically for Zettelkasten</h2>
+                <p class="mb-4">These plugins implement Zettelkasten principles in Obsidian. Not essential for basic note-taking, but crucial if you're serious about knowledge management.</p>
+
+                <div class="plugin-card">
+                    <h3 class="text-xl font-bold mb-2">6. Graph Analysis - Understand your knowledge network</h3>
+                    <p class="mb-3">Native graph view is cool for exploration. Graph Analysis gives actual metrics. Which notes are isolated? What's the average connections per note? Which topics need more development?</p>
+                    <p class="mb-3"><strong>Actionable insight:</strong> I run it monthly. Notes with 0-1 connections get expanded or linked. Orphaned notes get integrated or deleted.</p>
+                    <pre><code class="language-bash"># Typical output for a mature note:
+# Connections: 12
+# Orphans in vault: 3
+# Most connected note: "Systems Thinking" (28 links)</code></pre>
+                </div>
+
+                <div class="plugin-card">
+                    <h3 class="text-xl font-bold mb-2">7. Citations - Academic Zettelkasten workflow</h3>
+                    <p class="mb-3">If you work with research papers, this is non-negotiable. Integrates with Zotero, cites from PDF metadata, formats bibliographies automatically.</p>
+                    <p class="mb-3"><strong>Workflow:</strong> Highlight in Zotero → Export to Obsidian → Citations plugin pulls metadata → Creates properly formatted note with PDF attachments.</p>
+                    <pre><code class="language-markdown">---
+citekey: smith2024
+type: article-journal
+author: Smith, J.
+year: 2024
+title: "Knowledge Management in Practice"
+---
+
+## Abstract
+The paper argues that...</code></pre>
+                </div>
+
+                <div class="plugin-card">
+                    <h3 class="text-xl font-bold mb-2">8. Smart Connections - AI-powered semantic search</h3>
+                    <p class="mb-3">Traditional linking = exact words or manual links. Smart Connections uses embeddings to find related notes by meaning. Write about "compound interest" and it suggests notes about "exponential growth" even if you never linked them.</p>
+                    <p class="mb-3"><strong>Tradeoff:</strong> Requires local LLM or OpenAI API. Not free (compute or API costs). But the serendipity it creates is worth it for large vaults.</p>
+                    <p class="text-sm text-gray-600">I use it weekly. Always finds connections I missed.</p>
+                </div>
+            </section>
+
+            <section id="workflow-plugins">
+                <h2 class="text-3xl font-bold mb-4 mt-8">Plugins that improve daily workflow</h2>
+                <p class="mb-4">Quality of life plugins. Not transformative, but they remove friction from your day.</p>
+
+                <div class="plugin-card">
+                    <h3 class="text-xl font-bold mb-2">9. Commander - Create custom command palettes</h3>
+                    <p class="mb-3">Build your own command palette. I have "Open today's journal," "Create new Zettel," "Show unreferenced notes" all bound to hotkeys. No clicking through menus.</p>
+                    <p class="mb-3"><strong>Example setup:</strong></p>
+                    <pre><code class="language-bash">Ctrl+Alt+J → Open daily note
+Ctrl+Alt+Z → Create Zettel from selection
+Ctrl+Alt+U → Show unlinked mentions</code></pre>
+                </div>
+
+                <div class="plugin-card">
+                    <h3 class="text-xl font-bold mb-2">10. Homepage - Start where you want</h3>
+                    <p class="mb-3">Opens a specific note on launch. Mine opens "Dashboard" with Dataview queries showing today's tasks, recent notes, and project status. Single source of truth for my day.</p>
+                    <p class="text-sm text-gray-600">Small plugin, big impact on workflow consistency.</p>
+                </div>
+
+                <div class="plugin-card">
+                    <h3 class="text-xl font-bold mb-2">11. Calendar + Periodic Notes - Time-based notes</h3>
+                    <p class="mb-3">Calendar view of daily notes. Periodic Notes creates weekly, monthly, yearly notes. I use all three. Daily for tasks, monthly for reviews, yearly for goals and reflections.</p>
+                    <p class="mb-3"><strong>Annual review workflow:</strong></p>
+                    <pre><code class="language-markdown"># Year Review 2024
+
+## Completed Projects
+<!-- Manually curated -->
+
+## Key Learnings
+<!-- From monthly reviews -->
+
+## Goals for 2025
+<!-- Forward-looking --></code></pre>
+                </div>
+            </section>
+
+            <section id="installation">
+                <h2 class="text-3xl font-bold mb-4 mt-8">Installation and setup</h2>
+                <p class="mb-4">Here's how to get these plugins running.</p>
+
+                <h3 class="text-2xl font-bold mb-3">Step 1: Enable community plugins</h3>
+                <ol class="list-decimal list-inside mb-4 space-y-2">
+                    <li>Open Obsidian Settings (gear icon)</li>
+                    <li>Go to "Community plugins" on the sidebar</li>
+                    <li>Turn on "Community plugins"</li>
+                    <li>Click "Browse" and search for each plugin name</li>
+                    <li>Install and enable each one</li>
+                </ol>
+
+                <h3 class="text-2xl font-bold mb-3">Step 2: Install from the list</h3>
+                <p class="mb-3">Search for these exact names in the plugin browser:</p>
+                <ul class="list-disc list-inside mb-4 space-y-1">
+                    <li>Dataview</li>
+                    <li>Templater</li>
+                    <li>Advanced Tables</li>
+                    <li>Obsidian Git</li>
+                    <li>QuickAdd</li>
+                    <li>Graph Analysis</li>
+                    <li>Citations</li>
+                    <li>Smart Connections</li>
+                    <li>Commander</li>
+                    <li>Homepage</li>
+                    <li>Calendar</li>
+                    <li>Periodic Notes</li>
+                </ul>
+
+                <h3 class="text-2xl font-bold mb-3">Step 3: Configure key plugins</h3>
+                <p class="mb-3">Each plugin has its own settings. Here's what I change from defaults:</p>
+
+                <div class="bg-gray-100 p-4 rounded-lg mb-4">
+                    <p class="font-bold mb-2">Templater settings:</p>
+                    <ul class="list-disc list-inside space-y-1 text-sm">
+                        <li>Enable "Trigger Templater on new file creation"</li>
+                        <li>Set template folder location</li>
+                        <li>Disable "System prompt execution" (security preference)</li>
+                    </ul>
+                </div>
+
+                <div class="bg-gray-100 p-4 rounded-lg mb-4">
+                    <p class="font-bold mb-2">Dataview settings:</p>
+                    <ul class="list-disc list-inside space-y-1 text-sm">
+                        <li>Enable "Inline queries" (allows Dataview in any note)</li>
+                        <li>Set "Automatic refresh" (updates without restart)</li>
+                    </ul>
+                </div>
+
+                <div class="bg-gray-100 p-4 rounded-lg mb-4">
+                    <p class="font-bold mb-2">Obsidian Git settings:</p>
+                    <ul class="list-disc list-inside space-y-1 text-sm">
+                        <li>Set "Auto-commit interval" to 10 minutes</li>
+                        <li>Enable "Push on commit" if using remote repo</li>
+                        <li>Set "Commit message" with date variable</li>
+                    </ul>
+                </div>
+            </section>
+
+            <section id="zettelkasten-guide">
+                <h2 class="text-3xl font-bold mb-4 mt-8">Building your Zettelkasten workflow</h2>
+                <p class="mb-4">Plugins are tools. Workflow is what matters. Here's how I actually use these plugins day-to-day.</p>
+
+                <h3 class="text-2xl font-bold mb-3">Daily capture</h3>
+                <ol class="list-decimal list-inside mb-4 space-y-2">
+                    <li><strong>Morning:</strong> Open Obsidian, Homepage shows today's daily note</li>
+                    <li><strong>Throughout day:</strong> Hit QuickAdd hotkey to capture ideas</li>
+                    <li><strong>Evening:</strong> Process inbox items, create permanent notes as needed</li>
+                </ol>
+
+                <h3 class="text-2xl font-bold mb-3">Weekly review</h3>
+                <ol class="list-decimal list-inside mb-4 space-y-2">
+                    <li>Open Periodic Notes weekly note</li>
+                    <li>Run Dataview query to show tasks created this week</li>
+                    <li>Use Graph Analysis to find orphaned notes</li>
+                    <li>Create connections between new notes and existing knowledge</li>
+                    <li>Obsidian Git commits automatically - progress saved</li>
+                </ol>
+
+                <h3 class="text-2xl font-bold mb-3">Note creation workflow</h3>
+                <pre><code class="language-markdown"># Zettel: [Idea Name]
+
+## Context
+Why I'm writing this note. What problem it solves.
+
+## Core Concept
+The meat of the idea. One main point per note.
+
+## Connections
+<!-- Manual links to related notes -->
+[[Related Note 1]]
+[[Related Note 2]]
+
+## Source
+<!-- Where this idea came from -->
+- Book: "Book Title", p. 45
+- Conversation with @person
+- Original thought</code></pre>
+
+                <div class="feature-box">
+                    <p class="font-bold text-xl mb-2">Principles that work for me</p>
+                    <ul class="list-disc list-inside space-y-2 opacity-90">
+                        <li><strong>One idea per note:</strong> Keeps notes atomic and reusable</li>
+                        <li><strong>Link liberally:</strong> If notes aren't connected, they don't exist</li>
+                        <li><strong>Review regularly:</strong> Weekly review prevents link rot</li>
+                        <li><strong>Iterate constantly:</strong> Old notes get updated as understanding grows</li>
+                    </ul>
+                </div>
+            </section>
+
+            <section id="pros-cons">
+                <h2 class="text-3xl font-bold mb-4 mt-8">What works, what doesn't</h2>
+                <p class="mb-4">After using this setup for two years, here's my honest assessment.</p>
+
+                <h3 class="text-2xl font-bold mb-3">Pros</h3>
+                <ul class="list-disc list-inside mb-4 space-y-2">
+                    <li><strong>Speed:</strong> Keyboard-driven, instant search, zero cloud latency</li>
+                    <li><strong>Ownership:</strong> Your data is local Markdown files. Exportable, searchable, version-controlled</li>
+                    <li><strong>Flexibility:</strong> Plugins let you build exactly the workflow you need</li>
+                    <li><strong>Community:</strong> Tons of plugins, themes, tutorials. Never stuck for long</li>
+                    <li><strong>Cost:</strong> Free core, most plugins are free. Cheaper than Notion or Roam</li>
+                </ul>
+
+                <h3 class="text-2xl font-bold mb-3">Cons</h3>
+                <ul class="list-disc list-inside mb-4 space-y-2">
+                    <li><strong>Setup time:</strong> Not plug-and-play. Requires plugin curation and configuration</li>
+                    <li><strong>Maintenance:</strong> Plugins break on updates. Need to troubleshoot occasionally</li>
+                    <li><strong>Mobile app:</strong> Mobile experience is okay, not great. Sync is DIY</li>
+                    <li><strong>Learning curve:</strong> Dataview syntax, Templater scripting - not trivial</li>
+                    <li><strong>Overengineering risk:</strong> Easy to get lost in plugins and forget actual note-taking</li>
+                </ul>
+
+                <h3 class="text-2xl font-bold mb-3">Reality check</h3>
+                <p class="mb-4">
+                    Obsidian isn't magic. It's a tool. If you don't capture ideas, review notes, and make connections, no plugin will fix that. But if you're committed to building a Zettelkasten, this plugin stack removes friction and enables workflows that actually work.
+                </p>
+                <p class="mb-4">
+                    Best part: You can start simple (Dataview + Templater) and add complexity as needed. No need to install all 12 plugins on day one.
+                </p>
+            </section>
+
+            <section id="comparison">
+                <h2 class="text-3xl font-bold mb-4 mt-8">Obsidian vs alternatives</h2>
+                <p class="mb-4">If you're deciding between tools, here's how it compares.</p>
+
+                <div class="bg-gray-100 p-6 rounded-lg mb-6">
+                    <h4 class="font-bold text-lg mb-3">vs Notion</h4>
+                    <p class="mb-2">Notion is easier for beginners. Better mobile app, collaboration, databases out of the box. But it's cloud-only, slow for large vaults, and you're locked into their format.</p>
+                    <p><strong>Choose Obsidian if:</strong> You want local-first, speed, and Markdown portability.</p>
+                </div>
+
+                <div class="bg-gray-100 p-6 rounded-lg mb-6">
+                    <h4 class="font-bold text-lg mb-3">vs Roam Research</h4>
+                    <p class="mb-2">Roam pioneered the outliner + graph interface. Smoother UX for daily use, better block references. But it's proprietary, expensive ($15/month), and cloud-only.</p>
+                    <p><strong>Choose Obsidian if:</strong> You want open-source, local files, and don't mind rougher edges.</p>
+                </div>
+
+                <div class="bg-gray-100 p-6 rounded-lg mb-6">
+                    <h4 class="font-bold text-lg mb-3">vs Logseq</h4>
+                    <p class="mb-2">Logseq is outliner-first like Roam, open-source like Obsidian. Better built-in queries and databases. But smaller plugin ecosystem, newer project with rougher edges.</p>
+                    <p><strong>Choose Obsidian if:</strong> You want mature plugin ecosystem and traditional page-based editing.</p>
+                </div>
+            </section>
+
+            <section id="troubleshooting">
+                <h2 class="text-3xl font-bold mb-4 mt-8">Common issues and fixes</h2>
+                <p class="mb-4">Stuff that goes wrong and how to fix it.</p>
+
+                <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-4">
+                    <p class="font-bold">Issue: Plugins stop working after update</p>
+                    <p class="text-sm mt-2"><strong>Fix:</strong> Check plugin GitHub repo for known issues. Disable, uninstall, reinstall. Check Obsidian version compatibility.</p>
+                </div>
+
+                <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-4">
+                    <p class="font-bold">Issue: Dataview queries return nothing</p>
+                    <p class="text-sm mt-2"><strong>Fix:</strong> Check "Inline queries" is enabled. Verify syntax in Dataview docs. Ensure file metadata exists.</p>
+                </div>
+
+                <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-4">
+                    <p class="font-bold">Issue: Git sync fails with authentication error</p>
+                    <p class="text-sm mt-2"><strong>Fix:</strong> Use SSH key instead of HTTPS. Or use GitHub personal access token. Check git config in plugin settings.</p>
+                </div>
+
+                <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-4">
+                    <p class="font-bold">Issue: Smart Connections doesn't suggest anything</p>
+                    <p class="text-sm mt-2"><strong>Fix:</strong> Need to build embeddings first (Settings → Build index). Takes time for large vaults. Check API key or local LLM setup.</p>
+                </div>
+
+                <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-4">
+                    <p class="font-bold">Issue: Templater templates don't trigger</p>
+                    <p class="text-sm mt-2"><strong>Fix:</strong> Check folder path in settings. Ensure template files have .md extension. Verify "Trigger on new file creation" is enabled.</p>
+                </div>
+            </section>
+
+            <section id="conclusion">
+                <h2 class="text-3xl font-bold mb-4 mt-8">Bottom line</h2>
+                <p class="mb-4">
+                    Obsidian isn't perfect. Plugin management can be annoying. Setup takes time. But once you dial in your workflow, it's unmatched for personal knowledge management.
+                </p>
+                <p class="mb-4">
+                    The plugin ecosystem is what makes it work. These 12 plugins transformed Obsidian from "a Markdown editor with graphs" into a fully-functional Zettelkasten system.
+                </p>
+                <p class="mb-4">
+                    If you're serious about building a second brain, start with Dataview and Templater. Add others as you identify needs. Don't try to install everything at once.
+                </p>
+                <p class="mb-4">
+                    My vault now has 2,000+ notes, and I can actually find and connect ideas. That's more than I ever achieved with any other tool.
+                </p>
+                <p class="mb-4">
+                    Your mileage may vary. But this setup's been working for me for two years, and I don't see myself switching anytime soon.
+                </p>
+            </section>
+
+        </article>
+
+    </main>
+
+    <footer class="bg-gray-800 text-white py-12">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="grid md:grid-cols-3 gap-8 mb-8">
+                <div>
+                    <h3 class="font-bold text-lg mb-4">Programming Notes</h3>
+                    <p class="text-gray-400 text-sm">A collection of coding notes and tutorials from a full-stack developer.</p>
+                </div>
+                <div>
+                    <h3 class="font-bold text-lg mb-4">Quick Links</h3>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="index.html" class="hover:text-white">Home</a></li>
+                        <li><a href="about.html" class="hover:text-white">About</a></li>
+                        <li><a href="contact.html" class="hover:text-white">Contact</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-bold text-lg mb-4">Connect</h3>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="https://github.com" target="_blank" class="hover:text-white">GitHub</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 pt-8 text-center text-gray-400 text-sm">
+                <p>© 2026 Programming Notes. Built with simple HTML & Tailwind CSS.</p>
+                <p class="mt-2"><a href="privacy.html" class="hover:text-white">Privacy Policy</a></p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Prism.js for code highlighting -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-markdown.min.js"></script>
+
+</body>
+</html>

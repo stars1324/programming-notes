@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-LMWN7814BX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-LMWN7814BX');
+    </script>
+
+    <!-- SEO Meta Tags -->
+    <title>Huginn: Built My Own IFTTT and Saved $15/Month</title>
+    <meta name="description" content="Tired of IFTTT limitations? Built my own automation platform with Huginn. Self-hosted, unlimited workflows, and complete control. Here's my setup guide.">
+    <meta name="keywords" content="Huginn, self-hosted automation, IFTTT alternative, Huginn agents tutorial, create your own IFTTT, automation workflow, Docker automation">
+    <link rel="canonical" href="https://pnt.jacbex.com/huginn.html" />
+
+    <!-- Open Graph / Social Media -->
+    <meta property="og:title" content="Huginn: Self-Hosted Automation Platform">
+    <meta property="og:description" content="Create your own IFTTT with Huginn. Self-hosted, unlimited workflows, complete data control.">
+    <meta property="og:type" content="article">
+
+    <!-- Tailwind CSS for modern UI -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Code Highlighting (Prism.js) -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+
+    <!-- Structured Data (Schema.org) for Google -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "Huginn: Built My Own IFTTT and Saved $15/Month",
+      "description": "Guide to setting up Huginn for self-hosted automation workflows with agents.",
+      "author": {
+        "@type": "Person",
+        "name": "Programming Notes"
+      },
+      "proficiencyLevel": "Intermediate"
+    }
+    </script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+        .prose code { color: #eb5757; background: #f9f2f2; padding: 2px 4px; border-radius: 4px; }
+        .agent-card { background: #f8fafc; border-left: 4px solid #f59e0b; padding: 20px; margin: 16px 0; border-radius: 8px; }
+        .workflow-box { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; padding: 24px; border-radius: 12px; margin: 24px 0; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+            <a href="index.html" class="text-xl font-bold text-blue-600">📝 <span class="text-gray-700">Programming Notes</span></a>
+            <div class="space-x-6 hidden md:block">
+                <a href="index.html" class="hover:text-blue-500">Home</a>
+                <a href="about.html" class="hover:text-blue-500">About</a>
+                <a href="contact.html" class="hover:text-blue-500">Contact</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="bg-gradient-to-r from-amber-600 to-orange-700 text-white py-16">
+        <div class="max-w-4xl mx-auto px-4 text-center">
+            <h1 class="text-4xl md:text-5xl font-extrabold mb-4">Huginn: Built My Own IFTTT and Saved $15/Month</h1>
+            <p class="text-xl opacity-90">Wanted automation without the limits or subscription fees. Huginn lets me build custom workflows on my own server. Here's how to set it up.</p>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto px-4 py-12 bg-white mt-[-40px] rounded-xl shadow-lg mb-20">
+
+        <article class="prose prose-blue max-w-none">
+
+            <section id="introduction">
+                <h2 class="text-3xl font-bold mb-4">Why I ditched IFTTT</h2>
+                <p class="mb-4">
+                    Used IFTTT for years. "If This Then That" - simple premise, powerful results. Cross-posted tweets to LinkedIn, saved RSS items to Pocket, turned on lights at sunset. Life was good.
+                </p>
+                <p class="mb-4">
+                    Then they introduced limits. Free plan went from unlimited to 3 applets. Pro plan at $3.99/month still had restrictions. Want to run actions every 5 minutes? Pay more. Need complex logic? Not supported.
+                </p>
+                <p class="mb-4">
+                    Started looking for alternatives. <a href="https://n8n.io" class="text-blue-600 underline" target="_blank">n8n</a> was great but resource-heavy. <a href="https://zapier.com" class="text-blue-600 underline" target="_blank">Zapier</a> was even more expensive.
+                </p>
+                <p class="mb-4">
+                    Then found <a href="https://github.com/huginn/huginn" class="text-blue-600 underline" target="_blank">Huginn</a>. Open-source, self-hosted automation platform built by <a href="https://github.com/github" class="text-blue-600 underline" target="_blank">GitHub's former CTO</a>. Uses "agents" that consume events and trigger actions. Like IFTTT but without limits.
+                </p>
+
+                <div class="workflow-box">
+                    <p class="font-bold text-xl mb-2">What Huginn actually does</p>
+                    <p class="opacity-90">Think of it as a building block system for automation. Create agents that watch for stuff (RSS feeds, weather, websites). Create agents that do stuff (send emails, post to Slack, write to databases). Chain them together to build workflows. No arbitrary limits, no subscriptions, your data stays on your server.</p>
+                </div>
+            </section>
+
+            <section id="installation">
+                <h2 class="text-3xl font-bold mb-4 mt-8">Installation with Docker</h2>
+                <p class="mb-4">Easiest way to run Huginn is Docker. Here's my setup on a $5 VPS.</p>
+
+                <h3 class="text-2xl font-bold mb-3">Docker Compose setup</h3>
+                <pre><code class="language-yaml">version: '3'
+
+services:
+  huginn:
+    image: ghcr.io/huginn/huginn:latest
+    container_name: huginn
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    volumes:
+      - huginn_data:/var/lib/huginn
+    restart: unless-stopped
+
+volumes:
+  huginn_data:</code></pre>
+
+                <h3 class="text-2xl font-bold mb-3">Environment variables</h3>
+                <pre><code class="language-bash"># .env file
+DOMAIN=localhost:3000
+EMAIL_DOMAIN=example.com
+SMTP_ADDRESS=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USERNAME=your-email@gmail.com
+SMTP_PASSWORD=your-app-password
+EMAIL_FROM_ADDRESS=huginn@example.com
+
+# Optional: for secure setup
+HTTPS_ENABLED=true
+SECRET_TOKEN_BASE=$(openssl rand -base64 96)</code></pre>
+
+                <h3 class="text-2xl font-bold mb-3">Start the service</h3>
+                <pre><code class="language-bash"># Generate secret token
+SECRET_TOKEN_BASE=$(openssl rand -base64 96)
+
+# Start Huginn
+docker-compose up -d
+
+# Check logs
+docker-compose logs -f huginn</code></pre>
+
+                <h3 class="text-2xl font-bold mb-3">Initial setup</h3>
+                <ol class="list-decimal list-inside mb-4 space-y-2">
+                    <li>Open <code>http://your-server:3000</code></li>
+                    <li>Create admin account (username: <code>admin</code>, password: choose one)</li>
+                    <li>Change default credentials immediately</li>
+                    <li>You're in the dashboard - time to create agents</li>
+                </ol>
+
+                <p class="text-sm text-gray-600 mt-2">Pro tip: Put Nginx Proxy Manager in front of it for SSL and easy domain access.</p>
+            </section>
+
+            <section id="agents">
+                <h2 class="text-3xl font-bold mb-4 mt-8">Understanding Huginn agents</h2>
+                <p class="mb-4">Everything in Huginn is an agent. Agents consume events, process them, and emit new events. Chain them together to build workflows.</p>
+
+                <h3 class="text-2xl font-bold mb-3">Agent types</h3>
+                <ul class="list-disc list-inside mb-4 space-y-2">
+                    <li><strong>Sources:</strong> Generate events from external sources (RSS, websites, weather, Twitter)</li>
+                    <li><strong>Agents:</strong> Process and transform events (filters, formatters, delays)</li>
+                    <li><strong>Sinks:</strong> Send events elsewhere (email, Slack, webhooks, databases)</li>
+                </ul>
+
+                <div class="agent-card">
+                    <h3 class="text-xl font-bold mb-2">1. Website Agent - Monitor any website</h3>
+                    <p class="mb-3">Fetches websites periodically and extracts data using CSS selectors or JSONPath. Perfect for tracking price changes, blog updates, site monitoring.</p>
+                    <p class="mb-3"><strong>Use case:</strong> Monitor product page for price drop. Extract price using CSS selector. Trigger webhook when price changes.</p>
+                    <pre><code class="language-javascript">// Example configuration
+{
+  "url": "https://example.com/product",
+  "type": "html",
+  "mode": "on_change",
+  "extract": {
+    "price": {
+      "css": ".product-price",
+      "value": "string(.)"
+    }
+  },
+  "expected_update_period_in_days": 10
+}</code></pre>
+                </div>
+
+                <div class="agent-card">
+                    <h3 class="text-xl font-bold mb-2">2. RSS Agent - Track feeds</h3>
+                    <p class="mb-3">Monitors RSS/Atom feeds and emits events for new items. Can filter by keywords, categories, or content.</p>
+                    <p class="mb-3"><strong>Use case:</strong> Track tech blog RSS feed. Only emit events for posts containing "security" or "AI". Auto-save relevant articles to Notion.</p>
+                    <pre><code class="language-javascript">{
+  "url": "https://blog.example.com/rss",
+  "expected_update_period_in_days": 2
+}</code></pre>
+                </div>
+
+                <div class="agent-card">
+                    <h3 class="text-xl font-bold mb-2">3. Email Agent - Send notifications</h3>
+                    <p class="mb-3">Receives events and sends emails. Perfect for alerts, digests, or critical notifications.</p>
+                    <p class="mb-3"><strong>Use case:</strong> Weather agent forecasts rain tomorrow → Email agent sends reminder to take umbrella.</p>
+                    <pre><code class="language-javascript">{
+  "subject": "Rain expected tomorrow!",
+  "body": "Don't forget your umbrella. {{temperature}}°C expected.",
+  "to": "your-email@example.com"
+}</code></pre>
+                </div>
+
+                <div class="agent-card">
+                    <h3 class="text-xl font-bold mb-2">4. Webhook Agent - Receive external events</h3>
+                    <p class="mb-3">Creates unique URL that accepts POST requests. Perfect for receiving alerts from other services.</p>
+                    <p class="mb-3"><strong>Use case:</strong> Uptime Kuma sends webhook when site goes down → Huginn posts to Slack and sends SMS.</p>
+                    <p class="text-sm text-gray-600">Generates unique URL like: <code>https://huginn.example.com/users/1/webhooks/uuid</code></p>
+                </div>
+
+                <div class="agent-card">
+                    <h3 class="text-xl font-bold mb-2">5. Delay Agent - Time-based workflows</h3>
+                    <p class="mb-3">Receives events, holds them for specified duration, then emits. Great for rate limiting or delayed actions.</p>
+                    <p class="mb-3"><strong>Use case:</strong> RSS feed detects new article → Delay agent waits 24 hours → Email agent sends daily digest instead of spam.</p>
+                    <pre><code class="language-javascript">{
+  "expected_receive_period_in_days": 1,
+  "delay": "24h"
+}</code></pre>
+                </div>
+            </section>
+
+            <section id="workflows">
+                <h2 class="text-3xl font-bold mb-4 mt-8">Practical workflows I use</h2>
+                <p class="mb-4">Here are real workflows running on my server right now.</p>
+
+                <h3 class="text-2xl font-bold mb-3">Workflow 1: Daily tech news digest</h3>
+                <p class="mb-3">Instead of checking 20 RSS feeds constantly, I get one daily email.</p>
+                <ol class="list-decimal list-inside mb-4 space-y-2">
+                    <li><strong>RSS Agents</strong> monitor 10 tech blogs (Hacker News, TechCrunch, Ars Technica, etc.)</li>
+                    <li><strong>Filter Agent</strong> keeps only posts with "security" or "privacy" in title</li>
+                    <li><strong>Delay Agent</strong> accumulates articles for 24 hours</li>
+                    <li><strong>Email Agent</strong> sends digest at 8 AM with all articles</li>
+                </ol>
+                <p class="text-sm text-gray-600">Result: Morning email with curated security news. Zero effort after setup.</p>
+
+                <h3 class="text-2xl font-bold mb-3">Workflow 2: Price tracking for deals</h3>
+                <p class="mb-3">I track GPU prices and get alerts when they drop below threshold.</p>
+                <ol class="list-decimal list-inside mb-4 space-y-2">
+                    <li><strong>Website Agent</strong> checks Amazon product page every 6 hours</li>
+                    <li><strong>Extract</strong> current price using CSS selector</li>
+                    <li><strong>Comparison Agent</strong> checks if price < $500</li>
+                    <li><strong>Email Agent</strong> sends alert with product link if condition met</li>
+                </ol>
+                <pre><code class="language-javascript">// Comparison logic in Liquid template
+{% if price < 500 %}
+  Price dropped to ${{price}}! Buy now: {{url}}
+{% endif %}</code></pre>
+
+                <h3 class="text-2xl font-bold mb-3">Workflow 3: Server monitoring with notifications</h3>
+                <p class="mb-3">Uptime monitoring with multi-channel alerts.</p>
+                <ol class="list-decimal list-inside mb-4 space-y-2">
+                    <li><strong>Uptime Kuma</strong> monitors my servers (separate Docker container)</li>
+                    <li><strong>Webhook Agent</strong> receives alerts when sites go down</li>
+                    <li><strong>Post Agent</strong> sends message to Slack channel</li>
+                    <li><strong>Email Agent</strong> sends critical alerts to email</li>
+                </ol>
+                <p class="text-sm text-gray-600">Result: Instant Slack notification for minor issues, email for critical outages.</p>
+
+                <h3 class="text-2xl font-bold mb-3">Workflow 4: Social media cross-posting</h3>
+                <p class="mb-3">Auto-share blog posts across platforms (with manual approval).</p>
+                <ol class="list-decimal list-inside mb-4 space-y-2">
+                    <li><strong>RSS Agent</strong> monitors my blog's RSS feed</li>
+                    <li><strong>Format Agent</strong> converts to tweet format with hashtags</li>
+                    <li><strong>Delay Agent</strong> waits 1 hour (gives me time to edit)</li>
+                    <li><strong>Twitter Agent</strong> posts formatted tweet</li>
+                </ol>
+                <p class="text-sm text-gray-600">Note: Can disable Twitter agent to manually approve drafts in dashboard.</p>
+
+                <h3 class="text-2xl font-bold mb-3">Workflow 5: Weather-based reminders</h3>
+                <p class="mb-3">Practical automation based on weather forecasts.</p>
+                <ol class="list-decimal list-inside mb-4 space-y-2">
+                    <li><strong>Weather Agent</strong> checks forecast for my location at 7 AM</li>
+                    <li><strong>Logic Agent</strong> checks conditions (rain, snow, extreme heat)</li>
+                    <li><strong>Email Agent</strong> sends relevant reminder</li>
+                </ol>
+                <pre><code class="language-javascript">// Weather conditions that trigger alerts
+if (condition.includes("rain")) {
+  sendEmail("Take umbrella today");
+}
+if (temperature > 30) {
+  sendEmail("Wear light clothes, stay hydrated");
+}</code></pre>
+            </section>
+
+            <section id="advanced">
+                <h2 class="text-3xl font-bold mb-4 mt-8">Advanced agent chaining</h2>
+                <p class="mb-4">Real power comes from chaining agents. Here's how to build complex workflows.</p>
+
+                <h3 class="text-2xl font-bold mb-3">Linking agents</h3>
+                <p class="mb-3">Every agent has a "Create" button to make a new agent linked to it. This sets up automatic event passing.</p>
+                <pre><code class="language-bash"># Agent chain structure
+Source Agent → Filter Agent → Transform Agent → Output Agent
+
+# Example
+RSS Agent → Keyword Filter → Format for Slack → Post to Slack</code></pre>
+
+                <h3 class="text-2xl font-bold mb-3">Using Liquid templates</h3>
+                <p class="mb-3">Most agents support Liquid templating for dynamic content.</p>
+                <pre><code class="language-javascript">// Email body with dynamic data
+Subject: New post from {{title}}
+
+New article published:
+Title: {{title}}
+URL: {{url}}
+Summary: {{description}}
+
+Posted on: {{published_at}}</code></pre>
+
+                <h3 class="text-2xl font-bold mb-3">Conditional logic</h3>
+                <p class="mb-3">Use <code>if</code> statements in Liquid templates for branching logic.</p>
+                <pre><code class="language-javascript">{% if price < previous_price %}
+  Price dropped! Was ${{previous_price}}, now ${{price}}
+{% elsif price > previous_price %}
+  Price increased! Was ${{previous_price}}, now ${{price}}
+{% else %}
+  Price unchanged at ${{price}}
+{% endif %}</code></pre>
+
+                <h3 class="text-2xl font-bold mb-3">Error handling</h3>
+                <p class="mb-3">Agents can fail. Set up error handling agents to catch problems.</p>
+                <ul class="list-disc list-inside mb-4 space-y-2">
+                    <li><strong>Error Destination Agent:</strong> Catches failed events, logs them, sends alerts</li>
+                    <li><strong>Retry Logic:</strong> Some agents have built-in retry with exponential backoff</li>
+                    <li><strong>Dead Man's Switch:</strong> Agent emits event if no events received for X time</li>
+                </ul>
+            </section>
+
+            <section id="comparison">
+                <h2 class="text-3xl font-bold mb-4 mt-8">Huginn vs IFTTT vs Zapier</h2>
+                <p class="mb-4">Quick comparison of automation platforms.</p>
+
+                <div class="overflow-x-auto">
+                    <table class="min-w-full border-collapse border border-gray-300 mb-6">
+                        <thead>
+                            <tr class="bg-gray-100">
+                                <th class="border border-gray-300 px-4 py-2 text-left">Feature</th>
+                                <th class="border border-gray-300 px-4 py-2 text-left">Huginn</th>
+                                <th class="border border-gray-300 px-4 py-2 text-left">IFTTT</th>
+                                <th class="border border-gray-300 px-4 py-2 text-left">Zapier</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="border border-gray-300 px-4 py-2">Cost</td>
+                                <td class="border border-gray-300 px-4 py-2">Free (self-hosted)</td>
+                                <td class="border border-gray-300 px-4 py-2">$3.99+/month</td>
+                                <td class="border border-gray-300 px-4 py-2">$19+/month</td>
+                            </tr>
+                            <tr>
+                                <td class="border border-gray-300 px-4 py-2">Workflow limits</td>
+                                <td class="border border-gray-300 px-4 py-2">Unlimited</td>
+                                <td class="border border-gray-300 px-4 py-2">3 (free) / 20 (pro)</td>
+                                <td class="border border-gray-300 px-4 py-2">By task count</td>
+                            </tr>
+                            <tr>
+                                <td class="border border-gray-300 px-4 py-2">Run frequency</td>
+                                <td class="border border-gray-300 px-4 py-2">Every second</td>
+                                <td class="border border-gray-300 px-4 py-2">Every 5 minutes (pro)</td>
+                                <td class="border border-gray-300 px-4 py-2">1-15 minutes</td>
+                            </tr>
+                            <tr>
+                                <td class="border border-gray-300 px-4 py-2">Custom logic</td>
+                                <td class="border border-gray-300 px-4 py-2">Full programming support</td>
+                                <td class="border border-gray-300 px-4 py-2">Very limited</td>
+                                <td class="border border-gray-300 px-4 py-2">Moderate (Path/Formatter)</td>
+                            </tr>
+                            <tr>
+                                <td class="border border-gray-300 px-4 py-2">Data control</td>
+                                <td class="border border-gray-300 px-4 py-2">100% (your server)</td>
+                                <td class="border border-gray-300 px-4 py-2">On their servers</td>
+                                <td class="border border-gray-300 px-4 py-2">On their servers</td>
+                            </tr>
+                            <tr>
+                                <td class="border border-gray-300 px-4 py-2">Ease of use</td>
+                                <td class="border border-gray-300 px-4 py-2">Moderate (tech skills needed)</td>
+                                <td class="border border-gray-300 px-4 py-2">Very easy</td>
+                                <td class="border border-gray-300 px-4 py-2">Easy</td>
+                            </tr>
+                            <tr>
+                                <td class="border border-gray-300 px-4 py-2">Integrations</td>
+                                <td class="border border-gray-300 px-4 py-2">Anything with API/webhook</td>
+                                <td class="border border-gray-300 px-4 py-2">700+ services</td>
+                                <td class="border border-gray-300 px-4 py-2">5000+ apps</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3 class="text-2xl font-bold mb-3">When to choose Huginn</h3>
+                <ul class="list-disc list-inside mb-4 space-y-2">
+                    <li>You have technical skills and can self-host</li>
+                    <li>You need unlimited workflows</li>
+                    <li>You want data privacy</li>
+                    <li>You need custom logic beyond "if this then that"</li>
+                    <li>You're comfortable with Docker and basic config</li>
+                </ul>
+
+                <h3 class="text-2xl font-bold mb-3">When to stick with IFTTT/Zapier</h3>
+                <ul class="list-disc list-inside mb-4 space-y-2">
+                    <li>You want something that works in 5 minutes</li>
+                    <li>You need integrations with obscure services</li>
+                    <li>You don't want to manage a server</li>
+                    <li>Complexity scares you</li>
+                </ul>
+            </section>
+
+            <section id="troubleshooting">
+                <h2 class="text-3xl font-bold mb-4 mt-8">Common issues and fixes</h2>
+                <p class="mb-4">Stuff that breaks and how to fix it.</p>
+
+                <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-4">
+                    <p class="font-bold">Issue: Agent not receiving events</p>
+                    <p class="text-sm mt-2"><strong>Fix:</strong> Check if source agent is emitting events. Look at agent logs. Verify linking between agents. Make sure source agent is not disabled.</p>
+                </div>
+
+                <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-4">
+                    <p class="font-bold">Issue: Email agent not sending</p>
+                    <p class="text-sm mt-2"><strong>Fix:</strong> Verify SMTP settings. Check if email provider requires app-specific password (Gmail does). Test SMTP connection separately. Check spam folder.</p>
+                </div>
+
+                <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-4">
+                    <p class="font-bold">Issue: Website agent returning empty data</p>
+                    <p class="text-sm mt-2"><strong>Fix:</strong> Site might block bots. Check if User-Agent needs setting. Verify CSS selectors are correct. Try Fetch Agent with headers if site has anti-scraping.</p>
+                </div>
+
+                <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-4">
+                    <p class="font-bold">Issue: Agent consuming too much memory</p>
+                    <p class="text-sm mt-2"><strong>Fix:</strong> Reduce <code>expected_update_period_in_days</code>. Check for infinite loops. Limit event history in agent settings. Add memory limits to Docker container.</p>
+                </div>
+
+                <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-4">
+                    <p class="font-bold">Issue: Webhook URL not working</p>
+                    <p class="text-sm mt-2"><strong>Fix:</strong> Check if webhook is enabled. Verify URL is correct (case-sensitive). Check server firewall. Test with curl: <code>curl -X POST https://your-webhook-url -d '{"test":"data"}'</code></p>
+                </div>
+
+                <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-4">
+                    <p class="font-bold">Issue: Agents stopped running after update</p>
+                    <p class="text-sm mt-2"><strong>Fix:</strong> Check agent compatibility with new Huginn version. Look for deprecated options in release notes. Recreate agent if needed (export config first).</p>
+                </div>
+            </section>
+
+            <section id="tips">
+                <h2 class="text-3xl font-bold mb-4 mt-8">Tips for production use</h2>
+                <p class="mb-4">Hard-earned lessons from running Huginn in production.</p>
+
+                <h3 class="text-2xl font-bold mb-3">1. Start simple</h3>
+                <p class="mb-3">Don't build 10-agent chains on day one. Start with single agent, test it, then add complexity. Debugging complex chains is painful.</p>
+
+                <h3 class="text-2xl font-bold mb-3">2. Use descriptive names</h3>
+                <p class="mb-3">Name agents like "RSS - Hacker News → Filter - Security → Email - Daily Digest". Future you will thank present you.</p>
+
+                <h3 class="text-2xl font-bold mb-3">3. Monitor agent logs</h3>
+                <p class="mb-3">Check logs regularly. Silent failures are the worst. Set up error notification agents.</p>
+
+                <h3 class="text-2xl font-bold mb-3">4. Test webhooks with curl</h3>
+                <p class="mb-3">Before configuring webhook agent, test endpoint manually. Saves debugging time.</p>
+                <pre><code class="language-bash">curl -X POST https://huginn.example.com/webhooks/uuid \
+  -H "Content-Type: application/json" \
+  -d '{"message": "test"}'</code></pre>
+
+                <h3 class="text-2xl font-bold mb-3">5. Export agent configs</h3>
+                <p class="mb-3">Regularly export important agent configurations. Huginn supports JSON export/import. Saved me when I accidentally deleted an agent.</p>
+
+                <h3 class="text-2xl font-bold mb-3">6. Use delay agents for rate limiting</h3>
+                <p class="mb-3">Don't spam APIs. Use Delay Agent to throttle requests. Keeps you from getting banned.</p>
+
+                <h3 class="text-2xl font-bold mb-3">7. Set up monitoring</h3>
+                <p class="mb-3">Use Uptime Kuma or similar to monitor Huginn itself. Create workflow that alerts if Huginn stops emitting events.</p>
+
+                <h3 class="text-2xl font-bold mb-3">8. Document your workflows</h3>
+                <p class="mb-3">Create a note in Obsidian explaining each workflow. Six months later, you'll forget what that agent chain does.</p>
+            </section>
+
+            <section id="conclusion">
+                <h2 class="text-3xl font-bold mb-4 mt-8">Bottom line</h2>
+                <p class="mb-4">
+                    Huginn isn't for everyone. Requires technical skills, server management, and willingness to debug. But if you're comfortable with Docker and basic scripting, it's incredibly powerful.
+                </p>
+                <p class="mb-4">
+                    I've saved $15/month by replacing IFTTT Pro. More importantly, I have unlimited automation without arbitrary restrictions. Can run workflows every minute, chain 20 agents together, build custom logic - all impossible on IFTTT free plan.
+                </p>
+                <p class="mb-4">
+                    Best part: Complete data control. Everything runs on my server. No third-party tracking my automation triggers. My workflows, my data, my rules.
+                </p>
+                <p class="mb-4">
+                    If you're tired of IFTTT limits and Zapier pricing, give Huginn a shot. Start with one simple agent, go from there. Worst case: you learned Docker and automation concepts. Best case: you built your own automation platform that actually serves your needs.
+                </p>
+                <p class="mb-4">
+                    Been running it for 18 months now. 25 active agents, 0 subscription fees, and I automate stuff IFTTT could never handle. That's a win in my book.
+                </p>
+            </section>
+
+        </article>
+
+    </main>
+
+    <footer class="bg-gray-800 text-white py-12">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="grid md:grid-cols-3 gap-8 mb-8">
+                <div>
+                    <h3 class="font-bold text-lg mb-4">Programming Notes</h3>
+                    <p class="text-gray-400 text-sm">A collection of coding notes and tutorials from a full-stack developer.</p>
+                </div>
+                <div>
+                    <h3 class="font-bold text-lg mb-4">Quick Links</h3>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="index.html" class="hover:text-white">Home</a></li>
+                        <li><a href="about.html" class="hover:text-white">About</a></li>
+                        <li><a href="contact.html" class="hover:text-white">Contact</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-bold text-lg mb-4">Connect</h3>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="https://github.com" target="_blank" class="hover:text-white">GitHub</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 pt-8 text-center text-gray-400 text-sm">
+                <p>© 2026 Programming Notes. Built with simple HTML & Tailwind CSS.</p>
+                <p class="mt-2"><a href="privacy.html" class="hover:text-white">Privacy Policy</a></p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Prism.js for code highlighting -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-yaml.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+
+</body>
+</html>
