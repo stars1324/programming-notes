@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-LMWN7814BX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date);
+
+      gtag('config', 'G-LMWN7814BX');
+    </script>
+
+    <!-- SEO Meta Tags -->
+    <title>Refine: Built Admin Panels 10x Faster</title>
+    <meta name="description" content="Tired of building CRUD admin panels from scratch? Refine gives you authentication, routing, data tables out of the box. Built a complete dashboard in one day. Here's my guide.">
+    <meta name="keywords" content="Refine.dev, Refine tutorial, build admin panels, React admin framework, CRUD application, admin dashboard, internal tools, React data grid">
+    <link rel="canonical" href="https://pnt.jacbex.com/refine.html" />
+
+    <!-- Open Graph / Social Media -->
+    <meta property="og:title" content="Refine: Build Admin Panels 10x Faster">
+    <meta property="og:description" content="React framework for building admin panels, internal tools, and dashboards. CRUD, auth, and routing out of the box.">
+    <meta property="og:type" content="article">
+
+    <!-- Tailwind CSS for modern UI -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Code Highlighting (Prism.js) -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+
+    <!-- Structured Data (Schema.org) for Google -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "Refine: Built Admin Panels 10x Faster",
+      "description": "Guide to using Refine for building admin panels and CRUD applications with React.",
+      "author": {
+        "@type": "Person",
+        "name": "Programming Notes"
+      },
+      "proficiencyLevel": "Intermediate"
+    }
+    </script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+        .prose code { color: #eb5757; background: #f9f2f2; padding: 2px 4px; border-radius: 4px; }
+        .feature-card { background: #f8fafc; border-left: 4px solid #ef4444; padding: 20px; margin: 16px 0; border-radius: 8px; }
+        .feature-box { background: linear-gradient(135deg, #ef4444 0%, #f97316 100%); color: white; padding: 24px; border-radius: 12px; margin: 24px 0; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+            <a href="index.html" class="text-xl font-bold text-blue-600">📝 <span class="text-gray-700">Programming Notes</span></a>
+            <div class="space-x-6 hidden md:block">
+                <a href="index.html" class="hover:text-blue-500">Home</a>
+                <a href="about.html" class="hover:text-blue-500">About</a>
+                <a href="contact.html" class="hover:text-blue-500">Contact</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="bg-gradient-to-r from-red-600 to-orange-600 text-white py-16">
+        <div class="max-w-4xl mx-auto px-4 text-center">
+            <h1 class="text-4xl md:text-5xl font-extrabold mb-4">Refine: Built Admin Panels 10x Faster</h1>
+            <p class="text-xl opacity-90">Tired of building CRUD admin panels from scratch? Refine gives you authentication, routing, data tables out of the box. Built a complete dashboard in one day. Here's my guide.</p>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto px-4 py-12 bg-white mt-[-40px] rounded-xl shadow-lg mb-20">
+
+        <article class="prose prose-blue max-w-none">
+
+            <section id="introduction">
+                <h2 class="text-3xl font-bold mb-4">Why I switched to Refine</h2>
+                <p class="mb-4">
+                    Built admin panels the hard way for years. Create React App, install routing library, build authentication from scratch, create CRUD pages one by one, handle forms manually, manage state with Redux. Weeks of work for a simple dashboard.
+                </p>
+                <p class="mb-4">
+                    Tried <a href="https://ant.design/pro-components" class="text-blue-600 underline" target="_blank">Ant Design Pro</a> - powerful but opinionated. Wanted to use Material UI? Tough luck. Custom layouts? Fight the framework.
+                </p>
+                <p class="mb-4">
+                    Then found <a href="https://refine.dev" class="text-blue-600 underline" target="_blank">Refine</a>. Headless React framework for building admin panels. Gives you CRUD, routing, authentication, but stays out of UI decisions. Use any UI library. Build layouts your way. Focus on business logic instead of boilerplate.
+                </p>
+                <p class="mb-4">
+                    Built my last admin panel in a day. Not a joke. Start to finish, with authentication, data tables, forms, filtering, pagination. Would've taken two weeks before.
+                </p>
+
+                <div class="feature-box">
+                    <p class="font-bold text-xl mb-2">What Refine actually does</p>
+                    <p class="opacity-90">React framework for admin panels and internal tools. Auto-generates CRUD pages from your data. Handles routing, authentication, permissions, data fetching. Headless design means you choose the UI library (Ant Design, Material UI, Tailwind CSS, whatever). Connects to any REST or GraphQL API.</p>
+                </div>
+            </section>
+
+            <section id="installation">
+                <h2 class="text-3xl font-bold mb-4 mt-8">Installation and setup</h2>
+                <p class="mb-4">Quickest way to start with Refine.</p>
+
+                <h3 class="text-2xl font-bold mb-3">Option 1: Create new app (recommended)</h3>
+                <pre><code class="language-bash"># Create Refine app with interactive CLI
+npm create refine-app@latest
+
+# Follow the prompts:
+# - Project name: my-admin-panel
+# - Select framework: React
+# - Select UI library: Ant Design / Material UI / Mantine
+# - Select backend: REST API / GraphQL / Supabase / NestJS
+# - Select example: Basic / CRUD</code></pre>
+
+                <h3 class="text-2xl font-bold mb-3">Option 2: Install into existing project</h3>
+                <pre><code class="language-bash"># Install core package
+npm install @refinedev/core
+
+# Install UI library (example: Ant Design)
+npm install antd @refinedev/antd
+
+# Install router (if not present)
+npm install react-router-dom</code></pre>
+
+                <h3 class="text-2xl font-bold mb-3">Basic setup</h3>
+                <pre><code class="language-tsx">// src/App.tsx
+import { Refine } from "@refinedev/core";
+import { RefineThemes } from "@refinedev/antd";
+import { ConfigProvider } from "antd";
+import routerProvider from "@refinedev/react-router-v6";
+import dataProvider from "@refinedev/simple-rest";
+
+function App() {
+  return (
+    <ConfigProvider theme={RefineThemes.Blue}>
+      <Refine
+        routerProvider={routerProvider}
+        dataProvider={dataProvider("https://api.example.com")}
+        resources={[
+          {
+            name: "users",
+            list: "/users",
+            create: "/users/create",
+            edit: "/users/edit/:id",
+            show: "/users/show/:id",
+          },
+        ]}
+      >
+        {/* Your routes */}
+      </Refine>
+    </ConfigProvider>
+  );
+}</code></pre>
+            </section>
+
+            <section id="concepts">
+                <h2 class="text-3xl font-bold mb-4 mt-8">Core concepts</h2>
+                <p class="mb-4">Understand these and you understand Refine.</p>
+
+                <div class="feature-card">
+                    <h3 class="text-xl font-bold mb-2">1. Data Providers</h3>
+                    <p class="mb-3">Abstraction layer between Refine and your backend. One interface, any backend.</p>
+                    <pre><code class="language-tsx">// REST API
+import dataProvider from "@refinedev/simple-rest";
+const dataProvider = simpleRestDataProvider("https://api.example.com");
+
+// GraphQL
+import dataProvider from "@refinedev/graphql";
+const dataProvider = graphqlDataProvider("https://api.example.com/graphql");
+
+// Supabase
+import dataProvider from "@refinedev/supabase";
+const dataProvider = supabaseDataProvider(client);
+
+// Use in Refine
+<Refine dataProvider={dataProvider} /></code></pre>
+                    <p class="text-sm text-gray-600">Switch backends without changing your UI. Just swap data provider.</p>
+                </div>
+
+                <div class="feature-card">
+                    <h3 class="text-xl font-bold mb-2">2. Resources</h3>
+                    <p class="mb-3">Define your data model and routes. Refine generates CRUD pages automatically.</p>
+                    <pre><code class="language-tsx">const resources = [
+  {
+    name: "users",
+    list: UserList,
+    create: UserCreate,
+    edit: UserEdit,
+    show: UserShow,
+    meta: {
+      canDelete: true,
+      label: "Users",
+    },
+  },
+  {
+    name: "products",
+    list: ProductList,
+    create: ProductCreate,
+    edit: ProductEdit,
+  },
+];
+
+<Refine resources={resources} /></code></pre>
+                    <p class="text-sm text-gray-600">Each resource has list, create, edit, show pages. Omit what you don't need.</p>
+                </div>
+
+                <div class="feature-card">
+                    <h3 class="text-xl font-bold mb-2">3. Hooks for data fetching</h3>
+                    <p class="mb-3">Built-in hooks for CRUD operations. No need to write fetch logic.</p>
+                    <pre><code class="language-tsx">import { useTable, useForm, useShow } from "@refinedev/core";
+
+// List page - fetch data with pagination, sorting, filtering
+const { tableProps } = useTable({
+  resource: "users",
+  sorters: {
+    initial: [
+      { field: "id", order: "desc" },
+    ],
+  },
+});
+
+// Create/Edit form
+const { onFinish, formLoading } = useForm({
+  resource: "users",
+  action: "create", // or "edit"
+});
+
+// Show page
+const { queryResult } = useShow({
+  resource: "users",
+  id: userId,
+});</code></pre>
+                </div>
+
+                <div class="feature-card">
+                    <h3 class="text-xl font-bold mb-2">4. Authentication</h3>
+                    <p class="mb-3">Built-in auth providers for common scenarios.</p>
+                    <pre><code class="language-tsx">import { AuthProvider } from "@refinedev/core";
+
+const authProvider: AuthProvider = {
+  login: async ({ username, password }) => {
+    const response = await fetch("https://api.example.com/login", {
+      method: "POST",
+      body: JSON.stringify({ username, password }),
+    });
+    const data = await response.json();
+    localStorage.setItem("token", data.token);
+    return Promise.resolve();
+  },
+  logout: async () => {
+    localStorage.removeItem("token");
+    return Promise.resolve();
+  },
+  checkAuth: async () => {
+    const token = localStorage.getItem("token");
+    return token ? Promise.resolve() : Promise.reject();
+  },
+  checkError: async (error) => {
+    if (error.status === 401) {
+      return Promise.reject();
+    }
+    return Promise.resolve();
+  },
+  getPermissions: async () => {
+    return Promise.resolve();
+  },
+};
+
+<Refine authProvider={authProvider} /></code></pre>
+                </div>
+            </section>
+
+            <section id="building">
+                <h2 class="text-3xl font-bold mb-4 mt-8">Building a CRUD app</h2>
+                <p class="mb-4">Let's build a user management system from scratch.</p>
+
+                <h3 class="text-2xl font-bold mb-3">Step 1: Define resource</h3>
+                <pre><code class="language-tsx">// src/App.tsx
+<Refine
+  resources={[
+    {
+      name: "users",
+      list: "/users",
+      create: "/users/create",
+      edit: "/users/edit/:id",
+      show: "/users/show/:id",
+    },
+  ]}
+>
+  <Routes>
+    <Route path="/users" element={<UserList />} />
+    <Route path="/users/create" element={<UserCreate />} />
+    <Route path="/users/edit/:id" element={<UserEdit />} />
+    <Route path="/users/show/:id" element={<UserShow />} />
+  </Routes>
+</Refine></code></pre>
+
+                <h3 class="text-2xl font-bold mb-3">Step 2: List page</h3>
+                <pre><code class="language-tsx">// src/pages/users/list.tsx
+import { List, useTable } from "@refinedev/antd";
+import { Table, Space } from "antd";
+
+export const UserList: React.FC = () => {
+  const { tableProps } = useTable({
+    resource: "users",
+    sorters: {
+      initial: [{ field: "id", order: "desc" }],
+    },
+  });
+
+  return (
+    <List>
+      <Table {...tableProps} rowKey="id">
+        <Table.Column dataIndex="id" title="ID" />
+        <Table.Column dataIndex="name" title="Name" />
+        <Table.Column dataIndex="email" title="Email" />
+        <Table.Column dataIndex="role" title="Role" />
+        <Table.Column
+          title="Actions"
+          dataIndex="actions"
+          render={(_, record) => (
+            <Space>
+              <a href={`/users/show/${record.id}`}>View</a>
+              <a href={`/users/edit/${record.id}`}>Edit</a>
+            </Space>
+          )}
+        />
+      </Table>
+    </List>
+  );
+};</code></pre>
+
+                <h3 class="text-2xl font-bold mb-3">Step 3: Create page</h3>
+                <pre><code class="language-tsx">// src/pages/users/create.tsx
+import { Create, useForm } from "@refinedev/antd";
+import { Form, Input, Select, Button } from "antd";
+
+export const UserCreate: React.FC = () => {
+  const { formProps, saveButtonProps } = useForm({
+    resource: "users",
+    action: "create",
+  });
+
+  return (
+    <Create saveButtonProps={saveButtonProps}>
+      <Form {...formProps} layout="vertical">
+        <Form.Item
+          label="Name"
+          name="name"
+          rules={[{ required: true }]}
+        >
+          <Input />
+        </Form.Item>
+        <Form.Item
+          label="Email"
+          name="email"
+          rules={[
+            { required: true },
+            { type: "email" },
+          ]}
+        >
+          <Input type="email" />
+        </Form.Item>
+        <Form.Item
+          label="Role"
+          name="role"
+          rules={[{ required: true }]}
+        >
+          <Select>
+            <Select.Option value="admin">Admin</Select.Option>
+            <Select.Option value="user">User</Select.Option>
+            <Select.Option value="guest">Guest</Select.Option>
+          </Select>
+        </Form.Item>
+        <Form.Item
+          label="Password"
+          name="password"
+          rules={[{ required: true }]}
+        >
+          <Input.Password />
+        </Form.Item>
+      </Form>
+    </Create>
+  );
+};</code></pre>
+
+                <h3 class="text-2xl font-bold mb-3">Step 4: Edit page</h3>
+                <pre><code class="language-tsx">// src/pages/users/edit.tsx
+import { Edit, useForm } from "@refinedev/antd";
+import { Form, Input, Select } from "antd";
+
+export const UserEdit: React.FC = () => {
+  const { queryResult } = useShow();
+  const { data } = queryResult;
+  const record = data?.data;
+
+  const { formProps, saveButtonProps } = useForm({
+    resource: "users",
+    action: "edit",
+    id: record?.id,
+  });
+
+  return (
+    <Edit saveButtonProps={saveButtonProps}>
+      <Form {...formProps} layout="vertical" initialValues={record}>
+        {/* Same form as create, but pre-filled */}
+      </Form>
+    </Edit>
+  );
+};</code></pre>
+            </section>
+
+            <section id="advanced">
+                <h2 class="text-3xl font-bold mb-4 mt-8">Advanced features</h2>
+                <p class="mb-4">Beyond basic CRUD.</p>
+
+                <h3 class="text-2xl font-bold mb-3">1. Filtering and search</h3>
+                <pre><code class="language-tsx">import { useTable } from "@refinedev/antd";
+import { FilterDropdown, Input, Select } from "@antd";
+
+const { tableProps, searchFormProps } = useTable({
+  resource: "users",
+  onSearch: (params) => {
+    return [
+      {
+        field: "name",
+        operator: "contains",
+        value: params.name,
+      },
+      {
+        field: "role",
+        operator: "eq",
+        value: params.role,
+      },
+    ];
+  },
+});
+
+<Table.Column
+  dataIndex="name"
+  title="Name"
+  filterDropdown={(props) => (
+    <FilterDropdown {...props}>
+      <Input placeholder="Search by name" />
+    </FilterDropdown>
+  )}
+/></code></pre>
+
+                <h3 class="text-2xl font-bold mb-3">2. Relationships and foreign keys</h3>
+                <pre><code class="language-tsx">// User belongs to a company
+<Table.Column
+  dataIndex="company_id"
+  title="Company"
+  render={(value) => {
+    // Fetch company data
+    const { data } = useOne({
+      resource: "companies",
+      id: value,
+    });
+    return data?.data?.name;
+  }}
+/></code></pre>
+
+                <h3 class="text-2xl font-bold mb-3">3. File uploads</h3>
+                <pre><code class="language-tsx">import { Upload } from "antd";
+
+<Form.Item label="Avatar" name="avatar">
+  <Upload
+    customRequest={async ({ file, onSuccess, onError }) => {
+      try {
+        const response = await uploadFile(file);
+        onSuccess(response);
+        form.setFieldValue("avatar", response.url);
+      } catch (error) {
+        onError(error);
+      }
+    }}
+  >
+    <Button>Upload Avatar</Button>
+  </Upload>
+</Form.Item></code></pre>
+
+                <h3 class="text-2xl font-bold mb-3">4. Real-time updates</h3>
+                <pre><code class="language-tsx">import { useLive } from "@refinedev/core";
+
+const { data } = useLive({
+  resource: "users",
+  // WebSocket connection for real-time updates
+  liveMode: "auto",
+});
+
+// Table updates automatically when data changes</code></pre>
+            </section>
+
+            <section id="providers">
+                <h2 class="text-3xl font-bold mb-4 mt-8">Backend integrations</h2>
+                <p class="mb-4">Refine connects to anything.</p>
+
+                <h3 class="text-2xl font-bold mb-3">REST API</h3>
+                <pre><code class="language-tsx">import dataProvider from "@refinedev/simple-rest";
+
+const dataProvider = simpleRestDataProvider("https://api.example.com");</code></pre>
+
+                <h3 class="text-2xl font-bold mb-3">GraphQL</h3>
+                <pre><code class="language-tsx">import dataProvider from "@refinedev/graphql";
+
+const dataProvider = graphqlDataProvider("https://api.example.com/graphql");</code></pre>
+
+                <h3 class="text-2xl font-bold mb-3">Supabase</h3>
+                <pre><code class="language-tsx">import { dataProvider } from "@refinedev/supabase";
+import { createClient } from "@supabase/supabase-js";
+
+const supabaseClient = createClient("URL", "KEY");
+const dataProvider = supabaseDataProvider(supabaseClient);</code></pre>
+
+                <h3 class="text-2xl font-bold mb-3">NestJS CRUD</h3>
+                <pre><code class="language-tsx">import dataProvider from "@refinedev/nestjs-crud";
+
+const dataProvider = nestjsCrudDataProvider("https://api.example.com");</code></pre>
+
+                <h3 class="text-2xl font-bold mb-3">Airtable</h3>
+                <pre><code class="language-tsx">import dataProvider from "@refinedev/airtable";
+
+const dataProvider = airtableDataProvider("API_KEY", "BASE_ID");</code></pre>
+            </section>
+
+            <section id="ui-libraries">
+                <h2 class="text-3xl font-bold mb-4 mt-8">UI library choices</h2>
+                <p class="mb-4">Refine is headless. Choose any UI library.</p>
+
+                <h3 class="text-2xl font-bold mb-3">Ant Design (most popular)</h3>
+                <pre><code class="language-bash">npm install @refinedev/antd antd</code></pre>
+                <p class="mb-4">Enterprise-grade components. Great for internal tools. Large component library.</p>
+
+                <h3 class="text-2xl font-bold mb-3">Material UI</h3>
+                <pre><code class="language-bash">npm install @refinedev/mui @mui/material</code></pre>
+                <p class="mb-4">Google's design system. Clean, modern look. Good documentation.</p>
+
+                <h3 class="text-2xl font-bold mb-3">Mantine</h3>
+                <pre><code class="language-bash">npm install @refinedev/mantine @mantine/core</code></pre>
+                <p class="mb-4">Modern, customizable. Great hooks library. Active community.</p>
+
+                <h3 class="text-2xl font-bold mb-3">Headless (build your own)</h3>
+                <pre><code class="language-bash">npm install @refinedev/core</code></pre>
+                <p class="mb-4">Complete control. Build UI with Tailwind CSS, Chakra UI, whatever.</p>
+            </section>
+
+            <section id="comparison">
+                <h2 class="text-3xl font-bold mb-4 mt-8">Refine vs alternatives</h2>
+                <p class="mb-4">Quick comparison with other admin frameworks.</p>
+
+                <div class="overflow-x-auto">
+                    <table class="min-w-full border-collapse border border-gray-300 mb-6">
+                        <thead>
+                            <tr class="bg-gray-100">
+                                <th class="border border-gray-300 px-4 py-2 text-left">Feature</th>
+                                <th class="border border-gray-300 px-4 py-2 text-left">Refine</th>
+                                <th class="border border-gray-300 px-4 py-2 text-left">Ant Design Pro</th>
+                                <th class="border border-gray-300 px-4 py-2 text-left">React Admin</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="border border-gray-300 px-4 py-2">Learning curve</td>
+                                <td class="border border-gray-300 px-4 py-2">Moderate</td>
+                                <td class="border border-gray-300 px-4 py-2">Moderate</td>
+                                <td class="border border-gray-300 px-4 py-2">Moderate</td>
+                            </tr>
+                            <tr>
+                                <td class="border border-gray-300 px-4 py-2">UI flexibility</td>
+                                <td class="border border-gray-300 px-4 py-2">High (headless)</td>
+                                <td class="border border-gray-300 px-4 py-2">Low (Ant Design only)</td>
+                                <td class="border border-gray-300 px-4 py-2">Moderate (Material UI)</td>
+                            </tr>
+                            <tr>
+                                <td class="border border-gray-300 px-4 py-2">Backend support</td>
+                                <td class="border border-gray-300 px-4 py-2">REST, GraphQL, Supabase, Airtable</td>
+                                <td class="border border-gray-300 px-4 py-2">REST</td>
+                                <td class="border border-gray-300 px-4 py-2">REST, GraphQL</td>
+                            </tr>
+                            <tr>
+                                <td class="border border-gray-300 px-4 py-2">TypeScript support</td>
+                                <td class="border border-gray-300 px-4 py-2">Excellent</td>
+                                <td class="border border-gray-300 px-4 py-2">Good</td>
+                                <td class="border border-gray-300 px-4 py-2">Good</td>
+                            </tr>
+                            <tr>
+                                <td class="border border-gray-300 px-4 py-2">CRUD generation</td>
+                                <td class="border border-gray-300 px-4 py-2">Yes</td>
+                                <td class="border border-gray-300 px-4 py-2">Partial</td>
+                                <td class="border border-gray-300 px-4 py-2">Yes</td>
+                            </tr>
+                            <tr>
+                                <td class="border border-gray-300 px-4 py-2">Community</td>
+                                <td class="border border-gray-300 px-4 py-2">Growing</td>
+                                <td class="border border-gray-300 px-4 py-2">Large</td>
+                                <td class="border border-gray-300 px-4 py-2">Large</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="troubleshooting">
+                <h2 class="text-3xl font-bold mb-4 mt-8">Common issues and fixes</h2>
+                <p class="mb-4">Stuff that breaks and how to fix it.</p>
+
+                <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-4">
+                    <p class="font-bold">Issue: Data not loading in table</p>
+                    <p class="text-sm mt-2"><strong>Fix:</strong> Check data provider URL. Verify API returns correct format. Check browser network tab. Ensure resource name matches API endpoint.</p>
+                </div>
+
+                <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-4">
+                    <p class="font-bold">Issue: Create/Edit forms not saving</p>
+                    <p class="text-sm mt-2"><strong>Fix:</strong> Verify form field names match API expected format. Check <code>onFinish</code> is being called. Ensure data provider supports create/update operations.</p>
+                </div>
+
+                <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-4">
+                    <p class="font-bold">Issue: Authentication not working</p>
+                    <p class="text-sm mt-2"><strong>Fix:</strong> Verify auth provider methods return correct values. Check <code>checkAuth</code> logic. Ensure login stores token correctly. Verify token format with backend.</p>
+                </div>
+
+                <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-4">
+                    <p class="font-bold">Issue: Filters not applied</p>
+                    <p class="text-sm mt-2"><strong>Fix:</strong> Check filter operator values. Verify backend supports filtering. Use correct filter format: <code>{ field: "name", operator: "contains", value: "John" }</code></p>
+                </div>
+
+                <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-4">
+                    <p class="font-bold">Issue: TypeScript errors</p>
+                    <p class="text-sm mt-2"><strong>Fix:</strong> Ensure types are imported correctly. Check generic types in hooks: <code>useTable&lt;IUser&gt;()</code>. Update to latest Refine version.</p>
+                </div>
+            </section>
+
+            <section id="best-practices">
+                <h2 class="text-3xl font-bold mb-4 mt-8">Best practices from production use</h2>
+                <p class="mb-4">Lessons learned from real projects.</p>
+
+                <h3 class="text-2xl font-bold mb-3">1. Start with CLI</h3>
+                <p class="mb-3">Use <code>npm create refine-app@latest</code> for first project. Faster than manual setup. Good way to learn structure.</p>
+
+                <h3 class="text-2xl font-bold mb-3">2. Define resources early</h3>
+                <p class="mb-3">Map out all resources (users, products, orders) before coding. Less refactoring later. Use consistent naming conventions.</p>
+
+                <h3 class="text-2xl font-bold mb-3">3. Create reusable components</h3>
+                <p class="mb-3">Extract common table columns, form fields into reusable components. Reduces boilerplate across resources.</p>
+
+                <h3 class="text-2xl font-bold mb-3">4. Use TypeScript</h3>
+                <p class="mb-3">Refine has excellent TypeScript support. Define interfaces for your data models. Catches errors at compile time.</p>
+
+                <h3 class="text-2xl font-bold mb-3">5. Implement error handling</h3>
+                <p class="mb-3">Use <code>useOnError</code> to handle API errors globally. Show user-friendly notifications.</p>
+
+                <h3 class="text-2xl font-bold mb-3">6. Add loading states</h3>
+                <p class="mb-3">Use <code>formLoading</code> and <code>tableProps.loading</code> to show spinners during data fetching. Better UX.</p>
+
+                <h3 class="text-2xl font-bold mb-3">7. Implement permissions</h3>
+                <p class="mb-3">Use <code>canAccess</code> prop on resources to control access based on user roles. Protect sensitive operations.</p>
+            </section>
+
+            <section id="conclusion">
+                <h2 class="text-3xl font-bold mb-4 mt-8">Bottom line</h2>
+                <p class="mb-4">
+                    Refine isn't magic. It's just a really well-designed abstraction layer for admin panels. But that abstraction saves weeks of development time.
+                </p>
+                <p class="mb-4">
+                    CRUD pages that took days now take hours. Authentication is configured in minutes. Switching backends is a single line change. UI flexibility means my admin panels don't look like generic templates.
+                </p>
+                <p class="mb-4">
+                    Best part: it stays out of your way. Not opinionated about UI. Choose your components, build your layouts. Refine handles the boring stuff - data fetching, routing, state management.
+                </p>
+                <p class="mb-4">
+                    If you're building admin panels, internal tools, or dashboards, give Refine a shot. Start with their example project. Build a simple CRUD app. See how fast it goes.
+                </p>
+                <p class="mb-4">
+                    Been using it for 6 months now. Built 5 admin panels. Each one faster than the last. Can't imagine going back to building from scratch.
+                </p>
+            </section>
+
+        </article>
+
+    </main>
+
+    <footer class="bg-gray-800 text-white py-12">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="grid md:grid-cols-3 gap-8 mb-8">
+                <div>
+                    <h3 class="font-bold text-lg mb-4">Programming Notes</h3>
+                    <p class="text-gray-400 text-sm">A collection of coding notes and tutorials from a full-stack developer.</p>
+                </div>
+                <div>
+                    <h3 class="font-bold text-lg mb-4">Quick Links</h3>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="index.html" class="hover:text-white">Home</a></li>
+                        <li><a href="about.html" class="hover:text-white">About</a></li>
+                        <li><a href="contact.html" class="hover:text-white">Contact</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-bold text-lg mb-4">Connect</h3>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="https://github.com" target="_blank" class="hover:text-white">GitHub</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 pt-8 text-center text-gray-400 text-sm">
+                <p>© 2026 Programming Notes. Built with simple HTML & Tailwind CSS.</p>
+                <p class="mt-2"><a href="privacy.html" class="hover:text-white">Privacy Policy</a></p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Prism.js for code highlighting -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-tsx.min.js"></script>
+
+</body>
+</html>

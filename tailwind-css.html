@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-LMWN7814BX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date);
+
+      gtag('config', 'G-LMWN7814BX');
+    </script>
+
+    <!-- SEO Meta Tags -->
+    <title>Tailwind CSS: Finally, Responsive Design That Doesn't Suck</title>
+    <meta name="description" content="Tried writing custom CSS for years. Tailwind CSS changed everything. Build responsive layouts fast, no custom CSS files, no naming headaches. Here's my complete guide.">
+    <meta name="keywords" content="Tailwind CSS, Tailwind layout tutorial, responsive design guide, utility-first CSS, CSS framework, mobile-first design, Tailwind grid, flexbox">
+    <link rel="canonical" href="https://pnt.jacbex.com/tailwind-css.html" />
+
+    <!-- Open Graph / Social Media -->
+    <meta property="og:title" content="Tailwind CSS: Responsive Design Made Simple">
+    <meta property="og:description" content="Build responsive layouts without writing custom CSS. Utility-first framework that actually speeds up development.">
+    <meta property="og:type" content="article">
+
+    <!-- Tailwind CSS for modern UI -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Code Highlighting (Prism.js) -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+
+    <!-- Structured Data (Schema.org) for Google -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "Tailwind CSS: Finally, Responsive Design That Doesn't Suck",
+      "description": "Guide to using Tailwind CSS for building responsive layouts with utility-first classes.",
+      "author": {
+        "@type": "Person",
+        "name": "Programming Notes"
+      },
+      "proficiencyLevel": "Beginner"
+    }
+    </script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+        .prose code { color: #eb5757; background: #f9f2f2; padding: 2px 4px; border-radius: 4px; }
+        .pattern-card { background: #f8fafc; border-left: 4px solid #0ea5e9; padding: 20px; margin: 16px 0; border-radius: 8px; }
+        .feature-box { background: linear-gradient(135deg, #0ea5e9 0%, #06b6d4 100%); color: white; padding: 24px; border-radius: 12px; margin: 24px 0; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+            <a href="index.html" class="text-xl font-bold text-blue-600">📝 <span class="text-gray-700">Programming Notes</span></a>
+            <div class="space-x-6 hidden md:block">
+                <a href="index.html" class="hover:text-blue-500">Home</a>
+                <a href="about.html" class="hover:text-blue-500">About</a>
+                <a href="contact.html" class="hover:text-blue-500">Contact</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="bg-gradient-to-r from-sky-600 to-cyan-700 text-white py-16">
+        <div class="max-w-4xl mx-auto px-4 text-center">
+            <h1 class="text-4xl md:text-5xl font-extrabold mb-4">Tailwind CSS: Finally, Responsive Design That Doesn't Suck</h1>
+            <p class="text-xl opacity-90">Tried writing custom CSS for years. Tailwind CSS changed everything. Build responsive layouts fast, no custom CSS files, no naming headaches. Here's my complete guide.</p>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto px-4 py-12 bg-white mt-[-40px] rounded-xl shadow-lg mb-20">
+
+        <article class="prose prose-blue max-w-none">
+
+            <section id="introduction">
+                <h2 class="text-3xl font-bold mb-4">Why I switched to Tailwind CSS</h2>
+                <p class="mb-4">
+                    Built websites for 8 years with vanilla CSS, Bootstrap, you name it. Every project ended up the same: thousands of lines of custom CSS, class names like <code>card-header-primary-button</code>, and responsive designs that broke on someone's phone.
+                </p>
+                <p class="mb-4">
+                    Hated it. Spent more time fighting CSS specificity than building features. Naming classes gave me anxiety. "Is this <code>btn</code> or <code>button</code> or <code>btn-primary</code>?" Don't get me started on BEM methodology.
+                </p>
+                <p class="mb-4">
+                    Then tried <a href="https://tailwindcss.com" class="text-blue-600 underline" target="_blank">Tailwind CSS</a>. Skeptical at first - utility classes felt weird. But after one project, I was hooked. No more custom CSS files. No more naming classes. Just HTML with class names that describe what stuff looks like.
+                </p>
+                <p class="mb-4">
+                    My layouts became responsive by default. Spacing was consistent. Design system emerged organically. Best part: the CSS file stayed tiny because unused styles get purged in production.
+                </p>
+
+                <div class="feature-box">
+                    <p class="font-bold text-xl mb-2">What Tailwind actually is</p>
+                    <p class="opacity-90">Utility-first CSS framework. Instead of writing custom CSS in separate files, you use pre-defined classes directly in HTML. <code class="bg-white/20 px-2 py-1 rounded">flex</code> for flexbox, <code class="bg-white/20 px-2 py-1 rounded">p-4</code> for padding, <code class="bg-white/20 px-2 py-1 rounded">text-center</code> for centered text. Build complex designs without writing CSS.</p>
+                </div>
+            </section>
+
+            <section id="installation">
+                <h2 class="text-3xl font-bold mb-4 mt-8">Installation and setup</h2>
+                <p class="mb-4">Quickest way to start with Tailwind CSS.</p>
+
+                <h3 class="text-2xl font-bold mb-3">Option 1: CDN (for prototyping)</h3>
+                <pre><code class="language-html">&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+  &lt;script src="https://cdn.tailwindcss.com"&gt;&lt;/script&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;h1 class="text-3xl font-bold text-blue-600"&gt;Hello Tailwind!&lt;/h1&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+
+                <p class="text-sm text-gray-600 mt-2">Fastest way to try Tailwind. Not recommended for production (large file size).</p>
+
+                <h3 class="text-2xl font-bold mb-3">Option 2: npm (for production)</h3>
+                <pre><code class="language-bash"># Create project
+mkdir my-tailwind-project
+cd my-tailwind-project
+npm init -y
+
+# Install Tailwind CSS
+npm install -D tailwindcss postcss autoprefixer
+npx tailwindcss init -p</code></pre>
+
+                <h3 class="text-2xl font-bold mb-3">Configure Tailwind</h3>
+                <pre><code class="language-javascript">/** @type {import('tailwindcss').Config} */
+module.exports = {
+  content: [
+    "./src/**/*.{html,js}",
+    "./public/**/*.html",
+  ],
+  theme: {
+    extend: {},
+  },
+  plugins: [],
+}</code></pre>
+
+                <h3 class="text-2xl font-bold mb-3">Add Tailwind directives</h3>
+                <pre><code class="language-css">/* src/input.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;</code></pre>
+
+                <h3 class="text-2xl font-bold mb-3">Build CSS</h3>
+                <pre><code class="language-bash"># Build CSS file
+npx tailwindcss -i ./src/input.css -o ./dist/output.css --watch
+
+# Or add to package.json scripts
+"scripts": {
+  "build": "tailwindcss -i ./src/input.css -o ./dist/output.css",
+  "watch": "tailwindcss -i ./src/input.css -o ./dist/output.css --watch"
+}</code></pre>
+            </section>
+
+            <section id="fundamentals">
+                <h2 class="text-3xl font-bold mb-4 mt-8">Fundamental concepts</h2>
+                <p class="mb-4">Tailwind basics you'll use every day.</p>
+
+                <h3 class="text-2xl font-bold mb-3">1. Spacing scale</h3>
+                <p class="mb-3">Tailwind uses a consistent spacing scale. Goodbye random numbers.</p>
+                <pre><code class="language-html">&lt;!-- Padding --&gt;
+&lt;div class="p-4"&gt;Padding: 1rem (16px)&lt;/div&gt;
+&lt;div class="px-6 py-2"&gt;Padding X: 1.5rem, Padding Y: 0.5rem&lt;/div&gt;
+
+&lt;!-- Margin --&gt;
+&lt;div class="m-4"&gt;Margin: 1rem&lt;/div&gt;
+&lt;div class="mt-8 mb-4"&gt;Margin Top: 2rem, Margin Bottom: 1rem&lt;/div&gt;
+
+&lt;!-- Scale reference --&gt;
+&lt;!-- 0: 0px, 1: 0.25rem (4px), 2: 0.5rem (8px), 3: 0.75rem (12px)
+     4: 1rem (16px), 5: 1.25rem (20px), 6: 1.5rem (24px), 8: 2rem (32px) --&gt;</code></pre>
+
+                <h3 class="text-2xl font-bold mb-3">2. Flexbox layouts</h3>
+                <pre><code class="language-html">&lt;!-- Horizontal centering --&gt;
+&lt;div class="flex justify-center"&gt;
+  &lt;span&gt;Centered&lt;/span&gt;
+&lt;/div&gt;
+
+&lt;!-- Space between items --&gt;
+&lt;div class="flex justify-between items-center p-4"&gt;
+  &lt;span&gt;Left&lt;/span&gt;
+  &lt;span&gt;Right&lt;/span&gt;
+&lt;/div&gt;
+
+&lt;!-- Column layout --&gt;
+&lt;div class="flex flex-col gap-4"&gt;
+  &lt;div&gt;Item 1&lt;/div&gt;
+  &lt;div&gt;Item 2&lt;/div&gt;
+  &lt;div&gt;Item 3&lt;/div&gt;
+&lt;/div&gt;</code></pre>
+
+                <h3 class="text-2xl font-bold mb-3">3. Grid layouts</h3>
+                <pre><code class="language-html">&lt;!-- 3 column grid --&gt;
+&lt;div class="grid grid-cols-3 gap-4"&gt;
+  &lt;div&gt;Column 1&lt;/div&gt;
+  &lt;div&gt;Column 2&lt;/div&gt;
+  &lt;div&gt;Column 3&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;!-- Responsive grid --&gt;
+&lt;div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"&gt;
+  &lt;!-- 1 column on mobile, 2 on tablet, 3 on desktop --&gt;
+  &lt;div&gt;Responsive&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;!-- Grid with spanning --&gt;
+&lt;div class="grid grid-cols-4 gap-4"&gt;
+  &lt;div class="col-span-2"&gt;Spans 2 columns&lt;/div&gt;
+  &lt;div class="col-span-1"&gt;1 column&lt;/div&gt;
+  &lt;div class="col-span-1"&gt;1 column&lt;/div&gt;
+&lt;/div&gt;</code></pre>
+
+                <h3 class="text-2xl font-bold mb-3">4. Colors and typography</h3>
+                <pre><code class="language-html">&lt;!-- Colors --&gt;
+&lt;div class="bg-blue-500 text-white"&gt;Blue background, white text&lt;/div&gt;
+&lt;div class="bg-red-100 border border-red-500"&gt;Light red bg, red border&lt;/div&gt;
+
+&lt;!-- Typography --&gt;
+&lt;h1 class="text-4xl font-bold"&gt;Large bold heading&lt;/h1&gt;
+&lt;p class="text-lg text-gray-600"&gt;Large text, gray color&lt;/p&gt;
+&lt;p class="text-sm font-light"&gt;Small light text&lt;/p&gt;
+
+&lt;!-- Text alignment --&gt;
+&lt;p class="text-center"&gt;Centered text&lt;/p&gt;
+&lt;p class="text-right"&gt;Right-aligned text&lt;/p&gt;</code></pre>
+            </section>
+
+            <section id="responsive">
+                <h2 class="text-3xl font-bold mb-4 mt-8">Responsive design made easy</h2>
+                <p class="mb-4">This is where Tailwind shines. Mobile-first responsive design.</p>
+
+                <h3 class="text-2xl font-bold mb-3">Breakpoint system</h3>
+                <p class="mb-3">Tailwind uses mobile-first breakpoints.</p>
+                <pre><code class="language-bash">sm: 640px   # Small tablets
+md: 768px   # Tablets
+lg: 1024px  # Laptops
+xl: 1280px  # Desktops
+2xl: 1536px # Large screens</code></pre>
+
+                <div class="pattern-card">
+                    <h3 class="text-xl font-bold mb-2">Pattern 1: Responsive grid</h3>
+                    <p class="mb-3">Grid that adapts to screen size automatically.</p>
+                    <pre><code class="language-html">&lt;div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"&gt;
+  &lt;!-- Mobile: 1 column, Tablet: 2 columns, Desktop: 4 columns --&gt;
+  &lt;div class="bg-white p-6 rounded-lg shadow"&gt;Card 1&lt;/div&gt;
+  &lt;div class="bg-white p-6 rounded-lg shadow"&gt;Card 2&lt;/div&gt;
+  &lt;div class="bg-white p-6 rounded-lg shadow"&gt;Card 3&lt;/div&gt;
+  &lt;div class="bg-white p-6 rounded-lg shadow"&gt;Card 4&lt;/div&gt;
+&lt;/div&gt;</code></pre>
+                </div>
+
+                <div class="pattern-card">
+                    <h3 class="text-xl font-bold mb-2">Pattern 2: Responsive navigation</h3>
+                    <p class="mb-3">Hamburger menu on mobile, full menu on desktop.</p>
+                    <pre><code class="language-html">&lt;nav class="flex justify-between items-center p-4"&gt;
+  &lt;div class="text-xl font-bold"&gt;Logo&lt;/div&gt;
+
+  &lt;!-- Mobile: hidden, Desktop: visible --&gt;
+  &lt;div class="hidden md:flex space-x-4"&gt;
+    &lt;a href="#" class="hover:text-blue-600"&gt;Home&lt;/a&gt;
+    &lt;a href="#" class="hover:text-blue-600"&gt;About&lt;/a&gt;
+    &lt;a href="#" class="hover:text-blue-600"&gt;Contact&lt;/a&gt;
+  &lt;/div&gt;
+
+  &lt;!-- Mobile: visible, Desktop: hidden --&gt;
+  &lt;button class="md:hidden"&gt;☰&lt;/button&gt;
+&lt;/nav&gt;</code></pre>
+                </div>
+
+                <div class="pattern-card">
+                    <h3 class="text-xl font-bold mb-2">Pattern 3: Responsive spacing</h3>
+                    <p class="mb-3">More padding on larger screens.</p>
+                    <pre><code class="language-html">&lt;div class="p-4 md:p-8 lg:p-12"&gt;
+  &lt;h1 class="text-2xl md:text-4xl"&gt;
+    Larger padding and text on desktop
+  &lt;/h1&gt;
+&lt;/div&gt;
+
+&lt;!-- Different spacing on mobile vs desktop --&gt;
+&lt;section class="px-4 py-8 md:px-8 md:py-16"&gt;
+  Content
+&lt;/section&gt;</code></pre>
+                </div>
+
+                <div class="pattern-card">
+                    <h3 class="text-xl font-bold mb-2">Pattern 4: Hidden elements</h3>
+                    <p class="mb-3">Show/hide content based on screen size.</p>
+                    <pre><code class="language-html">&lt;!-- Only show on mobile --&gt;
+&lt;div class="block md:hidden"&gt;
+  Mobile-only content
+&lt;/div&gt;
+
+&lt;!-- Only show on desktop --&gt;
+&lt;div class="hidden md:block"&gt;
+  Desktop-only content
+&lt;/div&gt;
+
+&lt;!-- Hide on small screens, show on large --&gt;
+&lt;div class="hidden lg:block"&gt;
+  Large screens only
+&lt;/div&gt;</code></pre>
+                </div>
+            </section>
+
+            <section id="layouts">
+                <h2 class="text-3xl font-bold mb-4 mt-8">Common layout patterns</h2>
+                <p class="mb-4">Real layouts I use in every project.</p>
+
+                <h3 class="text-2xl font-bold mb-3">1. Card layout</h3>
+                <pre><code class="language-html">&lt;div class="max-w-md mx-auto bg-white rounded-xl shadow-md overflow-hidden"&gt;
+  &lt;img src="image.jpg" alt="Card image" class="w-full h-48 object-cover"&gt;
+  &lt;div class="p-6"&gt;
+    &lt;h2 class="text-2xl font-bold mb-2"&gt;Card Title&lt;/h2&gt;
+    &lt;p class="text-gray-600 mb-4"&gt;Card description goes here.&lt;/p&gt;
+    &lt;button class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"&gt;
+      Action
+    &lt;/button&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</code></pre>
+
+                <h3 class="text-2xl font-bold mb-3">2. Hero section</h3>
+                <pre><code class="language-html">&lt;section class="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-20"&gt;
+  &lt;div class="container mx-auto px-4 text-center"&gt;
+    &lt;h1 class="text-4xl md:text-6xl font-bold mb-6"&gt;
+      Hero Title
+    &lt;/h1&gt;
+    &lt;p class="text-xl md:text-2xl mb-8 opacity-90"&gt;
+      Hero description text
+    &lt;/p&gt;
+    &lt;div class="flex flex-col md:flex-row gap-4 justify-center"&gt;
+      &lt;button class="bg-white text-blue-600 px-8 py-3 rounded-lg font-bold"&gt;
+        Primary CTA
+      &lt;/button&gt;
+      &lt;button class="border-2 border-white px-8 py-3 rounded-lg font-bold"&gt;
+        Secondary CTA
+      &lt;/button&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/section&gt;</code></pre>
+
+                <h3 class="text-2xl font-bold mb-3">3. Dashboard layout</h3>
+                <pre><code class="language-html">&lt;div class="flex min-h-screen"&gt;
+  &lt;!-- Sidebar --&gt;
+  &lt;aside class="w-64 bg-gray-800 text-white hidden md:block"&gt;
+    &lt;div class="p-4"&gt;
+      &lt;h2 class="text-xl font-bold"&gt;Dashboard&lt;/h2&gt;
+    &lt;/div&gt;
+    &lt;nav class="mt-8"&gt;
+      &lt;a href="#" class="block px-4 py-2 hover:bg-gray-700"&gt;Overview&lt;/a&gt;
+      &lt;a href="#" class="block px-4 py-2 hover:bg-gray-700"&gt;Analytics&lt;/a&gt;
+      &lt;a href="#" class="block px-4 py-2 hover:bg-gray-700"&gt;Settings&lt;/a&gt;
+    &lt;/nav&gt;
+  &lt;/aside&gt;
+
+  &lt;!-- Main content --&gt;
+  &lt;main class="flex-1 bg-gray-100"&gt;
+    &lt;header class="bg-white shadow p-4"&gt;
+      &lt;h1 class="text-2xl font-bold"&gt;Page Title&lt;/h1&gt;
+    &lt;/header&gt;
+    &lt;div class="p-6"&gt;
+      Content goes here
+    &lt;/div&gt;
+  &lt;/main&gt;
+&lt;/div&gt;</code></pre>
+
+                <h3 class="text-2xl font-bold mb-3">4. Feature grid</h3>
+                <pre><code class="language-html">&lt;section class="py-16"&gt;
+  &lt;div class="container mx-auto px-4"&gt;
+    &lt;h2 class="text-3xl font-bold text-center mb-12"&gt;Features&lt;/h2&gt;
+
+    &lt;div class="grid grid-cols-1 md:grid-cols-3 gap-8"&gt;
+      &lt;!-- Feature 1 --&gt;
+      &lt;div class="text-center"&gt;
+        &lt;div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4"&gt;
+          &lt;span class="text-2xl"&gt;🚀&lt;/span&gt;
+        &lt;/div&gt;
+        &lt;h3 class="text-xl font-bold mb-2"&gt;Feature 1&lt;/h3&gt;
+        &lt;p class="text-gray-600"&gt;Description of feature 1&lt;/p&gt;
+      &lt;/div&gt;
+
+      &lt;!-- Feature 2 --&gt;
+      &lt;div class="text-center"&gt;
+        &lt;div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4"&gt;
+          &lt;span class="text-2xl"&gt;⚡&lt;/span&gt;
+        &lt;/div&gt;
+        &lt;h3 class="text-xl font-bold mb-2"&gt;Feature 2&lt;/h3&gt;
+        &lt;p class="text-gray-600"&gt;Description of feature 2&lt;/p&gt;
+      &lt;/div&gt;
+
+      &lt;!-- Feature 3 --&gt;
+      &lt;div class="text-center"&gt;
+        &lt;div class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4"&gt;
+          &lt;span class="text-2xl"&gt;🎯&lt;/span&gt;
+        &lt;/div&gt;
+        &lt;h3 class="text-xl font-bold mb-2"&gt;Feature 3&lt;/h3&gt;
+        &lt;p class="text-gray-600"&gt;Description of feature 3&lt;/p&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/section&gt;</code></pre>
+            </section>
+
+            <section id="components">
+                <h2 class="text-3xl font-bold mb-4 mt-8">Building components</h2>
+                <p class="mb-4">Reusable UI components with Tailwind.</p>
+
+                <h3 class="text-2xl font-bold mb-3">Button component</h3>
+                <pre><code class="language-html">&lt;!-- Primary button --&gt;
+&lt;button class="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 transition"&gt;
+  Primary
+&lt;/button&gt;
+
+&lt;!-- Secondary button --&gt;
+&lt;button class="bg-gray-200 text-gray-800 px-6 py-2 rounded-lg hover:bg-gray-300 transition"&gt;
+  Secondary
+&lt;/button&gt;
+
+&lt;!-- Outline button --&gt;
+&lt;button class="border-2 border-blue-500 text-blue-500 px-6 py-2 rounded-lg hover:bg-blue-50 transition"&gt;
+  Outline
+&lt;/button&gt;
+
+&lt;!-- Full width button --&gt;
+&lt;button class="w-full bg-blue-500 text-white py-3 rounded-lg hover:bg-blue-600 transition"&gt;
+  Full Width
+&lt;/button&gt;</code></pre>
+
+                <h3 class="text-2xl font-bold mb-3">Form inputs</h3>
+                <pre><code class="language-html">&lt;form class="max-w-md mx-auto space-y-4"&gt;
+  &lt;div&gt;
+    &lt;label class="block text-sm font-medium mb-2"&gt;Email&lt;/label&gt;
+    &lt;input
+      type="email"
+      class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+      placeholder="you@example.com"
+    &gt;
+  &lt;/div&gt;
+
+  &lt;div&gt;
+    &lt;label class="block text-sm font-medium mb-2"&gt;Message&lt;/label&gt;
+    &lt;textarea
+      class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+      rows="4"
+      placeholder="Your message"
+    &gt;&lt;/textarea&gt;
+  &lt;/div&gt;
+
+  &lt;button
+    type="submit"
+    class="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition"
+  &gt;
+    Submit
+  &lt;/button&gt;
+&lt;/form&gt;</code></pre>
+            </section>
+
+            <section id="customization">
+                <h2 class="text-3xl font-bold mb-4 mt-8">Customization and theming</h2>
+                <p class="mb-4">Tailwind is highly customizable. Don't fight defaults.</p>
+
+                <h3 class="text-2xl font-bold mb-3">Custom colors</h3>
+                <pre><code class="language-javascript">// tailwind.config.js
+module.exports = {
+  theme: {
+    extend: {
+      colors: {
+        brand: {
+          50: '#f0f9ff',
+          100: '#e0f2fe',
+          500: '#0ea5e9',
+          600: '#0284c7',
+          900: '#0c4a6e',
+        }
+      }
+    }
+  }
+}
+
+// Use in HTML
+&lt;div class="bg-brand-500 text-white"&gt;Custom brand color&lt;/div&gt;</code></pre>
+
+                <h3 class="text-2xl font-bold mb-3">Custom spacing</h3>
+                <pre><code class="language-javascript">// tailwind.config.js
+module.exports = {
+  theme: {
+    extend: {
+      spacing: {
+        '128': '32rem',
+        '144': '36rem',
+      }
+    }
+  }
+}
+
+// Use in HTML
+&lt;div class="p-128"&gt;Custom padding&lt;/div&gt;</code></pre>
+
+                <h3 class="text-2xl font-bold mb-3">Custom breakpoints</h3>
+                <pre><code class="language-javascript">// tailwind.config.js
+module.exports = {
+  theme: {
+    extend: {
+      screens: {
+        '3xl': '1600px',
+      }
+    }
+  }
+}
+
+// Use in HTML
+&lt;div class="3xl:text-6xl"&gt;Extra large text&lt;/div&gt;</code></pre>
+            </section>
+
+            <section id="performance">
+                <h2 class="text-3xl font-bold mb-4 mt-8">Performance best practices</h2>
+                <p class="mb-4">Keep your CSS bundle small.</p>
+
+                <h3 class="text-2xl font-bold mb-3">1. Purge unused styles</h3>
+                <pre><code class="language-javascript">// tailwind.config.js
+module.exports = {
+  content: [
+    "./src/**/*.{html,js}",
+    "./public/**/*.html",
+  ],
+  // Tailwind automatically scans these files and removes unused CSS
+}</code></pre>
+
+                <h3 class="text-2xl font-bold mb-3">2. Avoid dynamic class names</h3>
+                <pre><code class="language-html">&lt;!-- Bad: Tailwind can't detect these --&gt;
+&lt;div class="bg-{{ color }}-500"&gt;&lt;/div&gt;
+
+&lt;!-- Good: Use complete classes --&gt;
+&lt;div class="bg-blue-500"&gt;&lt;/div&gt;
+&lt;div class="bg-red-500"&gt;&lt;/div&gt;</code></pre>
+
+                <h3 class="text-2xl font-bold mb-3">3. Use JIT mode</h3>
+                <pre><code class="language-javascript">// tailwind.config.js
+module.exports = {
+  mode: 'jit',
+  // Generates styles on-demand, smaller bundles
+}</code></pre>
+            </section>
+
+            <section id="comparison">
+                <h2 class="text-3xl font-bold mb-4 mt-8">Tailwind vs other approaches</h2>
+                <p class="mb-4">Quick comparison.</p>
+
+                <div class="overflow-x-auto">
+                    <table class="min-w-full border-collapse border border-gray-300 mb-6">
+                        <thead>
+                            <tr class="bg-gray-100">
+                                <th class="border border-gray-300 px-4 py-2 text-left">Aspect</th>
+                                <th class="border border-gray-300 px-4 py-2 text-left">Tailwind CSS</th>
+                                <th class="border border-gray-300 px-4 py-2 text-left">Vanilla CSS</th>
+                                <th class="border border-gray-300 px-4 py-2 text-left">Bootstrap</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="border border-gray-300 px-4 py-2">Learning curve</td>
+                                <td class="border border-gray-300 px-4 py-2">Moderate</td>
+                                <td class="border border-gray-300 px-4 py-2">Low</td>
+                                <td class="border border-gray-300 px-4 py-2">Low</td>
+                            </tr>
+                            <tr>
+                                <td class="border border-gray-300 px-4 py-2">Development speed</td>
+                                <td class="border border-gray-300 px-4 py-2">Fast</td>
+                                <td class="border border-gray-300 px-4 py-2">Slow</td>
+                                <td class="border border-gray-300 px-4 py-2">Fast</td>
+                            </tr>
+                            <tr>
+                                <td class="border border-gray-300 px-4 py-2">Bundle size</td>
+                                <td class="border border-gray-300 px-4 py-2">Small (purged)</td>
+                                <td class="border border-gray-300 px-4 py-2">Depends</td>
+                                <td class="border border-gray-300 px-4 py-2">Medium</td>
+                            </tr>
+                            <tr>
+                                <td class="border border-gray-300 px-4 py-2">Customization</td>
+                                <td class="border border-gray-300 px-4 py-2">High</td>
+                                <td class="border border-gray-300 px-4 py-2">Unlimited</td>
+                                <td class="border border-gray-300 px-4 py-2">Moderate</td>
+                            </tr>
+                            <tr>
+                                <td class="border border-gray-300 px-4 py-2">Consistency</td>
+                                <td class="border border-gray-300 px-4 py-2">High</td>
+                                <td class="border border-gray-300 px-4 py-2">Low</td>
+                                <td class="border border-gray-300 px-4 py-2">High</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="troubleshooting">
+                <h2 class="text-3xl font-bold mb-4 mt-8">Common issues and fixes</h2>
+                <p class="mb-4">Stuff that breaks and how to fix it.</p>
+
+                <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-4">
+                    <p class="font-bold">Issue: Styles not applying</p>
+                    <p class="text-sm mt-2"><strong>Fix:</strong> Make sure you imported Tailwind directives in your CSS. Check that <code>content</code> paths in <code>tailwind.config.js</code> include your HTML files. Try rebuilding CSS.</p>
+                </div>
+
+                <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-4">
+                    <p class="font-bold">Issue: Responsive classes not working</p>
+                    <p class="text-sm mt-2"><strong>Fix:</strong> Remember mobile-first approach. Base classes apply to all screens, breakpoint classes apply to that size and up. Don't use <code>max-width</code> media queries mentally.</p>
+                </div>
+
+                <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-4">
+                    <p class="font-bold">Issue: Large CSS file in production</p>
+                    <p class="text-sm mt-2"><strong>Fix:</strong> Enable JIT mode or configure purge correctly. Check that <code>content</code> paths are correct. Run build command with <code>--minify</code> flag.</p>
+                </div>
+
+                <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-4">
+                    <p class="font-bold">Issue: Custom config not working</p>
+                    <p class="text-sm mt-2"><strong>Fix:</strong> Restart dev server after editing <code>tailwind.config.js</code>. Clear build cache. Ensure syntax is valid JavaScript.</p>
+                </div>
+            </section>
+
+            <section id="tips">
+                <h2 class="text-3xl font-bold mb-4 mt-8">Tips for faster development</h2>
+                <p class="mb-4">Hard-earned lessons.</p>
+
+                <h3 class="text-2xl font-bold mb-3">1. Learn the spacing scale</h3>
+                <p class="mb-3">Memorize 4, 8, 12, 16. You'll use them constantly. <code>gap-4</code>, <code>p-8</code>, <code>m-12</code>.</p>
+
+                <h3 class="text-2xl font-bold mb-3">2. Use VS Code extension</h3>
+                <p class="mb-3">Install "Tailwind CSS IntelliSense". Autocomplete, class descriptions, preview on hover. Game changer.</p>
+
+                <h3 class="text-2xl font-bold mb-3">3. Create reusable components</h3>
+                <p class="mb-3">Don't repeat classes. Create React components or partials with common Tailwind patterns.</p>
+
+                <h3 class="text-2xl font-bold mb-3">4. Use arbitrary values sparingly</h3>
+                <p class="mb-3"><code>w-[500px]</code> is fine for one-offs. But prefer scale values for consistency.</p>
+
+                <h3 class="text-2xl font-bold mb-3">5. Mobile-first mindset</h3>
+                <p class="mb-3">Start with mobile layout. Add <code>md:</code>, <code>lg:</code> breakpoints later. Prevents desktop-first thinking.</p>
+
+                <h3 class="text-2xl font-bold mb-3">6. Read the docs</h3>
+                <p class="mb-3">Tailwind docs are excellent. Bookmark the search page. You'll discover utilities you didn't know existed.</p>
+            </section>
+
+            <section id="conclusion">
+                <h2 class="text-3xl font-bold mb-4 mt-8">Bottom line</h2>
+                <p class="mb-4">
+                    Tailwind CSS isn't magic. It's just a different approach to writing CSS. But that approach saves me hours every week.
+                </p>
+                <p class="mb-4">
+                    No more CSS files to maintain. No more naming classes. No more fighting specificity. Just HTML that describes what stuff looks like.
+                </p>
+                <p class="mb-4">
+                    Responsive design became trivial. Design systems emerged naturally. My CSS bundles stayed small because unused styles get purged automatically.
+                </p>
+                <p class="mb-4">
+                    Give it a shot on your next project. Start with CDN to try it out. If it clicks, switch to npm for production. Worst case: you learn a new tool. Best case: you never write custom CSS again.
+                </p>
+            </section>
+
+        </article>
+
+    </main>
+
+    <footer class="bg-gray-800 text-white py-12">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="grid md:grid-cols-3 gap-8 mb-8">
+                <div>
+                    <h3 class="font-bold text-lg mb-4">Programming Notes</h3>
+                    <p class="text-gray-400 text-sm">A collection of coding notes and tutorials from a full-stack developer.</p>
+                </div>
+                <div>
+                    <h3 class="font-bold text-lg mb-4">Quick Links</h3>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="index.html" class="hover:text-white">Home</a></li>
+                        <li><a href="about.html" class="hover:text-white">About</a></li>
+                        <li><a href="contact.html" class="hover:text-white">Contact</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-bold text-lg mb-4">Connect</h3>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="https://github.com" target="_blank" class="hover:text-white">GitHub</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 pt-8 text-center text-gray-400 text-sm">
+                <p>© 2026 Programming Notes. Built with simple HTML & Tailwind CSS.</p>
+                <p class="mt-2"><a href="privacy.html" class="hover:text-white">Privacy Policy</a></p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Prism.js for code highlighting -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-html.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-css.min.js"></script>
+
+</body>
+</html>

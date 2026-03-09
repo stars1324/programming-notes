@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-LMWN7814BX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date);
+
+      gtag('config', 'G-LMWN7814BX');
+    </script>
+
+    <!-- SEO Meta Tags -->
+    <title>Tiptap: Finally Built a Rich Text Editor That Doesn't Suck</title>
+    <meta name="description" content="Tried every rich text editor out there. Tiptap is different - headless, customizable, React-friendly. Built a custom editor in a day. Here's my complete guide.">
+    <meta name="keywords" content="Tiptap, rich text editor React, Tiptap customization, WYSIWYG editor, ProseMirror, React editor, markdown editor, collaborative editing">
+    <link rel="canonical" href="https://pnt.jacbex.com/tiptap.html" />
+
+    <!-- Open Graph / Social Media -->
+    <meta property="og:title" content="Tiptap: Headless Rich Text Editor for React">
+    <meta property="og:description" content="Build custom rich text editors with Tiptap. Headless, extensible, React-friendly framework based on ProseMirror.">
+    <meta property="og:type" content="article">
+
+    <!-- Tailwind CSS for modern UI -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Code Highlighting (Prism.js) -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+
+    <!-- Structured Data (Schema.org) for Google -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "Tiptap: Finally Built a Rich Text Editor That Doesn't Suck",
+      "description": "Guide to building custom rich text editors with Tiptap framework for React.",
+      "author": {
+        "@type": "Person",
+        "name": "Programming Notes"
+      },
+      "proficiencyLevel": "Intermediate"
+    }
+    </script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+        .prose code { color: #eb5757; background: #f9f2f2; padding: 2px 4px; border-radius: 4px; }
+        .extension-card { background: #f8fafc; border-left: 4px solid #8b5cf6; padding: 20px; margin: 16px 0; border-radius: 8px; }
+        .feature-box { background: linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%); color: white; padding: 24px; border-radius: 12px; margin: 24px 0; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+            <a href="index.html" class="text-xl font-bold text-blue-600">📝 <span class="text-gray-700">Programming Notes</span></a>
+            <div class="space-x-6 hidden md:block">
+                <a href="index.html" class="hover:text-blue-500">Home</a>
+                <a href="about.html" class="hover:text-blue-500">About</a>
+                <a href="contact.html" class="hover:text-blue-500">Contact</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="bg-gradient-to-r from-violet-600 to-purple-700 text-white py-16">
+        <div class="max-w-4xl mx-auto px-4 text-center">
+            <h1 class="text-4xl md:text-5xl font-extrabold mb-4">Tiptap: Finally Built a Rich Text Editor That Doesn't Suck</h1>
+            <p class="text-xl opacity-90">Tried every rich text editor out there. Tiptap is different - headless, customizable, React-friendly. Built a custom editor in a day. Here's my complete guide.</p>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto px-4 py-12 bg-white mt-[-40px] rounded-xl shadow-lg mb-20">
+
+        <article class="prose prose-blue max-w-none">
+
+            <section id="introduction">
+                <h2 class="text-3xl font-bold mb-4">Why I switched to Tiptap</h2>
+                <p class="mb-4">
+                    Built content editors with everything over the years. Quill, Draft.js, Slate.js, even CKEditor. Every time, same story: either too limited, impossible to customize, or abandoned by maintainers.
+                </p>
+                <p class="mb-4">
+                    Quill was easy but customization was a nightmare. Want a custom toolbar button? Fight the source. Draft.js gave me nightmares with immutable state. Slate was powerful but required building everything from scratch.
+                </p>
+                <p class="mb-4">
+                    Then found <a href="https://tiptap.dev" class="text-blue-600 underline" target="_blank">Tiptap</a>. Headless editor framework built on ProseMirror (battle-tested document model). Zero opinions about UI, but gives you powerful APIs to build whatever you want.
+                </p>
+                <p class="mb-4">
+                    Built a custom markdown editor with slash commands, collaboration, and custom extensions in a day. Would've taken a week with anything else.
+                </p>
+
+                <div class="feature-box">
+                    <p class="font-bold text-xl mb-2">What makes Tiptap different</p>
+                    <p class="opacity-90">Headless means no default UI. You build the toolbar, menus, buttons - total control. Based on ProseMirror (same tech behind Notion, GitHub). React-specific package with hooks. Extensions system lets you add features modularly. Supports markdown out of the box, real-time collaboration, and everything in between.</p>
+                </div>
+            </section>
+
+            <section id="installation">
+                <h2 class="text-3xl font-bold mb-4 mt-8">Installation and setup</h2>
+                <p class="mb-4">Get Tiptap running in minutes.</p>
+
+                <h3 class="text-2xl font-bold mb-3">Install packages</h3>
+                <pre><code class="language-bash"># Core package
+npm install @tiptap/react @tiptap/starter-kit
+
+# Optional extensions
+npm install @tiptap/extension-placeholder
+npm install @tiptap/extension-link
+npm install @tiptap/extension-image
+npm install @tiptap/extension-code-block-lowlight
+npm install lowlight # for syntax highlighting</code></pre>
+
+                <h3 class="text-2xl font-bold mb-3">Basic editor component</h3>
+                <pre><code class="language-tsx">import { useEditor, EditorContent } from '@tiptap/react'
+import StarterKit from '@tiptap/starter-kit'
+
+function Editor() {
+  const editor = useEditor({
+    extensions: [StarterKit],
+    content: '<p>Hello World!</p>',
+  })
+
+  if (!editor) {
+    return null
+  }
+
+  return (
+    <div>
+      <EditorContent editor={editor} />
+    </div>
+  )
+}</code></pre>
+
+                <h3 class="text-2xl font-bold mb-3">Add basic styling</h3>
+                <pre><code class="language-css">/* Basic editor styles */
+.ProseMirror {
+  outline: none;
+  padding: 1rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+  min-height: 200px;
+}
+
+.ProseMirror p {
+  margin-bottom: 0.5rem;
+}
+
+.ProseMirror h1 {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin: 1rem 0 0.5rem;
+}
+
+.ProseMirror ul,
+.ProseMirror ol {
+  padding-left: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.ProseMirror code {
+  background: #f3f4f6;
+  padding: 0.2rem 0.4rem;
+  border-radius: 0.25rem;
+  font-family: monospace;
+}
+
+.ProseMirror pre {
+  background: #1f2937;
+  color: #f9fafb;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  overflow-x: auto;
+}
+
+.ProseMirror blockquote {
+  border-left: 4px solid #8b5cf6;
+  padding-left: 1rem;
+  font-style: italic;
+}</code></pre>
+            </section>
+
+            <section id="toolbar">
+                <h2 class="text-3xl font-bold mb-4 mt-8">Building a toolbar</h2>
+                <p class="mb-4">Tiptap is headless, so you build the UI. Here's a practical toolbar.</p>
+
+                <pre><code class="language-tsx">import { useEditor, EditorContent } from '@tiptap/react'
+import StarterKit from '@tiptap/starter-kit'
+import {
+  FaBold,
+  FaItalic,
+  FaStrikethrough,
+  FaCode,
+  FaHeading,
+  FaListUl,
+  FaListOl,
+  FaQuoteLeft,
+  FaUndo,
+  FaRedo,
+} from 'react-icons/fa'
+
+function RichTextEditor() {
+  const editor = useEditor({
+    extensions: [StarterKit],
+    content: '<p>Start writing...</p>',
+  })
+
+  if (!editor) return null
+
+  const ToolbarButton = ({
+    onClick,
+    isActive,
+    children,
+  }: {
+    onClick: () => void
+    isActive?: boolean
+    children: React.ReactNode
+  }) => (
+    <button
+      onClick={onClick}
+      className={`p-2 rounded hover:bg-gray-100 ${
+        isActive ? 'bg-purple-100 text-purple-700' : ''
+      }`}
+    >
+      {children}
+    </button>
+  )
+
+  return (
+    <div className="border rounded-lg overflow-hidden">
+      {/* Toolbar */}
+      <div className="border-b p-2 flex flex-wrap gap-1">
+        <ToolbarButton
+          onClick={() => editor.chain().focus().toggleBold().run()}
+          isActive={editor.isActive('bold')}
+        >
+          <FaBold />
+        </ToolbarButton>
+
+        <ToolbarButton
+          onClick={() => editor.chain().focus().toggleItalic().run()}
+          isActive={editor.isActive('italic')}
+        >
+          <FaItalic />
+        </ToolbarButton>
+
+        <ToolbarButton
+          onClick={() => editor.chain().focus().toggleStrike().run()}
+          isActive={editor.isActive('strike')}
+        >
+          <FaStrikethrough />
+        </ToolbarButton>
+
+        <ToolbarButton
+          onClick={() => editor.chain().focus().toggleCode().run()}
+          isActive={editor.isActive('code')}
+        >
+          <FaCode />
+        </ToolbarButton>
+
+        <div className="w-px bg-gray-300 mx-1" />
+
+        <ToolbarButton
+          onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
+          isActive={editor.isActive('heading', { level: 1 })}
+        >
+          <FaHeading />1
+        </ToolbarButton>
+
+        <ToolbarButton
+          onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
+          isActive={editor.isActive('heading', { level: 2 })}
+        >
+          <FaHeading />2
+        </ToolbarButton>
+
+        <div className="w-px bg-gray-300 mx-1" />
+
+        <ToolbarButton
+          onClick={() => editor.chain().focus().toggleBulletList().run()}
+          isActive={editor.isActive('bulletList')}
+        >
+          <FaListUl />
+        </ToolbarButton>
+
+        <ToolbarButton
+          onClick={() => editor.chain().focus().toggleOrderedList().run()}
+          isActive={editor.isActive('orderedList')}
+        >
+          <FaListOl />
+        </ToolbarButton>
+
+        <ToolbarButton
+          onClick={() => editor.chain().focus().toggleBlockquote().run()}
+          isActive={editor.isActive('blockquote')}
+        >
+          <FaQuoteLeft />
+        </ToolbarButton>
+
+        <div className="w-px bg-gray-300 mx-1" />
+
+        <ToolbarButton
+          onClick={() => editor.chain().focus().undo().run()}
+          disabled={!editor.can().undo()}
+        >
+          <FaUndo />
+        </ToolbarButton>
+
+        <ToolbarButton
+          onClick={() => editor.chain().focus().redo().run()}
+          disabled={!editor.can().redo()}
+        >
+          <FaRedo />
+        </ToolbarButton>
+      </div>
+
+      {/* Editor */}
+      <EditorContent editor={editor} />
+
+      {/* Character count */}
+      <div className="border-t p-2 text-sm text-gray-500">
+        {editor.storage.characterCount?.characters() || 0} characters
+      </div>
+    </div>
+  )
+}</code></pre>
+            </section>
+
+            <section id="extensions">
+                <h2 class="text-3xl font-bold mb-4 mt-8">Essential extensions</h2>
+                <p class="mb-4">Extensions make Tiptap powerful. Here's what I use in production.</p>
+
+                <div class="extension-card">
+                    <h3 class="text-xl font-bold mb-2">1. Placeholder</h3>
+                    <p class="mb-3">Shows placeholder text when editor is empty.</p>
+                    <pre><code class="language-tsx">import Placeholder from '@tiptap/extension-placeholder'
+
+const editor = useEditor({
+  extensions: [
+    StarterKit,
+    Placeholder.configure({
+      placeholder: 'Write something awesome...',
+    }),
+  ],
+})</code></pre>
+                    <p class="text-sm text-gray-600">CSS to style placeholder: <code>.ProseMirror p.is-empty::before { content: attr(data-placeholder); color: #9ca3af; }</code></p>
+                </div>
+
+                <div class="extension-card">
+                    <h3 class="text-xl font-bold mb-2">2. Link</h3>
+                    <p class="mb-3">Add and edit links with auto-detection.</p>
+                    <pre><code class="language-tsx">import Link from '@tiptap/extension-link'
+
+const editor = useEditor({
+  extensions: [
+    StarterKit,
+    Link.configure({
+      openOnClick: false,
+      HTMLAttributes: {
+        class: 'text-blue-600 underline',
+      },
+    }),
+  ],
+})
+
+// Add link programmatically
+editor.chain().focus().setLink({ href: 'https://example.com' }).run()
+
+// Remove link
+editor.chain().focus().unsetLink().run()</code></pre>
+                </div>
+
+                <div class="extension-card">
+                    <h3 class="text-xl font-bold mb-2">3. Image</h3>
+                    <p class="mb-3">Insert images with drag-and-drop support.</p>
+                    <pre><code class="language-tsx">import Image from '@tiptap/extension-image'
+
+const editor = useEditor({
+  extensions: [
+    StarterKit,
+    Image.configure({
+      inline: true,
+      allowBase64: true,
+      HTMLAttributes: {
+        class: 'rounded-lg max-w-full',
+      },
+    }),
+  ],
+})
+
+// Add image
+editor.chain().focus().setImage({ src: 'https://example.com/image.jpg' }).run()</code></pre>
+                </div>
+
+                <div class="extension-card">
+                    <h3 class="text-xl font-bold mb-2">4. Code block with syntax highlighting</h3>
+                    <p class="mb-3">Beautiful code blocks with language support.</p>
+                    <pre><code class="language-tsx">import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight'
+import { lowlight } from 'lowlight'
+import ts from 'lowlight/lib/languages/typescript'
+import python from 'lowlight/lib/languages/python'
+
+lowlight.registerLanguage('typescript', ts)
+lowlight.registerLanguage('python', python)
+
+const editor = useEditor({
+  extensions: [
+    StarterKit,
+    CodeBlockLowlight.configure({
+      lowlight,
+      defaultLanguage: 'typescript',
+    }),
+  ],
+})</code></pre>
+                </div>
+
+                <div class="extension-card">
+                    <h3 class="text-xl font-bold mb-2">5. Character count</h3>
+                    <p class="mb-3">Track characters, words, and sentences.</p>
+                    <pre><code class="language-tsx">import CharacterCount from '@tiptap/extension-character-count'
+
+const editor = useEditor({
+  extensions: [
+    StarterKit,
+    CharacterCount,
+  ],
+})
+
+// Access counts
+editor.storage.characterCount.characters()
+editor.storage.characterCount.words()</code></pre>
+                </div>
+
+                <div class="extension-card">
+                    <h3 class="text-xl font-bold mb-2">6. Task list</h3>
+                    <p class="mb-3">Interactive checkboxes for todo lists.</p>
+                    <pre><code class="language-tsx">import TaskList from '@tiptap/extension-task-list'
+import TaskItem from '@tiptap/extension-task-item'
+
+const editor = useEditor({
+  extensions: [
+    StarterKit,
+    TaskList,
+    TaskItem.configure({
+      nested: true,
+    }),
+  ],
+})</code></pre>
+                </div>
+
+                <div class="extension-card">
+                    <h3 class="text-xl font-bold mb-2">7. Mention</h3>
+                    <p class="mb-3">@mention users like in Slack or Notion.</p>
+                    <pre><code class="language-tsx">import Mention from '@tiptap/extension-mention'
+import { VueRenderer } from '@tiptap/vue-2'
+import MentionList from './MentionList.vue'
+
+const editor = useEditor({
+  extensions: [
+    StarterKit,
+    Mention.configure({
+      HTMLAttributes: {
+        class: 'mention',
+      },
+      suggestion: {
+        items: ({ query }) => {
+          return users.filter(user =>
+            user.name.toLowerCase().includes(query.toLowerCase())
+          )
+        },
+        render: () => {
+          let component
+          return {
+            onStart: (props) => {
+              component = new VueRenderer(MentionList, {
+                props,
+                editor,
+              })
+            },
+            onUpdate(props) {
+              component.updateProps(props)
+            },
+            onKeyPress() {
+              component.updateProps({ ...props })
+            },
+            onExit() {
+              component.destroy()
+            },
+          }
+        },
+      },
+    }),
+  ],
+})</code></pre>
+                </div>
+            </section>
+
+            <section id="custom-extensions">
+                <h2 class="text-3xl font-bold mb-4 mt-8">Building custom extensions</h2>
+                <p class="mb-4">Real power: build your own extensions.</p>
+
+                <h3 class="text-2xl font-bold mb-3">Custom mark extension (highlight)</h3>
+                <pre><code class="language-tsx">import { Mark, mergeAttributes } from '@tiptap/core'
+
+const Highlight = Mark.create({
+  name: 'highlight',
+
+  addOptions() {
+    return {
+      colors: ['#fef08a', '#fca5a5', '#86efac', '#93c5fd'],
+    }
+  },
+
+  addAttributes() {
+    return {
+      color: {
+        default: null,
+        parseHTML: element => element.getAttribute('data-color'),
+        renderHTML: attributes => {
+          if (!attributes.color) {
+            return {}
+          }
+          return {
+            'data-color': attributes.color,
+            style: `background-color: ${attributes.color}`,
+          }
+        },
+      },
+    }
+  },
+
+  parseHTML() {
+    return [
+      {
+        tag: 'mark',
+      },
+    ]
+  },
+
+  renderHTML({ HTMLAttributes }) {
+    return ['mark', mergeAttributes(HTMLAttributes), 0]
+  },
+
+  addCommands() {
+    return {
+      setHighlight:
+        attributes =>
+        ({ commands }) => {
+          return commands.setMark(this.name, attributes)
+        },
+      toggleHighlight:
+        attributes =>
+        ({ commands }) => {
+          return commands.toggleMark(this.name, attributes)
+        },
+      unsetHighlight:
+        () =>
+        ({ commands }) => {
+          return commands.unsetMark(this.name)
+        },
+    }
+  },
+})
+
+export default Highlight</code></pre>
+
+                <h3 class="text-2xl font-bold mb-3">Use custom extension</h3>
+                <pre><code class="language-tsx">import Highlight from './extensions/highlight'
+
+const editor = useEditor({
+  extensions: [
+    StarterKit,
+    Highlight,
+  ],
+})
+
+// Toggle highlight
+editor.chain().focus().toggleHighlight({ color: '#fef08a' }).run()
+
+// Check if highlight is active
+editor.isActive('highlight')</code></pre>
+            </section>
+
+            <section id="markdown">
+                <h2 class="text-3xl font-bold mb-4 mt-8">Markdown support</h2>
+                <p class="mb-4">Tiptap has excellent markdown support out of the box.</p>
+
+                <h3 class="text-2xl font-bold mb-3">Enable markdown</h3>
+                <pre><code class="language-tsx">import StarterKit from '@tiptap/starter-kit'
+import Markdown from '@tiptap/markdown'
+
+const editor = useEditor({
+  extensions: [
+    StarterKit,
+    Markdown.configure({
+      html: false,
+      transformPastedText: true,
+    }),
+  ],
+})
+
+// Get markdown
+const markdown = editor.storage.markdown.getMarkdown()
+
+// Set markdown
+editor.commands.setContent('## Heading\n\nParagraph text')</code></pre>
+
+                <h3 class="text-2xl font-bold mb-3">Markdown shortcuts</h3>
+                <pre><code class="language-bash"># Type at start of line:
+# → Heading 1
+## → Heading 2
+### → Heading 3
+- → Bullet list
+* → Bullet list
+1. → Ordered list
+[] → Checkbox
+> → Blockquote
+``` → Code block</code></pre>
+            </section>
+
+            <section id="collaboration">
+                <h2 class="text-3xl font-bold mb-4 mt-8">Real-time collaboration</h2>
+                <p class="mb-4">Like Google Docs, powered by WebSockets.</p>
+
+                <h3 class="text-2xl font-bold mb-3">Setup collaboration</h3>
+                <pre><code class="language-tsx">import { HocuspocusProvider } from '@hocuspocus/provider'
+import { Collaboration, CollaborationCursor } from '@tiptap/extension-collaboration'
+
+const provider = new HocuspocusProvider({
+  url: 'wss://your-server.com',
+  name: 'my-document',
+})
+
+const editor = useEditor({
+  extensions: [
+    StarterKit,
+    Collaboration.configure({
+      document: provider.document,
+    }),
+    CollaborationCursor.configure({
+      provider: provider,
+      user: {
+        name: 'John Doe',
+        color: '#8b5cf6',
+      },
+    }),
+  ],
+})</code></pre>
+
+                <h3 class="text-2xl font-bold mb-3">Style collaboration cursors</h3>
+                <pre><code class="language-css">/* Collaboration cursor */
+.collaboration-cursor__caret {
+  position: relative;
+  margin-left: -1px;
+  margin-right: -1px;
+  border-left: 1px solid;
+  word-break: normal;
+  pointer-events: none;
+}
+
+.collaboration-cursor__label {
+  position: absolute;
+  top: -1.4em;
+  left: -1px;
+  font-size: 12px;
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+  color: white;
+  white-space: nowrap;
+}</code></pre>
+            </section>
+
+            <section id="comparison">
+                <h2 class="text-3xl font-bold mb-4 mt-8">Tiptap vs other editors</h2>
+                <p class="mb-4">Quick comparison of rich text editors.</p>
+
+                <div class="overflow-x-auto">
+                    <table class="min-w-full border-collapse border border-gray-300 mb-6">
+                        <thead>
+                            <tr class="bg-gray-100">
+                                <th class="border border-gray-300 px-4 py-2 text-left">Feature</th>
+                                <th class="border border-gray-300 px-4 py-2 text-left">Tiptap</th>
+                                <th class="border border-gray-300 px-4 py-2 text-left">Quill</th>
+                                <th class="border border-gray-300 px-4 py-2 text-left">Slate</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="border border-gray-300 px-4 py-2">Headless</td>
+                                <td class="border border-gray-300 px-4 py-2">Yes</td>
+                                <td class="border border-gray-300 px-4 py-2">No</td>
+                                <td class="border border-gray-300 px-4 py-2">Yes</td>
+                            </tr>
+                            <tr>
+                                <td class="border border-gray-300 px-4 py-2">React support</td>
+                                <td class="border border-gray-300 px-4 py-2">Excellent</td>
+                                <td class="border border-gray-300 px-4 py-2">Basic</td>
+                                <td class="border border-gray-300 px-4 py-2">Good</td>
+                            </tr>
+                            <tr>
+                                <td class="border border-gray-300 px-4 py-2">Extensions</td>
+                                <td class="border border-gray-300 px-4 py-2">Easy to build</td>
+                                <td class="border border-gray-300 px-4 py-2">Limited</td>
+                                <td class="border border-gray-300 px-4 py-2">Manual</td>
+                            </tr>
+                            <tr>
+                                <td class="border border-gray-300 px-4 py-2">Markdown</td>
+                                <td class="border border-gray-300 px-4 py-2">Built-in</td>
+                                <td class="border border-gray-300 px-4 py-2">Plugin</td>
+                                <td class="border border-gray-300 px-4 py-2">Manual</td>
+                            </tr>
+                            <tr>
+                                <td class="border border-gray-300 px-4 py-2">Collaboration</td>
+                                <td class="border border-gray-300 px-4 py-2">Built-in</td>
+                                <td class="border border-gray-300 px-4 py-2">Complex</td>
+                                <td class="border border-gray-300 px-4 py-2">Manual</td>
+                            </tr>
+                            <tr>
+                                <td class="border border-gray-300 px-4 py-2">Learning curve</td>
+                                <td class="border border-gray-300 px-4 py-2">Moderate</td>
+                                <td class="border border-gray-300 px-4 py-2">Easy</td>
+                                <td class="border border-gray-300 px-4 py-2">Steep</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="troubleshooting">
+                <h2 class="text-3xl font-bold mb-4 mt-8">Common issues and fixes</h2>
+                <p class="mb-4">Stuff that breaks and how to fix it.</p>
+
+                <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-4">
+                    <p class="font-bold">Issue: Editor not rendering</p>
+                    <p class="text-sm mt-2"><strong>Fix:</strong> Ensure <code>useEditor</code> is called in a React component. Check that <code>EditorContent</code> receives the editor instance. Verify <code>if (!editor) return null</code> check exists.</p>
+                </div>
+
+                <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-4">
+                    <p class="font-bold">Issue: Toolbar buttons not working</p>
+                    <p class="text-sm mt-2"><strong>Fix:</strong> Ensure <code>editor.chain().focus().toggleBold().run()</code> includes <code>.focus()</code>. Without focus, commands may not execute. Check console for errors.</p>
+                </div>
+
+                <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-4">
+                    <p class="font-bold">Issue: Styling not applied</p>
+                    <p class="text-sm mt-2"><strong>Fix:</strong> Tiptap uses <code>.ProseMirror</code> class. Ensure CSS targets this class, not <code>editor</code>. Check specificity. Some elements need explicit styling (code blocks, lists).</p>
+                </div>
+
+                <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-4">
+                    <p class="font-bold">Issue: Extension not working</p>
+                    <p class="text-sm mt-2"><strong>Fix:</strong> Verify extension is imported and added to extensions array. Check for conflicts between extensions (two bold marks, for example). Read extension docs carefully.</p>
+                </div>
+
+                <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-4">
+                    <p class="font-bold">Issue: Markdown import/export broken</p>
+                    <p class="text-sm mt-2"><strong>Fix:</strong> Ensure markdown extension is configured correctly. Check <code>HTMLAttributes</code> don't conflict. Test with simple markdown first.</p>
+                </div>
+            </section>
+
+            <section id="best-practices">
+                <h2 class="text-3xl font-bold mb-4 mt-8">Best practices from production use</h2>
+                <p class="mb-4">Lessons learned from real projects.</p>
+
+                <h3 class="text-2xl font-bold mb-3">1. Start with StarterKit</h3>
+                <p class="mb-3">Includes most common extensions. Build from there, not from scratch.</p>
+
+                <h3 class="text-2xl font-bold mb-3">2. Use React-specific packages</h3>
+                <p class="mb-3">Tiptap has dedicated React packages. Better than generic wrappers.</p>
+
+                <h3 class="text-2xl font-bold mb-3">3. Optimize performance</h3>
+                <pre><code class="language-tsx">// Debounce auto-save
+import { debounce } from 'lodash'
+
+const saveContent = debounce((content) => {
+  localStorage.setItem('draft', content)
+}, 1000)
+
+editor.on('update', ({ editor }) => {
+  saveContent(editor.getHTML())
+})</code></pre>
+
+                <h3 class="text-2xl font-bold mb-3">4. Sanitize HTML</h3>
+                <pre><code class="language-tsx">import DOMPurify from 'dompurify'
+
+const cleanHTML = DOMPurify.sanitize(editor.getHTML())
+saveToDatabase(cleanHTML)</code></pre>
+
+                <h3 class="text-2xl font-bold mb-3">5. Handle mobile carefully</h3>
+                <p class="mb-3">Test on real devices. Mobile keyboards and text selection behave differently. Add mobile-specific styles.</p>
+
+                <h3 class="text-2xl font-bold mb-3">6. Provide feedback</h3>
+                <p class="mb-3">Show loading states during saves. Display character counts. Highlight active toolbar buttons. Good UX matters.</p>
+            </section>
+
+            <section id="conclusion">
+                <h2 class="text-3xl font-bold mb-4 mt-8">Bottom line</h2>
+                <p class="mb-4">
+                    Tiptap isn't for every use case. If you need a simple WYSIWYG editor with zero customization, Quill might be better. If you want something that just works out of the box with zero effort, consider CKEditor.
+                </p>
+                <p class="mb-4">
+                    But if you need a custom editor that fits your exact requirements, Tiptap is unbeatable. Built a Notion-like editor with slash commands in a day. Created a markdown editor with collaboration in an afternoon. Total control over the UI, powerful API, excellent React support.
+                </p>
+                <p class="mb-4">
+                    Best part: based on ProseMirror, so it's battle-tested. Companies like Notion, GitHub, Linear use similar tech. You're not building on someone's experimental framework.
+                </p>
+                <p class="mb-4">
+                    Give it a shot on your next content editor. Start with StarterKit, add extensions as needed. Build a custom toolbar. See how fast it comes together.
+                </p>
+            </section>
+
+        </article>
+
+    </main>
+
+    <footer class="bg-gray-800 text-white py-12">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="grid md:grid-cols-3 gap-8 mb-8">
+                <div>
+                    <h3 class="font-bold text-lg mb-4">Programming Notes</h3>
+                    <p class="text-gray-400 text-sm">A collection of coding notes and tutorials from a full-stack developer.</p>
+                </div>
+                <div>
+                    <h3 class="font-bold text-lg mb-4">Quick Links</h3>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="index.html" class="hover:text-white">Home</a></li>
+                        <li><a href="about.html" class="hover:text-white">About</a></li>
+                        <li><a href="contact.html" class="hover:text-white">Contact</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-bold text-lg mb-4">Connect</h3>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="https://github.com" target="_blank" class="hover:text-white">GitHub</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 pt-8 text-center text-gray-400 text-sm">
+                <p>© 2026 Programming Notes. Built with simple HTML & Tailwind CSS.</p>
+                <p class="mt-2"><a href="privacy.html" class="hover:text-white">Privacy Policy</a></p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Prism.js for code highlighting -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-tsx.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-css.min.js"></script>
+
+</body>
+</html>

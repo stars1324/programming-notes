@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-LMWN7814BX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-LMWN7814BX');
+    </script>
+
+    <!-- SEO Meta Tags -->
+    <title>Shadcn/UI: Finally Built UI Components That Don't Suck</title>
+    <meta name="description" content="Tried every React UI library out there. Shadcn/UI is different - you own the code. Copy-paste components, customize everything, ship faster. Here's my complete guide.">
+    <meta name="keywords" content="Shadcn UI, Next.js UI components, React components library, Tailwind CSS components, Shadcn installation guide, Radix UI, component library">
+    <link rel="canonical" href="https://pnt.jacbex.com/shadcn-ui.html" />
+
+    <!-- Open Graph / Social Media -->
+    <meta property="og:title" content="Shadcn/UI: Copy-Paste React Components You Actually Own">
+    <meta property="og:description" content="Not your typical component library. Copy code into your project, customize everything, ship beautiful UIs faster.">
+    <meta property="og:type" content="article">
+
+    <!-- Tailwind CSS for modern UI -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Code Highlighting (Prism.js) -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+
+    <!-- Structured Data (Schema.org) for Google -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "Shadcn/UI: Finally Built UI Components That Don't Suck",
+      "description": "Guide to using Shadcn/UI for building customizable React and Next.js components with Tailwind CSS.",
+      "author": {
+        "@type": "Person",
+        "name": "Programming Notes"
+      },
+      "proficiencyLevel": "Intermediate"
+    }
+    </script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+        .prose code { color: #eb5757; background: #f9f2f2; padding: 2px 4px; border-radius: 4px; }
+        .component-card { background: #f8fafc; border-left: 4px solid #16a34a; padding: 20px; margin: 16px 0; border-radius: 8px; }
+        .feature-box { background: linear-gradient(135deg, #16a34a 0%, #22c55e 100%); color: white; padding: 24px; border-radius: 12px; margin: 24px 0; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+            <a href="index.html" class="text-xl font-bold text-blue-600">📝 <span class="text-gray-700">Programming Notes</span></a>
+            <div class="space-x-6 hidden md:block">
+                <a href="index.html" class="hover:text-blue-500">Home</a>
+                <a href="about.html" class="hover:text-blue-500">About</a>
+                <a href="contact.html" class="hover:text-blue-500">Contact</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="bg-gradient-to-r from-green-700 to-emerald-800 text-white py-16">
+        <div class="max-w-4xl mx-auto px-4 text-center">
+            <h1 class="text-4xl md:text-5xl font-extrabold mb-4">Shadcn/UI: Finally Built UI Components That Don't Suck</h1>
+            <p class="text-xl opacity-90">Tried every React UI library out there. Shadcn/UI is different - you own the code. Copy-paste components, customize everything, ship faster. Here's my complete guide.</p>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto px-4 py-12 bg-white mt-[-40px] rounded-xl shadow-lg mb-20">
+
+        <article class="prose prose-blue max-w-none">
+
+            <section id="introduction">
+                <h2 class="text-3xl font-bold mb-4">Why I switched from Material-UI</h2>
+                <p class="mb-4">
+                    Been building React apps for years. Used <strong>Material-UI</strong>, <strong>Ant Design</strong>, <strong>Chakra UI</strong> - you name it. They all had the same problem: locked-in dependencies.
+                </p>
+                <p class="mb-4">
+                    Want to change a button style? Fight the library's CSS overrides. Need to customize a component? Read through pages of prop APIs. Want to remove unused code? Tree-shaking was hit-or-miss.
+                </p>
+                <p class="mb-4">
+                    Then found <a href="https://ui.shadcn.com" class="text-blue-600 underline" target="_blank">Shadcn/UI</a>. It's not a component library - it's a collection of <strong>copy-paste components</strong> you add to your project. You own the code. You can modify it. No dependencies to manage.
+                </p>
+                <p class="mb-4">
+                    Built my last SaaS dashboard in half the time. Customization was trivial. Bundle size stayed small because I only added what I needed.
+                </p>
+
+                <div class="feature-box">
+                    <p class="font-bold text-xl mb-2">What makes Shadcn/UI different</p>
+                    <p class="opacity-90">Not an npm package. You copy component code directly into your project. Based on Radix UI (accessible primitives) + Tailwind CSS (styling). Full control, zero dependencies, customizable forever. Your code, your rules.</p>
+                </div>
+            </section>
+
+            <section id="installation">
+                <h2 class="text-3xl font-bold mb-4 mt-8">Installation and setup</h2>
+                <p class="mb-4">Shadcn/UI works with React, Next.js, Vite, and more. Here's my Next.js setup.</p>
+
+                <h3 class="text-2xl font-bold mb-3">Prerequisites</h3>
+                <ul class="list-disc list-inside mb-4 space-y-2">
+                    <li>React 18+ or Next.js 13+</li>
+                    <li>Tailwind CSS configured</li>
+                    <li>Node.js 18+</li>
+                </ul>
+
+                <h3 class="text-2xl font-bold mb-3">Step 1: Initialize your project</h3>
+                <pre><code class="language-bash"># Create Next.js app
+npx create-next-app@latest my-app
+cd my-app
+
+# Or use existing project</code></pre>
+
+                <h3 class="text-2xl font-bold mb-3">Step 2: Configure Tailwind CSS</h3>
+                <p class="mb-3">Shadcn/UI needs Tailwind configured with custom paths.</p>
+                <pre><code class="language-javascript">// tailwind.config.js
+module.exports = {
+  darkMode: ["class"],
+  content: [
+    './pages/**/*.{ts,tsx}',
+    './components/**/*.{ts,tsx}',
+    './app/**/*.{ts,tsx}',
+    './src/**/*.{ts,tsx}',
+  ],
+  prefix: "",
+  theme: {
+    container: {
+      center: true,
+      padding: "2rem",
+      screens: {
+        "2xl": "1400px",
+      },
+    },
+    extend: {
+      colors: {
+        border: "hsl(var(--border))",
+        input: "hsl(var(--input))",
+        ring: "hsl(var(--ring))",
+        background: "hsl(var(--background))",
+        foreground: "hsl(var(--foreground))",
+        primary: {
+          DEFAULT: "hsl(var(--primary))",
+          foreground: "hsl(var(--primary-foreground))",
+        },
+        // ... more color tokens
+      },
+      borderRadius: {
+        lg: "var(--radius)",
+        md: "calc(var(--radius) - 2px)",
+        sm: "calc(var(--radius) - 4px)",
+      },
+    },
+  },
+  plugins: [require("tailwindcss-animate")],
+}</code></pre>
+
+                <h3 class="text-2xl font-bold mb-3">Step 3: Add CSS variables</h3>
+                <pre><code class="language-css">/* globals.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 222.2 47.4% 11.2%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 222.2 84% 4.9%;
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    /* ... dark mode colors */
+  }
+}
+}</code></pre>
+
+                <h3 class="text-2xl font-bold mb-3">Step 4: Install Shadcn/UI CLI</h3>
+                <pre><code class="language-bash"># Initialize Shadcn/UI
+npx shadcn-ui@latest init
+
+# Follow the prompts:
+# - TypeScript: Yes
+# - Style: Default
+# - Base color: Slate
+# - CSS variables: Yes</code></pre>
+
+                <h3 class="text-2xl font-bold mb-3">Step 5: Add components</h3>
+                <pre><code class="language-bash"># Add specific components
+npx shadcn-ui@latest add button
+npx shadcn-ui@latest add card
+npx shadcn-ui@latest add input
+npx shadcn-ui@latest add dialog
+
+# Or add multiple at once
+npx shadcn-ui@latest add button card input</code></pre>
+
+                <p class="text-sm text-gray-600 mt-2">Components are copied to <code>components/ui</code> directory. You own the code.</p>
+            </section>
+
+            <section id="components">
+                <h2 class="text-3xl font-bold mb-4 mt-8">Essential components I use daily</h2>
+                <p class="mb-4">These components end up in every project I build.</p>
+
+                <div class="component-card">
+                    <h3 class="text-xl font-bold mb-2">1. Button - Customizable by default</h3>
+                    <p class="mb-3">Variants, sizes, icons - all built with Tailwind classes you can modify.</p>
+                    <pre><code class="language-tsx">import { Button } from "@/components/ui/button"
+
+export default function Page() {
+  return (
+    <div className="flex gap-4">
+      <Button>Default</Button>
+      <Button variant="destructive">Destructive</Button>
+      <Button variant="outline">Outline</Button>
+      <Button variant="ghost">Ghost</Button>
+      <Button variant="link">Link</Button>
+    </div>
+  )
+}</code></pre>
+                    <p class="text-sm text-gray-600">Want custom variant? Just edit <code>components/ui/button.tsx</code> and add your Tailwind classes.</p>
+                </div>
+
+                <div class="component-card">
+                    <h3 class="text-xl font-bold mb-2">2. Card - Better than div soup</h3>
+                    <p class="mb-3">Structured card layout with header, content, footer. Perfect for dashboards.</p>
+                    <pre><code class="language-tsx">import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
+
+export function StatsCard() {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Total Users</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="text-3xl font-bold">12,345</div>
+        <p className="text-sm text-muted-foreground">+20% from last month</p>
+      </CardContent>
+    </Card>
+  )
+}</code></pre>
+                </div>
+
+                <div class="component-card">
+                    <h3 class="text-xl font-bold mb-2">3. Form components - Input, Select, Checkbox</h3>
+                    <p class="mb-3">Form elements with consistent styling and built-in validation support.</p>
+                    <pre><code class="language-tsx">import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Checkbox } from "@/components/ui/checkbox"
+
+export function LoginForm() {
+  return (
+    <form className="space-y-4">
+      <div>
+        <Label htmlFor="email">Email</Label>
+        <Input id="email" type="email" placeholder="Email" />
+      </div>
+      <div>
+        <Label htmlFor="password">Password</Label>
+        <Input id="password" type="password" />
+      </div>
+      <div className="flex items-center gap-2">
+        <Checkbox id="remember" />
+        <Label htmlFor="remember">Remember me</Label>
+      </div>
+    </form>
+  )
+}</code></pre>
+                </div>
+
+                <div class="component-card">
+                    <h3 class="text-xl font-bold mb-2">4. Dialog - Modal without the headache</h3>
+                    <p class="mb-3">Accessible dialog component with backdrop and keyboard support built-in.</p>
+                    <pre><code class="language-tsx">import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import { Button } from "@/components/ui/button"
+
+export function ConfirmDialog() {
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button variant="destructive">Delete Account</Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Are you sure?</DialogTitle>
+        </DialogHeader>
+        <div className="py-4">
+          This action cannot be undone.
+        </div>
+        <div className="flex gap-2 justify-end">
+          <Button variant="outline">Cancel</Button>
+          <Button variant="destructive">Delete</Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  )
+}</code></pre>
+                    <p class="text-sm text-gray-600">Built on Radix UI Dialog - accessibility handled for you.</p>
+                </div>
+
+                <div class="component-card">
+                    <h3 class="text-xl font-bold mb-2">5. Table - Data tables that work</h3>
+                    <p class="mb-3">Clean table component with built-in styling for headers and rows.</p>
+                    <pre><code class="language-tsx">import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
+
+export function UserTable() {
+  const users = [
+    { id: 1, name: "John", email: "john@example.com" },
+    { id: 2, name: "Jane", email: "jane@example.com" },
+  ]
+
+  return (
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Name</TableHead>
+          <TableHead>Email</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {users.map((user) => (
+          <TableRow key={user.id}>
+            <TableCell>{user.name}</TableCell>
+            <TableCell>{user.email}</TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+  )
+}</code></pre>
+                </div>
+            </section>
+
+            <section id="customization">
+                <h2 class="text-3xl font-bold mb-4 mt-8">Customizing components</h2>
+                <p class="mb-4">Real power: you can modify anything because it's your code.</p>
+
+                <h3 class="text-2xl font-bold mb-3">Adding custom variants</h3>
+                <p class="mb-3">Need a new button variant? Just edit the component file.</p>
+                <pre><code class="language-tsx">// components/ui/button.tsx
+const buttonVariants = cva(
+  "inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors",
+  {
+    variants: {
+      variant: {
+        default: "bg-primary text-primary-foreground hover:bg-primary/90",
+        destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90",
+        outline: "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
+        // Add your custom variant
+        success: "bg-green-600 text-white hover:bg-green-700",
+      },
+    },
+  }
+)</code></pre>
+
+                <h3 class="text-2xl font-bold mb-3">Changing component behavior</h3>
+                <p class="mb-3">Want to add auto-complete to input? Modify the component directly.</p>
+                <pre><code class="language-tsx">// components/ui/input.tsx
+import * as React from "react"
+
+export interface InputProps
+  extends React.InputHTMLAttributes<HTMLInputElement> {
+  autocompleteOptions?: string[]
+}
+
+const Input = React.forwardRef<HTMLInputElement, InputProps>(
+  ({ className, type, autocompleteOptions, ...props }, ref) => {
+    const [showAutocomplete, setShowAutocomplete] = React.useState(false)
+
+    return (
+      <div className="relative">
+        <input
+          type={type}
+          className={cn(
+            "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2",
+            className
+          )}
+          ref={ref}
+          {...props}
+        />
+        {autocompleteOptions && showAutocomplete && (
+          <div className="absolute top-full mt-1 w-full bg-white border rounded-md shadow-lg">
+            {autocompleteOptions.map((option) => (
+              <div key={option} className="px-3 py-2 hover:bg-gray-100">
+                {option}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    )
+  }
+)</code></pre>
+
+                <h3 class="text-2xl font-bold mb-3">Theming with CSS variables</h3>
+                <p class="mb-3">Change entire app theme by modifying CSS variables.</p>
+                <pre><code class="language-css">/* Custom brand color */
+:root {
+  --primary: 210 100% 50%; /* Blue brand color */
+  --primary-foreground: 0 0% 100%;
+}
+
+/* Dark mode toggle */
+.dark {
+  --primary: 210 100% 60%;
+  --primary-foreground: 222.2 47.4% 11.2%;
+}</code></pre>
+                <p class="text-sm text-gray-600">All components use these variables automatically. Theme entire app in one place.</p>
+            </section>
+
+            <section id="comparison">
+                <h2 class="text-3xl font-bold mb-4 mt-8">Shadcn/UI vs other libraries</h2>
+                <p class="mb-4">Quick comparison with popular React UI libraries.</p>
+
+                <div class="overflow-x-auto">
+                    <table class="min-w-full border-collapse border border-gray-300 mb-6">
+                        <thead>
+                            <tr class="bg-gray-100">
+                                <th class="border border-gray-300 px-4 py-2 text-left">Feature</th>
+                                <th class="border border-gray-300 px-4 py-2 text-left">Shadcn/UI</th>
+                                <th class="border border-gray-300 px-4 py-2 text-left">Material-UI</th>
+                                <th class="border border-gray-300 px-4 py-2 text-left">Chakra UI</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="border border-gray-300 px-4 py-2">Installation</td>
+                                <td class="border border-gray-300 px-4 py-2">Copy-paste code</td>
+                                <td class="border border-gray-300 px-4 py-2">npm install</td>
+                                <td class="border border-gray-300 px-4 py-2">npm install</td>
+                            </tr>
+                            <tr>
+                                <td class="border border-gray-300 px-4 py-2">Bundle size</td>
+                                <td class="border border-gray-300 px-4 py-2">Only what you use</td>
+                                <td class="border border-gray-300 px-4 py-2">Tree-shakeable</td>
+                                <td class="border border-gray-300 px-4 py-2">Medium</td>
+                            </tr>
+                            <tr>
+                                <td class="border border-gray-300 px-4 py-2">Customization</td>
+                                <td class="border border-gray-300 px-4 py-2">Edit code directly</td>
+                                <td class="border border-gray-300 px-4 py-2">Theme config</td>
+                                <td class="border border-gray-300 px-4 py-2">Theme config</td>
+                            </tr>
+                            <tr>
+                                <td class="border border-gray-300 px-4 py-2">Dependencies</td>
+                                <td class="border border-gray-300 px-4 py-2">Radix UI + class-variance-authority</td>
+                                <td class="border border-gray-300 px-4 py-2">@mui/material</td>
+                                <td class="border border-gray-300 px-4 py-2">@chakra-ui/react</td>
+                            </tr>
+                            <tr>
+                                <td class="border border-gray-300 px-4 py-2">Accessibility</td>
+                                <td class="border border-gray-300 px-4 py-2">Built-in (Radix UI)</td>
+                                <td class="border border-gray-300 px-4 py-2">Good</td>
+                                <td class="border border-gray-300 px-4 py-2">Good</td>
+                            </tr>
+                            <tr>
+                                <td class="border border-gray-300 px-4 py-2">Learning curve</td>
+                                <td class="border border-gray-300 px-4 py-2">Low (if you know Tailwind)</td>
+                                <td class="border border-gray-300 px-4 py-2">Moderate</td>
+                                <td class="border border-gray-300 px-4 py-2">Low</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3 class="text-2xl font-bold mb-3">When to choose Shadcn/UI</h3>
+                <ul class="list-disc list-inside mb-4 space-y-2">
+                    <li>You want full control over component code</li>
+                    <li>You're comfortable editing Tailwind CSS classes</li>
+                    <li>You need heavy customization</li>
+                    <li>You want minimal bundle size</li>
+                    <li>You're building with Next.js or React</li>
+                </ul>
+
+                <h3 class="text-2xl font-bold mb-3">When to use other libraries</h3>
+                <ul class="list-disc list-inside mb-4 space-y-2">
+                    <li>You need pre-built components fast without customization</li>
+                    <li>You don't want to manage component code</li>
+                    <li>You prefer prop-based customization</li>
+                    <li>You're not using Tailwind CSS</li>
+                </ul>
+            </section>
+
+            <section id="patterns">
+                <h2 class="text-3xl font-bold mb-4 mt-8">Common UI patterns</h2>
+                <p class="mb-4">Real UI patterns I've built with Shadcn/UI.</p>
+
+                <h3 class="text-2xl font-bold mb-3">1. Data table with sorting and filtering</h3>
+                <pre><code class="language-tsx">import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
+
+export function SortableTable({ data }) {
+  const [sortConfig, setSortConfig] = React.useState({ key: null, direction: 'asc' })
+  const [filter, setFilter] = React.useState('')
+
+  const filteredData = data.filter(item =>
+    item.name.toLowerCase().includes(filter.toLowerCase())
+  )
+
+  const sortedData = React.useMemo(() => {
+    if (!sortConfig.key) return filteredData
+    return [...filteredData].sort((a, b) => {
+      if (a[sortConfig.key] < b[sortConfig.key]) return sortConfig.direction === 'asc' ? -1 : 1
+      if (a[sortConfig.key] > b[sortConfig.key]) return sortConfig.direction === 'asc' ? 1 : -1
+      return 0
+    })
+  }, [filteredData, sortConfig])
+
+  return (
+    <div>
+      <Input
+        placeholder="Filter..."
+        value={filter}
+        onChange={(e) => setFilter(e.target.value)}
+        className="mb-4"
+      />
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead onClick={() => setSortConfig({ key: 'name', direction: sortConfig.direction === 'asc' ? 'desc' : 'asc' })}>
+              Name {sortConfig.key === 'name' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+            </TableHead>
+            <TableHead>Email</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {sortedData.map(item => (
+            <TableRow key={item.id}>
+              <TableCell>{item.name}</TableCell>
+              <TableCell>{item.email}</TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </div>
+  )
+}</code></pre>
+
+                <h3 class="text-2xl font-bold mb-3">2. Form with validation</h3>
+                <pre><code class="language-tsx">import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import * as z from "zod"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+
+const formSchema = z.object({
+  username: z.string().min(2, "Username must be at least 2 characters"),
+  email: z.string().email("Invalid email"),
+})
+
+export function ProfileForm() {
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      username: "",
+      email: "",
+    },
+  })
+
+  function onSubmit(values: z.infer<typeof formSchema>) {
+    console.log(values)
+  }
+
+  return (
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <FormField
+          control={form.control}
+          name="username"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Username</FormLabel>
+              <FormControl>
+                <Input placeholder="Username" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="email"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Email</FormLabel>
+              <FormControl>
+                <Input type="email" placeholder="Email" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <Button type="submit">Submit</Button>
+      </form>
+    </Form>
+  )
+}</code></pre>
+
+                <h3 class="text-2xl font-bold mb-3">3. Command palette (Cmd+K)</h3>
+                <pre><code class="language-tsx">import {
+  CommandDialog,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command"
+import { useEffect, useState } from "react"
+
+export function CommandPalette() {
+  const [open, setOpen] = useState(false)
+
+  useEffect(() => {
+    const down = (e: KeyboardEvent) => {
+      if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault()
+        setOpen((open) => !open)
+      }
+    }
+    document.addEventListener('keydown', down)
+    return () => document.removeEventListener('keydown', down)
+  }, [])
+
+  return (
+    <CommandDialog open={open} onOpenChange={setOpen}>
+      <CommandInput placeholder="Type a command or search..." />
+      <CommandList>
+        <CommandEmpty>No results found.</CommandEmpty>
+        <CommandGroup heading="Suggestions">
+          <CommandItem>Calendar</CommandItem>
+          <CommandItem>Search Email</CommandItem>
+          <CommandItem>Settings</CommandItem>
+        </CommandGroup>
+      </CommandList>
+    </CommandDialog>
+  )
+}</code></pre>
+            </section>
+
+            <section id="troubleshooting">
+                <h2 class="text-3xl font-bold mb-4 mt-8">Common issues and fixes</h2>
+                <p class="mb-4">Stuff that breaks and how to fix it.</p>
+
+                <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-4">
+                    <p class="font-bold">Issue: Components don't have styles</p>
+                    <p class="text-sm mt-2"><strong>Fix:</strong> Make sure Tailwind is configured correctly. Check that <code>tailwind.config.js</code> includes your components directory. Verify CSS variables are defined in <code>globals.css</code>.</p>
+                </div>
+
+                <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-4">
+                    <p class="font-bold">Issue: CLI init command fails</p>
+                    <p class="text-sm mt-2"><strong>Fix:</strong> Ensure you're in a Next.js or React project. Check that <code>package.json</code> exists. Update Node.js to v18+. Clear cache with <code>rm -rf node_modules .next</code> and retry.</p>
+                </div>
+
+                <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-4">
+                    <p class="font-bold">Issue: Component not found after adding</p>
+                    <p class="text-sm mt-2"><strong>Fix:</strong> Check import path. Shadcn/UI uses <code>@/components/ui/...</code>. Ensure your <code>tsconfig.json</code> has path aliases set up correctly.</p>
+                </div>
+
+                <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-4">
+                    <p class="font-bold">Issue: Dark mode not working</p>
+                    <p class="text-sm mt-2"><strong>Fix:</strong> Make sure <code>darkMode: ["class"]</code> is in Tailwind config. Add <code>class="dark"</code> to <code>&lt;html&gt;</code> element when toggling dark mode. Verify dark mode CSS variables exist.</p>
+                </div>
+
+                <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-4">
+                    <p class="font-bold">Issue: TypeScript errors in components</p>
+                    <p class="text-sm mt-2"><strong>Fix:</strong> Update types: <code>npm install -D @types/react @types/react-dom</code>. Ensure <code>tsconfig.json</code> includes <code>"jsx": "preserve"</code> and proper path aliases.</p>
+                </div>
+
+                <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-4">
+                    <p class="font-bold">Issue: Component updates overwrite my changes</p>
+                    <p class="text-sm mt-2"><strong>Fix:</strong> Shadcn/UI won't overwrite existing components. Your changes are safe. But if you re-add a component, you'll need to merge changes manually. Consider backing up customized components.</p>
+                </div>
+            </section>
+
+            <section id="best-practices">
+                <h2 class="text-3xl font-bold mb-4 mt-8">Best practices from production use</h2>
+                <p class="mb-4">Lessons learned after shipping multiple projects with Shadcn/UI.</p>
+
+                <h3 class="text-2xl font-bold mb-3">1. Only add what you need</h3>
+                <p class="mb-3">Don't add all components at once. Start with Button, Input, Card - basics. Add others as needed. Keeps codebase clean.</p>
+
+                <h3 class="text-2xl font-bold mb-3">2. Customize early</h3>
+                <p class="mb-3">If you need custom variants, add them before building many components. Changing button styles after using it in 50 places sucks.</p>
+
+                <h3 class="text-2xl font-bold mb-3">3. Create wrapper components</h3>
+                <p class="mb-3">For app-specific UI patterns, create wrapper components:</p>
+                <pre><code class="language-tsx">// components/app-button.tsx
+import { Button } from "@/components/ui/button"
+
+export function AppButton({ children, ...props }) {
+  return (
+    <Button className="rounded-full px-6" {...props}>
+      {children}
+    </Button>
+  )
+}</code></pre>
+
+                <h3 class="text-2xl font-bold mb-3">4. Version control your components</h3>
+                <p class="mb-3">Since you own the code, track changes in Git. Easy to revert customizations that don't work.</p>
+
+                <h3 class="text-2xl font-bold mb-3">5. Document your custom variants</h3>
+                <p class="mb-3">Create a storybook or docs page showing your custom component variants. Future you will thank present you.</p>
+
+                <h3 class="text-2xl font-bold mb-3">6. Use with component libraries</h3>
+                <p class="mb-3">Shadcn/UI doesn't have every component. Combine with other libraries for complex stuff like data grids or rich text editors.</p>
+            </section>
+
+            <section id="conclusion">
+                <h2 class="text-3xl font-bold mb-4 mt-8">Bottom line</h2>
+                <p class="mb-4">
+                    Shadcn/UI isn't for everyone. If you want pre-built components and don't care about customization, Material-UI or Chakra UI might be better.
+                </p>
+                <p class="mb-4">
+                    But if you want full control, minimal bundle size, and the ability to customize anything, Shadcn/UI is fantastic. It's how component libraries should work - you own the code, you modify it, you ship faster.
+                </p>
+                <p class="mb-4">
+                    Built 3 SaaS apps with it now. Each time, customization was trivial. No fighting against the library's architecture. No bundle size bloat. Just clean, accessible components that work.
+                </p>
+                <p class="mb-4">
+                    If you're starting a new React/Next.js project, give Shadcn/UI a shot. Add a few components, see how it feels. Worst case: you learned a new approach. Best case: you found your go-to UI solution.
+                </p>
+            </section>
+
+        </article>
+
+    </main>
+
+    <footer class="bg-gray-800 text-white py-12">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="grid md:grid-cols-3 gap-8 mb-8">
+                <div>
+                    <h3 class="font-bold text-lg mb-4">Programming Notes</h3>
+                    <p class="text-gray-400 text-sm">A collection of coding notes and tutorials from a full-stack developer.</p>
+                </div>
+                <div>
+                    <h3 class="font-bold text-lg mb-4">Quick Links</h3>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="index.html" class="hover:text-white">Home</a></li>
+                        <li><a href="about.html" class="hover:text-white">About</a></li>
+                        <li><a href="contact.html" class="hover:text-white">Contact</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-bold text-lg mb-4">Connect</h3>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="https://github.com" target="_blank" class="hover:text-white">GitHub</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 pt-8 text-center text-gray-400 text-sm">
+                <p>© 2026 Programming Notes. Built with simple HTML & Tailwind CSS.</p>
+                <p class="mt-2"><a href="privacy.html" class="hover:text-white">Privacy Policy</a></p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Prism.js for code highlighting -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-tsx.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-css.min.js"></script>
+
+</body>
+</html>
