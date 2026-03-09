@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-LMWN7814BX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date);
+
+      gtag('config', 'G-LMWN7814BX');
+    </script>
+
+    <!-- SEO Meta Tags -->
+    <title>Novu: Built a Notification System That Doesn't Suck</title>
+    <meta name="description" content="Tired of managing notification infrastructure? Novu gives you email, SMS, push, in-app notifications in one place. Self-hosted, open source. Here's my complete integration guide.">
+    <meta name="keywords" content="Novu, open source notification infrastructure, Novu integration, notification system, multi-channel notifications, email templates, push notifications, self-hosted notifications">
+    <link rel="canonical" href="https://pnt.jacbex.com/novu.html" />
+
+    <!-- Open Graph / Social Media -->
+    <meta property="og:title" content="Novu: Open Source Notification Infrastructure">
+    <meta property="og:description" content="Centralize all notifications with Novu. Email, SMS, push, in-app - one API, self-hosted, open source.">
+    <meta property="og:type" content="article">
+
+    <!-- Tailwind CSS for modern UI -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Code Highlighting (Prism.js) -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+
+    <!-- Structured Data (Schema.org) for Google -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "Novu: Built a Notification System That Doesn't Suck",
+      "description": "Guide to integrating Novu for multi-channel notification management.",
+      "author": {
+        "@type": "Person",
+        "name": "Programming Notes"
+      },
+      "proficiencyLevel": "Intermediate"
+    }
+    </script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+        .prose code { color: #eb5757; background: #f9f2f2; padding: 2px 4px; border-radius: 4px; }
+        .channel-card { background: #f8fafc; border-left: 4px solid #f59e0b; padding: 20px; margin: 16px 0; border-radius: 8px; }
+        .feature-box { background: linear-gradient(135deg, #f59e0b 0%, #f97316 100%); color: white; padding: 24px; border-radius: 12px; margin: 24px 0; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+            <a href="index.html" class="text-xl font-bold text-blue-600">📝 <span class="text-gray-700">Programming Notes</span></a>
+            <div class="space-x-6 hidden md:block">
+                <a href="index.html" class="hover:text-blue-500">Home</a>
+                <a href="about.html" class="hover:text-blue-500">About</a>
+                <a href="contact.html" class="hover:text-blue-500">Contact</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="bg-gradient-to-r from-amber-600 to-orange-700 text-white py-16">
+        <div class="max-w-4xl mx-auto px-4 text-center">
+            <h1 class="text-4xl md:text-5xl font-extrabold mb-4">Novu: Built a Notification System That Doesn't Suck</h1>
+            <p class="text-xl opacity-90">Tired of managing notification infrastructure? Novu gives you email, SMS, push, in-app notifications in one place. Self-hosted, open source. Here's my complete integration guide.</p>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto px-4 py-12 bg-white mt-[-40px] rounded-xl shadow-lg mb-20">
+
+        <article class="prose prose-blue max-w-none">
+
+            <section id="introduction">
+                <h2 class="text-3xl font-bold mb-4">Why I needed a notification infrastructure</h2>
+                <p class="mb-4">
+                    Built a SaaS app last year. Users needed notifications - welcome emails, password resets, weekly digests, SMS alerts for critical events, push notifications for mobile app. Sounded straightforward.
+                </p>
+                <p class="mb-4">
+                    Ended up with a mess. SendGrid for emails, Twilio for SMS, Firebase Cloud Messaging for push. Separate APIs, different formatting, duplicate logic across codebase. Managing user preferences ("don't send SMS after 10 PM") became a nightmare.
+                </p>
+                <p class="mb-4">
+                    Then discovered <a href="https://novu.co" class="text-blue-600 underline" target="_blank">Novu</a>. Open-source notification infrastructure. Centralize all channels, manage preferences in one place, design templates visually. Self-hosted or cloud option. Basically, build your own notification service without the headache.
+                </p>
+                <p class="mb-4">
+                    Megrated all notification logic in a weekend. One API call instead of three. User preferences unified. Templates managed in UI instead of code. Should've started with Novu from day one.
+                </p>
+
+                <div class="feature-box">
+                    <p class="font-bold text-xl mb-2">What Novu actually does</p>
+                    <p class="opacity-90">Single API for all notification channels - email, SMS, push, in-app, chat (Slack, Discord). Centralized template management with drag-and-drop editor. User preference management (opt-out per channel). Digest and batching (combine notifications). Delivery analytics and retry logic. Self-hosted or managed cloud. Open source, so you own the data.</p>
+                </div>
+            </section>
+
+            <section id="installation">
+                <h2 class="text-3xl font-bold mb-4 mt-8">Installation and setup</h2>
+                <p class="mb-4">Two options: self-hosted or Novu Cloud. I'll show both.</p>
+
+                <h3 class="text-2xl font-bold mb-3">Option 1: Self-hosted with Docker</h3>
+                <pre><code class="language-bash"># Clone Novu repo
+git clone https://github.com/novuhq/novu.git
+cd novu
+
+# Copy environment file
+cp .env.example .env
+
+# Edit .env with your configuration
+# - JWT_SECRET (generate strong secret)
+# - REDIS_HOST (Redis connection)
+# - MONGO_URL (MongoDB connection)
+
+# Start with Docker Compose
+docker-compose up -d
+
+# Access web dashboard at http://localhost:4200</code></pre>
+
+                <h3 class="text-2xl font-bold mb-3">Option 2: Novu Cloud (managed)</h3>
+                <pre><code class="language-bash"># Sign up at https://dash.novu.co
+# Get API key from Settings > API Keys
+
+# Install SDK
+npm install @novu/node</code></pre>
+
+                <h3 class="text-2xl font-bold mb-3">Initialize SDK</h3>
+                <pre><code class="language-javascript">import { Novu } from '@novu/node';
+
+const novu = new Novu(process.env.NOVU_API_KEY);
+
+// Test connection
+await novu.trigger('test-notification', {
+  to: {
+    subscriberId: 'user-123',
+  },
+  payload: {
+    message: 'Hello from Novu!',
+  },
+});</code></pre>
+            </section>
+
+            <section id="concepts">
+                <h2 class="text-3xl font-bold mb-4 mt-8">Core concepts</h2>
+                <p class="mb-4">Understand these and you understand Novu.</p>
+
+                <div class="channel-card">
+                    <h3 class="text-xl font-bold mb-2">1. Subscribers</h3>
+                    <p class="mb-3">People who receive notifications. Each subscriber has channels configured (email, phone, push tokens).</p>
+                    <pre><code class="language-javascript">await novu.subscribers.identify('user-123', {
+  email: 'user@example.com',
+  firstName: 'John',
+  lastName: 'Doe',
+  phone: '+1234567890',
+  locale: 'en',
+  data: {
+    avatarUrl: 'https://example.com/avatar.jpg',
+  },
+});
+
+// Add channels to subscriber
+await novu.subscribers.updateCredentials('user-123', {
+  providerId: 'sendgrid',
+  credentials: {
+    email: 'user@example.com',
+  },
+});
+
+await novu.subscribers.updateCredentials('user-123', {
+  providerId: 'fcm',
+  credentials: {
+    deviceTokens: ['push-token-123'],
+  },
+});</code></pre>
+                </div>
+
+                <div class="channel-card">
+                    <h3 class="text-xl font-bold mb-2">2. Workflows (formerly Templates)</h3>
+                    <p class="mb-3">Define how notifications look and behave. Create in dashboard or code.</p>
+                    <pre><code class="language-javascript">// Create workflow in dashboard or via API
+const workflow = await novu.workflows.create({
+  name: 'welcome-email',
+  description: 'Send welcome email to new users',
+  tags: ['onboarding', 'email'],
+  steps: [
+    {
+      type: 'email',
+      template: {
+        subject: 'Welcome to {{appName}}',
+        body: '<h1>Hello {{firstName}}</h1><p>Thanks for joining!</p>',
+      },
+    },
+  ],
+  active: true,
+});</code></pre>
+                </div>
+
+                <div class="channel-card">
+                    <h3 class="text-xl font-bold mb-2">3. Triggers</h3>
+                    <p class="mb-3">Execute workflows with data. This is how you send notifications from your app.</p>
+                    <pre><code class="language-javascript">await novu.trigger('welcome-email', {
+  to: {
+    subscriberId: 'user-123',
+  },
+  payload: {
+    appName: 'MyApp',
+    firstName: 'John',
+  },
+  // Override actor (who sent notification)
+  actor: {
+    subscriberId: 'system',
+  },
+});</code></pre>
+                </div>
+
+                <div class="channel-card">
+                    <h3 class="text-xl font-bold mb-2">4. Topics</h3>
+                    <p class="mb-3">Broadcast notifications to groups of subscribers.</p>
+                    <pre><code class="language-javascript">// Create topic
+await novu.topics.create({
+  key: 'product-updates',
+  name: 'Product Updates',
+});
+
+// Add subscribers to topic
+await novu.topics.addSubscribers('product-updates', {
+  subscribers: ['user-123', 'user-456'],
+});
+
+// Trigger to all topic subscribers
+await novu.trigger('product-update', {
+  to: [{ type: 'Topic', topicKey: 'product-updates' }],
+  payload: {
+    updateTitle: 'New Feature Released',
+  },
+});</code></pre>
+                </div>
+            </section>
+
+            <section id="channels">
+                <h2 class="text-3xl font-bold mb-4 mt-8">Setting up notification channels</h2>
+                <p class="mb-4">Configure each channel in Novu dashboard. Here's what I use.</p>
+
+                <h3 class="text-2xl font-bold mb-3">1. Email channel</h3>
+                <pre><code class="language-javascript">// In dashboard: Integrations > Email > SendGrid
+// Enter your SendGrid API key
+
+// Or configure via code
+await novu.integrations.create({
+  providerId: 'sendgrid',
+  credentials: {
+    apiKey: process.env.SENDGRID_API_KEY,
+  },
+  active: true,
+  channel: 'email',
+});
+
+// Design email template visually
+// Templates > Create New > Email
+// Drag-and-drop editor with variables</code></pre>
+
+                <h3 class="text-2xl font-bold mb-3">2. SMS channel</h3>
+                <pre><code class="language-javascript">// In dashboard: Integrations > SMS > Twilio
+// Enter Twilio Account SID and Auth Token
+
+await novu.integrations.create({
+  providerId: 'twilio',
+  credentials: {
+    accountSid: process.env.TWILIO_ACCOUNT_SID,
+    authToken: process.env.TWILIO_AUTH_TOKEN,
+  },
+  active: true,
+  channel: 'sms',
+});</code></pre>
+
+                <h3 class="text-2xl font-bold mb-3">3. Push notifications</h3>
+                <pre><code class="language-javascript">// In dashboard: Integrations > Push > FCM/APNs
+// Upload Firebase service account or APNs certificate
+
+await novu.integrations.create({
+  providerId: 'fcm',
+  credentials: {
+    privateKey: process.env.FIREBASE_PRIVATE_KEY,
+    projectId: 'my-project',
+  },
+  active: true,
+  channel: 'push',
+});
+
+// Store push tokens for subscriber
+await novu.subscribers.updateCredentials('user-123', {
+  providerId: 'fcm',
+  credentials: {
+    deviceTokens: ['push-token-from-mobile-app'],
+  },
+});</code></pre>
+
+                <h3 class="text-2xl font-bold mb-3">4. In-app notifications</h3>
+                <pre><code class="language-bash"># Install frontend SDK
+npm install @novu/react
+
+# React component
+import { NovuProvider, useNotifications } from '@novu/react';
+
+function App() {
+  return (
+    <NovuProvider
+      subscriberId="user-123"
+      applicationIdentifier="YOUR_APP_ID"
+    >
+      <NotificationCenter />
+    </NovuProvider>
+  );
+}
+
+function NotificationCenter() {
+  const { notifications, fetchNotifications, markAsSeen } = useNotifications();
+
+  return (
+    <div>
+      {notifications.map(notification => (
+        <div key={notification.id}>
+          {notification.payload.message}
+        </div>
+      ))}
+    </div>
+  );
+}</code></pre>
+
+                <h3 class="text-2xl font-bold mb-3">5. Chat apps (Slack, Discord, etc.)</h3>
+                <pre><code class="language-javascript">// In dashboard: Integrations > Chat > Slack
+// OAuth with your Slack workspace
+
+await novu.integrations.create({
+  providerId: 'slack',
+  credentials: {
+    webhookUrl: 'https://hooks.slack.com/services/YOUR/WEBHOOK/URL',
+  },
+  active: true,
+  channel: 'chat',
+});</code></pre>
+            </section>
+
+            <section id="workflows">
+                <h2 class="text-3xl font-bold mb-4 mt-8">Creating notification workflows</h2>
+                <p class="mb-4">Real workflows I use in production.</p>
+
+                <h3 class="text-2xl font-bold mb-3">Workflow 1: Welcome email series</h3>
+                <pre><code class="language-javascript">// Step 1: Send immediately after signup
+await novu.trigger('welcome-email', {
+  to: { subscriberId: 'user-123' },
+  payload: {
+    firstName: 'John',
+    confirmationLink: 'https://myapp.com/confirm/123',
+  },
+});
+
+// Step 2: Onboarding tips (24 hours later)
+await novu.trigger('onboarding-tips', {
+  to: { subscriberId: 'user-123' },
+  payload: {
+    tips: ['Tip 1', 'Tip 2', 'Tip 3'],
+  },
+});
+
+// Step 3: Check-in (3 days later)
+await novu.trigger('welcome-checkin', {
+  to: { subscriberId: 'user-123' },
+  payload: {},
+});</code></pre>
+
+                <h3 class="text-2xl font-bold mb-3">Workflow 2: Transactional emails with retry</h3>
+                <pre><code class="language-javascript">// Password reset with automatic retry on failure
+await novu.trigger('password-reset', {
+  to: { subscriberId: 'user-123' },
+  payload: {
+    resetLink: 'https://myapp.com/reset/token-123',
+    expiresAt: '1 hour',
+  },
+  options: {
+    retries: {
+      count: 3,
+      interval: 300, // 5 minutes
+    },
+  },
+});</code></pre>
+
+                <h3 class="text-2xl font-bold mb-3">Workflow 3: Multi-channel alerts</h3>
+                <pre><code class="language-javascript">// Critical alert: send to email, SMS, and push simultaneously
+await novu.trigger('critical-alert', {
+  to: { subscriberId: 'user-123' },
+  payload: {
+    alertMessage: 'Server is down!',
+    severity: 'critical',
+    actionLink: 'https://myapp.com/incidents/123',
+  },
+});</code></pre>
+
+                <h3 class="text-2xl font-bold mb-3">Workflow 4: Daily digest</h3>
+                <pre><code class="language-javascript">// Batch notifications into daily digest
+await novu.trigger('daily-digest', {
+  to: { subscriberId: 'user-123' },
+  payload: {
+    notifications: [
+      { title: 'New follower', time: '2:30 PM' },
+      { title: 'Comment on your post', time: '3:15 PM' },
+      { title: 'Task completed', time: '4:00 PM' },
+    ],
+  },
+  // Digest configuration
+  overrides: {
+    email: {
+      subject: 'Your daily digest',
+    },
+  },
+});</code></pre>
+            </section>
+
+            <section id="preferences">
+                <h2 class="text-3xl font-bold mb-4 mt-8">User preferences</h2>
+                <p class="mb-4">Let users control their notification settings.</p>
+
+                <h3 class="text-2xl font-bold mb-3">Get subscriber preferences</h3>
+                <pre><code class="language-javascript">const subscriber = await novu.subscribers.get('user-123');
+
+// Preferences structure
+console.log(subscriber.data.preferences);
+// {
+//   email: true,
+//   sms: false,
+//   push: true,
+//   workflow_preferences: {
+//     'marketing-emails': false,
+//     'product-updates': true,
+//   }
+// }</code></pre>
+
+                <h3 class="text-2xl font-bold mb-3">Update preferences via API</h3>
+                <pre><code class="language-javascript">await novu.subscribers.updatePreferences('user-123', {
+  email: false, // Disable all emails
+  workflow_preferences: {
+    'critical-alerts': {
+      email: true, // Except critical alerts
+      sms: true,
+      push: true,
+    },
+  },
+});</code></pre>
+
+                <h3 class="text-2xl font-bold mb-3">Preferences widget (React)</h3>
+                <pre><code class="language-tsx">import { NotificationPreferences } from '@novu/react';
+
+function UserSettings() {
+  return (
+    <div>
+      <h2>Notification Settings</h2>
+      <NotificationPreferences
+        subscriberId="user-123"
+        applicationIdentifier="YOUR_APP_ID"
+        preferenceSchema={[
+          {
+            type: 'email',
+            label: 'Email Notifications',
+          },
+          {
+            type: 'sms',
+            label: 'SMS Notifications',
+          },
+          {
+            type: 'workflow',
+            label: 'Product Updates',
+            workflowId: 'product-updates',
+            channels: ['email', 'push'],
+          },
+        ]}
+      />
+    </div>
+  );
+}</code></pre>
+            </section>
+
+            <section id="analytics">
+                <h2 class="text-3xl font-bold mb-4 mt-8">Analytics and monitoring</h2>
+                <p class="mb-4">Track notification performance.</p>
+
+                <h3 class="text-2xl font-bold mb-3">Delivery status</h3>
+                <pre><code class="language-javascript">// Get notification execution status
+const execution = await novu.notifications.getExecution('execution-id-123');
+
+console.log(execution.status);
+// 'success' | 'failed' | 'pending'
+
+console.log(execution.channels);
+// {
+//   email: { status: 'success', providerId: 'sendgrid' },
+//   sms: { status: 'failed', error: 'Invalid phone number' },
+// }</code></pre>
+
+                <h3 class="text-2xl font-bold mb-3">Analytics dashboard</h3>
+                <pre><code class="language-bash"># Built-in dashboard at http://localhost:4200
+# View:
+# - Total notifications sent
+# - Delivery rate per channel
+# - Error rates
+# - Popular workflows
+# - Subscriber engagement</code></pre>
+
+                <h3 class="text-2xl font-bold mb-3">Webhook events</h3>
+                <pre><code class="language-javascript">// Novu sends webhooks for events
+app.post('/webhooks/novu', (req, res) => {
+  const event = req.body;
+
+  switch (event.type) {
+    case 'notification.sent':
+      console.log('Notification sent:', event.data);
+      break;
+    case 'notification.failed':
+      console.error('Notification failed:', event.data);
+      // Log to error tracking
+      Sentry.captureException(event.data.error);
+      break;
+    case 'subscriber.created':
+      // Sync to your database
+      await syncSubscriber(event.data);
+      break;
+  }
+
+  res.status(200).send('OK');
+});</code></pre>
+            </section>
+
+            <section id="advanced">
+                <h2 class="text-3xl font-bold mb-4 mt-8">Advanced features</h2>
+                <p class="mb-4">Beyond basic notifications.</p>
+
+                <h3 class="text-2xl font-bold mb-3">1. Digests and batching</h3>
+                <pre><code class="language-javascript">// Combine multiple notifications into one email
+await novu.trigger('activity-digest', {
+  to: { subscriberId: 'user-123' },
+  payload: {},
+  overrides: {
+    email: {
+      // Send digest every hour
+      digest: true,
+      strategy: 'time',
+      time: '60',
+    },
+  },
+});</code></pre>
+
+                <h3 class="text-2xl font-bold mb-3">2. Delayed sending</h3>
+                <pre><code class="language-javascript">await novu.trigger('birthday-email', {
+  to: { subscriberId: 'user-123' },
+  payload: { firstName: 'John' },
+  // Schedule for future date
+  overrides: {
+    email: {
+      delay: {
+        unit: 'days',
+        value: 30,
+      },
+    },
+  },
+});</code></pre>
+
+                <h3 class="text-2xl font-bold mb-3">3. Localization</h3>
+                <pre><code class="language-javascript">await novu.trigger('welcome-email', {
+  to: { subscriberId: 'user-123' },
+  payload: { firstName: 'John' },
+  // Use subscriber's locale
+  overrides: {
+    email: {
+      locale: 'es', // Spanish template
+    },
+  },
+});</code></pre>
+
+                <h3 class="text-2xl font-bold mb-3">4. Tenant isolation (multi-tenant)</h3>
+                <pre><code class="language-javascript">await novu.trigger('tenant-notification', {
+  to: { subscriberId: 'user-123' },
+  payload: {},
+  // Isolate by tenant
+  transactionId: 'tenant-456',
+});</code></pre>
+            </section>
+
+            <section id="comparison">
+                <h2 class="text-3xl font-bold mb-4 mt-8">Novu vs alternatives</h2>
+                <p class="mb-4">Quick comparison of notification services.</p>
+
+                <div class="overflow-x-auto">
+                    <table class="min-w-full border-collapse border border-gray-300 mb-6">
+                        <thead>
+                            <tr class="bg-gray-100">
+                                <th class="border border-gray-300 px-4 py-2 text-left">Feature</th>
+                                <th class="border border-gray-300 px-4 py-2 text-left">Novu</th>
+                                <th class="border border-gray-300 px-4 py-2 text-left">SendGrid</th>
+                                <th class="border border-gray-300 px-4 py-2 text-left">OneSignal</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="border border-gray-300 px-4 py-2">Channels</td>
+                                <td class="border border-gray-300 px-4 py-2">Email, SMS, Push, In-app, Chat</td>
+                                <td class="border border-gray-300 px-4 py-2">Email only</td>
+                                <td class="border border-gray-300 px-4 py-2">Push, Email (limited)</td>
+                            </tr>
+                            <tr>
+                                <td class="border border-gray-300 px-4 py-2">Self-hosted</td>
+                                <td class="border border-gray-300 px-4 py-2">Yes</td>
+                                <td class="border border-gray-300 px-4 py-2">No</td>
+                                <td class="border border-gray-300 px-4 py-2">No</td>
+                            </tr>
+                            <tr>
+                                <td class="border border-gray-300 px-4 py-2">Open source</td>
+                                <td class="border border-gray-300 px-4 py-2">Yes</td>
+                                <td class="border border-gray-300 px-4 py-2">No</td>
+                                <td class="border border-gray-300 px-4 py-2">No</td>
+                            </tr>
+                            <tr>
+                                <td class="border border-gray-300 px-4 py-2">Template editor</td>
+                                <td class="border border-gray-300 px-4 py-2">Visual + Code</td>
+                                <td class="border border-gray-300 px-4 py-2">Visual + Code</td>
+                                <td class="border border-gray-300 px-4 py-2">Basic</td>
+                            </tr>
+                            <tr>
+                                <td class="border border-gray-300 px-4 py-2">User preferences</td>
+                                <td class="border border-gray-300 px-4 py-2">Built-in</td>
+                                <td class="border border-gray-300 px-4 py-2">Manual</td>
+                                <td class="border border-gray-300 px-4 py-2">Basic</td>
+                            </tr>
+                            <tr>
+                                <td class="border border-gray-300 px-4 py-2">Pricing</td>
+                                <td class="border border-gray-300 px-4 py-2">Free tier, then usage-based</td>
+                                <td class="border border-gray-300 px-4 py-2">Free tier, then tiered</td>
+                                <td class="border border-gray-300 px-4 py-2">Free tier, then tiered</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="troubleshooting">
+                <h2 class="text-3xl font-bold mb-4 mt-8">Common issues and fixes</h2>
+                <p class="mb-4">Stuff that breaks and how to fix it.</p>
+
+                <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-4">
+                    <p class="font-bold">Issue: Notifications not sending</p>
+                    <p class="text-sm mt-2"><strong>Fix:</strong> Check integration credentials. Verify workflow is active. Look at execution logs in dashboard. Test with <code>novu.trigger()</code> and check return value.</p>
+                </div>
+
+                <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-4">
+                    <p class="font-bold">Issue: Email templates not rendering variables</p>
+                    <p class="text-sm mt-2"><strong>Fix:</strong> Use double curly braces: <code>{{firstName}}</code>. Check payload matches variable names. Test template preview in dashboard with sample data.</p>
+                </div>
+
+                <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-4">
+                    <p class="font-bold">Issue: Push notifications not reaching devices</p>
+                    <p class="text-sm mt-2"><strong>Fix:</strong> Verify FCM/APNs credentials. Check device tokens are valid. Ensure push notification is enabled on mobile device. Test with Novu's push notification tester.</p>
+                </div>
+
+                <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-4">
+                    <p class="font-bold">Issue: Digests not combining</p>
+                    <p class="text-sm mt-2"><strong>Fix:</strong> Check digest strategy is correct. Ensure same subscriber ID. Verify time window is appropriate. Look at workflow execution logs.</p>
+                </div>
+
+                <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-4">
+                    <p class="font-bold">Issue: Self-hosted setup fails</p>
+                    <p class="text-sm mt-2"><strong>Fix:</strong> Ensure MongoDB and Redis are running. Check environment variables. Verify Docker has enough resources. Check logs: <code>docker-compose logs api</code></p>
+                </div>
+            </section>
+
+            <section id="best-practices">
+                <h2 class="text-3xl font-bold mb-4 mt-8">Best practices from production use</h2>
+                <p class="mb-4">Hard-earned lessons.</p>
+
+                <h3 class="text-2xl font-bold mb-3">1. Start with Novu Cloud</h3>
+                <p class="mb-3">Self-host later if needed. Cloud has free tier and saves setup time. Migrate to self-hosted when you hit scale or compliance requirements.</p>
+
+                <h3 class="text-2xl font-bold mb-3">2. Create workflows in dashboard</h3>
+                <p class="mb-3">Visual template editor is faster than code. Design templates there, reference by ID in code. Better for designers too.</p>
+
+                <h3 class="text-2xl font-bold mb-3">3. Use transactionId for idempotency</h3>
+                <pre><code class="language-javascript">// Prevent duplicate notifications
+await novu.trigger('order-confirmation', {
+  transactionId: `order-${orderId}`, // Unique per order
+  to: { subscriberId: 'user-123' },
+  payload: { orderId },
+});</code></pre>
+
+                <h3 class="text-2xl font-bold mb-3">4. Monitor delivery rates</h3>
+                <p class="mb-3">Set up alerts for high failure rates. Check analytics dashboard weekly. Clean invalid email addresses and phone numbers regularly.</p>
+
+                <h3 class="text-2xl font-bold mb-3">5. Respect user preferences</h3>
+                <p class="mb-3">Always check preferences before sending. Provide easy opt-out. This improves deliverability and user satisfaction.</p>
+
+                <h3 class="text-2xl font-bold mb-3">6. Test before production</h3>
+                <pre><code class="language-javascript">// Use test subscriber during development
+const TEST_SUBSCRIBER = 'test-user';
+
+if (process.env.NODE_ENV === 'development') {
+  await novu.trigger('welcome-email', {
+    to: { subscriberId: TEST_SUBSCRIBER },
+    payload: { /* test data */ },
+  });
+}</code></pre>
+
+                <h3 class="text-2xl font-bold mb-3">7. Handle failures gracefully</h3>
+                <pre><code class="language-javascript">try {
+  await novu.trigger('critical-alert', {
+    to: { subscriberId: 'user-123' },
+    payload: {},
+  });
+} catch (error) {
+  // Log but don't crash app
+  console.error('Notification failed:', error);
+
+  // Store for retry later
+  await retryQueue.add({
+    workflow: 'critical-alert',
+    subscriberId: 'user-123',
+    payload: {},
+  });
+}</code></pre>
+            </section>
+
+            <section id="conclusion">
+                <h2 class="text-3xl font-bold mb-4 mt-8">Bottom line</h2>
+                <p class="mb-4">
+                    Novu isn't for everyone. If you only send emails and have simple requirements, SendGrid might be enough. If you don't care about owning your infrastructure, use SaaS services.
+                </p>
+                <p class="mb-4">
+                    But if you need multi-channel notifications, user preference management, or want to self-host, Novu is fantastic. Single API for everything, visual template editor, open-source and extensible.
+                </p>
+                <p class="mb-4">
+                    Best part: started with Novu Cloud, migrated to self-hosted when we hit scale. Seamless transition, same API. No vendor lock-in.
+                </p>
+                <p class="mb-4">
+                    If you're building notification infrastructure, give Novu a shot. Start with their free tier. Design a workflow. Send a test notification. See how much simpler it is than managing multiple providers yourself.
+                </p>
+            </section>
+
+        </article>
+
+    </main>
+
+    <footer class="bg-gray-800 text-white py-12">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="grid md:grid-cols-3 gap-8 mb-8">
+                <div>
+                    <h3 class="font-bold text-lg mb-4">Programming Notes</h3>
+                    <p class="text-gray-400 text-sm">A collection of coding notes and tutorials from a full-stack developer.</p>
+                </div>
+                <div>
+                    <h3 class="font-bold text-lg mb-4">Quick Links</h3>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="index.html" class="hover:text-white">Home</a></li>
+                        <li><a href="about.html" class="hover:text-white">About</a></li>
+                        <li><a href="contact.html" class="hover:text-white">Contact</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-bold text-lg mb-4">Connect</h3>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="https://github.com" target="_blank" class="hover:text-white">GitHub</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 pt-8 text-center text-gray-400 text-sm">
+                <p>© 2026 Programming Notes. Built with simple HTML & Tailwind CSS.</p>
+                <p class="mt-2"><a href="privacy.html" class="hover:text-white">Privacy Policy</a></p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Prism.js for code highlighting -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-tsx.min.js"></script>
+
+</body>
+</html>
