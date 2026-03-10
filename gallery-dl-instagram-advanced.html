@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-LMWN7814BX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date);
+
+      gtag('config', 'G-LMWN7814BX');
+    </script>
+
+    <!-- SEO Meta Tags -->
+    <title>Gallery-dl Instagram: What Actually Works for Downloading</title>
+    <meta name="description" content="Tried downloading from Instagram with gallery-dl and hit walls. Figured out authentication, Stories, rate limits. Here's what I learned through trial and error.">
+    <meta name="keywords" content="gallery-dl Instagram, download Instagram stories, Instagram video download, gallery-dl authentication, Instagram downloader tutorial">
+    <link rel="canonical" href="https://pnt.jacbex.com/gallery-dl-instagram-advanced.html" />
+
+    <!-- Open Graph / Social Media -->
+    <meta property="og:title" content="Gallery-dl Instagram: Real-World Downloading">
+    <meta property="og:description" content="What I learned from downloading Instagram content with gallery-dl. Authentication, Stories, avoiding rate limits.">
+    <meta property="og:type" content="article">
+
+    <!-- Tailwind CSS for modern UI -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Code Highlighting (Prism.js) -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+
+    <!-- Structured Data (Schema.org) for Google -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "Gallery-dl Instagram: What Actually Works for Downloading",
+      "description": "Practical guide to downloading Instagram content with gallery-dl.",
+      "author": {
+        "@type": "Person",
+        "name": "Programming Notes"
+      }
+    }
+    </script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+        .prose code { color: #eb5757; background: #f9f2f2; padding: 2px 4px; border-radius: 4px; }
+        .technique-card { background: #f8fafc; border-left: 4px solid #ec4899; padding: 20px; margin: 16px 0; border-radius: 8px; }
+        .feature-box { background: linear-gradient(135deg, #ec4899 0%, #f472b6 100%); color: white; padding: 24px; border-radius: 12px; margin: 24px 0; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+            <a href="index.html" class="text-xl font-bold text-blue-600">📝 <span class="text-gray-700">Programming Notes</span></a>
+            <div class="space-x-6 hidden md:block">
+                <a href="index.html" class="hover:text-blue-500">Home</a>
+                <a href="about.html" class="hover:text-blue-500">About</a>
+                <a href="contact.html" class="hover:text-blue-500">Contact</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="bg-gradient-to-r from-pink-600 to-rose-700 text-white py-16">
+        <div class="max-w-4xl mx-auto px-4 text-center">
+            <h1 class="text-4xl md:text-5xl font-extrabold mb-4">Gallery-dl Instagram: What Actually Works</h1>
+            <p class="text-xl opacity-90">Started with basic downloads, kept hitting walls. Figured out Stories, authentication, rate limits the hard way. Here's what I learned through lots of trial and error.</p>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto px-4 py-12 bg-white mt-[-40px] rounded-xl shadow-lg mb-20">
+
+        <article class="prose prose-blue max-w-none">
+
+            <section id="introduction">
+                <h2 class="text-3xl font-bold mb-4">Why I wrote this</h2>
+                <p class="mb-4">
+                    Used gallery-dl for Instagram a while. Basic downloads worked fine - public profiles, individual posts, nothing fancy. Thought that was enough.
+                </p>
+                <p class="mb-4">
+                    Then wanted to download Stories. Hit a wall. Needed to access a private account. Hit another wall. Got rate limited constantly. Realized there's a lot more to this than the basic commands.
+                </p>
+                <p class="mb-4">
+                    Spent way too much time reading GitHub issues, testing different approaches, failing repeatedly. Eventually found stuff that actually works reliably.
+                </p>
+                <p class="mb-4">
+                    Not trying to be comprehensive or cover everything. Just documenting what I wish I knew when I started. If you're stuck with Instagram downloading, maybe this helps.
+                </p>
+            </section>
+
+            <section id="authentication">
+                <h2 class="text-3xl font-bold mb-4 mt-8">Authentication setup</h2>
+                <p class="mb-4">Instagram requires login for private profiles, Stories, and higher download limits.</p>
+
+                <h3 class="text-2xl font-bold mb-3">Method 1: Browser cookies (recommended)</h3>
+                <pre><code class="language-bash"># Install gallery-dl with cookies support
+pip install gallery-dl[cookies]
+
+# Option A: Use browser-cookies.txt extension
+# 1. Install browser extension (Chrome/Firefox)
+#    https://github.com/gallery-dl/browser-cookies.txt
+# 2. Log into Instagram in browser
+# 3. Click extension icon to export cookies
+# 4. Save to ~/.config/gallery-dl/cookies.txt
+
+# Option B: Extract cookies manually
+# 1. Log into Instagram in browser
+# 2. Open DevTools (F12) > Application > Cookies
+# 3. Find sessionid cookie
+# 4. Copy value
+
+# Configure gallery-dl to use cookies
+mkdir -p ~/.config/gallery-dl
+cat > ~/.config/gallery-dl/config.json << EOF
+{
+  "extractor": {
+    "instagram": {
+      "cookies": "~/.config/gallery-dl/cookies.txt"
+    }
+  }
+}
+EOF</code></pre>
+
+                <h3 class="text-2xl font-bold mb-3">Method 2: Browser profile</h3>
+                <pre><code class="language-bash"># Use Selenium/Playwright to handle authentication
+from gallery_dl import job
+
+# Download with browser session
+job.Download('https://www.instagram.com/p/CODE/')
+job.run('instagram', url='https://www.instagram.com/p/CODE/',
+        cookies=cookies_dict)</code></pre>
+
+                <h3 class="text-2xl font-bold mb-3">Method 3: Two-factor authentication</h3>
+                <pre><code class="language-bash"># For accounts with 2FA, use session file
+gallery-dl --write-log log.txt instagram:user
+
+# First run will prompt for:
+# - Username
+# - Password
+# - 2FA code (check authenticator app)
+
+# Session saved to ~/.config/gallery-dl/instagram-session.json
+
+# Future downloads use saved session
+gallery-dl instagram:username</code></pre>
+
+                <h3 class="text-2xl font-bold mb-3">Test authentication</h3>
+                <pre><code class="language-bash"># Test if authentication works
+gallery-dl -i --no-download instagram:user
+
+# Should show your username and private posts if successful
+# -i: interactive mode
+# --no-download: don't actually download files</code></pre>
+            </section>
+
+            <section id="stories">
+                <h2 class="text-3xl font-bold mb-4 mt-8">Downloading Stories and Highlights</h2>
+                <p class="mb-4">Stories require authentication and disappear after 24 hours.</p>
+
+                <div class="technique-card">
+                    <h3 class="text-xl font-bold mb-2">Download current Stories</h3>
+                    <pre><code class="language-bash"># Download all Stories from a user
+gallery-dl instagram:user/stories
+
+# Download Stories from multiple users
+gallery-dl instagram:user1/stories instagram:user2/stories
+
+# Download and organize by date
+gallery-dl -o "filename={date:%Y-%m-%d}_{user}_{num}_{id}" instagram:user/stories</code></pre>
+                </div>
+
+                <div class="technique-card">
+                    <h3 class="text-xl font-bold mb-2">Download Highlights</h3>
+                    <pre><code class="language-bash"># Download all Highlights
+gallery-dl instagram:user/highlights
+
+# Download specific Highlight
+gallery-dl instagram:user/highlights/123456789
+
+# Keep Highlight structure (folders)
+gallery-dl --no-directory-skip instagram:user/highlights
+
+# This creates:
+# highlights/1/
+#   highlight_1.jpg
+#   highlight_2.jpg
+# highlights/2/
+#   highlight_1.jpg</code></pre>
+                </div>
+
+                <div class="technique-card">
+                    <h3 class="text-xl font-bold mb-2">Automated Story downloading</h3>
+                    <pre><code class="language-python">#!/usr/bin/env python3
+"""
+Download Stories from followed users daily
+"""
+import subprocess
+from datetime import datetime
+
+# List of users to monitor
+USERS = [
+    'user1',
+    'user2',
+    'user3',
+]
+
+def download_stories():
+    """Download Stories from all users"""
+    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+    log_file = f'story_download_{timestamp}.log'
+
+    for user in USERS:
+        print(f"Downloading Stories from {user}...")
+
+        cmd = [
+            'gallery-dl',
+            '--write-log', log_file,
+            '--verbose',
+            f'instagram:{user}/stories'
+        ]
+
+        try:
+            subprocess.run(cmd, check=True)
+            print(f"✓ Downloaded Stories from {user}")
+        except subprocess.CalledProcessError:
+            print(f"✗ Failed to download from {user}")
+
+if __name__ == '__main__':
+    download_stories()</code></pre>
+                </div>
+            </section>
+
+            <section id="bulk">
+                <h2 class="text-3xl font-bold mb-4 mt-8">Bulk downloading strategies</h2>
+                <p class="mb-4">Download entire profiles, multiple users, with smart organization.</p>
+
+                <h3 class="text-2xl font-bold mb-3">Download entire profile</h3>
+                <pre><code class="language-bash"># Download all posts (high-res versions)
+gallery-dl instagram:username
+
+# Include tagged posts
+gallery-dl instagram:username/tagged
+
+# Download with metadata
+gallery-dl --write-metadata --write-info-json instagram:username
+
+# Creates filename.jpg and filename.json (likes, comments, etc.)</code></pre>
+
+                <div class="technique-card">
+                    <h3 class="text-xl font-bold mb-2">Smart filename organization</h3>
+                    <pre><code class="language-bash"># Organize by date and type
+gallery-dl -o "
+  filename=instagram/{user}/{date:%Y/%m/%d}_{id}_{filename}.{extension}
+  metadata=false
+" instagram:username
+
+# Result:
+# instagram/username/2026/03/10_123456789_photo.jpg
+# instagram/username/2026/03/10_123456790_album_1.jpg
+# instagram/username/2026/03/10_123456790_album_2.jpg
+
+# Alternative: Include post title/description
+gallery-dl -o "
+  filename=instagram/{user}/{date:%Y-%m-%d}_{id}_{title[:50]}.{extension}
+  metadata=false
+" instagram:username</code></pre>
+                </div>
+
+                <h3 class="text-2xl font-bold mb-3">Batch download multiple users</h3>
+                <pre><code class="language-bash"># Create users.txt with one username per line
+cat > users.txt << EOF
+user1
+user2
+user3
+user4
+EOF
+
+# Download from all users
+while read user; do
+  gallery-dl "instagram:$user"
+done < users.txt
+
+# Parallel download (3 at a time)
+cat users.txt | xargs -P 3 -I {} gallery-dl instagram:{}</code></pre>
+
+                <div class="technique-card">
+                    <h3 class="text-xl font-bold mb-2">Resume interrupted downloads</h3>
+                    <pre><code class="language-bash"># Gallery-dl automatically skips downloaded files
+# But you can enable range support for partial files
+
+# Enable range requests
+gallery-dl -o "range=true" instagram:username
+
+# Continue from last download
+gallery-dl --download-archive archive.txt instagram:username
+
+# archive.txt records downloaded URLs
+# won't re-download if interrupted</code></pre>
+                </div>
+            </section>
+
+            <section id="videos">
+                <h2 class="text-3xl font-bold mb-4 mt-8">Videos and Reels</h2>
+                <p class="mb-4">Download videos in high quality.</p>
+
+                <h3 class="text-2xl font-bold mb-3">Download videos from posts</h3>
+                <pre><code class="language-bash"># Download single video post
+gallery-dl instagram:p/CODE12345
+
+# Download all video posts from profile
+gallery-dl --filter "type == 'video'" instagram:username
+
+# Download videos only (skip images)
+gallery-dl --filter "extension == 'mp4'" instagram:username</code></pre>
+
+                <div class="technique-card">
+                    <h3 class="text-xl font-bold mb-2">Download Reels</h3>
+                    <pre><code class="language-bash"># Download Reels from profile
+gallery-dl instagram:username/reels
+
+# Download specific Reel
+gallery-dl instagram:p/REEL_CODE
+
+# Download all Reels (not posts)
+gallery-dl --filter "typename == 'GraphVideo'" instagram:username
+
+# Organize Reels separately
+gallery-dl -o "
+  filename=reels/{user}/{date:%Y-%m-%d}_{id}.{extension}
+" instagram:username/reels</code></pre>
+                </div>
+
+                <div class="technique-card">
+                    <h3 class="text-xl font-bold mb-2">Video quality options</h3>
+                    <pre><code class="language-bash"># Download highest quality (default)
+gallery-dl instagram:p/CODE
+
+# List available formats first
+gallery-dl -K --list-formats instagram:p/CODE
+
+# Download specific format
+gallery-dl -f "bestvideo+bestaudio" instagram:p/CODE
+
+# Download with subtitles (if available)
+gallery-dl --write-subs --sub-lang en instagram:p/CODE</code></pre>
+                </div>
+            </section>
+
+            <section id="limits">
+                <h2 class="text-3xl font-bold mb-4 mt-8">Handling rate limits</h2>
+                <p class="mb-4">Instagram has strict rate limits. Here's how to work around them.</p>
+
+                <div class="technique-card">
+                    <h3 class="text-xl font-bold mb-2">Configurable delays</h3>
+                    <pre><code class="language-bash"># Add delay between requests
+gallery-dl -o "sleep-request=3" instagram:username
+
+# Random delays to avoid detection
+gallery-dl -o "sleep-request=2..5" instagram:username
+
+# Specific delays for different actions
+gallery-dl -o "
+  sleep-request=3
+  sleep-image=2
+  sleep-metadata=1
+" instagram:username</code></pre>
+                </div>
+
+                <div class="technique-card">
+                    <h3 class="text-xl font-bold mb-2">Retry logic</h3>
+                    <pre><code class="language-bash"># Configure retry attempts
+gallery-dl -o "
+  retries=5
+  retry=3
+  timeout=60
+" instagram:username
+
+# Continue on HTTP 429 (rate limit)
+gallery-dl --abort-on-error false --continue instagram:username</code></pre>
+                </div>
+
+                <div class="technique-card">
+                    <h3 class="text-xl font-bold mb-2">Proxy rotation</h3>
+                    <pre><code class="language-bash"># Use proxy
+gallery-dl -o "proxy=http://proxy.example.com:8080" instagram:username
+
+# Use SOCKS proxy
+gallery-dl -o "socks-proxy=socks5://127.0.0.1:1080" instagram:username
+
+# Load proxies from file
+cat > proxies.txt << EOF
+http://proxy1.example.com:8080
+http://proxy2.example.com:8080
+socks5://127.0.0.1:1080
+EOF
+
+# Use random proxy from file
+gallery-dl --get-proxy from-proxy-file.txt instagram:username</code></pre>
+                </div>
+
+                <h3 class="text-2xl font-bold mb-3">Distribute downloads over time</h3>
+                <pre><code class="language-python">#!/usr/bin/env python3
+"""
+Download in batches with delays
+"""
+import time
+import subprocess
+
+USERS = ['user1', 'user2', 'user3', 'user4', 'user5']
+BATCH_SIZE = 2
+DELAY_BETWEEN_BATCHES = 300  # 5 minutes
+
+def download_batch(users):
+    """Download a batch of users"""
+    for user in users:
+        print(f"Downloading {user}...")
+        subprocess.run(['gallery-dl', f'instagram:{user}'])
+        time.sleep(60)  # 1 minute between users
+
+# Split into batches
+for i in range(0, len(USERS), BATCH_SIZE):
+    batch = USERS[i:i + BATCH_SIZE]
+    download_batch(batch)
+
+    if i + BATCH_SIZE < len(USERS):
+        print(f"Waiting {DELAY_BETWEEN_BATCHES}s before next batch...")
+        time.sleep(DELAY_BETWEEN_BATCHES)</code></pre>
+            </section>
+
+            <section id="metadata">
+                <h2 class="text-3xl font-bold mb-4 mt-8">Metadata and organization</h2>
+                <p class="mb-4">Extract and organize additional information.</p>
+
+                <h3 class="text-2xl font-bold mb-3">Download with metadata</h3>
+                <pre><code class="language-bash"># Save metadata as JSON
+gallery-dl --write-info-json instagram:username
+
+# Save description as .txt file
+gallery-dl --write-description instagram:username
+
+# Save all metadata options
+gallery-dl \
+  --write-info-json \
+  --write-description \
+  --write-metadata \
+  instagram:username</code></pre>
+
+                <div class="technique-card">
+                    <h3 class="text-xl font-bold mb-2">Custom metadata templates</h3>
+                    <pre><code class="language-bash"># Create custom metadata files
+gallery-dl -o "
+  info-json=true
+  metadata=true
+  metadata-template={
+    'user': '{user}',
+    'id': '{id}',
+    'likes': '{likes}',
+    'comments': '{comment_count}',
+    'date': '{date}',
+    'url': '{url}',
+    'description': '{description[:200]}'
+  }
+" instagram:username</code></pre>
+                </div>
+
+                <h3 class="text-2xl font-bold mb-3">Organize by tags and mentions</h3>
+                <pre><code class="language-bash"># Extract hashtags and mentions
+gallery-dl --filter "'#tag' in description" instagram:username
+
+# Save hashtags to separate file
+gallery-dl -o "
+  metadata-template={tags}
+  metadata-directory={directory}/metadata
+" instagram:username</code></pre>
+            </section>
+
+            <section id="automation">
+                <h2 class="text-3xl font-bold mb-4 mt-8">Automation workflows</h2>
+                <p class="mb-4">Set up automated downloading schedules.</p>
+
+                <h3 class="text-2xl font-bold mb-3">Cron job for daily downloads</h3>
+                <pre><code class="language-bash">#!/bin/bash
+# daily-instagram-download.sh
+
+USERS=("user1" "user2" "user3")
+BASE_DIR="/path/to/downloads"
+DATE=$(date +%Y%m%d)
+
+for user in "${USERS[@]}"; do
+  echo "Downloading $user..."
+  gallery-dl \
+    --write-log "$BASE_DIR/logs/$user_$DATE.log" \
+    --config "$BASE_DIR/config.json" \
+    "instagram:$user"
+done
+
+# Save as daily-instagram-download.sh
+# Make executable: chmod +x daily-instagram-download.sh
+
+# Add to crontab (runs daily at 3 AM)
+# crontab -e
+# 0 3 * * * /path/to/daily-instagram-download.sh</code></pre>
+
+                <h3 class="text-2xl font-bold mb-3">Python automation script</h3>
+                <pre><code class="language-python">#!/usr/bin/env python3
+"""
+Advanced Instagram downloader with filtering and organization
+"""
+import os
+import json
+import subprocess
+from datetime import datetime
+from pathlib import Path
+
+class InstagramDownloader:
+    def __init__(self, config_file='config.json'):
+        self.config = self.load_config(config_file)
+        self.download_dir = Path(self.config.get('download_dir', './downloads'))
+
+    def load_config(self, config_file):
+        """Load configuration from JSON"""
+        with open(config_file) as f:
+            return json.load(f)
+
+    def download_user(self, username, content_type='all'):
+        """Download content from a user"""
+        url = f'instagram:{username}'
+
+        if content_type == 'stories':
+            url += '/stories'
+        elif content_type == 'highlights':
+            url += '/highlights'
+        elif content_type == 'reels':
+            url += '/reels'
+
+        cmd = [
+            'gallery-dl',
+            '--config', self.config.get('gallery_dl_config'),
+            '--write-info-json',
+            '--write-description',
+            url
+        ]
+
+        try:
+            subprocess.run(cmd, check=True)
+            return {'status': 'success', 'user': username}
+        except subprocess.CalledProcessError as e:
+            return {'status': 'error', 'user': username, 'error': str(e)}
+
+    def download_all_users(self):
+        """Download from all configured users"""
+        results = []
+
+        for user_config in self.config['users']:
+            username = user_config['username']
+            content_types = user_config.get('content_types', ['all'])
+
+            for content_type in content_types:
+                print(f"Downloading {content_type} from {username}...")
+                result = self.download_user(username, content_type)
+                results.append(result)
+
+        # Save results
+        timestamp = datetime.now().isoformat()
+        report = {
+            'timestamp': timestamp,
+            'results': results
+        }
+
+        report_file = self.download_dir / f'report_{timestamp}.json'
+        with open(report_file, 'w') as f:
+            json.dump(report, f, indent=2)
+
+        return results
+
+# config.json
+"""
+{
+  "download_dir": "./instagram_downloads",
+  "gallery_dl_config": "./gallery-dl.conf",
+  "users": [
+    {
+      "username": "user1",
+      "content_types": ["all", "stories"]
+    },
+    {
+      "username": "user2",
+      "content_types": ["all", "highlights"]
+    }
+  ]
+}
+"""</code></pre>
+            </section>
+
+            <section id="troubleshooting">
+                <h2 class="text-3xl font-bold mb-4 mt-8">Common issues and solutions</h2>
+                <p class="mb-4">Problems you'll hit at intermediate level.</p>
+
+                <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-4">
+                    <p class="font-bold">Issue: Login required error</p>
+                    <p class="text-sm mt-2"><strong>Fix:</strong> Cookies expired. Re-export cookies from browser. Check cookies.txt file format. Ensure sessionid is present. Try logging out and back in on browser, then re-export.</p>
+                </div>
+
+                <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-4">
+                    <p class="font-bold">Issue: HTTP 429 Too Many Requests</p>
+                    <p class="text-sm mt-2"><strong>Fix:</strong> Hit rate limit. Increase sleep-request delay. Wait 1-2 hours before retrying. Use different proxies. Authenticate (higher limits with login).</p>
+                </div>
+
+                <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-4">
+                    <p class="font-bold">Issue: Stories download as empty</p>
+                    <p class="text-sm mt-2"><strong>Fix:</strong> Stories expired (24h limit) or user has no active Stories. User's account might be private and you're not following them. Check authentication is working.</p>
+                </div>
+
+                <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-4">
+                    <p class="font-bold">Issue: Video downloads fail at random</p>
+                    <p class="text-sm mt-2"><strong>Fix:</strong> Instagram's CDN throttling. Enable range requests: <code>-o "range=true"</code>. Use proxy. Reduce concurrent downloads to 1.</p>
+                </div>
+
+                <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-4">
+                    <p class="font-bold">Issue: Metadata not downloading</p>
+                    <p class="text-sm mt-2"><strong>Fix:</strong> Check <code>--write-info-json</code> flag. Verify permissions on download directory. Instagram might not provide metadata for private accounts.</p>
+                </div>
+
+                <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-4">
+                    <p class="font-bold">Issue: Challenge required error</p>
+                    <p class="text-sm mt-2"><strong>Fix:</strong> Instagram flagged suspicious activity. Wait 24-48 hours. Use browser-based authentication. Consider using official API for bulk operations.</p>
+                </div>
+            </section>
+
+            <section id="best-practices">
+                <h2 class="text-3xl font-bold mb-4 mt-8">Best practices from experience</h2>
+                <p class="mb-4">Hard-earned lessons.</p>
+
+                <h3 class="text-2xl font-bold mb-3">1. Always respect rate limits</h3>
+                <p class="mb-3">Start with conservative delays (3-5 seconds). Increase gradually if no issues. Better to be slow than get IP banned.</p>
+
+                <h3 class="text-2xl font-bold mb-3">2. Organize downloads from day one</h3>
+                <p class="mb-3">Use consistent filename templates. Separate raw downloads from processed content. Back up important collections. Hard to reorganize terabytes of media later.</p>
+
+                <h3 class="text-2xl font-bold mb-3">3. Monitor logs</h3>
+                <pre><code class="language-bash"># Always enable logging
+gallery-dl --write-log instagram.log --verbose instagram:username
+
+# Check for errors
+grep "ERROR" instagram.log
+
+# Monitor downloads in real-time
+tail -f instagram.log</code></pre>
+
+                <h3 class="text-2xl font-bold mb-3">4. Use download archive</h3>
+                <p class="mb-3">Always use <code>--download-archive</code> for large downloads. Prevents re-downloads if interrupted. Saves time and bandwidth.</p>
+
+                <h3 class="text-2xl font-bold mb-3">5. Test on small scale first</h3>
+                <p class="mb-3">Test configuration on single post before bulk download. Verify filename template works. Check metadata format. Scale up once confirmed.</p>
+
+                <h3 class="text-2xl font-bold mb-3">6. Keep gallery-dl updated</h3>
+                <pre><code class="language-bash"># Update regularly
+pip install --upgrade gallery-dl
+
+# Check version
+gallery-dl --version</code></pre>
+
+                <h3 class="text-2xl font-bold mb-3">7. Respect content creators</h3>
+                <p class="mb-3">Don't redistribute downloaded content. Use for personal archiving only. Support creators through official channels when possible.</p>
+            </section>
+
+            <section id="conclusion">
+                <h2 class="text-3xl font-bold mb-4 mt-8">Moving forward</h2>
+                <p class="mb-4">
+                    With these intermediate techniques, you can handle most Instagram downloading scenarios. Authentication unlocks private content, smart rate limiting prevents bans, automation makes it hands-off.
+                </p>
+                <p class="mb-4">
+                    Advanced topics would include: Instagram Graph API integration, building web UI around gallery-dl, distributed downloading across multiple machines, ML-based content classification. But that's another article.
+                </p>
+                <p class="mb-4">
+                    Gallery-dl's documentation is excellent - <a href="https://github.com/mikf/gallery-dl" class="text-blue-600 underline" target="_blank">GitHub repo</a> has detailed examples. Join their Discord for community support.
+                </p>
+                <p class="mb-4">
+                    Remember: Instagram's terms of service prohibit bulk downloading. Use responsibly, respect rate limits, and don't redistribute content.
+                </p>
+            </section>
+
+        </article>
+
+    </main>
+
+    <footer class="bg-gray-800 text-white py-12">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="grid md:grid-cols-3 gap-8 mb-8">
+                <div>
+                    <h3 class="font-bold text-lg mb-4">Programming Notes</h3>
+                    <p class="text-gray-400 text-sm">A collection of coding notes and tutorials from a full-stack developer.</p>
+                </div>
+                <div>
+                    <h3 class="font-bold text-lg mb-4">Quick Links</h3>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="index.html" class="hover:text-white">Home</a></li>
+                        <li><a href="about.html" class="hover:text-white">About</a></li>
+                        <li><a href="contact.html" class="hover:text-white">Contact</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-bold text-lg mb-4">Connect</h3>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="https://github.com" target="_blank" class="hover:text-white">GitHub</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 pt-8 text-center text-gray-400 text-sm">
+                <p>© 2026 Programming Notes. Built with simple HTML & Tailwind CSS.</p>
+                <p class="mt-2"><a href="privacy.html" class="hover:text-white">Privacy Policy</a></p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Prism.js for code highlighting -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+
+</body>
+</html>

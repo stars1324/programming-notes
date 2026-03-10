@@ -1,0 +1,1056 @@
+gallery-dl instagram<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-LMWN7814BX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date);
+
+      gtag('config', 'G-LMWN7814BX');
+    </script>
+
+    <!-- SEO Meta Tags -->
+    <title>DrissionPage: What I Learned After Using It for a Year</title>
+    <meta name="description" content="Started with basic DrissionPage, hit walls with complex sites. Figured out session management, detection bypass, concurrent scraping. Here's what actually works.">
+    <meta name="keywords" content="DrissionPage tutorial, Selenium alternative, web scraping Python, bypass Cloudflare, session management, DrissionPage examples">
+    <link rel="canonical" href="https://pnt.jacbex.com/drissionpage-advanced.html" />
+
+    <!-- Open Graph / Social Media -->
+    <meta property="og:title" content="DrissionPage: Real-World Scraping Techniques">
+    <meta property="og:description" content="What I learned from months of using DrissionPage in production. Session management, avoiding detection, handling complex sites.">
+    <meta property="og:type" content="article">
+
+    <!-- Tailwind CSS for modern UI -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Code Highlighting (Prism.js) -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+
+    <!-- Structured Data (Schema.org) for Google -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "DrissionPage: What I Learned After Using It for a Year",
+      "description": "Real-world DrissionPage techniques for handling complex sites and detection bypass.",
+      "author": {
+        "@type": "Person",
+        "name": "Programming Notes"
+      }
+    }
+    </script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+        .prose code { color: #eb5757; background: #f9f2f2; padding: 2px 4px; border-radius: 4px; }
+        .tech-card { background: #f8fafc; border-left: 4px solid #0891b2; padding: 20px; margin: 16px 0; border-radius: 8px; }
+        .feature-box { background: linear-gradient(135deg, #0891b2 0%, #06b6d4 100%); color: white; padding: 24px; border-radius: 12px; margin: 24px 0; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+            <a href="index.html" class="text-xl font-bold text-blue-600">📝 <span class="text-gray-700">Programming Notes</span></a>
+            <div class="space-x-6 hidden md:block">
+                <a href="index.html" class="hover:text-blue-500">Home</a>
+                <a href="about.html" class="hover:text-blue-500">About</a>
+                <a href="contact.html" class="hover:text-blue-500">Contact</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="bg-gradient-to-r from-cyan-600 to-teal-700 text-white py-16">
+        <div class="max-w-4xl mx-auto px-4 text-center">
+            <h1 class="text-4xl md:text-5xl font-extrabold mb-4">DrissionPage: What I Learned After Using It for a Year</h1>
+            <p class="text-xl opacity-90">Started with basic page loads, kept hitting walls. Here's how I handled complex sites, detection, sessions, and actually got stuff working reliably.</p>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto px-4 py-12 bg-white mt-[-40px] rounded-xl shadow-lg mb-20">
+
+        <article class="prose prose-blue max-w-none">
+
+            <section id="introduction">
+                <h2 class="text-3xl font-bold mb-4">How I got here</h2>
+                <p class="mb-4">
+                    Used DrissionPage on and off for maybe a year. Basic stuff worked fine - navigate to page, click some buttons, extract text. Thought I had it figured out.
+                </p>
+                <p class="mb-4">
+                    Then tried scraping a site with heavy JavaScript and Cloudflare. Got blocked constantly. Sessions kept expiring. Dynamic content wouldn't load. Realized there's a whole other level to this.
+                </p>
+                <p class="mb-4">
+                    Spent way too much time figuring this stuff out through trial and error. Documentation exists but it's scattered. Eventually cobbled together solutions that actually work in production.
+                </p>
+                <p class="mb-4">
+                    Not claiming this is the "right" way or "best practices". Just what worked for me after lots of failed attempts. If you're stuck at the basic level and need to handle real sites, maybe this helps.
+                </p>
+            </section>
+
+            <section id="sessions">
+                <h2 class="text-3xl font-bold mb-4 mt-8">Session management</h2>
+                <p class="mb-4">Real sites need login, cookies, headers. Here's how to manage sessions properly.</p>
+
+                <h3 class="text-2xl font-bold mb-3">Persistent sessions</h3>
+                <pre><code class="language-python">from DrissionPage import ChromiumPage
+import pickle
+import os
+
+class SessionManager:
+    def __init__(self, session_file='session.pkl'):
+        self.session_file = session_file
+        self.cookies = {}
+        self.headers = {}
+
+    def save_session(self, page):
+        """Save cookies and headers to file"""
+        self.cookies = page.cookies(as_dict=True)
+        self.headers = {
+            'User-Agent': page.user_agent,
+            'Referer': page.url,
+        }
+
+        with open(self.session_file, 'wb') as f:
+            pickle.dump({
+                'cookies': self.cookies,
+                'headers': self.headers,
+            }, f)
+
+    def load_session(self, page):
+        """Load saved session into browser"""
+        if not os.path.exists(self.session_file):
+            return False
+
+        with open(self.session_file, 'rb') as f:
+            data = pickle.load(f)
+
+        # Restore cookies
+        for name, value in data['cookies'].items():
+            page.set.cookies(name, value)
+
+        return True
+
+# Usage
+page = ChromiumPage()
+manager = SessionManager()
+
+# Try to load existing session
+if not manager.load_session(page):
+    # No session found, need to login
+    page.get('https://example.com/login')
+    page.ele('#username').input('myusername')
+    page.ele('#password').input('mypassword')
+    page.ele('#login-btn').click()
+
+    # Wait for login to complete
+    page.wait.load_start()
+
+    # Save session for next time
+    manager.save_session(page)</code></pre>
+
+                <h3 class="text-2xl font-bold mb-3">Custom headers and auth</h3>
+                <pre><code class="language-python">from DrissionPage import ChromiumPage
+
+# Set custom headers before navigation
+page = ChromiumPage()
+
+# Add authorization headers
+page.set.headers({
+    'Authorization': 'Bearer your-token-here',
+    'X-API-Key': 'your-api-key',
+    'Accept': 'application/json',
+})
+
+# Set user agent to avoid detection
+page.set.user_agent(
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) '
+    'AppleWebKit/537.36 (KHTML, like Gecko) '
+    'Chrome/120.0.0.0 Safari/537.36'
+)
+
+# Navigate with custom headers
+page.get('https://api.example.com/protected',
+         headers={'X-Custom-Header': 'value'})</code></pre>
+
+                <h3 class="text-2xl font-bold mb-3">Handle multiple sessions</h3>
+                <pre><code class="language-python">from DrissionPage import ChromiumPage
+import threading
+
+class MultiSessionScraper:
+    def __init__(self, num_sessions=3):
+        self.sessions = []
+        self.num_sessions = num_sessions
+
+    def create_session(self, user_creds):
+        """Create browser instance with login"""
+        page = ChromiumPage()
+
+        # Login with credentials
+        page.get('https://example.com/login')
+        page.ele('#username').input(user_creds['username'])
+        page.ele('#password').input(user_creds['password'])
+        page.ele('#login-btn').click()
+        page.wait.load_start()
+
+        return page
+
+    def init_sessions(self, credentials_list):
+        """Initialize multiple sessions"""
+        threads = []
+        for creds in credentials_list[:self.num_sessions]:
+            thread = threading.Thread(
+                target=lambda: self.sessions.append(
+                    self.create_session(creds)
+                )
+            )
+            threads.append(thread)
+            thread.start()
+
+        # Wait for all sessions to initialize
+        for thread in threads:
+            thread.join()
+
+    def scrape_with_rotation(self, urls):
+        """Rotate through sessions to avoid rate limiting"""
+        results = []
+        for i, url in enumerate(urls):
+            # Use session in round-robin fashion
+            session = self.sessions[i % self.num_sessions]
+            session.get(url)
+            data = session.ele('.content').text
+            results.append(data)
+
+        return results</code></pre>
+            </section>
+
+            <section id="dynamic">
+                <h2 class="text-3xl font-bold mb-4 mt-8">Handling dynamic content</h2>
+                <p class="mb-4">Modern sites load content asynchronously. Here's how to handle it.</p>
+
+                <div class="tech-card">
+                    <h3 class="text-xl font-bold mb-2">Wait strategies</h3>
+                    <p class="mb-3">Don't just use sleep(). Use smart waiting.</p>
+                    <pre><code class="language-python">from DrissionPage import ChromiumPage
+import time
+
+page = ChromiumPage()
+
+# Strategy 1: Wait for specific element
+page.get('https://example.com/dynamic')
+element = page.ele('#dynamic-content', timeout=10)
+# Waits up to 10 seconds for element to appear
+
+# Strategy 2: Wait for page state
+page.wait.load_start()  # Wait for page to start loading
+page.wait.doc_loaded()  # Wait for document to complete
+page.wait.network_idle()  # Wait for network to be idle
+
+# Strategy 3: Wait for custom condition
+def content_loaded(page):
+    return page.ele('.data-table') is not None
+
+page.wait(5, content_loaded)  # Check every 0.5s for 5s
+
+# Strategy 4: Wait for URL change
+page.get('https://example.com/redirect')
+page.wait.url_change('https://example.com/target')
+
+# Strategy 5: Wait for element count
+def items_loaded(page):
+    return len(page.eles('.item')) > 10
+
+page.wait(10, items_loaded)</code></pre>
+                </div>
+
+                <div class="tech-card">
+                    <h3 class="text-xl font-bold mb-2">Infinite scroll handling</h3>
+                    <p class="mb-3">Load all items from infinite scroll pages.</p>
+                    <pre><code class="language-python">def scrape_infinite_scroll(page, max_scrolls=50):
+    """Scrape all items from infinite scroll page"""
+    items = set()  # Use set to avoid duplicates
+    scroll_count = 0
+    previous_height = 0
+
+    while scroll_count < max_scrolls:
+        # Collect current items
+        for item in page.eles('.product-card'):
+            item_id = item.attr('data-id')
+            if item_id and item_id not in items:
+                items.add(item_id)
+                # Process item here
+                title = item.ele('.title').text
+                price = item.ele('.price').text
+                print(f"Scraped: {title} - {price}")
+
+        # Scroll to bottom
+        page.scroll.to_bottom()
+
+        # Wait for new content to load
+        page.wait(2)
+
+        # Check if page height changed (new content loaded)
+        current_height = page.html.scrollHeight
+        if current_height == previous_height:
+            # No new content, reached end
+            break
+
+        previous_height = current_height
+        scroll_count += 1
+
+    return len(items)
+
+# Usage
+page.get('https://example.com/products')
+total_items = scrape_infinite_scroll(page)
+print(f"Total items scraped: {total_items}")</code></pre>
+                </div>
+
+                <div class="tech-card">
+                    <h3 class="text-xl font-bold mb-2">WebSocket interception</h3>
+                    <p class="mb-3">Capture real-time data from WebSocket connections.</p>
+                    <pre><code class="language-python">from DrissionPage import ChromiumPage
+import json
+
+page = ChromiumPage()
+
+# Enable network monitoring
+page.set.none_mode()
+
+# Navigate to page with WebSocket
+page.get('https://example.com/live-data')
+
+# Capture WebSocket messages
+ws_messages = []
+
+def on_websocket(message):
+    """Handle WebSocket message"""
+    data = json.loads(message)
+    ws_messages.append(data)
+    print(f"Received: {data}")
+
+# Listen for WebSocket traffic
+page.listen.start('websocket')
+
+# Wait for data
+page.wait(10)
+
+# Get captured messages
+messages = page.listen.wait(extra_cond=lambda m: m.type == 'websocket')
+
+for msg in messages:
+    if msg.ws_data:
+        data = json.loads(msg.ws_data)
+        # Process WebSocket data
+        print(data)
+
+# Stop listening
+page.listen.stop()</code></pre>
+                </div>
+            </section>
+
+            <section id="detection">
+                <h2 class="text-3xl font-bold mb-4 mt-8">Bypassing detection</h2>
+                <p class="mb-4">Sites fight bots. Here's how to stay under the radar.</p>
+
+                <div class="tech-card">
+                    <h3 class="text-xl font-bold mb-2">Browser fingerprinting</h3>
+                    <p class="mb-3">Hide automation characteristics.</p>
+                    <pre><code class="language-python">from DrissionPage import ChromiumPage
+import random
+
+# Create page with anti-detection settings
+page = ChromiumPage(
+    arguments=[
+        '--disable-blink-features=AutomationControlled',
+        '--disable-dev-shm-usage',
+        '--no-sandbox',
+        '--disable-gpu',
+    ]
+)
+
+# Remove webdriver traces
+page.run_cdp('Page.addScriptToEvaluateOnNewDocument', {
+    'source': '''
+        Object.defineProperty(navigator, 'webdriver', {
+            get: () => undefined
+        });
+
+        Object.defineProperty(navigator, 'plugins', {
+            get: () => [1, 2, 3, 4, 5]
+        });
+
+        Object.defineProperty(navigator, 'languages', {
+            get: () => ['en-US', 'en']
+        });
+
+        window.chrome = {
+            runtime: {}
+        };
+    '''
+})
+
+# Randomize behavior
+def random_sleep(min_sec=1, max_sec=3):
+    """Sleep for random duration"""
+    time.sleep(random.uniform(min_sec, max_sec))
+
+# Mimic human typing
+def human_type(element, text):
+    """Type text like a human"""
+    for char in text:
+        element.input(char, delay=random.randint(50, 200))
+
+# Use it
+page.get('https://example.com')
+search_box = page.ele('#search')
+human_type(search_box, 'search query')
+random_sleep(0.5, 1.5)
+search_box.enter()</code></pre>
+                </div>
+
+                <div class="tech-card">
+                    <h3 class="text-xl font-bold mb-2">Cloudflare bypass</h3>
+                    <p class="mb-3">Handle Cloudflare challenges gracefully.</p>
+                    <pre><code class="language-python">from DrissionPage import ChromiumPage
+import time
+
+def bypass_cloudflare(page, url, max_wait=30):
+    """
+    Navigate through Cloudflare challenge
+    """
+    page.get(url)
+
+    start_time = time.time()
+
+    while time.time() - start_time < max_wait:
+        # Check if we're on Cloudflare challenge page
+        if 'challenge-platform' in page.url:
+            print("Waiting for Cloudflare challenge...")
+
+            # Wait for challenge to complete
+            # Check for success indicators
+            if page.ele('title:text=Just a moment'):
+                time.sleep(5)  # Wait for Cloudflare to process
+                continue
+
+            # Check if we're through
+            if not 'cloudflare' in page.url.lower():
+                print("Cloudflare bypassed!")
+                return True
+
+        # Check if we're already on target page
+        if not 'challenge' in page.url:
+            return True
+
+        time.sleep(2)
+
+    print("Failed to bypass Cloudflare")
+    return False
+
+# Enhanced approach with browser profile
+def create_stealth_browser():
+    """Create browser that looks more human"""
+    page = ChromiumPage(
+        user_data_path='./browser_profile',  # Persist profile
+        arguments=[
+            '--disable-blink-features=AutomationControlled',
+            '--exclude-switches=enable-automation',
+            '--disable-infobars',
+        ]
+    )
+
+    # Set realistic viewport
+    page.set.window.size(1920, 1080)
+    page.set.window.max()
+
+    return page
+
+# Usage
+page = create_stealth_browser()
+success = bypass_cloudflare(page, 'https://protected-site.com')
+
+if success:
+    # Proceed with scraping
+    data = page.ele('.content').text
+else:
+    print("Could not access site")</code></pre>
+                </div>
+
+                <div class="tech-card">
+                    <h3 class="text-xl font-bold mb-2">Rate limiting and delays</h3>
+                    <p class="mb-3">Implement smart delays to avoid bans.</p>
+                    <pre><code class="language-python">import time
+import random
+from DrissionPage import ChromiumPage
+
+class SmartDelayer:
+    def __init__(self, min_delay=1, max_delay=3):
+        self.min_delay = min_delay
+        self.max_delay = max_delay
+        self.last_action = time.time()
+
+    def wait(self):
+        """Wait with random duration"""
+        # Calculate time since last action
+        elapsed = time.time() - self.last_action
+
+        # Add random delay
+        delay = random.uniform(self.min_delay, self.max_delay)
+        if elapsed < delay:
+            time.sleep(delay - elapsed)
+
+        self.last_action = time.time()
+
+    def human_action(self, action_func, *args, **kwargs):
+        """Execute action with human-like delay"""
+        self.wait()
+        result = action_func(*args, **kwargs)
+        return result
+
+# Usage
+page = ChromiumPage()
+delayer = SmartDelays(min_delay=2, max_delay=5)
+
+urls = ['url1.com', 'url2.com', 'url3.com']
+
+for url in urls:
+    delayer.human_action(page.get, url)
+
+    # Process page
+    data = page.ele('.content').text
+
+    # Random longer pause between pages
+    time.sleep(random.uniform(10, 20))</code></pre>
+                </div>
+            </section>
+
+            <section id="concurrent">
+                <h2 class="text-3xl font-bold mb-4 mt-8">Concurrent scraping</h2>
+                <p class="mb-4">Speed up scraping with multiple browsers.</p>
+
+                <h3 class="text-2xl font-bold mb-3">Thread-based parallel scraping</h3>
+                <pre><code class="language-python">from DrissionPage import ChromiumPage
+import threading
+import queue
+import time
+
+class WorkerThread(threading.Thread):
+    def __init__(self, task_queue, result_queue):
+        super().__init__()
+        self.task_queue = task_queue
+        self.result_queue = result_queue
+        self.page = None
+
+    def run(self):
+        """Worker thread that processes tasks"""
+        # Create browser instance for this thread
+        self.page = ChromiumPage()
+
+        while True:
+            try:
+                # Get task from queue
+                task = self.task_queue.get(timeout=5)
+
+                if task is None:  # Poison pill
+                    break
+
+                # Process task
+                url, action = task
+                try:
+                    result = self.process_task(url, action)
+                    self.result_queue.put(result)
+                except Exception as e:
+                    self.result_queue.put({'error': str(e), 'url': url})
+
+                self.task_queue.task_done()
+
+            except queue.Empty:
+                continue
+
+        # Cleanup
+        if self.page:
+            self.page.quit()
+
+    def process_task(self, url, action):
+        """Process single scraping task"""
+        self.page.get(url)
+        self.page.wait.load_start()
+
+        if action == 'scrape':
+            return {
+                'url': url,
+                'data': self.page.ele('.content').text,
+            }
+        elif action == 'screenshot':
+            return {
+                'url': url,
+                'screenshot': self.page.get_screenshot(),
+            }
+
+def parallel_scrape(urls, num_workers=3):
+    """Scrape multiple URLs in parallel"""
+    # Create queues
+    task_queue = queue.Queue()
+    result_queue = queue.Queue()
+
+    # Add tasks to queue
+    for url in urls:
+        task_queue.put((url, 'scrape'))
+
+    # Add poison pills
+    for _ in range(num_workers):
+        task_queue.put(None)
+
+    # Create and start workers
+    workers = []
+    for _ in range(num_workers):
+        worker = WorkerThread(task_queue, result_queue)
+        worker.start()
+        workers.append(worker)
+
+    # Wait for completion
+    for worker in workers:
+        worker.join()
+
+    # Collect results
+    results = []
+    while not result_queue.empty():
+        results.append(result_queue.get())
+
+    return results
+
+# Usage
+urls = [
+    'https://example.com/page1',
+    'https://example.com/page2',
+    'https://example.com/page3',
+    'https://example.com/page4',
+    'https://example.com/page5',
+]
+
+results = parallel_scrape(urls, num_workers=3)
+print(f"Scraped {len(results)} pages")</code></pre>
+
+                <h3 class="text-2xl font-bold mb-3">Resource management</h3>
+                <pre><code class="language-python">class BrowserPool:
+    """Pool of browser instances for efficient resource usage"""
+    def __init__(self, max_size=5):
+        self.pool = []
+        self.max_size = max_size
+        self.lock = threading.Lock()
+
+    def acquire(self):
+        """Get browser from pool"""
+        with self.lock:
+            if self.pool:
+                return self.pool.pop()
+            else:
+                # Create new browser
+                return ChromiumPage()
+
+    def release(self, browser):
+        """Return browser to pool"""
+        with self.lock:
+            if len(self.pool) < self.max_size:
+                # Clear cookies and cache
+                browser.cookies.clear_all()
+                self.pool.append(browser)
+            else:
+                # Pool full, close browser
+                browser.quit()
+
+    def cleanup(self):
+        """Close all browsers in pool"""
+        with self.lock:
+            for browser in self.pool:
+                browser.quit()
+            self.pool.clear()
+
+# Usage
+pool = BrowserPool(max_size=3)
+
+try:
+    browser = pool.acquire()
+    browser.get('https://example.com')
+    # Do work
+    data = browser.ele('.content').text
+    pool.release(browser)
+finally:
+    pool.cleanup()</code></pre>
+            </section>
+
+            <section id="error-handling">
+                <h2 class="text-3xl font-bold mb-4 mt-8">Production-ready error handling</h2>
+                <p class="mb-4">Real scrapers fail. Handle failures gracefully.</p>
+
+                <h3 class="text-2xl font-bold mb-3">Retry with exponential backoff</h3>
+                <pre><code class="language-python">import time
+from functools import wraps
+
+def retry(max_attempts=3, base_delay=1, max_delay=60):
+    """Decorator for retry with exponential backoff"""
+    def decorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            attempt = 0
+            while attempt < max_attempts:
+                try:
+                    return func(*args, **kwargs)
+                except Exception as e:
+                    attempt += 1
+                    if attempt >= max_attempts:
+                        raise
+
+                    # Exponential backoff
+                    delay = min(base_delay * (2 ** attempt), max_delay)
+                    print(f"Attempt {attempt} failed, retrying in {delay}s...")
+                    time.sleep(delay)
+
+            return None
+        return wrapper
+    return decorator
+
+# Usage
+@retry(max_attempts=3, base_delay=2)
+def scrape_page(page, url):
+    page.get(url)
+    page.wait.load_start()
+    return page.ele('.content').text
+
+# Try scraping
+try:
+    data = scrape_page(page, 'https://example.com')
+except Exception as e:
+    print(f"Failed after retries: {e}")</code></pre>
+
+                <h3 class="text-2xl font-bold mb-3">Comprehensive error handling</h3>
+                <pre><code class="language-python">from DrissionPage import ChromiumPage
+import logging
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+class RobustScraper:
+    def __init__(self):
+        self.page = None
+        self.max_retries = 3
+
+    def init_browser(self):
+        """Initialize browser with error handling"""
+        try:
+            self.page = ChromiumPage()
+            logger.info("Browser initialized successfully")
+            return True
+        except Exception as e:
+            logger.error(f"Failed to initialize browser: {e}")
+            return False
+
+    def safe_scrape(self, url, selector):
+        """Scrape with comprehensive error handling"""
+        if not self.page:
+            if not self.init_browser():
+                return None
+
+        for attempt in range(self.max_retries):
+            try:
+                # Navigate with timeout
+                self.page.get(url, timeout=30)
+
+                # Wait for page load
+                self.page.wait.load_start()
+
+                # Find element
+                element = self.page.ele(selector, timeout=10)
+
+                if not element:
+                    logger.warning(f"Element not found: {selector}")
+                    return None
+
+                # Extract data
+                return element.text
+
+            except TimeoutError:
+                logger.warning(f"Timeout on attempt {attempt + 1}")
+                if attempt < self.max_retries - 1:
+                    time.sleep(2 ** attempt)  # Exponential backoff
+
+            except Exception as e:
+                logger.error(f"Error on attempt {attempt + 1}: {e}")
+                if attempt == self.max_retries - 1:
+                    # Last attempt failed, try restarting browser
+                    self.restart_browser()
+
+        return None
+
+    def restart_browser(self):
+        """Restart browser to recover from errors"""
+        logger.info("Restarting browser...")
+        try:
+            if self.page:
+                self.page.quit()
+            self.init_browser()
+        except Exception as e:
+            logger.error(f"Failed to restart browser: {e}")
+
+    def cleanup(self):
+        """Cleanup resources"""
+        if self.page:
+            self.page.quit()
+
+# Usage
+scraper = RobustScraper()
+try:
+    data = scraper.safe_scrape(
+        'https://example.com',
+        '.main-content'
+    )
+    if data:
+        print(f"Scraped: {data}")
+finally:
+    scraper.cleanup()</code></pre>
+            </section>
+
+            <section id="patterns">
+                <h2 class="text-3xl font-bold mb-4 mt-8">Production patterns</h2>
+                <p class="mb-4">Real project patterns I use.</p>
+
+                <h3 class="text-2xl font-bold mb-3">Configuration management</h3>
+                <pre><code class="language-python">import yaml
+import os
+
+class Config:
+    """Centralized configuration management"""
+    def __init__(self, config_file='config.yaml'):
+        with open(config_file) as f:
+            self.config = yaml.safe_load(f)
+
+    def get(self, key, default=None):
+        """Get configuration value"""
+        keys = key.split('.')
+        value = self.config
+        for k in keys:
+            value = value.get(k)
+            if value is None:
+                return default
+        return value
+
+# config.yaml
+"""
+scraping:
+  concurrent_browsers: 3
+  page_timeout: 30
+  retry_attempts: 3
+  delay_between_requests: 2
+
+proxies:
+  - type: http
+    host: proxy1.example.com
+    port: 8080
+  - type: socks5
+    host: proxy2.example.com
+    port: 1080
+
+logging:
+  level: INFO
+  file: scraper.log
+"""
+
+# Usage
+config = Config()
+timeout = config.get('scraping.page_timeout', 30)
+proxies = config.get('proxies', [])</code></pre>
+
+                <h3 class="text-2xl font-bold mb-3">Data pipeline integration</h3>
+                <pre><code class="language-python">import csv
+import json
+from datetime import datetime
+
+class DataPipeline:
+    """Handle data extraction and storage"""
+    def __init__(self, output_format='json'):
+        self.output_format = output_format
+        self.data = []
+
+    def extract_data(self, page, schema):
+        """Extract structured data based on schema"""
+        record = {}
+        for field, selector in schema.items():
+            element = page.ele(selector)
+            record[field] = element.text if element else None
+
+        record['scraped_at'] = datetime.now().isoformat()
+        self.data.append(record)
+        return record
+
+    def save(self, filename):
+        """Save data to file"""
+        if self.output_format == 'json':
+            with open(filename, 'w') as f:
+                json.dump(self.data, f, indent=2)
+
+        elif self.output_format == 'csv':
+            if self.data:
+                keys = self.data[0].keys()
+                with open(filename, 'w', newline='') as f:
+                    writer = csv.DictWriter(f, fieldnames=keys)
+                    writer.writeheader()
+                    writer.writerows(self.data)
+
+# Usage
+pipeline = DataPipeline(output_format='json')
+
+schema = {
+    'title': '.product-title',
+    'price': '.product-price',
+    'description': '.product-description',
+    'rating': '.rating'
+}
+
+for url in product_urls:
+    page.get(url)
+    page.wait.load_start()
+    pipeline.extract_data(page, schema)
+
+pipeline.save('products.json')</code></pre>
+            </section>
+
+            <section id="comparison">
+                <h2 class="text-3xl font-bold mb-4 mt-8">When to use DrissionPage vs alternatives</h2>
+                <p class="mb-4">My decision framework.</p>
+
+                <div class="overflow-x-auto">
+                    <table class="min-w-full border-collapse border border-gray-300 mb-6">
+                        <thead>
+                            <tr class="bg-gray-100">
+                                <th class="border border-gray-300 px-4 py-2 text-left">Use Case</th>
+                                <th class="border border-gray-300 px-4 py-2 text-left">Best Tool</th>
+                                <th class="border border-gray-300 px-4 py-2 text-left">Why</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="border border-gray-300 px-4 py-2">Simple static sites</td>
+                                <td class="border border-gray-300 px-4 py-2">requests + BeautifulSoup</td>
+                                <td class="border border-gray-300 px-4 py-2">Fast, lightweight, no browser overhead</td>
+                            </tr>
+                            <tr>
+                                <td class="border border-gray-300 px-4 py-2">JavaScript-heavy sites</td>
+                                <td class="border border-gray-300 px-4 py-2">DrissionPage</td>
+                                <td class="border border-gray-300 px-4 py-2">Better detection bypass than Selenium</td>
+                            </tr>
+                            <tr>
+                                <td class="border border-gray-300 px-4 py-2">Simple automation</td>
+                                <td class="border border-gray-300 px-4 py-2">Playwright</td>
+                                <td class="border border-gray-300 px-4 py-2">Better documentation, multi-language</td>
+                            </tr>
+                            <tr>
+                                <td class="border border-gray-300 px-4 py-2">Large scale scraping</td>
+                                <td class="border border-gray-300 px-4 py-2">Scrapy + DrissionPage</td>
+                                <td class="border border-gray-300 px-4 py-2">Scrapy framework, DrissionPage downloader</td>
+                            </tr>
+                            <tr>
+                                <td class="border border-gray-300 px-4 py-2">Anti-bot protected sites</td>
+                                <td class="border border-gray-300 px-4 py-2">DrissionPage</td>
+                                <td class="border border-gray-300 px-4 py-2">Best detection bypass</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="troubleshooting">
+                <h2 class="text-3xl font-bold mb-4 mt-8">Common intermediate issues</h2>
+                <p class="mb-4">Problems I hit at this level.</p>
+
+                <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-4">
+                    <p class="font-bold">Issue: Memory leaks with long-running scrapers</p>
+                    <p class="text-sm mt-2"><strong>Fix:</strong> Periodically restart browser. Clear cache and cookies. Use browser pool with max size. Monitor memory usage and restart when threshold exceeded.</p>
+                </div>
+
+                <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-4">
+                    <p class="font-bold">Issue: Session expiring mid-scrape</p>
+                    <p class="text-sm mt-2"><strong>Fix:</strong> Implement session refresh logic. Detect auth failures (redirect to login). Store multiple credentials. Auto-relogin when session expires.</p>
+                </div>
+
+                <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-4">
+                    <p class="font-bold">Issue: Captcha appearing frequently</p>
+                    <p class="text-sm mt-2"><strong>Fix:</strong> Slow down requests. Rotate IP addresses with proxies. Solve captchas with 2Captcha or DeathByCaptcha. Use headful mode occasionally to see what's happening.</p>
+                </div>
+
+                <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-4">
+                    <p class="font-bold">Issue: Dynamic content not loading</p>
+                    <p class="text-sm mt-2"><strong>Fix:</strong> Use network_idle wait. Monitor XHR requests. Wait for specific element count. Check for WebSocket data. Some content loaded via lazy loading - scroll to trigger.</p>
+                </div>
+
+                <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-4">
+                    <p class="font-bold">Issue: Browser crashes with many tabs</p>
+                    <p class="text-sm mt-2"><strong>Fix:</strong> Limit concurrent browsers. Close tabs when done. Use incognito mode for isolation. Restart browser periodically.</p>
+                </div>
+            </section>
+
+            <section id="conclusion">
+                <h2 class="text-3xl font-bold mb-4 mt-8">Moving forward</h2>
+                <p class="mb-4">
+                    At this level, you can handle most scraping challenges. Session management, dynamic content, detection bypass - these techniques cover 80% of real-world scenarios.
+                </p>
+                <p class="mb-4">
+                    Next step would be advanced topics: distributed scraping with Redis queue, machine learning for CAPTCHA solving, building scrapers as microservices. But that's another article.
+                </p>
+                <p class="mb-4">
+                    Best way to learn: pick a challenging site (e-commerce, social media, news aggregator) and build a production scraper. You'll hit problems not covered here - solving them is how you get to advanced level.
+                </p>
+                <p class="mb-4">
+                    DrissionPage's GitHub repo has good examples. Join their Discord for community help. Read the source code when stuck - it's well-written.
+                </p>
+                <p class="mb-4">
+                    Happy scraping. Stay under the radar.
+                </p>
+            </section>
+
+        </article>
+
+    </main>
+
+    <footer class="bg-gray-800 text-white py-12">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="grid md:grid-cols-3 gap-8 mb-8">
+                <div>
+                    <h3 class="font-bold text-lg mb-4">Programming Notes</h3>
+                    <p class="text-gray-400 text-sm">A collection of coding notes and tutorials from a full-stack developer.</p>
+                </div>
+                <div>
+                    <h3 class="font-bold text-lg mb-4">Quick Links</h3>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="index.html" class="hover:text-white">Home</a></li>
+                        <li><a href="about.html" class="hover:text-white">About</a></li>
+                        <li><a href="contact.html" class="hover:text-white">Contact</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-bold text-lg mb-4">Connect</h3>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="https://github.com" target="_blank" class="hover:text-white">GitHub</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 pt-8 text-center text-gray-400 text-sm">
+                <p>© 2026 Programming Notes. Built with simple HTML & Tailwind CSS.</p>
+                <p class="mt-2"><a href="privacy.html" class="hover:text-white">Privacy Policy</a></p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Prism.js for code highlighting -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+
+</body>
+</html>
