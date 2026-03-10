@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-LMWN7814BX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-LMWN7814BX');
+    </script>
+
+    <!-- SEO Meta Tags -->
+    <title>Playwright Stealth: Real Problems Bypassing Cloudflare (What Actually Works)</title>
+    <meta name="description" content="My experience trying to bypass Cloudflare 5-second shield with Playwright stealth mode. What works, what doesn't, and why sometimes you just can't win.">
+    <meta name="keywords" content="Playwright stealth, Cloudflare bypass, web scraping Python, anti-bot detection">
+    <link rel="canonical" href="https://pnt.jacbex.com/playwright-cloudflare.html">
+
+    <!-- Open Graph / Social Media -->
+    <meta property="og:title" content="Playwright Stealth: Real Problems Bypassing Cloudflare">
+    <meta property="og:description" content="Real problems I hit trying to bypass Cloudflare with Playwright and what actually worked.">
+    <meta property="og:type" content="article">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+        .code-block { background: #1e293b; color: #e2e8f0; padding: 1rem; border-radius: 0.5rem; overflow-x: auto; }
+        .code-block code { font-family: 'Monaco', 'Menlo', monospace; font-size: 0.875rem; }
+        pre { margin: 0; }
+        .warning-box { background: #fef3c7; border-left: 4px solid #f59e0b; padding: 1rem; margin: 1.5rem 0; }
+        .info-box { background: #dbeafe; border-left: 4px solid #3b82f6; padding: 1rem; margin: 1.5rem 0; }
+        .problem-box { background: #fee2e2; border-left: 4px solid #ef4444; padding: 1rem; margin: 1.5rem 0; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
+            <a href="index.html" class="text-xl font-bold text-blue-600">📝 <span class="text-gray-700">Programming Notes</span></a>
+            <div class="space-x-6 hidden md:block">
+                <a href="index.html" class="hover:text-blue-500">Home</a>
+                <a href="about.html" class="hover:text-blue-500">About</a>
+                <a href="contact.html" class="hover:text-blue-500">Contact</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Article Header -->
+    <header class="bg-gradient-to-r from-blue-700 to-indigo-800 text-white py-16">
+        <div class="max-w-4xl mx-auto px-4">
+            <p class="text-blue-200 mb-2">Python, Web Scraping</p>
+            <h1 class="text-4xl md:text-5xl font-extrabold mb-4">Playwright Stealth: Real Problems Bypassing Cloudflare (What Actually Works)</h1>
+            <p class="text-xl opacity-90 mb-6">My experience trying to bypass Cloudflare 5-second shield with Playwright stealth mode. What works, what doesn't, and why sometimes you just can't win.</p>
+            <p class="text-lg opacity-75">March 10, 2026</p>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-4xl mx-auto px-4 py-12">
+
+        <!-- Introduction -->
+        <section class="mb-12">
+            <h2 class="text-3xl font-bold mb-6">How I Got Here</h2>
+            <p class="text-gray-700 mb-4">
+                I needed to scrape a React app protected by Cloudflare. Thought it would be easy - just install playwright-stealth, configure it, and done. That's not what happened.
+            </p>
+            <p class="text-gray-700 mb-4">
+                After weeks of trial and error, going through GitHub issues, trying different proxies, and failing countless times, I finally figured out what actually works. Spoiler: it's not just playwright-stealth.
+            </p>
+            <p class="text-gray-700">
+                This is what I learned, the problems I hit, and the solutions that actually worked in production.
+            </p>
+        </section>
+
+        <!-- Problem 1 -->
+        <section class="mb-12">
+            <h2 class="text-3xl font-bold mb-6">Problem 1: Playwright-stealth Doesn't Install Properly</h2>
+            <p class="text-gray-700 mb-4">
+                First problem I hit - couldn't even get playwright-stealth working. The package on PyPI is outdated. There's a notice on GitHub:
+            </p>
+
+            <div class="problem-box">
+                <p class="font-bold text-red-800 mb-2">⚠️ GitHub Issue #40</p>
+                <p class="text-red-700">"This repo is not the source for the PyPi package (playwright-stealth) anymore"</p>
+                <p class="text-sm text-red-600 mt-2">Source: <a href="https://github.com/AtuboDad/playwright_stealth/issues/40" target="_blank" class="underline">github.com/AtuboDad/playwright_stealth/issues/40</a></p>
+            </div>
+
+            <p class="text-gray-700 mb-4">
+                What happened: I ran <code class="bg-gray-100 px-2 py-1 rounded">pip install playwright-stealth</code>, then tried to import it:
+            </p>
+
+            <div class="code-block mb-4">
+                <pre><code>from playwright_stealth import Stealth</code></pre>
+            </div>
+
+            <p class="text-gray-700 mb-4">
+                Got ImportError. The package is broken. Multiple issues report this (#16, #22, #31).
+            </p>
+
+            <h3 class="text-2xl font-bold mb-4 mt-8">What Actually Worked</h3>
+            <p class="text-gray-700 mb-4">
+                I had to install from the original repo directly:
+            </p>
+
+            <div class="code-block mb-4">
+                <pre><code>pip install git+https://github.com/Granitosaurus/playwright-stealth.git</code></pre>
+            </div>
+
+            <p class="text-gray-700 mb-4">
+                Then use it like this:
+            </p>
+
+            <div class="code-block mb-4">
+                <pre><code>from playwright.sync_api import sync_playwright
+from playwright_stealth import stealth_sync
+
+with sync_playwright() as p:
+    browser = p.chromium.launch(headless=True)
+    page = browser.new_page()
+    stealth_sync(page)  # This hides webdriver properties
+    page.goto("https://example.com")</code></pre>
+            </div>
+
+            <div class="info-box">
+                <p class="font-bold text-blue-800 mb-2">💡 Tip</p>
+                <p class="text-blue-700">Even with stealth installed, Cloudflare still detects you. More on that next.</p>
+            </div>
+        </section>
+
+        <!-- Problem 2 -->
+        <section class="mb-12">
+            <h2 class="text-3xl font-bold mb-6">Problem 2: Cloudflare Still Detects the Bot</h2>
+            <p class="text-gray-700 mb-4">
+                Got stealth working, but Cloudflare still blocked me. Got the 5-second shield, then a 1020 error (access denied).
+            </p>
+
+            <p class="text-gray-700 mb-4">
+                This is what everyone complains about on StackOverflow and Reddit. Even with:
+            </p>
+
+            <ul class="list-disc list-inside text-gray-700 mb-4 space-y-2">
+                <li>Stealth mode enabled</li>
+                <li>Custom user-agent</li>
+                <li>Real browser cookies</li>
+                <li>Human-like mouse movements</li>
+            </ul>
+
+            <p class="text-gray-700 mb-4">
+                Cloudflare still blocked the request. Why?
+            </p>
+
+            <h3 class="text-2xl font-bold mb-4 mt-8">What Cloudflare Actually Checks</h3>
+            <p class="text-gray-700 mb-4">
+                After digging through forums and GitHub issues, I found that Cloudflare checks:
+            </p>
+
+            <ul class="list-disc list-inside text-gray-700 mb-4 space-y-2">
+                <li><strong>TLS fingerprint</strong> - Python's requests have different TLS fingerprints than Chrome</li>
+                <li><strong>HTTP/2 fingerprint</strong> - The way browser orders headers</li>
+                <li><strong>Browser fingerprint</strong> - Canvas, WebGL, audio context</li>
+                <li><strong>IP reputation</strong> - Datacenter IPs vs residential IPs</li>
+                <li><strong>Behavior patterns</strong> - Too perfect timing = bot</li>
+            </ul>
+
+            <p class="text-gray-700 mb-4">
+                Playwright-stealth only hides the <code>navigator.webdriver</code> property. It doesn't fix TLS fingerprints or IP reputation.
+            </p>
+        </section>
+
+        <!-- Problem 3 -->
+        <section class="mb-12">
+            <h2 class="text-3xl font-bold mb-6">Problem 3: Residential Proxies Are Expensive</h2>
+            <p class="text-gray-700 mb-4">
+                Everyone said "use residential proxies." Yeah, great. They cost $500/month for decent ones.
+            </p>
+
+            <div class="warning-box">
+                <p class="font-bold text-yellow-800 mb-2">⚠️ Reality Check</p>
+                <p class="text-yellow-700">Free proxies are either slow, already blacklisted by Cloudflare, or exit after 5 minutes. Residential proxy services cost serious money.</p>
+            </div>
+
+            <p class="text-gray-700 mb-4">
+                I tried:
+            </p>
+
+            <ul class="list-disc list-inside text-gray-700 mb-4 space-y-2">
+                <li>Bright Data - $500+/month</li>
+                <li>Smartproxy - $75-$200/month</li>
+                <li>Oxylabs - $300+/month</li>
+                <li>Free proxy lists - All blocked by Cloudflare</li>
+            </ul>
+
+            <h3 class="text-2xl font-bold mb-4 mt-8">What Actually Worked (Budget Solution)</h3>
+            <p class="text-gray-700 mb-4">
+                For low-volume scraping, I used:
+            </p>
+
+            <div class="code-block mb-4">
+                <pre><code>from playwright.sync_api import sync_playwright
+from playwright_stealth import stealth_sync
+
+# Use datacenter proxies with rotation
+proxies = [
+    "http://proxy1.example.com:8000",
+    "http://proxy2.example.com:8000",
+    # ... more proxies
+]
+
+with sync_playwright() as p:
+    for proxy in proxies:
+        try:
+            browser = p.chromium.launch(
+                headless=True,
+                proxy={"server": proxy}
+            )
+            page = browser.new_page()
+            stealth_sync(page)
+
+            # Add random delays to mimic human behavior
+            page.wait_for_timeout(2000 + random.randint(0, 3000))
+
+            page.goto("https://target-site.com")
+
+            # If we get here, proxy works
+            break
+
+        except Exception as e:
+            continue
+            # Try next proxy</code></pre>
+            </div>
+
+            <p class="text-gray-700 mb-4">
+                This isn't perfect. Cloudflare still blocks some datacenter IPs. But with enough rotation, some get through.
+            </p>
+        </section>
+
+        <!-- Problem 4 -->
+        <section class="mb-12">
+            <h2 class="text-3xl font-bold mb-6">Problem 4: Headless Mode Gets Detected</h2>
+            <p class="text-gray-700 mb-4">
+                GitHub Issue #30 and #21 - headless browsers fail detection tests. Cloudflare checks:
+            </p>
+
+            <ul class="list-disc list-inside text-gray-700 mb-4 space-y-2">
+                <li>Screen size (headless often has 0x0 or weird dimensions)</li>
+                <li>WebGL renderer (headless shows "Google SwiftShader" instead of real GPU)</li>
+                <li>Missing browser plugins</li>
+                <li>Automation indicators</li>
+            </ul>
+
+            <h3 class="text-2xl font-bold mb-4 mt-8">What Actually Worked</h3>
+            <p class="text-gray-700 mb-4">
+                I had to run in headed mode on a remote server:
+            </p>
+
+            <div class="code-block mb-4">
+                <pre><code>browser = p.chromium.launch(
+    headless=False,  # headed mode
+    args=[
+        '--start-maximized',
+        '--disable-blink-features=AutomationControlled'
+    ]
+)
+
+# Set viewport size
+page = browser.new_page(
+    viewport={'width': 1920, 'height': 1080}
+)</code></pre>
+            </div>
+
+            <p class="text-gray-700 mb-4">
+                For servers without a display, use Xvfb:
+            </p>
+
+            <div class="code-block mb-4">
+                <pre><code># Install Xvfb
+# sudo apt-get install xvfb
+
+# Run Playwright with virtual display
+xvfb-run python script.py</code></pre>
+            </div>
+
+            <div class="info-box">
+                <p class="font-bold text-blue-800 mb-2">💡 Note</p>
+                <p class="text-blue-700">Modern Cloudflare checks are more sophisticated. Even headed mode can be detected through behavioral analysis.</p>
+            </div>
+        </section>
+
+        <!-- Problem 5 -->
+        <section class="mb-12">
+            <h2 class="text-3xl font-bold mb-6">Problem 5: reCAPTCHA Doesn't Show</h2>
+            <p class="text-gray-700 mb-4">
+                GitHub Issue #38 - recaptcha not showing. Sometimes Cloudflare serves a CAPTCHA, but it never appears in Playwright.
+            </p>
+
+            <p class="text-gray-700 mb-4">
+                What happens: The page loads, you see the "Checking your browser" message, then... nothing. Page stays blank.
+            </p>
+
+            <h3 class="text-2xl font-bold mb-4 mt-8">What Actually Worked</h3>
+            <p class="text-gray-700 mb-4">
+                This is usually because:
+            </p>
+
+            <ol class="list-decimal list-inside text-gray-700 mb-4 space-y-2">
+                <li>JavaScript is blocked</li>
+                <li>The iframe containing the CAPTCHA is blocked by privacy settings</li>
+                <li>Cloudflare decided to block instead of challenge</li>
+            </ol>
+
+            <p class="text-gray-700 mb-4">
+                I tried:
+            </p>
+
+            <div class="code-block mb-4">
+                <pre><code># Wait for the Cloudflare challenge to complete
+page.wait_for_selector("title", timeout=30000)
+
+# Or wait for specific element that appears after challenge
+page.wait_for_selector("#main-content", timeout=30000)</code></pre>
+            </div>
+
+            <p class="text-gray-700 mb-4">
+                Sometimes though, the site just doesn't want automated traffic. No workaround for that.
+            </p>
+
+            <div class="problem-box">
+                <p class="font-bold text-red-800 mb-2">⚠️ Unsolved Problem</p>
+                <p class="text-red-700">Some sites use Cloudflare's "Managed Challenge" which is invisible. If it fails, you just get blocked. No CAPTCHA to solve.</p>
+            </div>
+        </section>
+
+        <!-- What Works -->
+        <section class="mb-12">
+            <h2 class="text-3xl font-bold mb-6">What Actually Works (in 2026)</h2>
+            <p class="text-gray-700 mb-4">
+                After all this trial and error, here's my setup that <em>usually</em> works:
+            </p>
+
+            <div class="code-block mb-4">
+                <pre><code>from playwright.sync_api import sync_playwright
+from playwright_stealth import stealth_sync
+import random
+import time
+
+def create_stealth_context(proxy_url):
+    """Create a browser context with anti-detection measures"""
+    with sync_playwright() as p:
+        browser = p.chromium.launch(
+            headless=False,  # headed mode
+            proxy={"server": proxy_url} if proxy_url else None,
+            args=[
+                '--disable-blink-features=AutomationControlled',
+                '--disable-dev-shm-usage',
+                '--no-sandbox',
+            ]
+        )
+
+        context = browser.new_context(
+            viewport={'width': 1920, 'height': 1080},
+            user_agent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+            locale='en-US',
+            timezone_id='America/New_York',
+        )
+
+        page = context.new_page()
+        stealth_sync(page)
+
+        return browser, page
+
+def scrape_with_retry(url, max_retries=5):
+    """Scrape with proxy rotation and retries"""
+    proxies = load_proxies()  # Your proxy list
+
+    for attempt in range(max_retries):
+        proxy = random.choice(proxies) if proxies else None
+
+        try:
+            browser, page = create_stealth_context(proxy)
+
+            # Random delay before request
+            time.sleep(random.uniform(2, 5))
+
+            # Navigate to page
+            response = page.goto(url, wait_until="domcontentloaded", timeout=30000)
+
+            # Wait for Cloudflare challenge
+            time.sleep(5)
+
+            # Check if we got blocked
+            if response.status == 403 or response.status == 1020:
+                browser.close()
+                continue
+
+            # Wait for content
+            page.wait_for_selector("body", timeout=15000)
+
+            # Extract data
+            content = page.content()
+
+            browser.close()
+            return content
+
+        except Exception as e:
+            if 'browser' in locals():
+                browser.close()
+            continue
+
+    raise Exception("All retries failed")</code></pre>
+            </div>
+
+            <h3 class="text-2xl font-bold mb-4 mt-8">Key Points</h3>
+            <ul class="list-disc list-inside text-gray-700 mb-4 space-y-2">
+                <li><strong>Headed mode</strong> - Less suspicious than headless</li>
+                <li><strong>Proxy rotation</strong> - Don't hit from same IP repeatedly</li>
+                <li><strong>Random delays</strong> - Humans don't make instant requests</li>
+                <li><strong>Real user agent</strong> - Use current Chrome version</li>
+                <li><strong>Geolocation match</strong> - Match timezone to proxy location</li>
+                <li><strong>Retry logic</strong> - Some proxies will fail, try others</li>
+            </ul>
+
+            <div class="warning-box">
+                <p class="font-bold text-yellow-800 mb-2">⚠️ Reality Check</p>
+                <p class="text-yellow-700">Even with all this, some sites will still block you. Cloudflare gets smarter every month. What works today might not work next month.</p>
+            </div>
+        </section>
+
+        <!-- When to Give Up -->
+        <section class="mb-12">
+            <h2 class="text-3xl font-bold mb-6">When to Just Give Up</h2>
+            <p class="text-gray-700 mb-4">
+                Sometimes the best solution is to accept defeat. I've learned to move on when:
+            </p>
+
+            <ul class="list-disc list-inside text-gray-700 mb-4 space-y-2">
+                <li>Site uses Enterprise Cloudflare with bot management (budget: $0, success rate: 0%)</li>
+                <li>Requires phone verification or 2FA</li>
+                <li>Session checks are too strict (fingerprinting + IP + behavior pattern)</li>
+                <li>Legal gray area or explicit terms prohibiting scraping</li>
+            </ul>
+
+            <p class="text-gray-700 mb-4">
+                Alternatives I use:
+            </p>
+
+            <ul class="list-disc list-inside text-gray-700 mb-4 space-y-2">
+                <li>Official API (if available)</li>
+                <li>Manual export/download (for one-time data needs)</li>
+                <li>Third-party data providers (sometimes cheaper than building own scraper)</li>
+                <li>Different target site with similar data but weaker protection</li>
+            </ul>
+        </section>
+
+        <!-- Conclusion -->
+        <section class="mb-12">
+            <h2 class="text-3xl font-bold mb-6">Final Thoughts</h2>
+            <p class="text-gray-700 mb-4">
+                Playwright-stealth helps, but it's not a magic bullet. Cloudflare is sophisticated, and they actively work to detect automated browsers.
+            </p>
+            <p class="text-gray-700 mb-4">
+                The combination that works for me:
+            </p>
+            <ul class="list-disc list-inside text-gray-700 mb-4 space-y-2">
+                <li>Stealth mode (hide webdriver flags)</li>
+                <li>Headed mode (avoid headless detection)</li>
+                <li>Proxy rotation (spread requests across IPs)</li>
+                <li>Human-like delays (don't request too fast)</li>
+                <li>Accept that some sites just can't be scraped</li>
+            </ul>
+            <p class="text-gray-700 mb-4">
+                Not claiming this is the "right" way or that it works everywhere. It's just what I've learned through months of failing and trying again.
+            </p>
+            <p class="text-gray-700">
+                If you're dealing with Cloudflare in 2026, expect to spend time debugging and adjusting. The cat-and-mouse game never ends.
+            </p>
+        </section>
+
+        <!-- Related Articles -->
+        <section class="mb-12 bg-white rounded-lg shadow-md p-8">
+            <h2 class="text-2xl font-bold mb-6">Related Articles</h2>
+            <div class="grid md:grid-cols-2 gap-6">
+                <a href="drissionpage.html" class="block p-4 border rounded-lg hover:border-blue-500 transition">
+                    <h3 class="font-bold text-lg mb-2">DrissionPage: The Selenium Alternative That Bypasses Bot Detection</h3>
+                    <p class="text-gray-600 text-sm">Stop getting blocked by Cloudflare. See how DrissionPage bypasses anti-bot shields that catch Selenium every time.</p>
+                </a>
+                <a href="drissionpage-problems.html" class="block p-4 border rounded-lg hover:border-blue-500 transition">
+                    <h3 class="font-bold text-lg mb-2">DrissionPage: Real Problems That Blocked Me (And How I Got Past Them)</h3>
+                    <p class="text-gray-600 text-sm">Click detection failing, scroll issues, Cloudflare blocking. Real problems from GitHub issues and what actually works.</p>
+                </a>
+            </div>
+        </section>
+
+        <!-- Sources -->
+        <section class="mb-12 bg-gray-100 rounded-lg p-8">
+            <h2 class="text-2xl font-bold mb-6">Sources & Further Reading</h2>
+            <ul class="space-y-2 text-gray-700">
+                <li><a href="https://github.com/AtuboDad/playwright_stealth/issues" target="_blank" class="text-blue-600 hover:underline">playwright-stealth GitHub Issues</a> - Real problems people report</li>
+                <li><a href="https://github.com/HasData/cloudflare-bypass" target="_blank" class="text-blue-600 hover:underline">Cloudflare Bypass Examples</a> - Working code examples</li>
+                <li><a href="https://stackoverflow.com/questions/78902913/how-to-bypass-cloudflare-using-playwright" target="_blank" class="text-blue-600 hover:underline">StackOverflow: Bypass Cloudflare with Playwright</a></li>
+                <li><a href="https://www.reddit.com/r/learnpython/comments/1hxs4lf/bypassing_cloudflare_when_using_python_playwright/" target="_blank" class="text-blue-600 hover:underline">Reddit: Cloudflare Bypass Discussion</a></li>
+            </ul>
+        </section>
+
+    </main>
+
+    <footer class="bg-gray-800 text-white py-12">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="grid md:grid-cols-3 gap-8 mb-8">
+                <div>
+                    <h3 class="font-bold text-lg mb-4">Programming Notes</h3>
+                    <p class="text-gray-400 text-sm">A collection of coding notes and tutorials from a full-stack developer.</p>
+                </div>
+                <div>
+                    <h3 class="font-bold text-lg mb-4">Quick Links</h3>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="index.html" class="hover:text-white">Home</a></li>
+                        <li><a href="about.html" class="hover:text-white">About</a></li>
+                        <li><a href="contact.html" class="hover:text-white">Contact</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-bold text-lg mb-4">Connect</h3>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="https://github.com" target="_blank" class="hover:text-white">GitHub</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 pt-8 text-center text-gray-400 text-sm">
+                <p>© 2026 Programming Notes. Built with simple HTML & Tailwind CSS.</p>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>
