@@ -75,7 +75,7 @@
     </header>
 
     <main class="max-w-4xl mx-auto px-4 py-12 bg-white mt-[-40px] rounded-xl shadow-lg mb-20">
-        
+
         <article class="prose prose-blue max-w-none">
             
             <section id="introduction">
@@ -270,6 +270,159 @@ async def crawl_and_index(url):
             </section>
 
         </article>
+
+        <!-- 推荐阅读 -->
+        <section class="mt-16 pt-8 border-t border-gray-200">
+            <h3 class="text-2xl font-bold mb-6">📚 Recommended Reading</h3>
+
+            <div class="grid md:grid-cols-2 gap-6">
+
+                <!-- Web Scraping 相关 -->
+                <div>
+                    <h4 class="font-semibold text-gray-700 mb-3 flex items-center">
+                        <span class="w-2 h-2 bg-blue-500 rounded-full mr-2"></span>
+                        Web Scraping
+                    </h4>
+                    <div class="space-y-3">
+                        <a href="drissionpage.html" class="block text-gray-600 hover:text-blue-600 group">
+                            <span class="group-hover:translate-x-1 inline-block transition-transform text-sm">→</span>
+                            <span class="text-sm">DrissionPage: Selenium Alternative That Bypasses Bot Detection</span>
+                        </a>
+                        <a href="scrapegraph-ai.html" class="block text-gray-600 hover:text-blue-600 group">
+                            <span class="group-hover:translate-x-1 inline-block transition-transform text-sm">→</span>
+                            <span class="text-sm">Scrapegraph-ai: AI-Powered Web Scraping for Structured Data</span>
+                        </a>
+                        <a href="playwright-cloudflare.html" class="block text-gray-600 hover:text-blue-600 group">
+                            <span class="group-hover:translate-x-1 inline-block transition-transform text-sm">→</span>
+                            <span class="text-sm">Playwright Stealth: Real Problems Bypassing Cloudflare</span>
+                        </a>
+                        <a href="drissionpage-problems.html" class="block text-gray-600 hover:text-blue-600 group">
+                            <span class="group-hover:translate-x-1 inline-block transition-transform text-sm">→</span>
+                            <span class="text-sm">DrissionPage: Real Problems That Blocked Me (And Solutions)</span>
+                        </a>
+                        <a href="drissionpage-advanced.html" class="block text-gray-600 hover:text-blue-600 group">
+                            <span class="group-hover:translate-x-1 inline-block transition-transform text-sm">→</span>
+                            <span class="text-sm">DrissionPage: What I Learned After Using It for a Year</span>
+                        </a>
+                        <a href="instaloader.html" class="block text-gray-600 hover:text-blue-600 group">
+                            <span class="group-hover:translate-x-1 inline-block transition-transform text-sm">→</span>
+                            <span class="text-sm">Instaloader: Download Instagram Photos Without Login</span>
+                        </a>
+                        <a href="playwright-stealth.html" class="block text-gray-600 hover:text-blue-600 group">
+                            <span class="group-hover:translate-x-1 inline-block transition-transform text-sm">→</span>
+                            <span class="text-sm">Playwright Stealth: Scraping Modern React/Vue Apps Without Getting Blocked</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- AI/ML 相关 -->
+                <div>
+                    <h4 class="font-semibold text-gray-700 mb-3 flex items-center">
+                        <span class="w-2 h-2 bg-purple-500 rounded-full mr-2"></span>
+                        AI & LLMs
+                    </h4>
+                    <div class="space-y-3">
+                        <a href="embedchain.html" class="block text-gray-600 hover:text-blue-600 group">
+                            <span class="group-hover:translate-x-1 inline-block transition-transform text-sm">→</span>
+                            <span class="text-sm">Embedchain: Finally Built a Chatbot That Knows My Stuff</span>
+                        </a>
+                        <a href="flowise.html" class="block text-gray-600 hover:text-blue-600 group">
+                            <span class="group-hover:translate-x-1 inline-block transition-transform text-sm">→</span>
+                            <span class="text-sm">Flowise: Build an AI Knowledge Bot in Minutes (No Coding)</span>
+                        </a>
+                        <a href="dify.html" class="block text-gray-600 hover:text-blue-600 group">
+                            <span class="group-hover:translate-x-1 inline-block transition-transform text-sm">→</span>
+                            <span class="text-sm">Dify: Finally Built That AI Chatbot Without Writing Code</span>
+                        </a>
+                        <a href="whisper.html" class="block text-gray-600 hover:text-blue-600 group">
+                            <span class="group-hover:translate-x-1 inline-block transition-transform text-sm">→</span>
+                            <span class="text-sm">Whisper: Finally, Speech to Text That Actually Works</span>
+                        </a>
+                        <a href="gpt-sovits.html" class="block text-gray-600 hover:text-blue-600 group">
+                            <span class="group-hover:translate-x-1 inline-block transition-transform text-sm">→</span>
+                            <span class="text-sm">GPT-SoVITS: Clone Any Voice with 5 Seconds of Audio</span>
+                        </a>
+                        <a href="babyagi.html" class="block text-gray-600 hover:text-blue-600 group">
+                            <span class="group-hover:translate-x-1 inline-block transition-transform text-sm">→</span>
+                            <span class="text-sm">BabyAGI: Built an AI Agent That Actually Does Stuff</span>
+                        </a>
+                        <a href="bark.html" class="block text-gray-600 hover:text-blue-600 group">
+                            <span class="group-hover:translate-x-1 inline-block transition-transform text-sm">→</span>
+                            <span class="text-sm">Bark: AI Voice Generation That Actually Sounds Human</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- DevOps & Self-Hosted Tools -->
+                <div>
+                    <h4 class="font-semibold text-gray-700 mb-3 flex items-center">
+                        <span class="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
+                        DevOps & Self-Hosted
+                    </h4>
+                    <div class="space-y-3">
+                        <a href="n8n.html" class="block text-gray-600 hover:text-blue-600 group">
+                            <span class="group-hover:translate-x-1 inline-block transition-transform text-sm">→</span>
+                            <span class="text-sm">n8n: Self-Hosted Zapier Alternative - Automate Workflows</span>
+                        </a>
+                        <a href="huginn.html" class="block text-gray-600 hover:text-blue-600 group">
+                            <span class="group-hover:translate-x-1 inline-block transition-transform text-sm">→</span>
+                            <span class="text-sm">Huginn: Built My Own IFTTT and Saved $15/Month</span>
+                        </a>
+                        <a href="coolify.html" class="block text-gray-600 hover:text-blue-600 group">
+                            <span class="group-hover:translate-x-1 inline-block transition-transform text-sm">→</span>
+                            <span class="text-sm">Coolify: Finally, Deploy Apps Like Heroku But on Your Own Server</span>
+                        </a>
+                        <a href="portainer.html" class="block text-gray-600 hover:text-blue-600 group">
+                            <span class="group-hover:translate-x-1 inline-block transition-transform text-sm">→</span>
+                            <span class="text-sm">Portainer: Finally, Docker Management That Doesn't Suck</span>
+                        </a>
+                        <a href="nginx-proxy-manager.html" class="block text-gray-600 hover:text-blue-600 group">
+                            <span class="group-hover:translate-x-1 inline-block transition-transform text-sm">→</span>
+                            <span class="text-sm">Nginx Proxy Manager: Finally, SSL Certificates That Don't Suck</span>
+                        </a>
+                        <a href="minio.html" class="block text-gray-600 hover:text-blue-600 group">
+                            <span class="group-hover:translate-x-1 inline-block transition-transform text-sm">→</span>
+                            <span class="text-sm">MinIO: Build Your Own S3-Compatible Storage and Save 90%</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- More Tools -->
+                <div>
+                    <h4 class="font-semibold text-gray-700 mb-3 flex items-center">
+                        <span class="w-2 h-2 bg-orange-500 rounded-full mr-2"></span>
+                        More Tools
+                    </h4>
+                    <div class="space-y-3">
+                        <a href="gallery-dl-instagram-advanced.html" class="block text-gray-600 hover:text-blue-600 group">
+                            <span class="group-hover:translate-x-1 inline-block transition-transform text-sm">→</span>
+                            <span class="text-sm">Gallery-dl Instagram: What Actually Works</span>
+                        </a>
+                        <a href="tiktok-live-recorder-problems.html" class="block text-gray-600 hover:text-blue-600 group">
+                            <span class="group-hover:translate-x-1 inline-block transition-transform text-sm">→</span>
+                            <span class="text-sm">TikTok Live Recorder: Real Problems I Hit</span>
+                        </a>
+                        <a href="youget.html" class="block text-gray-600 hover:text-blue-600 group">
+                            <span class="group-hover:translate-x-1 inline-block transition-transform text-sm">→</span>
+                            <span class="text-sm">You-Get: Download 4K Videos from 100+ Sites via Command Line</span>
+                        </a>
+                        <a href="facebook-page-scraper.html" class="block text-gray-600 hover:text-blue-600 group">
+                            <span class="group-hover:translate-x-1 inline-block transition-transform text-sm">→</span>
+                            <span class="text-sm">Facebook Page Scraper: Extract Business Data Without API</span>
+                        </a>
+                        <a href="gallerydl.html" class="block text-gray-600 hover:text-blue-600 group">
+                            <span class="group-hover:translate-x-1 inline-block transition-transform text-sm">→</span>
+                            <span class="text-sm">Gallery-dl: Mass Download High-Res Images from Pixiv, Instagram, Pinterest</span>
+                        </a>
+                        <a href="index.html" class="block text-blue-600 font-semibold hover:text-blue-700 group">
+                            <span class="group-hover:translate-x-1 inline-block transition-transform text-sm">←</span>
+                            <span class="text-sm">View All 45+ Articles</span>
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+        </section>
 
     </main>
 
