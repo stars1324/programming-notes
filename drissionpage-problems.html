@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-LMWN7814BX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date);
+      gtag('config', 'G-LMWN7814BX');
+    </script>
+
+    <!-- SEO Meta Tags -->
+    <title>DrissionPage: Real Problems That Blocked Me (And How I Got Past Them)</title>
+    <meta name="description" content="DrissionPage looked perfect but real sites threw curveballs. Click detection failing, scroll issues, Cloudflare blocking, race conditions. Here's what actually works in production.">
+    <meta name="keywords" content="DrissionPage problems, DrissionPage issues, web automation problems, DrissionPage troubleshooting, click not working, scroll issues">
+    <link rel="canonical" href="https://pnt.jacbex.com/drissionpage-problems.html" />
+
+    <!-- Open Graph / Social Media -->
+    <meta property="og:title" content="DrissionPage: Real Problems and Solutions">
+    <meta property="og:description" content="Actual DrissionPage problems from GitHub issues and how I solved them.">
+    <meta property="og:type" content="article">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Code Highlighting -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "DrissionPage: Real Problems That Blocked Me (And How I Got Past Them)",
+      "description": "Solutions to real DrissionPage problems from production use.",
+      "author": {
+        "@type": "Person",
+        "name": "Programming Notes"
+      }
+    }
+    </script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+        .prose code { color: #eb5757; background: #f9f2f2; padding: 2px 4px; border-radius: 4px; }
+        .issue-card { background: #fef3c7; border-left: 4px solid #f59e0b; padding: 20px; margin: 16px 0; border-radius: 8px; }
+        .solution-card { background: #d1fae5; border-left: 4px solid #10b981; padding: 20px; margin: 16px 0; border-radius: 8px; }
+        .unsolved-card { background: #fee2e2; border-left: 4px solid #ef4444; padding: 20px; margin: 16px 0; border-radius: 8px; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+
+    <nav class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+            <a href="index.html" class="text-xl font-bold text-blue-600">📝 <span class="text-gray-700">Programming Notes</span></a>
+            <div class="space-x-6 hidden md:block">
+                <a href="index.html" class="hover:text-blue-500">Home</a>
+                <a href="about.html" class="hover:text-blue-500">About</a>
+                <a href="contact.html" class="hover:text-blue-500">Contact</a>
+            </div>
+        </div>
+    </nav>
+
+    <header class="bg-gradient-to-r from-sky-600 to-cyan-700 text-white py-16">
+        <div class="max-w-4xl mx-auto px-4 text-center">
+            <h1 class="text-4xl md:text-5xl font-extrabold mb-4">DrissionPage: Real Problems That Blocked Me (And How I Got Past Them)</h1>
+            <p class="text-xl opacity-90">DrissionPage looked perfect in tutorials. Real sites were different. Click detection failing, scroll issues, Cloudflare blocking. Here's what actually works in production.</p>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto px-4 py-12 bg-white mt-[-40px] rounded-xl shadow-lg mb-20">
+
+        <article class="prose prose-blue max-w-none">
+
+            <section id="intro">
+                <h2 class="text-3xl font-bold mb-4">Why I'm writing this</h2>
+                <p class="mb-4">
+                    Used DrissionPage for a while after getting frustrated with Selenium. Tutorials made it look simple - "just click this button", "just scroll that page". Tried it on actual sites and hit walls immediately.
+                </p>
+                <p class="mb-4">
+                    Looked at GitHub issues - turns out I wasn't alone. Lots of people hitting the same problems. Some solved, some still open.
+                </p>
+                <p class="mb-4">
+                    This isn't a tutorial - it's me documenting the stuff that blocked me and how I got past it. Not perfect, not pretty, but it works for my use cases.
+                </p>
+                <p class="mb-4">
+                    Sources:
+                    - <a href="https://github.com/g1879/DrissionPage/issues" target="_blank" class="text-blue-600 underline">DrissionPage GitHub Issues</a>
+                    - <a href="https://github.com/g1879/DrissionPage/issues/329" target="_blank" class="text-blue-600 underline">Issue #329 - Cloudflare detection</a>
+                    - <a href="https://github.com/g1879/DrissionPage/issues/654" target="_blank" class="text-blue-600 underline">Issue #654 - Multi-threading race conditions</a>
+                    - <a href="https://github.com/g1879/DrissionPage/issues/659" target="_blank" class="text-blue-600 underline">Issue #659 - Scroll to bottom problem</a>
+                </p>
+            </section>
+
+            <section id="problem-1">
+                <h2 class="text-3xl font-bold mb-4">Problem #1: Clicks don't register</h2>
+                <div class="issue-card">
+                    <p class="font-bold mb-2">The Problem</p>
+                    <p class="mb-3">Action chain looks perfect, runs without errors, but element doesn't respond. Click happens but nothing changes. Drove me crazy for weeks.</p>
+                </div>
+
+                <h3 class="text-2xl font-bold mb-3">What actually helped</h3>
+                <pre><code class="language-python">from DrissionPage import ChromiumPage
+
+page = ChromiumPage()
+page.get('https://example.com')
+
+# Problem: this doesn't actually click
+button = page.ele('#submit-button')
+button.click()
+
+# What worked for me:
+# 1. Wait longer before clicking
+page.wait.load_start()
+
+# 2. Make sure element is actually clickable
+button = page.ele('#submit-button', timeout=10)
+if button:
+    # Click in different ways until one works
+    try:
+        button.click()
+    except:
+        # Try JS click
+        button.run_js('this.click()')
+
+    # Or click at center of element
+    button.click(at=(0.5, 0.5))</code></pre>
+
+                <h3 class="text-2xl font-bold mb-3">Hidden elements</h3>
+                <pre><code class="language-python"># Sometimes element is hidden by another element
+# DrissionPage finds it but can't click it
+
+# Solution: make element visible first
+page.run_js('''
+    const element = document.querySelector('#submit-button');
+    if (element) {
+        element.style.display = 'block';
+        element.style.visibility = 'visible';
+        element.style.opacity = '1';
+    }
+''')
+
+# Then click
+button.click()</code></pre>
+
+                <div class="solution-card">
+                    <p class="font-bold mb-2">The real issue</p>
+                    <p class="mb-3">Sometimes element is covered by a modal or overlay. Need to close that first.</p>
+                    <pre><code class="language-python"># Check if anything is blocking clicks
+def is_blocked(page, element):
+    # Get element position
+    rect = element.rect
+
+    # Check if anything is covering it
+    # (simplified - in reality this is more complex)
+    covered = page.run_js(f'''
+        const rect = arguments[0].getBoundingClientRect();
+        const topEl = document.elementFromPoint(rect.x + rect.width/2, rect.y + rect.height/2);
+        return topEl !== arguments[0];
+    ''', element)
+
+    return is_blocked(page, button)</code></pre>
+                </div>
+            </section>
+
+            <section id="problem-2">
+                <h2 class="text-3xl font-bold mb-4">Problem #2: Page scrolls to bottom automatically</h2>
+                <div class="issue-card">
+                    <p class="font-bold mb-2">GitHub Issue #659</p>
+                    <p class="mb-3">Execute GET request and page jumps to bottom. Happens on some SPA sites that auto-scroll on load.</p>
+                </div>
+
+                <h3 class="text-2xl font-bold mb-3">Workarounds I tried</h3>
+                <pre><code class="language-python">from DrissionPage import ChromiumPage
+import time
+
+page = ChromiumPage()
+page.get('https://example.com')
+
+# Problem: page auto-scrolls to bottom
+# Solution 1: Wait for initial load, then scroll back up
+page.wait(2)  # Let auto-scroll finish
+scroll_to = 0  # scroll to top
+page.run_js(f'window.scrollTo(0, {scroll_to});')
+
+# Solution 2: Disable JS before page loads
+# (doesn't work for all sites but worth trying)
+page.get('https://example.com', timeout=30, load_mode='none')
+
+# Solution 3: Run JS before page loads
+page.run_js('''
+    window.addEventListener('scroll', function(e) {
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+    }, true);
+''')
+
+# Solution 4: Set scroll position immediately after get
+page.get('https://example.com', \
+         lambda url: url.set.scroll_to_top())</code></pre>
+
+                <h3 class="text-2xl font-bold mb-3">What actually works reliably</h3>
+                <div class="solution-card">
+                    <p class="font-bold mb-2">Best solution I found</p>
+                    <pre><code class="language-python"># Intercept scroll events
+page.get('https://example.com')
+
+# Immediately set scroll position
+page.run_js('window.scrollTo(0, 0);')
+
+# Then wait for actual content to load
+page.wait.doc_loaded()
+
+# Force scroll position again
+page.run_js('window.scrollTo(0, 0);')
+
+# Sometimes need to do this multiple times
+for _ in range(3):
+    page.run_js('window.scrollTo(0, 0);')
+    time.sleep(0.5)</code></pre>
+                </div>
+            </section>
+
+            <section id="problem-3">
+                <h2 class="text-3xl font-bold mb-4">Problem #3: Cloudflare bot detection</h2>
+                <div class="issue-card">
+                    <p class="font-bold mb-2">GitHub Issue #329</p>
+                    <p class="mb-3">DrissionPage click is just simulated mouse click, not real. Cloudflare knows. Clicks work, but site still blocks you.</p>
+                </div>
+
+                <h3 class="text-2xl font-bold mb-3">What someone in issue #329 tried</h3>
+                <pre><code class="language-python"># User found pyautogui can do real mouse clicks
+import pyautogui
+
+# Get browser window position
+# (need to manually measure or use tool)
+
+# Click at specific coordinates
+pyautogui.click(x, y)
+
+# This worked for them but has drawbacks:
+# - Requires knowing exact window position
+# - Can't move mouse while script runs
+# - Doesn't work headless</code></pre>
+
+                <h3 class="text-2xl font-bold mb-3">What worked for me</h3>
+                <div class="solution-card">
+                    <p class="font-bold mb-2">Browser fingerprints matter</p>
+                    <pre><code class="language-python"># Make browser look more human
+from DrissionPage import ChromiumPage
+
+page = ChromiumPage(
+    arguments=[
+        '--disable-blink-features=AutomationControlled',
+        '--disable-dev-shm-usage',
+        '--no-first-run',
+        '--no-default-browser-check',
+        '--disable-infobars',
+    ],
+    headless=False  # Headless is easier to detect
+)
+
+# Set realistic viewport
+page.set.window.size(1920, 1080)
+page.set.window.max()
+
+# Add realistic user agent
+page.set.user_agent(
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) '
+    'AppleWebKit/537.36 (KHTML, like Gecko) '
+    'Chrome/120.0.0.0 Safari/537.36'
+)</code></pre>
+                </div>
+
+                <h3 class="text-2xl font-bold mb-3">Human-like delays</h3>
+                <pre><code class="language-python">import random
+import time
+
+def human_click(element):
+    """Click in a way that looks less automated"""
+    # Move mouse to element first
+    element.hover()
+
+    # Random delay
+    time.sleep(random.uniform(0.5, 1.5))
+
+    # Click
+    element.click()
+
+    # Random delay after click
+    time.sleep(random.uniform(1, 2))
+
+# Also, don't click everything instantly
+# Add random delays between actions
+time.sleep(random.uniform(2, 5))</code></pre>
+
+                <div class="unsolved-card">
+                    <p class="font-bold mb-2">Still unsolved</p>
+                    <p class="mb-3">Some sites just won't let you in. Cloudflare Enterprise, custom bot detection - if they really don't want bots, there's only so much you can do.</p>
+                    <p class="text-sm">Best approach: try different tactics, if all fail, move on or use manual intervention.</p>
+                </div>
+            </section>
+
+            <section id="problem-4">
+                <h2 class="text-3xl font-bold mb-4">Problem #4: Multi-threading race conditions</h2>
+                <div class="issue-card">
+                    <p class="font-bold mb-2">GitHub Issue #654</p>
+                    <p class="mb-3">Create multiple ChromiumPage instances concurrently. Multiple browser windows pop up instead of reusing existing ones. Race condition in browser initialization.</p>
+                </div>
+
+                <h3 class="text-2xl font-bold mb-3">The problem</h3>
+                <pre><code class="language-python">from DrissionPage import ChromiumPage
+import threading
+
+def scrape(url):
+    page = ChromiumPage()  # Creates new browser each time
+    page.get(url)
+    # ... do work
+    page.quit()
+
+# Problem with multiple threads
+threads = []
+for url in urls:
+    t = threading.Thread(target=scrape, args=(url,))
+    threads.append(t)
+    t.start()
+
+# Results: multiple browser windows
+# Or: crashes due to race conditions</code></pre>
+
+                <h3 class="text-2xl font-bold mb-3">Solution that worked</h3>
+                <div class="solution-card">
+                    <p class="font-bold mb-2">Don't create multiple browsers</p>
+                    <pre><code class="language-python">from DrissionPage import ChromiumPage
+from DrissionPage import ChromiumPage as Page
+import threading
+
+# Share single browser instance
+# NOT recommended by DrissionPage docs but works
+
+class BrowserPool:
+    def __init__(self):
+        self.page = ChromiumPage()
+        self.lock = threading.Lock()
+
+    def scrape(self, url):
+        with self.lock:
+            self.page.get(url)
+            # ... do work
+            # Don't quit, just navigate
+
+# Use pool instead
+pool = BrowserPool()
+threads = []
+for url in urls:
+    t = threading.Thread(target=pool.scrape, args=(url,))
+    threads.append(t)
+    t.start()
+
+for t in threads:
+    t.join()
+
+# When done
+pool.page.quit()</code></pre>
+                </div>
+
+                <h3 class="text-2xl font-bold mb-3">Better approach: use multiprocessing</h3>
+                <pre><code class="language-python">from DrissionPage import ChromiumPage
+import multiprocessing
+
+def scrape_worker(url):
+    """Each process gets its own browser"""
+    page = ChromiumPage()
+    try:
+        page.get(url)
+        # ... do work
+        return result
+    finally:
+        page.quit()
+
+# Use processes instead of threads
+with multiprocessing.Pool(processes=3) as pool:
+    results = pool.map(scrape_worker, urls)
+
+# Each process is isolated
+# Slower but more stable
+# Each has own browser instance</code></pre>
+            </section>
+
+            <section id="problem-5">
+                <h2 class="text-3xl font-bold mb-4">Problem #5: Element found but not interactable</h2>
+                <p class="mb-4">Common scenario: element exists, DrissionPage finds it, but interaction fails.</p>
+
+                <h3 class="text-2xl font-bold mb-3">Cause 1: Element in iframe</h3>
+                <pre><code class="language-python"># Problem: can't find element in iframe
+button = page.ele('#button')  # Returns None
+
+# Solution: switch to iframe first
+iframe = page.ele('iframe').src_frame
+
+# Now search within iframe
+button = iframe.ele('#button')
+
+# Or select iframe by index
+page.ele('iframe:nth-child(1)').src_frame</code></pre>
+
+                <h3 class="text-2xl font-bold mb-3">Cause 2: Shadow DOM</h3>
+                <pre><code class="language-python"># Shadow DOM elements not accessible by default
+# Solution: access through web component
+
+page.get('https://example.com')
+
+# Access shadow root
+shadow_root = page.run_js('''
+    return document.querySelector('my-component').shadowRoot;
+''')
+
+# Then search within shadow root
+element = page.run_js('''
+    const shadowRoot = document.querySelector('my-component').shadowRoot;
+    return shadowRoot.querySelector('#button');
+''')
+
+# Or DrissionPage's shadow DOM support
+from DrissionPage import WebPage
+
+# Actually DrissionPage has some shadow DOM support
+# but not perfect for all cases</code></pre>
+
+                <h3 class="text-2xl font-bold mb-3">Cause 3: Element not in viewport</h3>
+                <pre><code class="language-python"># Element exists but outside viewport
+element = page.ele('#button')
+
+# Solution: scroll to element first
+element.scroll.to_center()
+
+# Or scroll into view
+element.scroll.into_view()
+
+# Then interact
+element.click()</code></pre>
+            </section>
+
+            <section id="problem-6">
+                <h2 class="text-3xl font-bold mb-4">Problem #6: Dynamic content loading issues</h2>
+                <p class="mb-4">Element exists but data hasn't loaded yet.</p>
+
+                <h3 class="text-2xl font-bold mb-3">Explicit waits</h3>
+                <pre><code class="language-python">from DrissionPage import ChromiumPage
+
+page = ChromiumPage()
+page.get('https://example.com')
+
+# Don't immediately interact
+# Wait for specific condition
+def data_loaded(page):
+    return page.ele('.data-loaded') is not None
+
+# Wait up to 10 seconds
+page.wait(10, data_loaded)
+
+# Or wait for network to be idle
+page.wait.network_idle()
+
+# Then interact
+data = page.ele('.content').text</code></pre>
+
+                <h3 class="text-2xl font-bold mb-3">Trigger lazy loading</h3>
+                <pre><code class="language-python"># Some sites load content on scroll
+# Need to scroll to trigger it
+
+page.get('https://example.com')
+
+# Scroll down slowly
+for i in range(5):
+    page.scroll.down(300)
+    time.sleep(0.5)
+
+# Now content is loaded
+items = page.eles('.item')
+
+# Scroll to load more
+page.scroll.to_bottom()
+
+# Wait for new content to appear
+page.wait(2)  # wait for AJAX
+
+# Get newly loaded items
+new_items = page.eles('.item')</code></pre>
+            </section>
+
+            <section id="problem-7">
+                <h2 class="text-3xl font-bold mb-4">Problem #7: Cookies and session handling</h2>
+                <p class="mb-4">Can't stay logged in, or cookies don't persist.</p>
+
+                <h3 class="text-2xl font-bold mb-3">Cookie persistence</h3>
+                <pre><code class="language-python">from DrissionPage import ChromiumPage
+
+# Save cookies after login
+page = ChromiumPage()
+page.get('https://example.com/login')
+
+# Do login stuff...
+
+# Save cookies
+cookies = page.cookies(as_dict=True)
+
+# Save to file for later
+import json
+with open('cookies.json', 'w') as f:
+    json.dump(cookies, f)
+
+# Later, load cookies
+with open('cookies.json', 'r') as f:
+    cookies = json.load(f)
+
+# Set cookies before navigating
+for name, value in cookies.items():
+    page.set.cookies(name, value)
+
+# Now navigate
+page.get('https://example.com/dashboard')  # Should be logged in</code></pre>
+
+                <h3 class="text-2xl font-bold mb-3">User data directory</h3>
+                <pre><code class="language-python"># Use same user data directory to persist sessions
+from DrissionPage import ChromiumPage
+
+page = ChromiumPage(
+    user_data_path='./browser_profile'
+)
+
+# First run: login, creates profile
+page.get('https://example.com/login')
+# do login...
+
+# Next run: same path, session persists
+page.quit()  # saves state
+
+# Later...
+page = ChromiumPage(
+    user_data_path='./browser_profile'
+)
+page.get('https://example.com/dashboard')  # Still logged in!</code></pre>
+            </section>
+
+            <section id="troubleshooting">
+                <h2 class="text-3xl font-bold mb-4">How I debug when things go wrong</h2>
+                <p class="mb-4">Debugging DrissionPage scripts can be frustrating. Here's what helps.</p>
+
+                <h3 class="text-2xl font-bold mb-3">Visual debugging</h3>
+                <pre><code class="language-python"># Don't use headless mode when debugging
+page = ChromiumPage(headless=False)
+
+# Watch what happens
+# See the actual browser window</code></pre>
+
+                <h3 class="text-2xl font-bold mb-3">Screenshots on error</h3>
+                <pre><code class="language-python">try:
+    # ... do work ...
+    element.click()
+except Exception as e:
+    # Take screenshot before failing
+    screenshot_path = f'error_{int(time.time())}.png'
+    page.get_screenshot(path=screenshot_path)
+    raise</code></pre>
+
+                <h3 class="text-2xl font-bold mb-3">Check actual browser console</h3>
+                <pre><code class="python"># See what JavaScript errors exist
+console_errors = page.run_js('''
+    return Array.from(window.console.errors).map(e => e.message);
+''')
+
+print("Console errors:", console_errors)
+
+# Often reveals the real problem</code></pre>
+
+                <h3 class="text-2xl font-bold mb-3">Page source vs rendered HTML</h3>
+                <pre><code class="language-python"># Sometimes page source differs from rendered HTML
+# Check both
+
+# What server sent
+source = page.html
+
+# What browser rendered (after JS)
+rendered = page.run_js('document.body.innerHTML')
+
+# Compare to find dynamically added content</code></pre>
+            </section>
+
+            <section id="reality">
+                <h2 class="text-3xl font-bold mb-4">Reality check</h2>
+                <p class="mb-4">
+                    DrissionPage is great but it's not magic. Some sites just don't want to be automated. Cloudflare Enterprise, custom bot detection, obfuscated JavaScript - if a site really doesn't want you, they'll make it hard.
+                </p>
+                <p class="mb-4">
+                    The issues I mentioned? They're from real use cases. Some I solved, some I worked around, some I just avoided those sites.
+                </p>
+                <p class="mb-4">
+                    If you're hitting problems not covered here, check the <a href="https://github.com/g1879/DrissionPage/issues" target="_blank" class="text-blue-600 underline">GitHub issues</a>. Someone probably hit it before. Search through closed issues too, not just open.
+                </p>
+                <p class="mb-4">
+                    And if you find a solution that works, consider documenting it. Not for clout - but because I'll probably hit the same problem 6 months from now and forgot how I fixed it.
+                </p>
+                <p class="mb-4">
+                    Good luck. Web automation is a cat-and-mouse game. DrissionPage helps but doesn't win every battle.
+                </p>
+            </section>
+
+        </article>
+
+    </main>
+
+    <footer class="bg-gray-800 text-white py-12">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="grid md:grid-cols-3 gap-8 mb-8">
+                <div>
+                    <h3 class="font-bold text-lg mb-4">Programming Notes</h3>
+                    <p class="text-gray-400 text-sm">A collection of coding notes and tutorials from a full-stack developer.</p>
+                </div>
+                <div>
+                    <h3 class="font-bold text-lg mb-4">Quick Links</h3>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="index.html" class="hover:text-white">Home</a></li>
+                        <li><a href="about.html" class="hover:text-white">About</a></li>
+                        <li><a href="contact.html" class="hover:text-white">Contact</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-bold text-lg mb-4">Connect</h3>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="https://github.com" target="_blank" class="hover:text-white">GitHub</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 pt-8 text-center text-gray-400 text-sm">
+                <p>© 2026 Programming Notes. Built with simple HTML & Tailwind CSS.</p>
+                <p class="mt-2"><a href="privacy.html" class="hover:text-white">Privacy Policy</a></p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Prism.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+
+</body>
+</html>

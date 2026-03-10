@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-LMWN7814BX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date);
+      gtag('config', 'G-LMWN7814BX');
+    </script>
+
+    <!-- SEO Meta Tags -->
+    <title>TikTok Live Recorder: Real Problems I Hit and How I Fixed Them</title>
+    <meta name="description" content="Used TikTok-Live-Recorder for months. Hit walls constantly - recordings wouldn't start, wouldn't stop, quality issues. Here's how I solved actual problems from GitHub issues.">
+    <meta name="keywords" content="TikTok Live Recorder issues, TikTok recording problems, live stream recording errors, TikTok-Live-Recorder troubleshooting">
+    <link rel="canonical" href="https://pnt.jacbex.com/tiktok-live-recorder.html" />
+
+    <!-- Open Graph / Social Media -->
+    <meta property="og:title" content="TikTok Live Recorder: Real Problems and Solutions">
+    <meta property="og:description" content="Actual problems from GitHub issues and how I fixed them. Recording failures, quality issues, automation tips.">
+    <meta property="og:type" content="article">
+
+    <!-- Tailwind CSS for modern UI -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Code Highlighting (Prism.js) -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "TikTok Live Recorder: Real Problems I Hit and How I Fixed Them",
+      "description": "Solutions to real TikTok-Live-Recorder problems from GitHub issues.",
+      "author": {
+        "@type": "Person",
+        "name": "Programming Notes"
+      }
+    }
+    </script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+        .prose code { color: #eb5757; background: #f9f2f2; padding: 2px 4px; border-radius: 4px; }
+        .issue-card { background: #fef3c7; border-left: 4px solid #f59e0b; padding: 20px; margin: 16px 0; border-radius: 8px; }
+        .solution-card { background: #d1fae5; border-left: 4px solid #10b981; padding: 20px; margin: 16px 0; border-radius: 8px; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+
+    <nav class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+            <a href="index.html" class="text-xl font-bold text-blue-600">📝 <span class="text-gray-700">Programming Notes</span></a>
+            <div class="space-x-6 hidden md:block">
+                <a href="index.html" class="hover:text-blue-500">Home</a>
+                <a href="about.html" class="hover:text-blue-500">About</a>
+                <a href="contact.html" class="hover:text-blue-500">Contact</a>
+            </div>
+        </div>
+    </nav>
+
+    <header class="bg-gradient-to-r from-purple-600 to-indigo-700 text-white py-16">
+        <div class="max-w-4xl mx-auto px-4 text-center">
+            <h1 class="text-4xl md:text-5xl font-extrabold mb-4">TikTok Live Recorder: Real Problems I Hit and How I Fixed Them</h1>
+            <p class="text-xl opacity-90">Used TikTok-Live-Recorder for months. Hit walls constantly - recordings wouldn't start, wouldn't stop, quality issues. Here's how I solved actual problems from GitHub issues.</p>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto px-4 py-12 bg-white mt-[-40px] rounded-xl shadow-lg mb-20">
+
+        <article class="prose prose-blue max-w-none">
+
+            <section id="intro">
+                <h2 class="text-3xl font-bold mb-4">Why I'm writing this</h2>
+                <p class="mb-4">
+                    Found TikTok-Live-Recorder, thought it was perfect. Set it up, worked great for a week. Then problems started showing up.
+                </p>
+                <p class="mb-4">
+                    Recordings wouldn't start even though users were live. Sometimes recordings wouldn't stop until I manually killed the process. Video quality looked terrible sometimes. Checked GitHub issues - turns out these are common problems lots of people hit.
+                </p>
+                <p class="mb-4">
+                    Spent way too much time figuring out fixes. Documenting what actually worked for me, not theoretical solutions. If you're hitting the same walls, maybe this saves you some time.
+                </p>
+            </section>
+
+            <section id="issue-1">
+                <h2 class="text-3xl font-bold mb-4">Problem #1: Recordings won't start</h2>
+                <div class="issue-card">
+                    <p class="font-bold mb-2">The Issue</p>
+                    <p class="mb-3">User is live, tool says they're live, but recording never starts. Just sits there checking status forever. Happened randomly, no rhyme or reason.</p>
+                </div>
+
+                <h3 class="text-2xl font-bold mb-3">What actually worked for me</h3>
+                <pre><code class="language-bash"># 1. First, verify username format exactly matches TikTok URL
+# @username vs username - both should work but sometimes doesn't
+
+# 2. Check if TikTok changed their Webcast API
+# Tool uses tiktok.live webcast endpoint
+# If TikTok changes it, tool breaks until update
+
+# 3. Try forcing record even if status check fails
+python recorder.py --user @username --force-record
+
+# 4. Enable debug logging to see what's happening
+# In config.ini:
+enable_debug_log = true
+
+# Then check logs:
+tail -f recorder.log
+
+# Look for errors like:
+# ERROR: Failed to get live info
+# ERROR: No URL found</code></pre>
+
+                <div class="solution-card">
+                    <p class="font-bold mb-2">Temporary fix that worked</p>
+                    <p class="mb-3">Restart the tool completely. Sometimes it gets into a weird state where status checking works but recording fails. Kill process and restart:</p>
+                    <pre><code class="language-bash"># Kill existing instances
+pkill -f recorder.py
+
+# Start fresh
+source venv/bin/activate  # or venv\Scripts\activate on Windows
+python recorder.py</code></pre>
+                </div>
+
+                <h3 class="text-2xl font-bold mb-3">Root cause (I think)</h3>
+                <p class="mb-3">
+                    TikTok's CDN returns different stream URLs based on your location or IP. Sometimes the URL returned is invalid or expired. Tool tries to start recording with bad URL, fails silently.
+                </p>
+                <p class="mb-3">
+                    <strong>My workaround:</strong> Run on a VPS in different region than my local machine. More consistent stream URLs that way.
+                </p>
+            </section>
+
+            <section id="issue-2">
+                <h2 class="text-3xl font-bold mb-4">Problem #2: Recordings won't stop</h2>
+                <div class="issue-card">
+                    <p class="font-bold mb-2">The Issue</p>
+                    <p class="mb-3">User goes offline, but recording keeps going. File grows until I manually kill it. Happens especially when streamer loses connection or pauses stream, then comes back.</p>
+                </div>
+
+                <h3 class="text-2xl font-bold mb-3">What I did</h3>
+                <pre><code class="language-bash"># 1. Set recording timeout in config.ini
+# Even if stream appears live, stop recording after X minutes
+recording_timeout = 3600  # 1 hour max
+
+# 2. Add restart-on-change option
+# Restart recording if stream parameters change
+restart_on_change = true
+
+# 3. Monitor disk space during recording
+# Run separate script:
+while true; do
+  df -h | grep recordings
+  sleep 300  # check every 5 min
+done</code></pre>
+
+                <h3 class="text-2xl font-bold mb-3">Cron job to kill hung recordings</h3>
+                <pre><code class="language-bash">#!/bin/bash
+# kill-hung-recordings.sh
+
+# Find recordings older than 2 hours (probably hung)
+find /path/to/recordings -name "*.mp4" -mmin +120 -exec rm {} \;
+
+# Also kill the process if recording file hasn't grown in 10 min
+python recorder.py &
+RECORDER_PID=$!
+
+while true; do
+  # Find largest recording file
+  LATEST_FILE=$(ls -t /path/to/recordings/*.mp4 | head -1)
+
+  # Check size, wait 10 min, check again
+  SIZE1=$(stat -f%z "$LATEST_FILE" 2>/dev/null || echo 0)
+  sleep 600
+  SIZE2=$(stat -f%z "$LATEST_FILE" 2>/dev/null || echo 0)
+
+  # If same size, process is probably hung
+  if [ "$SIZE1" -eq "$SIZE2" ]; then
+    kill $RECORDER_PID
+    break
+  fi
+
+  sleep 60
+done</code></pre>
+            </section>
+
+            <section id="issue-3">
+                <h2 class="text-3xl font-bold mb-4">Problem #3: Status checking just stops</h2>
+                <div class="issue-card">
+                    <p class="font-bold mb-2">The Issue</p>
+                    <p class="mb-3">Tool runs fine for hours or days, then suddenly stops checking if users are live. No errors, just sits there. Only notice because recordings aren't appearing.</p>
+                </div>
+
+                <h3 class="text-2xl font-bold mb-3">How I diagnosed it</h3>
+                <pre><code class="language-bash"># 1. Enable debug logging
+enable_debug_log = true
+
+# 2. Run in foreground to see output
+python recorder.py --no-daemon
+
+# Saw this in logs:
+# INFO: Checking users...
+# DEBUG: API request failed: 429 Too Many Requests
+# INFO: Sleeping 60 seconds...
+# But then it never woke up from sleep</code></pre>
+
+                <div class="solution-card">
+                    <p class="font-bold mb-2">Fix that worked</p>
+                    <p class="mb-3">Turns out TikTok was rate-limiting the API requests. Tool waits after hitting limit, but sometimes never resumes checking.</p>
+                    <pre><code class="language-ini"># In config.ini, increase check interval
+check_interval = 300  # 5 minutes between checks instead of 60 seconds
+
+# Also add retry logic:
+max_retries = 3
+retry_delay = 30</code></pre>
+                </div>
+
+                <h3 class="text-2xl font-bold mb-3">Monitoring script</h3>
+                <pre><code class="language-bash">#!/bin/bash
+# monitor.sh - Watch if recorder is actually working
+
+while true; do
+  LAST_CHECK=$(stat -f%m /path/to/recordings/*.mp4 2>/dev/null | head -1 | xargs -I{} date -r {} +"%Y-%m-%d %H:%M:%S")
+  NOW=$(date +"%Y-%m-%d %H:%M:%S")
+
+  TIME_DIFF=$(( $(date -j -f "%Y-%m-%d %H:%M:%S" "$NOW" -f "%Y-%m-%d %H:%M:%S" "$LAST_CHECK") +%s ))
+
+  # If no file modified in 30 minutes, restart
+  if [ $TIME_DIFF -gt 1800 ]; then
+    echo "$(date): No recent activity, restarting..."
+    pkill -f recorder.py
+    sleep 10
+    cd /path/to/TikTok-Live-Recorder
+    python recorder.py &
+  fi
+
+  sleep 600  # check every 10 minutes
+done</code></pre>
+            </section>
+
+            <section id="issue-4">
+                <h2 class="text-3xl font-bold mb-4">Problem #4: Video quality looks terrible</h2>
+                <div class="issue-card">
+                    <p class="font-bold mb-2">The Issue</p>
+                    <p class="mb-3">Recording is 480p or 720p even though streamer is definitely broadcasting in 1080p. Saw #267 in GitHub issues - bot accesses different stream URLs that deliver lower resolution.</p>
+                </div>
+
+                <h3 class="text-2xl font-bold mb-3">What I tried that didn't work</h3>
+                <pre><code class="language-bash"># Setting video_quality in config.ini
+# This didn't actually fix it:
+video_quality = 1080p
+
+# Turns out this is just a preference, not guaranteed</code></pre>
+
+                <h3 class="text-2xl font-bold mb-3">What actually helped</h3>
+                <div class="solution-card">
+                    <p class="font-bold mb-2">Set quality to empty string</p>
+                    <pre><code class="language-ini"># Leave empty to request original quality
+video_quality =
+
+# Not 1080p, not source, just empty
+# This lets TikTok send whatever quality it wants</code></pre>
+                </div>
+
+                <h3 class="text-2xl font-bold mb-3">Region hack</h3>
+                <pre><code class="language-bash"># TikTok serves different quality based on region
+# Ran recorder through VPN to different countries
+
+# Using proxy in config.ini
+[Connection]
+proxy = socks5://127.0.0.1:1080
+
+# Or set environment variable
+export HTTP_PROXY=socks5://127.0.0.1:1080
+export HTTPS_PROXY=socks5://127.0.0.1:1080
+python recorder.py</code></pre>
+
+                <p class="text-sm text-gray-600 mt-2">YMMV - sometimes helped, sometimes didn't. Depends on TikTok's CDN at that moment.</p>
+            </section>
+
+            <section id="issue-5">
+                <h2 class="text-3xl font-bold mb-4">Problem #5: Can't record more than a few streams at once</h2>
+                <div class="issue-card">
+                    <p class="font-bold mb-2">The Issue</p>
+                    <p class="mb-3">Tried monitoring 20 users, recordings started failing after 3-4 simultaneous streams. Saw issue #194 - more than 10 simultaneous recordings doesn't work reliably.</p>
+                </div>
+
+                <h3 class="text-2xl font-bold mb-3">How I handled it</h3>
+                <pre><code class="language-bash"># 1. Limit concurrent recordings
+# In config.ini:
+max_concurrent_recordings = 5
+
+# 2. Prioritize important users
+# Created priority list:
+important_users = @creator1, @creator2, @creator3
+
+# Regular users:
+regular_users = @creator4, @creator5
+
+# Run separate instances:
+# Instance 1 - VIP users (always recording)
+python recorder.py --config config-priority.ini
+
+# Instance 2 - Regular users (lower priority)
+python recorder.py --config config-regular.ini</code></pre>
+
+                <h3 class="text-2xl font-bold mb-3">Resource monitoring</h3>
+                <pre><code class="language-bash"># Check if system can handle more streams
+# While recording, run:
+nvidia-smi  # if using GPU acceleration
+htop  # see CPU and RAM usage
+iotop  # see disk I/O
+
+# For me, limit was disk I/O
+# Multiple streams writing to same disk = bottleneck
+
+# Solution: Record to different disks
+# config-1.ini:
+download_folder = /mnt/disk1/recordings
+
+# config-2.ini:
+download_folder = /mnt/disk2/recordings</code></pre>
+            </section>
+
+            <section id="automation">
+                <h2 class="text-3xl font-bold mb-4">Getting notifications when streams start</h2>
+                <div class="issue-card">
+                    <p class="font-bold mb-2">The Feature Request</p>
+                    <p class="mb-3">Issue #399 - people want Telegram notifications when streams start. Not built into tool yet, so I hacked something together.</p>
+                </div>
+
+                <h3 class="text-2xl font-bold mb-3">Simple notification script</h3>
+                <pre><code class="language-bash">#!/bin/bash
+# notify.sh - Send notification when new recording starts
+
+RECORDINGS_DIR="/path/to/recordings"
+TELEGRAM_TOKEN="your-bot-token"
+CHAT_ID="your-chat-id"
+
+# Get count of mp4 files
+PREVIOUS_COUNT=$(find "$RECORDINGS_DIR" -name "*.mp4" | wc -l)
+
+while true; do
+  sleep 60  # check every minute
+
+  CURRENT_COUNT=$(find "$RECORDINGS_DIR" -name "*.mp4" | wc -l)
+
+  if [ $CURRENT_COUNT -gt $PREVIOUS_COUNT ]; then
+    NEW_FILES=$((CURRENT_COUNT - PREVIOUS_COUNT))
+
+    # Get latest file
+    LATEST_FILE=$(ls -t "$RECORDINGS_DIR"/*.mp4 | head -1)
+    FILENAME=$(basename "$LATEST_FILE")
+
+    # Send to Telegram
+    curl -s -X POST \
+      "https://api.telegram.org/bot$TELEGRAM_TOKEN/sendMessage" \
+      -d chat_id="$CHAT_ID" \
+      -d text="🔴 New TikTok recording: $FILENAME"
+
+    PREVIOUS_COUNT=$CURRENT_COUNT
+  fi
+done</code></pre>
+
+                <h3 class="text-2xl font-bold mb-3">Discord webhook alternative</h3>
+                <pre><code class="language-bash">#!/bin/bash
+# discord-notify.sh
+
+WEBHOOK_URL="your-discord-webhook-url"
+
+send_discord_notification() {
+  local username=$1
+  local status=$2
+
+  curl -X POST "$WEBHOOK_URL" \
+    -H "Content-Type: application/json" \
+    -d "{
+      \"content\": \"**TikTok Live Alert**\n\n**User**: @$username\n**Status**: $status\",
+      \"username\": \"TikTok Recorder\"
+    }"
+}
+
+# Call when recording starts
+send_discord_notification "creator1" "Started recording"</code></pre>
+            </section>
+
+            <section id="maintenance">
+                <h2 class="text-3xl font-bold mb-4">Maintenance tips that matter</h2>
+
+                <h3 class="text-2xl font-bold mb-3">Keep it updated</h3>
+                <pre><code class="language-bash"># Check for updates weekly
+cd TikTok-Live-Recorder
+git fetch origin
+git log HEAD..origin/main --oneline
+
+# If updates available:
+git pull origin/main
+pip install -r requirements.txt --upgrade
+
+# I set reminder in calendar for every Monday</code></pre>
+
+                <h3 class="text-2xl font-bold mb-3">Clean old recordings automatically</h3>
+                <pre><code class="language-bash">#!/bin/bash
+# cleanup.sh - Delete recordings older than 30 days
+
+RECORDINGS_DIR="/path/to/recordings"
+KEEP_DAYS=30
+
+find "$RECORDINGS_DIR" -name "*.mp4" -mtime +$KEEP_DAYS -delete
+
+# Add to crontab:
+# 0 2 * * * /path/to/cleanup.sh
+# Runs daily at 2 AM</code></pre>
+
+                <h3 class="text-2xl font-bold mb-3">Backup important stuff</h3>
+                <pre><code class="language-bash">#!/bin/bash
+# backup.sh - Copy important recordings to backup drive
+
+SOURCE="/path/to/recordings"
+DESTINATION="/mnt/backup/tiktok"
+
+# Use rsync to copy only new files
+rsync -av --progress "$SOURCE/" "$DESTINATION/"
+
+# I run this weekly
+# Saved me when main drive died</code></pre>
+            </section>
+
+            <section id="reality-check">
+                <h2 class="text-3xl font-bold mb-4">Reality check</h2>
+                <p class="mb-4">
+                    Not trying to say TikTok-Live-Recorder is perfect. It breaks. TikTok changes stuff and tool breaks. Developer fixes it when they can.
+                </p>
+                <p class="mb-4">
+                    But compared to manually screen recording? It's way better. Set and forget mostly works. Issues pop up but there are usually workarounds.
+                </p>
+                <p class="mb-4">
+                    If you're thinking about using it, my advice: start small. Monitor 2-3 users max at first. Get that working reliably before adding more. Test thoroughly before relying on it.
+                </p>
+                <p class="mb-4">
+                    And join the GitHub discussions. That's where real troubleshooting happens - people posting actual problems and solutions that worked for them. Not theoretical perfect-world scenarios.
+                </p>
+            </section>
+
+        </article>
+
+    </main>
+
+    <footer class="bg-gray-800 text-white py-12">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="grid md:grid-cols-3 gap-8 mb-8">
+                <div>
+                    <h3 class="font-bold text-lg mb-4">Programming Notes</h3>
+                    <p class="text-gray-400 text-sm">A collection of coding notes and tutorials from a full-stack developer.</p>
+                </div>
+                <div>
+                    <h3 class="font-bold text-lg mb-4">Quick Links</h3>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="index.html" class="hover:text-white">Home</a></li>
+                        <li><a href="about.html" class="hover:text-white">About</a></li>
+                        <li><a href="contact.html" class="hover:text-white">Contact</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-bold text-lg mb-4">Connect</h3>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="https://github.com" target="_blank" class="hover:text-white">GitHub</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 pt-8 text-center text-gray-400 text-sm">
+                <p>© 2026 Programming Notes. Built with simple HTML & Tailwind CSS.</p>
+                <p class="mt-2"><a href="privacy.html" class="hover:text-white">Privacy Policy</a></p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Prism.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-ini.min.js"></script>
+
+</body>
+</html>
