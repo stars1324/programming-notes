@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-LMWN7814BX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-LMWN7814BX');
+    </script>
+
+    <!-- SEO Meta Tags -->
+    <title>Rclone: Finally, Cloud Storage Sync That Doesn't Suck</title>
+    <meta name="description" content="How I use Rclone to sync files between Google Drive, Dropbox, S3, and local storage. Mount cloud storage as a drive, sync backups, and automate everything.">
+    <meta name="keywords" content="Rclone, cloud storage sync, Google Drive mount, S3 backup, CLI sync tool, rclone serve">
+    <link rel="canonical" href="https://pnt.jacbex.com/rclone.html">
+
+    <!-- Open Graph / Social Media -->
+    <meta property="og:title" content="Rclone: Finally, Cloud Storage Sync That Doesn't Suck">
+    <meta property="og:description" content="Sync Google Drive, Dropbox, S3 with Rclone. Mount cloud storage as local drive and automate backups.">
+    <meta property="og:type" content="article">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+        .code-block { background: #1e293b; color: #e2e8f0; padding: 1rem; border-radius: 0.5rem; overflow-x: auto; }
+        .code-block code { font-family: 'Monaco', 'Menlo', monospace; font-size: 0.875rem; }
+        pre { margin: 0; }
+        .info-box { background: #dbeafe; border-left: 4px solid #3b82f6; padding: 1rem; margin: 1.5rem 0; }
+        .warning-box { background: #fef3c7; border-left: 4px solid #f59e0b; padding: 1rem; margin: 1.5rem 0; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+            <a href="index.html" class="text-xl font-bold text-blue-600">📝 <span class="text-gray-700">Programming Notes</span></a>
+            <div class="space-x-6 hidden md:block">
+                <a href="index.html" class="hover:text-blue-500">Home</a>
+                <a href="about.html" class="hover:text-blue-500">About</a>
+                <a href="contact.html" class="hover:text-blue-500">Contact</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Article Header -->
+    <header class="bg-gradient-to-r from-emerald-600 to-teal-700 text-white py-16">
+        <div class="max-w-4xl mx-auto px-4">
+            <p class="text-emerald-200 mb-2">Command Line, Cloud Storage, Backup</p>
+            <h1 class="text-4xl md:text-5xl font-extrabold mb-4">Rclone: Finally, Cloud Storage Sync That Doesn't Suck</h1>
+            <p class="text-xl opacity-90 mb-6">Sync files between Google Drive, Dropbox, S3, and local storage. Mount cloud storage as a drive. Automate backups with cron. Here's what I actually use.</p>
+            <p class="text-lg opacity-75">March 11, 2026 · 10 min read</p>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-4xl mx-auto px-4 py-12">
+
+        <!-- Introduction -->
+        <section class="mb-12">
+            <h2 class="text-3xl font-bold mb-6">How I Got Here</h2>
+            <p class="text-gray-700 mb-4">
+                Needed a way to sync files between my servers and cloud storage. Tried a bunch of options:
+            </p>
+            <ul class="list-disc list-inside text-gray-700 mb-4 space-y-2">
+                <li><strong>Google Drive desktop app:</strong> Works, but requires GUI. Can't run on headless servers.</li>
+                <li><strong>rsync:</strong> Great for SSH, but doesn't work with cloud storage APIs.</li>
+                <li><strong>Cloud provider CLI tools:</strong> Each one is different. Too many to learn.</li>
+            </ul>
+            <p class="text-gray-700 mb-4">
+                Then someone mentioned <a href="https://rclone.org" class="text-blue-600 underline" target="_blank">Rclone</a>. One tool for all cloud storage. Can sync, mount, serve files. Command-line only. Sounded exactly like what I needed.
+            </p>
+        </section>
+
+        <!-- Installation -->
+        <section class="mb-12">
+            <h2 class="text-3xl font-bold mb-6">Getting It Installed</h2>
+            <p class="text-gray-700 mb-4">
+                Installation is straightforward:
+            </p>
+
+            <div class="code-block mb-4">
+                <pre><code># Linux/macOS
+curl https://rclone.org/install.sh | sudo bash
+
+# Or with Homebrew (macOS/Linux)
+brew install rclone
+
+# Verify installation
+rclone version</code></pre>
+            </div>
+
+            <p class="text-gray-700 mb-4">
+                That's it. No dependencies, no configuration files yet. Just a binary that works.
+            </p>
+        </section>
+
+        <!-- Configuration -->
+        <section class="mb-12">
+            <h2 class="text-3xl font-bold mb-6">Setting Up Cloud Storage</h2>
+            <p class="text-gray-700 mb-4">
+                Rclone uses "remotes" - configuration profiles for each cloud storage service. Setting up a remote is interactive:
+            </p>
+
+            <div class="code-block mb-4">
+                <pre><code>rclone config</code></pre>
+            </div>
+
+            <p class="text-gray-700 mb-4">
+                This starts an interactive setup. Here's what it looks like for Google Drive:
+            </p>
+
+            <div class="code-block mb-4">
+                <pre><code>No remotes found - make a new one
+n) New remote
+s) Set configuration password
+q) Quit config
+n/s/q> n
+
+name> gdrive
+
+Type of storage to configure.
+Choose a number from below, or type in your own value
+ 1 / 1Fichier
+   \ "fichier"
+ 2 / Alias for an existing remote
+   \ "alias"
+...
+17 / Google Drive
+   \ "drive"
+...
+Storage> 17
+
+Google Application Client Id - leave blank normally.
+client_id>
+
+OAuth Client Secret - leave blank normally.
+client_secret>
+
+Scope that rclone should use when accessing the remote.
+Choose a number from below, or type in your own value
+ 1 / Full access all files, except Application Data Folder.
+ 2 / Read-only access to file metadata and file contents.
+ 3 / Read-only access to file metadata.
+...
+scope> 1
+
+root_folder_id>
+
+service_account_file>
+
+Edit advanced config? (y/n)
+y) Yes
+n) No (default)
+y/n> n
+
+Remote config
+
+Use auto config?
+ * Say Y if not sure
+ * Say N if you are working on a remote or headless machine
+y) Yes (default)
+n) No
+y/n> n
+
+If your browser doesn't open automatically please go to the following link:
+https://accounts.google.com/o/oauth2/auth?...
+
+Log in and authorize rclone for access
+
+Enter verification code> 4/1AXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+Configure this as a team drive?
+y) Yes
+n) No (default)
+y/n> n
+
+--------------------
+[gdrive]
+type = drive
+scope = drive
+token = {"access_token":"XXX","token_type":"Bearer"}
+--------------------
+y) Yes this is OK (default)
+e) Edit this remote
+d) Delete this remote
+y/e/d> y</code></pre>
+            </div>
+
+            <p class="text-gray-700 mb-4">
+                Key points:
+            </p>
+            <ul class="list-disc list-inside text-gray-700 mb-4 space-y-2">
+                <li>Choose option <strong>n</strong> for new remote</li>
+                <li>Name it something memorable (like <code>gdrive</code>)</li>
+                <li>For Google Drive, choose storage type <strong>17</strong></li>
+                <li>Scope <strong>1</strong> gives full access (what most people want)</li>
+                <li>On headless servers, answer <strong>n</strong> to auto config, then use the link to authorize</li>
+            </ul>
+
+            <p class="text-gray-700 mb-4">
+                After setup, you can list remotes:
+            </p>
+
+            <div class="code-block mb-4">
+                <pre><code>rclone listremotes</code></pre>
+            </div>
+        </section>
+
+        <!-- Basic Sync -->
+        <section class="mb-12">
+            <h2 class="text-3xl font-bold mb-6">Basic Sync Commands</h2>
+            <p class="text-gray-700 mb-4">
+                Once configured, syncing is straightforward:
+            </p>
+
+            <div class="code-block mb-4">
+                <pre><code># List files in remote
+rclone ls gdrive:backups
+
+# Copy files (local to remote)
+rclone copy /path/to/local gdrive:backups
+
+# Sync files (makes target match source)
+rclone sync /path/to/local gdrive:backups
+
+# Copy from remote to local
+rclone copy gdrive:backups /path/to/local
+
+# Check what would change without doing it
+rclone sync --dry-run /path/to/local gdrive:backups</code></pre>
+            </div>
+
+            <div class="info-box">
+                <p class="font-bold text-blue-800 mb-2">💡 Copy vs Sync</p>
+                <p class="text-blue-700"><strong>copy</strong> copies files that don't exist at destination. <strong>sync</strong> makes destination match source (deletes files at destination that don't exist at source). Be careful with sync!</p>
+            </div>
+        </section>
+
+        <!-- Mount as Drive -->
+        <section class="mnt-12">
+            <h2 class="text-3xl font-bold mb-6">Mounting Cloud Storage as a Drive</h2>
+            <p class="text-gray-700 mb-4">
+                This is the feature that made me stick with Rclone. You can mount cloud storage as a local directory:
+            </p>
+
+            <div class="code-block mb-4">
+                <pre><code># First, install FUSE (if not already installed)
+# Ubuntu/Debian:
+sudo apt install fuse
+
+# macOS with Homebrew:
+brew install macfuse
+
+# Create mount point
+mkdir ~/gdrive
+
+# Mount Google Drive
+rclone mount gdrive: ~/gdrive --daemon</code></pre>
+            </div>
+
+            <p class="text-gray-700 mb-4">
+                Now you can access Google Drive like a local folder:
+            </p>
+
+            <div class="code-block mb-4">
+                <pre><code>ls ~/gdrive
+cp file.txt ~/gdrive/backups/
+cd ~/gdrive/documents</code></pre>
+            </div>
+
+            <p class="text-gray-700 mb-4">
+                Mount options that are useful:
+            </p>
+
+            <div class="code-block mb-4">
+                <pre><code># Mount with caching (faster for frequent access)
+rclone mount gdrive: ~/gdrive \
+  --daemon \
+  --vfs-cache-mode full \
+  --cache-dir /tmp/rclone-cache
+
+# Mount with read-write access
+rclone mount gdrive: ~/gdrive \
+  --daemon \
+  --allow-other
+
+# Unmount when done
+fusermount -u ~/gdrive  # Linux
+umount ~/gdrive         # macOS</code></pre>
+            </div>
+            <p class="text-gray-700 mb-4">
+                The <code>--vfs-cache-mode full</code> flag is important. It caches files locally for faster access and better compatibility with applications.
+            </p>
+        </section>
+
+        <!-- Automated Backups -->
+        <section class="mb-12">
+            <h2 class="text-3xl font-bold mb-6">Automating Backups with Cron</h2>
+            <p class="text-gray-700 mb-4">
+                This is what I actually use Rclone for - automated daily backups:
+            </p>
+
+            <div class="code-block mb-4">
+                <pre><code>#!/bin/bash
+# backup-script.sh
+
+# Local directories to backup
+SOURCE_DIRS=("/var/www" "/home/user/documents" "/etc")
+
+# Backup destination (Google Drive)
+REMOTE="gdrive:server-backups"
+
+# Date stamp
+DATE=$(date +%Y%m%d_%H%M%S)
+
+# Create backup directory
+BACKUP_DIR="${REMOTE}/${DATE}"
+
+# Sync each directory
+for DIR in "${SOURCE_DIRS[@]}"; do
+    DIR_NAME=$(basename "$DIR")
+    echo "Backing up $DIR to ${BACKUP_DIR}/${DIR_NAME}"
+    rclone sync "$DIR" "${BACKUP_DIR}/${DIR_NAME}" \
+        --progress \
+        --log-file=/var/log/rclone-backup.log \
+        --log-level INFO
+done
+
+# Keep only last 30 days of backups
+echo "Cleaning up old backups..."
+rclone delete $REMOTE --min-age 30d
+
+echo "Backup completed: $DATE"</code></pre>
+            </div>
+
+            <p class="text-gray-700 mb-4">
+                Add to crontab for daily execution:
+            </p>
+
+            <div class="code-block mb-4">
+                <pre><code># Edit crontab
+crontab -e
+
+# Add this line for daily backup at 2 AM
+0 2 * * * /path/to/backup-script.sh >> /var/log/backup.log 2>&1</code></pre>
+            </div>
+
+            <div class="warning-box">
+                <p class="font-bold text-yellow-800 mb-2">⚠️ First Run Tip</p>
+                <p class="text-yellow-700">First backup will take a long time if you have lots of files. Test with <code>--dry-run</code> first to see what will happen without actually transferring anything.</p>
+            </div>
+        </section>
+
+        <!-- S3 Backup -->
+        <section class="mb-12">
+            <h2 class="text-3xl font-bold mb-6">Backing Up to S3-Compatible Storage</h2>
+            <p class="text-gray-700 mb-4">
+                I also use Rclone to backup to S3-compatible storage (like MinIO or AWS S3):
+            </p>
+
+            <div class="code-block mb-4">
+                <pre><code># Configure S3 remote
+rclone config
+
+# Choose S3 storage type
+Storage> 3  # S3
+
+provider> 1  # AWS
+
+access_key_id> YOUR_ACCESS_KEY
+
+secret_access_key> YOUR_SECRET_KEY
+
+region> us-east-1
+
+endpoint> https://s3.amazonaws.com
+
+location_constraint>
+
+acl>
+
+Edit advanced config? y/n> n
+
+Remote config
+[name> s3
+storage> s3
+... (config details) ...
+y/e/d> y</code></pre>
+            </div>
+
+            <p class="text-gray-700 mb-4">
+                Now you can sync to S3 just like Google Drive:
+            </p>
+
+            <div class="code-block mb-4">
+                <pre><code># Sync to S3
+rclone sync /path/to/backups s3:my-bucket/backups
+
+# List S3 buckets
+rclone lsd s3:
+
+# Check S3 storage usage
+rclone about s3:</code></pre>
+            </div>
+
+            <p class="text-gray-700 mb-4">
+                For self-hosted S3 (like MinIO), just use your endpoint:
+            </p>
+
+            <div class="code-block mb-4">
+                <pre><code># MinIO setup
+endpoint> https://minio.example.com
+
+# Then use it normally
+rclone sync /data minio:my-bucket/data</code></pre>
+            </div>
+        </section>
+
+        <!-- Serve Files -->
+        <section class="mb-12">
+            <h2 class="text-3xl font-bold mb-6">Serving Files Over HTTP</h2>
+            <p class="text-gray-700 mb-4">
+                Rclone can also serve files over HTTP/S. Great for quick sharing:
+            </p>
+
+            <div class="code-block mb-4">
+                <pre><code># Serve current directory over HTTP
+rclone serve http /path/to/files --addr 0.0.0.0:8080
+
+# Serve remote (like Google Drive) over HTTP
+rclone serve http gdrive:public-files --addr 0.0.0.0:8080
+
+# With authentication
+rclone serve http /path/to/files \
+  --addr 0.0.0.0:8080 \
+  --user admin \
+  --pass securepassword
+
+# Serve with HTTPS (needs cert)
+rclone serve http /path/to/files \
+  --addr 0.0.0.0:443 \
+  --cert /path/to/cert.pem \
+  --key /path/to/key.pem</code></pre>
+            </div>
+
+            <p class="text-gray-700 mb-4">
+                I use this to quickly share files from my servers without setting up nginx or Apache.
+            </p>
+        </section>
+
+        <!-- What Works -->
+        <section class="mb-12">
+            <h2 class="text-3xl font-bold mb-6">What Actually Works for Me</h2>
+            <p class="text-gray-700 mb-4">
+                After using Rclone for a while, here's my setup:
+            </p>
+
+            <h3 class="text-2xl font-bold mb-4 mt-8">Daily Backup Script</h3>
+            <div class="code-block mb-4">
+                <pre><code>#!/bin/bash
+# /usr/local/bin/daily-backup.sh
+
+# Backup database
+mysqldump -u root -p$MYSQL_ROOT_PASSWORD \
+  --all-databases | gzip > /tmp/mysql_backup.sql.gz
+
+# Backup to Google Drive
+rclone sync /tmp/mysql_backup.sql.gz \
+  gdrive:server-backups/mysql/$(date +%Y%m%d).sql.gz \
+  --progress
+
+# Backup to S3 (redundancy)
+rclone sync /tmp/mysql_backup.sql.gz \
+  s3:my-bucket/mysql-backups/$(date +%Y%m%d).sql.gz \
+  --progress
+
+# Cleanup local temp file
+rm /tmp/mysql_backup.sql.gz
+
+echo "Backup completed: $(date)"</code></pre>
+            </div>
+
+            <h3 class="text-2xl font-bold mb-4 mt-8">Monitor Sync Status</h3>
+            <div class="code-block mb-4">
+                <pre><code># Check sync status
+rclone check gdrive:backups /local/backups
+
+# Get size of remote
+rclone size gdrive:backups
+
+# Monitor in real-time
+rclone sync /local gdrive:backups --stats 1s</code></pre>
+            </div>
+
+            <h3 class="text-2xl font-bold mb-4 mt-8">Mount for Continuous Access</h3>
+            <div class="code-block mb-4">
+                <pre><code># /etc/fstab entry (Linux)
+# Requires: rclone mount gdrive: /mnt/gdrive fuse \
+#   defaults,idmap=user,allow-other,_netdev,user 0 0
+
+# Or systemd service (for boot-time mount)
+# /etc/systemd/system/rclone-gdrive.service
+[Unit]
+Description=Rclone Google Drive Mount
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=notify
+ExecStart=/usr/bin/rclone mount gdrive: /mnt/gdrive \
+  --vfs-cache-mode full \
+  --allow-other
+Restart=on-failure
+RestartSec=5s
+
+[Install]
+WantedBy=default.target</code></pre>
+            </div>
+        </section>
+
+        <!-- Common Issues -->
+        <section class="mb-12">
+            <h2 class="text-3xl font-bold mb-6">Problems I Hit</h2>
+
+            <h3 class="text-2xl font-bold mb-4 mt-8">Mount Fails with "Device or Resource Busy"</h3>
+            <p class="text-gray-700 mb-4">
+                Happens when mount point is already in use. Fix:
+            </p>
+            <div class="code-block mb-4">
+                <pre><code># Check what's mounted
+mount | grep gdrive
+
+# Force unmount
+fusermount -uz ~/gdrive
+
+# Try mounting again
+rclone mount gdrive: ~/gdrive --daemon</code></pre>
+            </div>
+
+            <h3 class="text-2xl font-bold mb-4 mt-8">Sync is Slow</h3>
+            <p class="text-gray-700 mb-4">
+                Large number of files can slow down sync. Solutions:
+            </p>
+            <div class="code-block mb-4">
+                <pre><code># Use --fast-list (faster for large directories)
+rclone sync /local gdrive:backups --fast-list
+
+# Limit concurrent transfers
+rclone sync /local gdrive:backups --transfers 8
+
+# Skip modtime checks (faster but less accurate)
+rclone sync /local gdrive:backups --no-update-modtime</code></pre>
+            </div>
+
+            <h3 class="text-2xl font-bold mb-4 mt-8">OAuth Token Expires</h3>
+            <p class="text-gray-700 mb-4">
+                After some time, Google Drive OAuth tokens expire. Re-run config:
+            </p>
+            <div class="code-block mb-4">
+                <pre><code># Reauthorize existing remote
+rclone config reconnect gdrive:
+
+# Or edit existing remote
+rclone config edit gdrive</code></pre>
+            </div>
+        </section>
+
+        <!-- Final Thoughts -->
+        <section class="mb-12">
+            <h2 class="text-3xl font-bold mb-6">Final Thoughts</h2>
+            <p class="text-gray-700 mb-4">
+                Rclone is one of those tools that just works. Once configured, it's reliable and fast.
+            </p>
+            <p class="text-gray-700 mb-4">
+                The combination that works for me:
+            </p>
+            <ul class="list-disc list-inside text-gray-700 mb-4 space-y-2">
+                <li><strong>Daily automated backups</strong> - Cron + Rclone sync</li>
+                <li><strong>Multiple cloud destinations</strong> - Google Drive + S3 for redundancy</li>
+                <li><strong>Mount for easy access</strong> - Use cached mount mode for better performance</li>
+                <li><strong>Monitor with logs</strong> - Check logs regularly to catch sync failures early</li>
+            </ul>
+            <p class="text-gray-700 mb-4">
+                Not claiming it's perfect - sometimes API limits cause issues,偶尔需要重新授权. But compared to desktop apps or other CLI tools, Rclone is by far the most reliable option I've found.
+            </p>
+        </section>
+
+        <!-- 推荐阅读 -->
+        <section class="mt-16 pt-8 border-t border-gray-200">
+            <h3 class="text-2xl font-bold mb-6">📚 Recommended Reading</h3>
+
+            <div class="grid md:grid-cols-2 gap-6">
+
+                <!-- Storage & Backup -->
+                <div>
+                    <h4 class="font-semibold text-gray-700 mb-3 flex items-center">
+                        <span class="w-2 h-2 bg-teal-500 rounded-full mr-2"></span>
+                        Storage & Backup
+                    </h4>
+                    <div class="space-y-3">
+                        <a href="minio.html" class="block text-gray-600 hover:text-blue-600 group">
+                            <span class="group-hover:translate-x-1 inline-block transition-transform text-sm">→</span>
+                            <span class="text-sm">MinIO: Build Your Own S3-Compatible Storage and Save 90%</span>
+                        </a>
+                        <a href="coolify.html" class="block text-gray-600 hover:text-blue-600 group">
+                            <span class="group-hover:translate-x-1 inline-block transition-transform text-sm">→</span>
+                            <span class="text-sm">Coolify: Finally, Deploy Apps Like Heroku But on Your Own Server</span>
+                        </a>
+                        <a href="portainer.html" class="block text-gray-600 hover:text-blue-600 group">
+                            <span class="group-hover:translate-x-1 inline-block transition-transform text-sm">→</span>
+                            <span class="text-sm">Portainer: Finally, Docker Management That Doesn't Suck</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Automation -->
+                <div>
+                    <h4 class="font-semibold text-gray-700 mb-3 flex items-center">
+                        <span class="w-2 h-2 bg-orange-500 rounded-full mr-2"></span>
+                        Automation
+                    </h4>
+                    <div class="space-y-3">
+                        <a href="n8n.html" class="block text-gray-600 hover:text-blue-600 group">
+                            <span class="group-hover:translate-x-1 inline-block transition-transform text-sm">→</span>
+                            <span class="text-sm">n8n: Self-Hosted Zapier Alternative - Automate Workflows</span>
+                        </a>
+                        <a href="huginn.html" class="block text-gray-600 hover:text-blue-600 group">
+                            <span class="group-hover:translate-x-1 inline-block transition-transform text-sm">→</span>
+                            <span class="text-sm">Huginn: Built My Own IFTTT and Saved $15/Month</span>
+                        </a>
+                        <a href="index.html" class="block text-blue-600 font-semibold hover:text-blue-700 group">
+                            <span class="group-hover:translate-x-1 inline-block transition-transform text-sm">←</span>
+                            <span class="text-sm">View All 45+ Articles</span>
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-gray-800 text-white py-12">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="grid md:grid-cols-3 gap-8 mb-8">
+                <div>
+                    <h3 class="font-bold text-lg mb-4">Programming Notes</h3>
+                    <p class="text-gray-400 text-sm">A collection of coding notes and tutorials from a full-stack developer.</p>
+                </div>
+                <div>
+                    <h3 class="font-bold text-lg mb-4">Quick Links</h3>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="index.html" class="hover:text-white">Home</a></li>
+                        <li><a href="about.html" class="hover:text-white">About</a></li>
+                        <li><a href="contact.html" class="hover:text-white">Contact</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-bold text-lg mb-4">Connect</h3>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="https://github.com" target="_blank" class="hover:text-white">GitHub</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 pt-8 text-center text-gray-400 text-sm">
+                <p>© 2026 Programming Notes. Built with simple HTML & Tailwind CSS.</p>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>
