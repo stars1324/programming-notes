@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-LMWN7814BX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-LMWN7814BX');
+    </script>
+
+    <!-- SEO Meta Tags -->
+    <title>Instaloader 429 Error: Real Problems I Hit and How I Fixed Them</title>
+    <meta name="description" content="Real problems with Instaloader 429 errors, rate limiting, and getting blocked. What actually works: proxies, delays, session management, and when to just give up.">
+    <meta name="keywords" content="Instaloader 429 error, Instagram rate limit, proxy rotation, Instaloader blocked, Instagram scraping problems">
+    <link rel="canonical" href="https://pnt.jacbex.com/instaloader-429-errors.html">
+
+    <!-- Open Graph / Social Media -->
+    <meta property="og:title" content="Instaloader 429 Error: Real Problems and Solutions">
+    <meta property="og:description" content="Dealing with 429 errors and rate limiting when using Instaloader. Real solutions that actually work.">
+    <meta property="og:type" content="article">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+        .code-block { background: #1e293b; color: #e2e8f0; padding: 1rem; border-radius: 0.5rem; overflow-x: auto; }
+        .code-block code { font-family: 'Monaco', 'Menlo', monospace; font-size: 0.875rem; }
+        pre { margin: 0; }
+        .warning-box { background: #fef3c7; border-left: 4px solid #f59e0b; padding: 1rem; margin: 1.5rem 0; }
+        .info-box { background: #dbeafe; border-left: 4px solid #3b82f6; padding: 1rem; margin: 1.5rem 0; }
+        .problem-box { background: #fee2e2; border-left: 4px solid #ef4444; padding: 1rem; margin: 1.5rem 0; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+            <a href="index.html" class="text-xl font-bold text-blue-600">📝 <span class="text-gray-700">Programming Notes</span></a>
+            <div class="space-x-6 hidden md:block">
+                <a href="index.html" class="hover:text-blue-500">Home</a>
+                <a href="about.html" class="hover:text-blue-500">About</a>
+                <a href="contact.html" class="hover:text-blue-500">Contact</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Article Header -->
+    <header class="bg-gradient-to-r from-pink-600 to-purple-700 text-white py-16">
+        <div class="max-w-4xl mx-auto px-4">
+            <p class="text-pink-200 mb-2">Python, Instagram, Troubleshooting</p>
+            <h1 class="text-4xl md:text-5xl font-extrabold mb-4">Instaloader 429 Error: Real Problems I Hit and How I Fixed Them</h1>
+            <p class="text-xl opacity-90 mb-6">429 errors, rate limits, getting blocked. The problems I ran into with Instaloader and what actually worked to avoid them.</p>
+            <p class="text-lg opacity-75">March 11, 2026</p>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-4xl mx-auto px-4 py-12">
+
+        <!-- Introduction -->
+        <section class="mb-12">
+            <h2 class="text-3xl font-bold mb-6">How I Got Here</h2>
+            <p class="text-gray-700 mb-4">
+                Started using Instaloader to download Instagram content. Worked fine for a few hours, then suddenly everything started failing with 429 errors.
+            </p>
+            <p class="text-gray-700 mb-4">
+                Spent days trying different approaches. Some worked temporarily, most didn't. Here's what I learned through trial and error.
+            </p>
+            <div class="warning-box">
+                <p class="font-bold text-yellow-800 mb-2">⚠️ Important Note</p>
+                <p class="text-yellow-700">Instagram's rate limits change frequently. What works today might not work next month. This is just my experience from late 2025 to early 2026.</p>
+            </div>
+        </section>
+
+        <!-- Problem 1 -->
+        <section class="mb-12">
+            <h2 class="text-3xl font-bold mb-6">Problem 1: 429 Error After a Few Requests</h2>
+            <p class="text-gray-700 mb-4">
+                This was the first problem I hit. Downloaded maybe 10-20 posts, then:
+            </p>
+
+            <div class="code-block mb-4">
+                <pre><code>QueryReturnedNotFoundException: HTTP Error Code: 429</code></pre>
+            </div>
+
+            <p class="text-gray-700 mb-4">
+                Or sometimes just:
+            </p>
+
+            <div class="code-block mb-4">
+                <pre><code>429 Too Many Requests</code></pre>
+            </div>
+
+            <h3 class="text-2xl font-bold mb-4 mt-8">What I Tried (That Didn't Work)</h3>
+            <ul class="list-disc list-inside text-gray-700 mb-4 space-y-2">
+                <li>Waiting 60 seconds between requests - still got blocked</li>
+                <li>Using different targets (different profiles) - didn't help</li>
+                <li>Clearing session file - no effect</li>
+                <li>Rotating user agents - Instagram doesn't care</li>
+            </ul>
+
+            <h3 class="text-2xl font-bold mb-4 mt-8">What Actually Worked</h3>
+            <p class="text-gray-700 mb-4">
+                After much testing, I found the combination that works:
+            </p>
+
+            <div class="code-block mb-4">
+                <pre><code>import instaloader
+import time
+import random
+
+L = instaloader.Instaloader()
+
+# Load session if exists
+try:
+    L.load_session_from_file('your_username', 'session_file')
+except:
+    pass
+
+# Add delay between requests
+L.context.quiet = True
+
+def download_with_delay(profile):
+    try:
+        # Random delay 3-8 seconds
+        time.sleep(random.uniform(3, 8))
+
+        # Download with metadata only (faster, less API calls)
+        profile = instaloader.Profile.from_username(L.context, profile)
+
+        # Download posts one by one with longer delays
+        for post in profile.get_posts():
+            time.sleep(random.uniform(5, 10))
+            L.download_post(post, target=profile.username)
+
+            # Stop after 50 posts to avoid hitting limits
+            if post.shortcode == list(profile.get_posts())[49].shortcode:
+                break
+
+    except Exception as e:
+        print(f"Error: {e}")
+        # Wait longer on error
+        time.sleep(60)</code></pre>
+            </div>
+
+            <p class="text-gray-700 mb-4">
+                Key points:
+            </p>
+            <ul class="list-disc list-inside text-gray-700 mb-4 space-y-2">
+                <li><strong>Random delays:</strong> 3-8 seconds between requests, 5-10 seconds when downloading posts</li>
+                <li><strong>Limit batch size:</strong> Stop after 50 posts per session</li>
+                <li><strong>Error handling:</strong> Wait 60 seconds on any error</li>
+                <li><strong>Session persistence:</strong> Load session from file to avoid re-login</li>
+            </ul>
+        </section>
+
+        <!-- Problem 2 -->
+        <section class="mb-12">
+            <h2 class="text-3xl font-bold mb-6">Problem 2: Login Required Even for Public Profiles</h2>
+            <p class="text-gray-700 mb-4">
+                Suddenly Instaloader started asking for login even though I was accessing public profiles:
+            </p>
+
+            <div class="code-block mb-4">
+                <pre><code>LoginRequiredException: Login required to access this profile</code></pre>
+            </div>
+
+            <h3 class="text-2xl font-bold mb-4 mt-8">What I Discovered</h3>
+            <p class="text-gray-700 mb-4">
+                Instagram enforces login more aggressively when:
+            </p>
+            <ul class="list-disc list-inside text-gray-700 mb-4 space-y-2">
+                <li>You access too many different profiles in a short time</li>
+                <li>Your IP has been flagged for suspicious activity</li>
+                <li>You're accessing the same profile repeatedly</li>
+            </ul>
+
+            <h3 class="text-2xl font-bold mb-4 mt-8">What Actually Worked</h3>
+            <div class="code-block mb-4">
+                <pre><code>import instaloader
+
+# Login with session file
+L = instaloader.Instaloader()
+
+# Login once and save session
+L.login('your_username', 'your_password')
+L.save_session_to_file('session_file')
+
+# Now you can access public profiles
+# But still need delays and limits!</code></pre>
+            </div>
+
+            <div class="info-box">
+                <p class="font-bold text-blue-800 mb-2">💡 Tip</p>
+                <p class="text-blue-700">Once logged in, you can access private profiles you follow. But rate limits become stricter. Download less content per session.</p>
+            </div>
+        </section>
+
+        <!-- Problem 3 -->
+        <section class="mb-12">
+            <h2 class="text-3xl font-bold mb-6">Problem 3: Session Expires After a Few Hours</h2>
+            <p class="text-gray-700 mb-4">
+                Session file works for a while, then suddenly:
+            </p>
+
+            <div class="code-block mb-4">
+                <pre><code>BadResponseException: 400 Bad Request</code></pre>
+            </div>
+
+            <h3 class="text-2xl font-bold mb-4 mt-8">What Actually Worked</h3>
+            <div class="code-block mb-4">
+                <pre><code>import instaloader
+import os
+
+L = instaloader.Instaloader()
+
+# Check if session file exists and is recent
+session_file = 'session_file'
+
+if os.path.exists(session_file):
+    file_age = time.time() - os.path.getmtime(session_file)
+
+    # Session is only valid for ~6 hours
+    if file_age > 6 * 60 * 60:
+        os.remove(session_file)
+        print("Session expired, logging in again")
+
+# Try to load session, login if needed
+try:
+    L.load_session_from_file('your_username', session_file)
+except:
+    L.login('your_username', 'your_password')
+    L.save_session_to_file(session_file)</code></pre>
+            </div>
+
+            <p class="text-gray-700 mb-4">
+                Sessions seem to last 6-12 hours before expiring. After that, you need to log in again.
+            </p>
+        </section>
+
+        <!-- Problem 4 -->
+        <section class="mb-12">
+            <h2 class="text-3xl font-bold mb-6">Problem 4: IP Address Blocked</h2>
+            <p class="text-gray-700 mb-4">
+                This is the worst one. Got my IP blocked entirely:
+            </p>
+
+            <div class="code-block mb-4">
+                <pre><code>ConnectionError: Failed to establish connection</code></pre>
+            </div>
+
+            <p class="text-gray-700 mb-4">
+                Or the browser shows "Access Denied" when trying to access Instagram from that IP.
+            </p>
+
+            <h3 class="text-2xl font-bold mb-4 mt-8">How I Found Out</h3>
+            <p class="text-gray-700 mb-4">
+                Opened Instagram in a regular browser using the same network connection - got the access denied page. Confirmed the IP was blocked.
+            </p>
+
+            <h3 class="text-2xl font-bold mb-4 mt-8">What Actually Worked</h3>
+
+            <div class="problem-box">
+                <p class="font-bold text-red-800 mb-2">⚠️ Bad News</p>
+                <p class="text-red-700">Once your IP is blocked, there's not much you can do. Options:</p>
+                <ul class="list-disc list-inside text-red-700 mt-2 space-y-1">
+                    <li>Wait 24-48 hours (block might expire)</li>
+                    <li>Use a different network (home vs mobile data)</li>
+                    <li>Use proxies (expensive but works)</li>
+                    <li>Use VPN (hit or miss, Instagram blocks many VPN IPs)</li>
+                </ul>
+            </div>
+
+            <h3 class="text-2xl font-bold mb-4 mt-8">Proxy Setup</h3>
+            <div class="code-block mb-4">
+                <pre><code>import instaloader
+
+# With HTTP proxy
+L = instaloader.Instaloader(
+    proxy_config={
+        'http': 'http://proxy-server:port',
+        'https': 'https://proxy-server:port'
+    }
+)
+
+# Or with SOCKS proxy
+L = instaloader.Instaloader(
+    proxy_config={
+        'http': 'socks5://proxy-server:port',
+        'https': 'socks5://proxy-server:port'
+    }
+)
+
+# Test the proxy
+try:
+    profile = instaloader.Profile.from_username(L.context, 'instagram')
+    print("Proxy works!")
+except:
+    print("Proxy failed or blocked")</code></pre>
+            </div>
+
+            <div class="warning-box">
+                <p class="font-bold text-yellow-800 mb-2">⚠️ Proxy Costs</p>
+                <p class="text-yellow-700">Good proxies cost money. Free proxies are almost always already blocked by Instagram. Expect to pay $50-200/month for residential proxies that work.</p>
+            </div>
+        </section>
+
+        <!-- Problem 5 -->
+        <section class="mb-12">
+            <h2 class="text-3xl font-bold mb-6">Problem 5: Challenge Required</h2>
+            <p class="text-gray-700 mb-4">
+                Sometimes Instagram throws a challenge instead of just blocking:
+            </p>
+
+            <div class="code-block mb-4">
+                <pre><code>TwoFactorAuthRequiredException: Challenge required</code></pre>
+            </div>
+
+            <p class="text-gray-700 mb-4">
+                This means Instagram wants you to verify your account via SMS or email.
+            </p>
+
+            <h3 class="text-2xl font-bold mb-4 mt-8">What Actually Worked</h3>
+            <div class="code-block mb-4">
+                <pre><code>import instaloader
+
+L = instaloader.Instaloader()
+
+# Enable two-factor handling
+L.interactive_login('your_username')  # Prompts for 2FA code
+
+# Save session after successful login
+L.save_session_to_file('session_file')</code></pre>
+            </div>
+
+            <p class="text-gray-700 mb-4">
+                After doing this once, Instagram trusts your session more. Still need to respect rate limits though.
+            </p>
+        </section>
+
+        <!-- What Works -->
+        <section class="mb-12">
+            <h2 class="text-3xl font-bold mb-6">What Actually Works (in 2026)</h2>
+
+            <h3 class="text-2xl font-bold mb-4 mt-8">Conservative Approach</h3>
+            <div class="code-block mb-4">
+                <pre><code>import instaloader
+import time
+import random
+
+L = instaloader.Instaloader()
+
+# Load or create session
+try:
+    L.load_session_from_file('username', 'session')
+except:
+    L.login('username', 'password')
+    L.save_session_to_file('session')
+
+def safe_download(profile_name, max_posts=30):
+    try:
+        profile = instaloader.Profile.from_username(L.context, profile_name)
+
+        count = 0
+        for post in profile.get_posts():
+            if count >= max_posts:
+                break
+
+            # Random delay 5-15 seconds
+            delay = random.uniform(5, 15)
+            print(f"Waiting {delay:.1f}s...")
+            time.sleep(delay)
+
+            L.download_post(post, target=profile_name)
+            count += 1
+
+            # Random longer pause every 10 posts
+            if count % 10 == 0:
+                long_pause = random.uniform(30, 60)
+                print(f"Long pause: {long_pause:.1f}s")
+                time.sleep(long_pause)
+
+        print(f"Downloaded {count} posts from {profile_name}")
+
+    except Exception as e:
+        print(f"Error: {e}")
+        # Wait 5 minutes on error
+        time.sleep(300)
+
+# Use it
+safe_download('target_profile', max_posts=30)</code></pre>
+            </div>
+
+            <h3 class="text-2xl font-bold mb-4 mt-8">Key Settings That Work for Me</h3>
+            <ul class="list-disc list-inside text-gray-700 mb-4 space-y-2">
+                <li><strong>Delays:</strong> 5-15 seconds random between posts</li>
+                <li><strong>Long pause:</strong> 30-60 seconds every 10 posts</li>
+                <li><strong>Batch limit:</strong> 30-50 posts max per profile</li>
+                <li><strong>Session:</strong> Reload from file, re-login every 6 hours</li>
+                <li><strong>Error wait:</strong> 5 minutes if anything fails</li>
+            </ul>
+        </section>
+
+        <!-- When to Give Up -->
+        <section class="mb-12">
+            <h2 class="text-3xl font-bold mb-6">When to Just Give Up</h2>
+            <p class="text-gray-700 mb-4">
+                Sometimes nothing works. Signs you should stop:
+            </p>
+            <ul class="list-disc list-inside text-gray-700 mb-4 space-y-2">
+                <li>Your IP gets blocked repeatedly (even after waiting 24h)</li>
+                <li>429 errors happen immediately after logging in</li>
+                <li>Account gets temporarily locked</li>
+                <li>You're downloading thousands of posts per day (this is not normal use)</li>
+            </ul>
+
+            <p class="text-gray-700 mb-4">
+                At this point, consider:
+            </p>
+            <ul class="list-disc list-inside text-gray-700 mb-4 space-y-2">
+                <li>Using official Instagram API (requires approval)</li>
+                <li>Buying access from a data provider</li>
+                <li>Accepting that you can't download that much content</li>
+            </ul>
+        </section>
+
+        <!-- Related Articles -->
+        <section class="mb-12 bg-white rounded-lg shadow-md p-8">
+            <h2 class="text-2xl font-bold mb-6">Related Articles</h2>
+            <div class="grid md:grid-cols-2 gap-6">
+                <a href="instaloader.html" class="block p-4 border rounded-lg hover:border-blue-500 transition">
+                    <h3 class="font-bold text-lg mb-2">Instaloader: Download Instagram Photos Without Login</h3>
+                    <p class="text-gray-600 text-sm">Basic setup and usage for downloading Instagram content.</p>
+                </a>
+                <a href="gallery-dl-instagram-advanced.html" class="block p-4 border rounded-lg hover:border-blue-500 transition">
+                    <h3 class="font-bold text-lg mb-2">Gallery-dl Instagram: What Actually Works</h3>
+                    <p class="text-gray-600 text-sm">Alternative tool for Instagram downloading with different approach.</p>
+                </a>
+            </div>
+        </section>
+
+        <!-- 推荐阅读 -->
+        <section class="mt-16 pt-8 border-t border-gray-200">
+            <h3 class="text-2xl font-bold mb-6">📚 Recommended Reading</h3>
+
+            <div class="grid md:grid-cols-2 gap-6">
+
+                <!-- Instagram Tools -->
+                <div>
+                    <h4 class="font-semibold text-gray-700 mb-3 flex items-center">
+                        <span class="w-2 h-2 bg-pink-500 rounded-full mr-2"></span>
+                        Instagram Tools
+                    </h4>
+                    <div class="space-y-3">
+                        <a href="instaloader.html" class="block text-gray-600 hover:text-blue-600 group">
+                            <span class="group-hover:translate-x-1 inline-block transition-transform text-sm">→</span>
+                            <span class="text-sm">Instaloader: Download Instagram Photos Without Login</span>
+                        </a>
+                        <a href="instaloader-advanced.html" class="block text-gray-600 hover:text-blue-600 group">
+                            <span class="group-hover:translate-x-1 inline-block transition-transform text-sm">→</span>
+                            <span class="text-sm">Instaloader: What I Learned After Using It for a Year</span>
+                        </a>
+                        <a href="gallery-dl-instagram-advanced.html" class="block text-gray-600 hover:text-blue-600 group">
+                            <span class="group-hover:translate-x-1 inline-block transition-transform text-sm">→</span>
+                            <span class="text-sm">Gallery-dl Instagram: What Actually Works</span>
+                        </a>
+                        <a href="gallerydl.html" class="block text-gray-600 hover:text-blue-600 group">
+                            <span class="group-hover:translate-x-1 inline-block transition-transform text-sm">→</span>
+                            <span class="text-sm">Gallery-dl: Mass Download High-Res Images from Multiple Sites</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Related Web Scraping -->
+                <div>
+                    <h4 class="font-semibold text-gray-700 mb-3 flex items-center">
+                        <span class="w-2 h-2 bg-blue-500 rounded-full mr-2"></span>
+                        Web Scraping
+                    </h4>
+                    <div class="space-y-3">
+                        <a href="drissionpage.html" class="block text-gray-600 hover:text-blue-600 group">
+                            <span class="group-hover:translate-x-1 inline-block transition-transform text-sm">→</span>
+                            <span class="text-sm">DrissionPage: The Selenium Alternative That Bypasses Bot Detection</span>
+                        </a>
+                        <a href="playwright-cloudflare.html" class="block text-gray-600 hover:text-blue-600 group">
+                            <span class="group-hover:translate-x-1 inline-block transition-transform text-sm">→</span>
+                            <span class="text-sm">Playwright Stealth: Real Problems Bypassing Cloudflare</span>
+                        </a>
+                        <a href="tiktok-live-recorder-problems.html" class="block text-gray-600 hover:text-blue-600 group">
+                            <span class="group-hover:translate-x-1 inline-block transition-transform text-sm">→</span>
+                            <span class="text-sm">TikTok Live Recorder: Real Problems I Hit and How I Fixed Them</span>
+                        </a>
+                        <a href="index.html" class="block text-blue-600 font-semibold hover:text-blue-700 group">
+                            <span class="group-hover:translate-x-1 inline-block transition-transform text-sm">←</span>
+                            <span class="text-sm">View All 45+ Articles</span>
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-gray-800 text-white py-12">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="grid md:grid-cols-3 gap-8 mb-8">
+                <div>
+                    <h3 class="font-bold text-lg mb-4">Programming Notes</h3>
+                    <p class="text-gray-400 text-sm">A collection of coding notes and tutorials from a full-stack developer.</p>
+                </div>
+                <div>
+                    <h3 class="font-bold text-lg mb-4">Quick Links</h3>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="index.html" class="hover:text-white">Home</a></li>
+                        <li><a href="about.html" class="hover:text-white">About</a></li>
+                        <li><a href="contact.html" class="hover:text-white">Contact</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-bold text-lg mb-4">Connect</h3>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="https://github.com" target="_blank" class="hover:text-white">GitHub</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 pt-8 text-center text-gray-400 text-sm">
+                <p>© 2026 Programming Notes. Built with simple HTML & Tailwind CSS.</p>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>

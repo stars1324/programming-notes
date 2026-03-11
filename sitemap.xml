@@ -294,4 +294,16 @@
         <changefreq>weekly</changefreq>
         <priority>0.9</priority>
     </url>
+    <url>
+        <loc>https://pnt.jacbex.com/instaloader-429-errors.html</loc>
+        <lastmod>2026-03-11</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.9</priority>
+    </url>
+    <url>
+        <loc>https://pnt.jacbex.com/instaloader-advanced.html</loc>
+        <lastmod>2026-03-11</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.9</priority>
+    </url>
 </urlset>
