@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-LMWN7814BX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-LMWN7814BX');
+    </script>
+
+    <!-- SEO Meta Tags -->
+    <title>Focalboard: Open Source Trello Alternative for Personal Task Management</title>
+    <meta name="description" content="Using Focalboard as a self-hosted Trello alternative. Manage tasks locally with kanban boards, free from subscription fees and data lock-in.">
+    <meta name="keywords" content="Focalboard, Trello alternative, kanban board, task management, open source project management, self-hosted tasks">
+    <link rel="canonical" href="https://pnt.jacbex.com/focalboard.html">
+
+    <!-- Open Graph / Social Media -->
+    <meta property="og:title" content="Focalboard: Open Source Trello Alternative">
+    <meta property="og:description" content="Self-hosted kanban board for task management. Free, open source alternative to Trello.">
+    <meta property="og:type" content="article">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+        .code-block { background: #1e293b; color: #e2e8f0; padding: 1rem; border-radius: 0.5rem; overflow-x: auto; }
+        .code-block code { font-family: 'Monaco', 'Menlo', monospace; font-size: 0.875rem; }
+        pre { margin: 0; }
+        .info-box { background: #dbeafe; border-left: 4px solid #3b82f6; padding: 1rem; margin: 1.5rem 0; }
+        .warning-box { background: #fef3c7; border-left: 4px solid #f59e0b; padding: 1rem; margin: 1.5rem 0; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+            <a href="index.html" class="text-xl font-bold text-blue-600">📝 <span class="text-gray-700">Programming Notes</span></a>
+            <div class="space-x-6 hidden md:block">
+                <a href="index.html" class="hover:text-blue-500">Home</a>
+                <a href="about.html" class="hover:text-blue-500">About</a>
+                <a href="contact.html" class="hover:text-blue-500">Contact</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Article Header -->
+    <header class="bg-gradient-to-r from-indigo-600 to-purple-700 text-white py-16">
+        <div class="max-w-4xl mx-auto px-4">
+            <p class="text-indigo-200 mb-2">Productivity, Task Management, Open Source</p>
+            <h1 class="text-4xl md:text-5xl font-extrabold mb-4">Focalboard: My Search for a Trello Alternative That Doesn't Cost $15/Month</h1>
+            <p class="text-xl opacity-90 mb-6">Tried Trello for personal projects. Hit the free tier limit. Looked for alternatives. Found Focalboard - open source, self-hosted, does what I need without the subscription.</p>
+            <p class="text-lg opacity-75">March 11, 2026 · 9 min read</p>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-3xl mx-auto px-4 py-12 prose prose-lg max-w-none">
+
+        <p class="lead text-xl text-gray-600 mb-8">
+            Needed a simple way to track tasks for my personal projects. Nothing fancy - just boards, lists, cards. Trello worked fine for a while, but then I hit the free tier limits.
+        </p>
+
+        <p>
+            Looked at the pricing: $15/month for features I'd actually use. That's $180/year. For a kanban board. Not happening.
+        </p>
+
+        <div class="bg-indigo-50 border-l-4 border-indigo-500 p-6 my-8">
+            <p class="font-semibold text-indigo-900 mb-2">What I was looking for:</p>
+            <ul class="space-y-1 text-indigo-800">
+                <li>Self-hosted (no subscription)</li>
+                <li>Open source (no vendor lock-in)</li>
+                <li>Similar to Trello (kanban boards)</li>
+                <li>Works offline or on my own server</li>
+            </ul>
+        </div>
+
+        <p>
+            Found <a href="https://www.focalboard.com" class="text-blue-600 underline" target="_blank">Focalboard</a>. Created by Mattermost (the team chat company). Open source. Does exactly what I need.
+        </p>
+
+        <hr class="my-12 border-gray-300">
+
+        <p class="text-2xl font-bold text-gray-900">
+            So how do you actually run it?
+        </p>
+
+        <p>
+            Focalboard gives you three options:
+        </p>
+
+        <div class="grid md:grid-cols-3 gap-4 my-8">
+            <div class="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
+                <div class="text-3xl mb-2">💻</div>
+                <h3 class="font-bold text-lg mb-2">Desktop App</h3>
+                <p class="text-gray-600 text-sm">Download and run on your computer</p>
+            </div>
+            <div class="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
+                <div class="text-3xl mb-2">🐳</div>
+                <h3 class="font-bold text-lg mb-2">Docker</h3>
+                <p class="text-gray-600 text-sm">Self-host on your server</p>
+            </div>
+            <div class="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
+                <div class="text-3xl mb-2">💬</div>
+                <h3 class="font-bold text-lg mb-2">Mattermost Plugin</h3>
+                <p class="text-gray-600 text-sm">Integrate with team chat</p>
+            </div>
+        </div>
+
+        <blockquote class="bg-gray-100 p-6 my-8 border-l-4 border-gray-400">
+            <p class="text-gray-700 mb-4">
+                <strong>Desktop app is what I use for personal projects.</strong> Just download and run.
+            </p>
+        </blockquote>
+
+        <div class="code-block my-8">
+            <pre><code># Download from GitHub releases
+sudo dpkg -i focalboard_*.deb  # Ubuntu/Debian
+# Or install .exe (Windows) or .dmg (macOS)
+
+# Run it
+focalboard</code></pre>
+        </div>
+
+        <p>
+            Opens in your browser. Everything runs locally. Data stored on your computer. That's it.
+        </p>
+
+        <p class="text-xl font-bold text-gray-900 mt-12 mb-4">
+            For teams, Docker makes more sense:
+        </p>
+
+        <div class="code-block my-8">
+            <pre><code>docker run -d \
+  --name focalboard \
+  -p 8080:8080 \
+  -v focalboard-data:/data \
+  mattermost/focalboard:latest</code></pre>
+        </div>
+
+        <hr class="my-12 border-gray-300">
+
+        <p class="text-2xl font-bold text-gray-900 mb-4">
+            First time setup is pretty straightforward
+        </p>
+
+        <p>
+            If you've used Trello, you'll feel right at home immediately.
+        </p>
+
+        <div class="bg-gray-50 p-6 my-8 rounded-lg">
+            <p class="font-semibold mb-4">Open Focalboard → Create new board → Name it (I use "Personal Projects") → Choose template or start blank</p>
+        </div>
+
+        <p>
+            Boards are your projects. Each board has lists and cards.
+        </p>
+
+        <p class="text-xl font-bold text-gray-900 mt-12 mb-4">
+            Here's how I organize my board:
+        </p>
+
+        <div class="code-block my-8">
+            <pre><code>Lists (left to right):
+├── Backlog     (stuff to do someday)
+├── To Do       (next up)
+├── Active      (working on now)
+├── Review      (need to check/test)
+└── Done        (completed)
+
+Cards can have:
+├── Title and description
+├── Due date
+├── Labels (bug, feature, refactor)
+└── Attachments (screenshots, files)</code></pre>
+        </div>
+
+        <p class="text-xl font-bold text-gray-900 mt-12 mb-4">
+            Features that actually matter
+        </p>
+
+        <p>
+            After using Focalboard for a while, most of the "features" don't matter. What I actually use:
+        </p>
+
+        <div class="my-8">
+            <h4 class="font-bold text-gray-900 mb-3">Card properties I use daily:</h4>
+            <ul class="space-y-2 text-gray-700">
+                <li>✓ Title and description</li>
+                <li>✓ Due dates (show up in calendar view)</li>
+                <li>✓ Labels (bug, feature, refactor)</li>
+                <li>✓ Attachments (screenshots, docs)</li>
+            </ul>
+        </div>
+
+        <div class="my-8">
+            <h4 class="font-bold text-gray-900 mb-3">Views I switch between:</h4>
+            <ul class="space-y-2 text-gray-700">
+                <li><strong>Board view</strong> - Classic kanban (use this 90% of the time)</li>
+                <li><strong>Table view</strong> - Spreadsheet-style (good for bulk editing)</li>
+                <li><strong>Calendar view</strong> - See due dates (great for planning)</li>
+            </ul>
+        </div>
+
+        <div class="info-box my-8">
+            <p class="font-bold text-blue-800 mb-2">💡 How I actually use it</p>
+            <p class="text-blue-700">Board view for day-to-day work. Table view when I need to see everything at once and reorganize. Calendar view for planning deadlines.</p>
+        </div>
+
+        <hr class="my-12 border-gray-300">
+
+        <p class="text-2xl font-bold text-gray-900 mb-4">
+            Real-world use: my daily workflow
+        </p>
+
+        <div class="code-block my-8">
+            <pre><code>Morning:
+├── Check "Active" list - what am I working on today?
+├── Move cards from "Planned" → "Active"
+└── Check due dates - anything overdue?
+
+During the day:
+├── Drag cards through workflow as I make progress
+├── Add notes with findings, decisions
+└── Attach screenshots or code snippets
+
+End of day:
+├── Completed cards → "Review"
+├── Clean up "Done" list (archive old cards)
+└── Plan tomorrow's tasks</code></pre>
+        </div>
+
+        <p class="text-xl font-bold text-gray-900 mt-12 mb-4">
+            So how does it compare to Trello?
+        </p>
+
+        <div class="grid md:grid-cols-2 gap-6 my-8">
+            <div class="bg-green-50 p-6 rounded-lg">
+                <h4 class="font-bold text-green-900 mb-3">✓ What Focalboard does better</h4>
+                <ul class="space-y-2 text-green-800 text-sm">
+                    <li><strong>Cost:</strong> Free vs $15/month</li>
+                    <li><strong>Privacy:</strong> Your data vs their servers</li>
+                    <li><strong>Offline:</strong> Works anywhere vs requires internet</li>
+                    <li><strong>Freedom:</strong> Open source, modify if needed</li>
+                </ul>
+            </div>
+            <div class="bg-red-50 p-6 rounded-lg">
+                <h4 class="font-bold text-red-900 mb-3">✗ What Trello does better</h4>
+                <ul class="space-y-2 text-red-800 text-sm">
+                    <li><strong>Integrations:</strong> Slack, GitHub, Jira (hundreds more)</li>
+                    <li><strong>Mobile:</strong> Polished native apps (Focalboard is basic)</li>
+                    <li><strong>Automation:</strong> Built-in Butler vs manual</li>
+                    <li><strong>Ecosystem:</strong> Templates, plugins, extensions</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="warning-box my-8">
+            <p class="font-bold text-yellow-800 mb-2">⚠️ Reality check</p>
+            <p class="text-yellow-700">Focalboard is simpler. If you need complex automations, lots of integrations, or enterprise features - you'll miss Trello's power-ups. But for basic kanban task management, it does everything I need.</p>
+        </div>
+
+        <hr class="my-12 border-gray-300">
+
+        <p class="text-2xl font-bold text-gray-900 mb-4">
+            Stuff that tripped me up
+        </p>
+
+        <p class="font-bold text-gray-900 mb-3">Data storage</p>
+        <p>
+            Desktop app stores data locally. If you switch computers, export and import manually. Or use Docker with persistent volume to avoid this entirely.
+        </p>
+
+        <p class="font-bold text-gray-900 mb-3 mt-6">Updates</p>
+        <p>
+            Doesn't auto-update. You manually download new versions from GitHub releases when you remember to.
+        </p>
+
+        <p class="font-bold text-gray-900 mb-3 mt-6">Mobile</p>
+        <p>
+            Mobile support is basic. You can access the web interface, but it's not optimized for touch. For serious mobile use, Trello's native apps are way better.
+        </p>
+
+        <hr class="my-12 border-gray-300">
+
+        <p class="text-2xl font-bold text-gray-900 mb-4">
+            So should you use it?
+        </p>
+
+        <p class="font-bold text-green-700 mb-3">Use Focalboard if:</p>
+        <ul class="space-y-1 text-gray-700 mb-6">
+            <li>✓ You want free, self-hosted task management</li>
+            <li>✓ You're okay with basic features (don't need complex automations)</li>
+            <li>✓ You care about data privacy (want everything on your own server)</li>
+            <li>✓ You're managing personal projects or a small team</li>
+            <li>✓ You're comfortable with Docker or command-line tools</li>
+        </ul>
+
+        <p class="font-bold text-red-700 mb-3">Stick with Trello if:</p>
+        <ul class="space-y-1 text-gray-700 mb-6">
+            <li>✗ You need lots of integrations (GitHub, Slack, etc.)</li>
+            <li>✗ You need powerful automation (Butler, rules, etc.)</li>
+            <li>✗ You rely heavily on mobile apps</li>
+            <li>✗ You have a large team that needs enterprise features</li>
+        </ul>
+
+        <hr class="my-12 border-gray-300">
+
+        <p class="text-2xl font-bold text-gray-900 mb-4">
+            Bottom line
+        </p>
+
+        <p>
+            Focalboard works for me. It's simple, fast, does what I need without the subscription fee.
+        </p>
+
+        <p>
+            For personal projects, it's perfect. Boards are responsive. Data stays on my machine. No monthly payments.
+        </p>
+
+        <p>
+            The main tradeoff is fewer features than Trello. But honestly, I rarely miss them. Basic kanban is enough for 90% of my task management needs.
+        </p>
+
+        <p>
+            If you're paying for Trello or hitting free tier limits, give Focalboard a shot. It might not have all the bells and whistles, but it gets the job done.
+        </p>
+
+        <!-- 推荐阅读 -->
+        <section class="mt-16 pt-8 border-t border-gray-200">
+            <h3 class="text-2xl font-bold mb-6">📚 Recommended Reading</h3>
+
+            <div class="grid md:grid-cols-2 gap-6">
+
+                <!-- Productivity -->
+                <div>
+                    <h4 class="font-semibold text-gray-700 mb-3 flex items-center">
+                        <span class="w-2 h-2 bg-indigo-500 rounded-full mr-2"></span>
+                        Productivity & Task Management
+                    </h4>
+                    <div class="space-y-3">
+                        <a href="logseq.html" class="block text-gray-600 hover:text-blue-600 group">
+                            <span class="group-hover:translate-x-1 inline-block transition-transform text-sm">→</span>
+                            <span class="text-sm">Logseq: Privacy-First Knowledge Base That Works Offline</span>
+                        </a>
+                        <a href="appflowy.html" class="block text-gray-600 hover:text-blue-600 group">
+                            <span class="group-hover:translate-x-1 inline-block transition-transform text-sm">→</span>
+                            <span class="text-sm">AppFlowy: The Notion Alternative That Respects Your Privacy</span>
+                        </a>
+                        <a href="obsidian-plugins.html" class="block text-gray-600 hover:text-blue-600 group">
+                            <span class="group-hover:translate-x-1 inline-block transition-transform text-sm">→</span>
+                            <span class="text-sm">Obsidian Plugins: Built a Zettelkasten That Works</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Automation -->
+                <div>
+                    <h4 class="font-semibold text-gray-700 mb-3 flex items-center">
+                        <span class="w-2 h-2 bg-orange-500 rounded-full mr-2"></span>
+                        Automation & Workflows
+                    </h4>
+                    <div class="space-y-3">
+                        <a href="n8n.html" class="block text-gray-600 hover:text-blue-600 group">
+                            <span class="group-hover:translate-x-1 inline-block transition-transform text-sm">→</span>
+                            <span class="text-sm">n8n: Self-Hosted Zapier Alternative - Automate Workflows</span>
+                        </a>
+                        <a href="huginn.html" class="block text-gray-600 hover:text-blue-600 group">
+                            <span class="group-hover:translate-x-1 inline-block transition-transform text-sm">→</span>
+                            <span class="text-sm">Huginn: Built My Own IFTTT and Saved $15/Month</span>
+                        </a>
+                        <a href="novu.html" class="block text-gray-600 hover:text-blue-600 group">
+                            <span class="group-hover:translate-x-1 inline-block transition-transform text-sm">→</span>
+                            <span class="text-sm">Novu: Built a Notification System That Doesn't Suck</span>
+                        </a>
+                        <a href="index.html" class="block text-blue-600 font-semibold hover:text-blue-700 group">
+                            <span class="group-hover:translate-x-1 inline-block transition-transform text-sm">←</span>
+                            <span class="text-sm">View All 45+ Articles</span>
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-gray-800 text-white py-12">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="grid md:grid-cols-3 gap-8 mb-8">
+                <div>
+                    <h3 class="font-bold text-lg mb-4">Programming Notes</h3>
+                    <p class="text-gray-400 text-sm">A collection of coding notes and tutorials from a full-stack developer.</p>
+                </div>
+                <div>
+                    <h3 class="font-bold text-lg mb-4">Quick Links</h3>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="index.html" class="hover:text-white">Home</a></li>
+                        <li><a href="about.html" class="hover:text-white">About</a></li>
+                        <li><a href="contact.html" class="hover:text-white">Contact</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-bold text-lg mb-4">Connect</h3>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="https://github.com" target="_blank" class="hover:text-white">GitHub</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 pt-8 text-center text-gray-400 text-sm">
+                <p>© 2026 Programming Notes. Built with simple HTML & Tailwind CSS.</p>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>
