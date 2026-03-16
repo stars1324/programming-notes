@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-LMWN7814BX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-LMWN7814BX');
+    </script>
+
+    <!-- SEO Meta Tags -->
+    <title>Autopsy Tutorial: Digital Forensics Tool for Recovering Deleted Files</title>
+    <meta name="description"="Learn how to use Autopsy, the powerful digital forensics platform, to recover deleted files, analyze disk images, and perform data recovery. Step-by-step tutorial with real examples.">
+    <meta name="keywords" content="Autopsy, digital forensics, file recovery, data recovery, deleted files, disk image analysis, computer forensics, Sleuth Kit">
+    <link rel="canonical" href="https://pnt.jacbex.com/autopsy.html">
+
+    <!-- Open Graph / Social Media -->
+    <meta property="og:title" content="Autopsy Tutorial: Digital Forensics Tool for Recovering Deleted Files">
+    <meta property="og:description" content="Master Autopsy for digital forensics and file recovery. Learn to analyze disk images and recover deleted data with practical examples.">
+    <meta property="og:type" content="article">
+
+    <!-- Tailwind CSS for modern UI -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Code Highlighting (Prism.js) -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+
+    <!-- Structured Data (Schema.org) for Google -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "Autopsy Tutorial: Digital Forensics Tool for Recovering Deleted Files",
+      "description": "Complete guide to using Autopsy for digital forensics and file recovery. Covers installation, disk image analysis, and deleted file recovery.",
+      "author": {
+        "@type": "Person",
+        "name": "Programming Notes"
+      },
+      "proficiencyLevel": "Intermediate",
+      "keywords": ["digital forensics", "file recovery", "data recovery", "Autopsy", "Sleuth Kit"]
+    }
+    </script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+        .prose code { color: #eb5757; background: #f9f2f2; padding: 2px 4px; border-radius: 4px; }
+        .feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; }
+        .feature-card { background: #f9fafb; padding: 1.5rem; border-radius: 0.75rem; border-left: 4px solid #3b82f6; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+            <a href="index.html" class="text-xl font-bold text-blue-600">📝 <span class="text-gray-700">Programming Notes</span></a>
+            <div class="space-x-6 hidden md:block">
+                <a href="index.html" class="hover:text-blue-500">Home</a>
+                <a href="about.html" class="hover:text-blue-500">About</a>
+                <a href="contact.html" class="hover:text-blue-500">Contact</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="bg-gradient-to-r from-gray-800 to-gray-900 text-white py-16">
+        <div class="max-w-4xl mx-auto px-4 text-center">
+            <h1 class="text-4xl md:text-5xl font-extrabold mb-4">Autopsy: Digital Forensics & File Recovery</h1>
+            <p class="text-xl opacity-90">Recover deleted files and analyze disk images with this powerful open-source forensics platform. No forensics degree required.</p>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto px-4 py-12 bg-white mt-[-40px] rounded-xl shadow-lg mb-20">
+
+        <article class="prose prose-blue max-w-none">
+
+            <p class="mb-6 text-lg text-gray-700 leading-relaxed">
+                Had a client accidentally delete critical business files. Empty trash, backups were corrupted, typical disaster scenario. Needed something more powerful than basic recovery software.
+            </p>
+
+            <p class="mb-8 text-gray-700 leading-relaxed">
+                That's when I properly explored <a href="https://www.autopsy.com/" class="text-blue-600 underline">Autopsy</a>. It's a graphical interface for The Sleuth Kit, used by actual digital forensics investigators. The learning curve is steeper than consumer recovery tools, but you get access to professional-grade analysis capabilities.
+            </p>
+
+            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">What Autopsy actually does</h2>
+
+            <p class="mb-6 text-gray-700">
+                Autopsy isn't just about hitting "recover" and hoping for the best. It analyzes disk images at multiple levels:
+            </p>
+
+            <div class="feature-grid mb-8">
+                <div class="feature-card">
+                    <h3 class="font-bold text-gray-900 mb-2">🔍 File System Analysis</h3>
+                    <p class="text-gray-600 text-sm">Understands NTFS, FAT, EXT4, HFS+ and other file systems. Reads metadata, journaling data, and allocation tables.</p>
+                </div>
+                <div class="feature-card">
+                    <h3 class="font-bold text-gray-900 mb-2">🗑️ Deleted File Recovery</h3>
+                    <p class="text-gray-600 text-sm">Finds files marked as deleted but not yet overwritten. Recovers directory structure and timestamps.</p>
+                </div>
+                <div class="feature-card">
+                    <h3 class="font-bold text-gray-900 mb-2">🖼️ File Carving</h3>
+                    <p class="text-gray-600 text-sm">Recovers files based on content signatures even when filesystem metadata is gone. Great for corrupted drives.</p>
+                </div>
+                <div class="feature-card">
+                    <h3 class="font-bold text-gray-900 mb-2">📊 Timeline Analysis</h3>
+                    <p class="text-gray-600 text-sm">Shows when files were created, modified, accessed. Useful for understanding what happened and when.</p>
+                </div>
+                <div class="feature-card">
+                    <h3 class="font-bold text-gray-900 mb-2">🔐 Web Browser Artifacts</h3>
+                    <p class="text-gray-600 text-sm">Extracts history, downloads, cookies from Chrome, Firefox, Safari. Even finds deleted browsing data.</p>
+                </div>
+                <div class="feature-card">
+                    <h3 class="font-bold text-gray-900 mb-2">📱 Mobile Device Support</h3>
+                    <p class="text-gray-600 text-sm">Analyzes iOS and Android backups. Extracts messages, call logs, app data.</p>
+                </div>
+            </div>
+
+            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">Installing Autopsy</h2>
+
+            <p class="mb-4 text-gray-700">Autopsy is cross-platform. The easiest method is downloading the platform-specific installer:</p>
+
+            <pre class="language-bash"><code># macOS (Intel)
+brew install --cask autopsy
+
+# macOS (Apple Silicon)
+# Download from sleuthkit.org/autopsy/downloads.php
+
+# Linux (Ubuntu/Debian)
+sudo apt-get install autopsy
+
+# Windows
+# Download installer from sleuthkit.org</code></pre>
+
+            <p class="mt-4 text-gray-600 text-sm">
+                Note: Autopsy requires Java 11 or later. Most installations include it, but you might need to install it separately on Linux.
+            </p>
+
+            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">Creating a disk image (important first step)</h2>
+
+            <p class="mb-4 text-gray-700">Before analyzing anything, you need to create a disk image. <strong class="text-red-600">Never work directly on the original drive</strong> - you risk overwriting the data you're trying to recover.</p>
+
+            <pre class="language-bash"><code># On macOS/Linux - create a bit-for-bit copy
+dd if=/dev/disk2 of=evidence.img bs=4M conv=noerror,sync status=progress
+
+# Split into chunks if the image is huge
+dd if=/dev/disk2 | split -b 4G - evidence.img.
+
+# On Windows - use FTK Imager (free) or similar
+# Or via WSL
+wsl dd if=/dev/sdb of=/mnt/c/evidence.img bs=4M conv=noerror,sync status=progress</code></pre>
+
+            <p class="mt-4 text-gray-600 text-sm">
+                <strong class="text-gray-900">Why this matters:</strong> Working on a copy preserves the original evidence and prevents accidental data loss. In professional forensics, this is standard practice.
+            </p>
+
+            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">Creating a new case</h2>
+
+            <p class="mb-4 text-gray-700">Launch Autopsy and create a new case:</p>
+
+            <ol class="list-decimal list-inside space-y-3 text-gray-700 mb-6">
+                <li>Click "New Case" and give it a name and case number</li>
+                <li>Choose a location for case data (needs space for extracted files)</li>
+                <li>Add a data source - select your disk image file</li>
+                <li>Choose ingest modules (more on this below)</li>
+                <li>Let it run the initial analysis</li>
+            </ol>
+
+            <p class="text-gray-600 mb-6">
+                The initial analysis can take a while depending on drive size. For a 500GB drive, expect anywhere from 30 minutes to several hours.
+            </p>
+
+            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">Understanding ingest modules</h2>
+
+            <p class="mb-4 text-gray-700">Ingest modules are analysis plugins that run automatically. Here's what I typically enable:</p>
+
+            <table class="w-full my-6 border border-gray-200 rounded-lg overflow-hidden">
+                <thead>
+                    <tr class="bg-gray-50">
+                        <th class="px-4 py-3 text-left text-sm font-semibold text-gray-900">Module</th>
+                        <th class="px-4 py-3 text-left text-sm font-semibold text-gray-900">Purpose</th>
+                        <th class="px-4 py-3 text-left text-sm font-semibold text-gray-900">Speed</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="px-4 py-3 text-sm text-gray-700">File Type</td>
+                        <td class="px-4 py-3 text-sm text-gray-700">Identifies file types by extension and content</td>
+                        <td class="px-4 py-3 text-sm text-gray-700">Fast</td>
+                    </tr>
+                    <tr>
+                        <td class="px-4 py-3 text-sm text-gray-700">Deleted Files</td>
+                        <td class="px-4 py-3 text-sm text-gray-700">Recovers files marked as deleted</td>
+                        <td class="px-4 py-3 text-sm text-gray-700">Fast</td>
+                    </tr>
+                    <tr>
+                        <td class="px-4 py-3 text-sm text-gray-700">Hash Lookup</td>
+                        <td class="px-4 py-3 text-sm text-gray-700">Identifies known files via NSRL database</td>
+                        <td class="px-4 py-3 text-sm text-gray-700">Medium</td>
+                    </tr>
+                    <tr>
+                        <td class="px-4 py-3 text-sm text-gray-700">EXIF</td>
+                        <td class="px-4 py-3 text-sm text-gray-700">Extracts metadata from images</td>
+                        <td class="px-4 py-3 text-sm text-gray-700">Fast</td>
+                    </tr>
+                    <tr>
+                        <td class="px-4 py-3 text-sm text-gray-700">Email Parser</td>
+                        <td class="px-4 py-3 text-sm text-gray-700">Extracts emails from PST/MBOX files</td>
+                        <td class="px-4 py-3 text-sm text-gray-700">Medium</td>
+                    </tr>
+                    <tr>
+                        <td class="px-4 py-3 text-sm text-gray-700">Web History</td>
+                        <td class="px-4 py-3 text-sm text-gray-700">Extracts browser history and downloads</td>
+                        <td class="px-4 py-3 text-sm text-gray-700">Medium</td>
+                    </tr>
+                    <tr>
+                        <td class="px-4 py-3 text-sm text-gray-700">Keyword Search</td>
+                        <td class="px-4 py-3 text-sm text-gray-700">Searches for specific text in files</td>
+                        <td class="px-4 py-3 text-sm text-gray-700">Slow</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <p class="text-gray-600 mb-6">
+                <strong class="text-gray-900">Tip:</strong> For quick recovery, skip the slower modules initially. You can always run them later.
+            </p>
+
+            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">Navigating the interface</h2>
+
+            <p class="mb-4 text-gray-700">Once analysis completes, you'll see several views:</p>
+
+            <ul class="list-disc list-inside space-y-2 text-gray-700 mb-6">
+                <li><strong class="text-gray-900">Tree View:</strong> Browse by directory structure, including deleted files</li>
+                <li><strong class="text-gray-900">File Types:</strong> Grouped by extension (JPG, PDF, DOCX, etc.)</li>
+                <li><strong class="text-gray-900">Deleted Files:</strong> Only shows files marked as deleted</li>
+                <li><strong class="text-gray-900">Results:</strong> Output from ingest modules (web history, emails, etc.)</li>
+                <li><strong class="text-gray-900">Timeline:</strong> Chronological view of file activity</li>
+            </ul>
+
+            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">Recovering deleted files</h2>
+
+            <p class="mb-4 text-gray-700">Here's the workflow I use for deleted file recovery:</p>
+
+            <ol class="list-decimal list-inside space-y-3 text-gray-700 mb-6">
+                <li>Go to "Deleted Files" view</li>
+                <li>Sort by "Path" or "File Type" to narrow down</li>
+                <li>Use filters to show only specific file types</li>
+                <li>Right-click files and "Extract" to save them</li>
+                <li>For multiple files, select them and extract to a folder</li>
+            </ol>
+
+            <pre class="language-bash"><code># Extraction creates this structure:
+case_name/
+├── exports/
+│   ├── deleted_files/
+│   │   ├── recovered_document.docx
+│   │   ├── recovered_photo.jpg
+│   │   └── ...</code></pre>
+
+            <p class="mt-4 text-gray-600 text-sm">
+                <strong class="text-gray-900">Success rates:</strong> Recently deleted files (within days) have near 100% recovery. Files deleted months ago may be partially overwritten. Fragmented files might not recover perfectly.
+            </p>
+
+            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">File carving for corrupted drives</h2>
+
+            <p class="mb-4 text-gray-700">When the file system is damaged, use file carving:</p>
+
+            <pre class="language-bash"><code># In Autopsy, go to Tools -> File Carving
+# Or run from command line with Sleuth Kit
+
+# carve JPEGs from an image
+fls -r evidence.img
+find evidence.img -type f -name "*.jpg"
+
+# More advanced carving with scalpel
+# First configure scalpel.conf with file signatures
+scalpel -c scalpel.conf -o output_dir evidence.img</code></pre>
+
+            <p class="mt-4 text-gray-600 text-sm">
+                File carving looks for file signatures (magic bytes) rather than relying on filesystem metadata. It's slower but can recover files from even heavily damaged drives.
+            </p>
+
+            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">Real-world example: Recovering accidentally deleted business files</h2>
+
+            <p class="mb-4 text-gray-700">Here's how I approached the client situation:</p>
+
+            <ol class="list-decimal list-inside space-y-3 text-gray-700 mb-6">
+                <li>Created a disk image of the affected drive using dd</li>
+                <li>Opened Autopsy and created a new case</li>
+                <li>Added the disk image as data source</li>
+                <li>Ran basic ingest modules (skipped keyword search initially)</li>
+                <li>Browsed to "Deleted Files" and filtered by Office documents</li>
+                <li>Found 47 deleted DOCX/XLSX files from the past week</li>
+                <li>Extracted all of them to verify</li>
+                <li>45 of 47 files opened successfully with no corruption</li>
+            </ol>
+
+            <p class="text-gray-600 mb-6">
+                Total time: about 4 hours (most was waiting for the initial ingest to complete). The alternative would have been days of manual reconstruction or permanent data loss.
+            </p>
+
+            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">Understanding what can and can't be recovered</h2>
+
+            <p class="mb-4 text-gray-700">Important to set expectations:</p>
+
+            <table class="w-full my-6 border border-gray-200 rounded-lg overflow-hidden">
+                <thead>
+                    <tr class="bg-gray-50">
+                        <th class="px-4 py-3 text-left text-sm font-semibold text-gray-900">Scenario</th>
+                        <th class="px-4 py-3 text-left text-sm font-semibold text-gray-900">Recovery Chance</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="px-4 py-3 text-sm text-gray-700">Recently deleted (hours/days)</td>
+                        <td class="px-4 py-3 text-sm text-green-700">Excellent - 95%+</td>
+                    </tr>
+                    <tr>
+                        <td class="px-4 py-3 text-sm text-gray-700">Deleted weeks ago</td>
+                        <td class="px-4 py-3 text-sm text-yellow-700">Good - 60-80%</td>
+                    </tr>
+                    <tr>
+                        <td class="px-4 py-3 text-sm text-gray-700">Deleted months ago</td>
+                        <td class="px-4 py-3 text-sm text-orange-700">Fair - 30-50%</td>
+                    </tr>
+                    <tr>
+                        <td class="px-4 py-3 text-sm text-gray-700">Secure wiped / overwritten</td>
+                        <td class="px-4 py-3 text-sm text-red-700">Poor - 0-5%</td>
+                    </tr>
+                    <tr>
+                        <td class="px-4 py-3 text-sm text-gray-700">SSD with TRIM enabled</td>
+                        <td class="px-4 py-3 text-sm text-red-700">Poor - 0-10%</td>
+                    </tr>
+                    <tr>
+                        <td class="px-4 py-3 text-sm text-gray-700">Encrypted drive (no password)</td>
+                        <td class="px-4 py-3 text-sm text-red-700">Impossible - 0%</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <p class="text-gray-600 mb-6">
+                <strong class="text-gray-900">SSD note:</strong> Modern SSDs with TRIM can make deleted files unrecoverable quickly. The TRIM command tells the SSD which blocks are no longer in use, and the SSD wipes them proactively for performance.
+            </p>
+
+            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">Advanced: Timeline analysis</h2>
+
+            <p class="mb-4 text-gray-700">The timeline view shows file activity over time:</p>
+
+            <pre class="language-bash"><code># Events shown in timeline:
+- File created
+- File modified
+- File accessed
+- File deleted
+- Metadata changes
+
+# You can filter by:
+- Date range
+- Event type
+- File type
+- Specific users (on multi-user systems)</code></pre>
+
+            <p class="mt-4 text-gray-600 text-sm">
+                Useful for understanding what happened to a system. Found malware that created files at 3 AM? Timeline will show it clearly.
+            </p>
+
+            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">Common pitfalls to avoid</h2>
+
+            <ul class="list-disc list-inside space-y-2 text-gray-700 mb-6">
+                <li><strong class="text-gray-900">Never work on the original drive</strong> - Always create an image first</li>
+                <li><strong class="text-gray-900">Don't recover to the same drive</strong> - You might overwrite other deleted files</li>
+                <li><strong class="text-gray-900">SSDs need immediate action</strong> - TRIM can wipe deleted files quickly</li>
+                <li><strong class="text-gray-900">Encrypted drives need passwords</strong> - BitLocker/FileVault without keys = no recovery</li>
+                <li><strong class="text-gray-900">Cloud sync can interfere</strong> - Disable Dropbox/OneDrive before recovery</li>
+            </ul>
+
+            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">When to use Autopsy vs simpler tools</h2>
+
+            <p class="mb-4 text-gray-700">Autopsy is overkill for simple situations:</p>
+
+            <table class="w-full my-6 border border-gray-200 rounded-lg overflow-hidden">
+                <thead>
+                    <tr class="bg-gray-50">
+                        <th class="px-4 py-3 text-left text-sm font-semibold text-gray-900">Use Autopsy when...</th>
+                        <th class="px-4 py-3 text-left text-sm font-semibold text-gray-900">Use simpler tools when...</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="px-4 py-3 text-sm text-gray-700">You need a full disk image</td>
+                        <td class="px-4 py-3 text-sm text-gray-700">Just recovering a few recent files</td>
+                    </tr>
+                    <tr>
+                        <td class="px-4 py-3 text-sm text-gray-700">Analyzing corrupted filesystems</td>
+                        <td class="px-4 py-3 text-sm text-gray-700">Working with a healthy drive</td>
+                    </tr>
+                    <tr>
+                        <td class="px-4 py-3 text-sm text-gray-700">Need timeline/activity analysis</td>
+                        <td class="px-4 py-3 text-sm text-gray-700">Only need to browse deleted files</td>
+                    </tr>
+                    <tr>
+                        <td class="px-4 py-3 text-sm text-gray-700">Professional/legal requirements</td>
+                        <td class="px-4 py-3 text-sm text-gray-700">Personal one-time recovery</td>
+                    </tr>
+                    <tr>
+                        <td class="px-4 py-3 text-sm text-gray-700">Analyzing disk images from elsewhere</td>
+                        <td class="px-4 py-3 text-sm text-gray-700">Recovering from local drives only</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">Resources for learning more</h2>
+
+            <ul class="list-disc list-inside space-y-2 text-gray-700 mb-6">
+                <li><a href="https://www.autopsy.com/docs/" class="text-blue-600 underline">Official Autopsy Documentation</a> - Comprehensive reference</li>
+                <li><a href="https://www.sleuthkit.org/" class="text-blue-600 underline">Sleuth Kit</a> - The underlying command-line tools</li>
+                <li><a href="https://www.cflabs.com/" class="text-blue-600 underline">CFLabs</a> - More advanced forensics training and tools</li>
+                <li><a href="https://www.dfir.org/" class="text-blue-600 underline">DFIR.org</a> - Digital Forensics and Incident Response community</li>
+            </ul>
+
+            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">Bottom line</h2>
+
+            <p class="text-gray-700 leading-relaxed">
+                Autopsis is professional-grade forensics software that happens to be free and open-source. It's not the simplest tool for basic file recovery, but when you need deep analysis, timeline reconstruction, or are working with damaged drives, it's incredibly powerful.
+            </p>
+
+            <p class="text-gray-700 leading-relaxed mt-4">
+                The learning curve is worth it. Even if you only use it occasionally, having a proper forensics tool in your toolkit can save the day when simpler recovery software fails.
+            </p>
+
+        </article>
+
+        <!-- 推荐阅读 -->
+        <section class="mt-16 pt-8 border-t border-gray-200">
+            <h3 class="text-2xl font-bold mb-6">📚 Recommended Reading</h3>
+
+            <div class="grid md:grid-cols-2 gap-6">
+
+                <!-- Data Management -->
+                <div>
+                    <h4 class="font-semibold text-gray-700 mb-3 flex items-center">
+                        <span class="w-2 h-2 bg-blue-500 rounded-full mr-2"></span>
+                        Data Management & Backup
+                    </h4>
+                    <div class="space-y-3">
+                        <a href="rclone.html" class="block text-gray-600 hover:text-blue-600 group">
+                            <span class="group-hover:translate-x-1 inline-block transition-transform text-sm">→</span>
+                            <span class="text-sm">Rclone: Sync Files to 70+ Cloud Storage Providers (Google Drive, S3, OneDrive)</span>
+                        </a>
+                        <a href="minio.html" class="block text-gray-600 hover:text-blue-600 group">
+                            <span class="group-hover:translate-x-1 inline-block transition-transform text-sm">→</span>
+                            <span class="text-sm">MinIO: S3-Compatible Object Storage on Your Own Server</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Content Recovery Tools -->
+                <div>
+                    <h4 class="font-semibold text-gray-700 mb-3 flex items-center">
+                        <span class="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
+                        Content Download & Recovery
+                    </h4>
+                    <div class="space-y-3">
+                        <a href="gallerydl.html" class="block text-gray-600 hover:text-blue-600 group">
+                            <span class="group-hover:translate-x-1 inline-block transition-transform text-sm">→</span>
+                            <span class="text-sm">Gallery-dl: Mass Download High-Res Images from Pixiv, Instagram, Pinterest</span>
+                        </a>
+                        <a href="youget.html" class="block text-gray-600 hover:text-blue-600 group">
+                            <span class="group-hover:translate-x-1 inline-block transition-transform text-sm">→</span>
+                            <span class="text-sm">You-Get: Download 4K Videos from 100+ Sites via Command Line</span>
+                        </a>
+                        <a href="instaloader.html" class="block text-gray-600 hover:text-blue-600 group">
+                            <span class="group-hover:translate-x-1 inline-block transition-transform text-sm">→</span>
+                            <span class="text-sm">Instaloader: Download Instagram Photos Without Login</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Automation Tools -->
+                <div>
+                    <h4 class="font-semibold text-gray-700 mb-3 flex items-center">
+                        <span class="w-2 h-2 bg-purple-500 rounded-full mr-2"></span>
+                        Automation & Workflows
+                    </h4>
+                    <div class="space-y-3">
+                        <a href="n8n.html" class="block text-gray-600 hover:text-blue-600 group">
+                            <span class="group-hover:translate-x-1 inline-block transition-transform text-sm">→</span>
+                            <span class="text-sm">n8n: Self-Hosted Zapier Alternative - Automate Workflows</span>
+                        </a>
+                        <a href="huginn.html" class="block text-gray-600 hover:text-blue-600 group">
+                            <span class="group-hover:translate-x-1 inline-block transition-transform text-sm">→</span>
+                            <span class="text-sm">Huginn: Build Your Own Automation Tools (No-Code Platform for Developers)</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Server Tools -->
+                <div>
+                    <h4 class="font-semibold text-gray-700 mb-3 flex items-center">
+                        <span class="w-2 h-2 bg-orange-500 rounded-full mr-2"></span>
+                        Self-Hosted Tools
+                    </h4>
+                    <div class="space-y-3">
+                        <a href="coolify.html" class="block text-gray-600 hover:text-blue-600 group">
+                            <span class="group-hover:translate-x-1 inline-block transition-transform text-sm">→</span>
+                            <span class="text-sm">Coolify: Finally, Deploy Apps Like Heroku But on Your Own Server</span>
+                        </a>
+                        <a href="portainer.html" class="block text-gray-600 hover:text-blue-600 group">
+                            <span class="group-hover:translate-x-1 inline-block transition-transform text-sm">→</span>
+                            <span class="text-sm">Portainer: Manage Docker Containers Without Touching the CLI</span>
+                        </a>
+                        <a href="nginx-proxy-manager.html" class="block text-gray-600 hover:text-blue-600 group">
+                            <span class="group-hover:translate-x-1 inline-block transition-transform text-sm">→</span>
+                            <span class="text-sm">Nginx Proxy Manager: Reverse Proxy with SSL Without Writing Configs</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- More -->
+                <div class="md:col-span-2">
+                    <h4 class="font-semibold text-gray-700 mb-3 flex items-center">
+                        <span class="w-2 h-2 bg-gray-500 rounded-full mr-2"></span>
+                        More Tools
+                    </h4>
+                    <div class="space-y-3">
+                        <a href="index.html" class="block text-blue-600 font-semibold hover:text-blue-700 group">
+                            <span class="group-hover:translate-x-1 inline-block transition-transform text-sm">←</span>
+                            <span class="text-sm">View All 45+ Articles</span>
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-8">
+        <div class="max-w-4xl mx-auto px-4 text-center">
+            <p class="mb-2">© 2026 Programming Notes. All rights reserved.</p>
+            <p class="text-gray-400 text-sm">Built with practical examples and real-world experience.</p>
+        </div>
+    </footer>
+
+    <!-- Prism.js for code highlighting -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+
+</body>
+</html>

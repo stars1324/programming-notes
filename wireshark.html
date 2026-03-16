@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-LMWN7814BX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-LMWN7814BX');
+    </script>
+
+    <!-- SEO Meta Tags -->
+    <title>Wireshark Tutorial: Network Traffic Analysis for Beginners</title>
+    <meta name="description" content="Learn Wireshark from scratch. Capture network packets, analyze traffic, debug network issues, and understand what's happening on your network. Complete beginner guide.">
+    <meta name="keywords" content="Wireshark tutorial, network traffic analysis, packet capture, network debugging, Wireshark filters, network protocol analysis">
+    <link rel="canonical" href="https://pnt.jacbex.com/wireshark.html">
+
+    <!-- Open Graph / Social Media -->
+    <meta property="og:title" content="Wireshark Tutorial: Network Traffic Analysis for Beginners">
+    <meta property="og:description" content="Master network traffic analysis with Wireshark. Learn to capture packets, filter traffic, and debug network issues like a pro.">
+    <meta property="og:type" content="article">
+
+    <!-- Tailwind CSS for modern UI -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Code Highlighting (Prism.js) -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+
+    <!-- Structured Data (Schema.org) for Google -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "Wireshark Tutorial: Network Traffic Analysis for Beginners",
+      "description": "Complete guide to network traffic analysis using Wireshark. Covers installation, packet capture, filtering, and practical troubleshooting scenarios.",
+      "author": {
+        "@type": "Person",
+        "name": "Programming Notes"
+      },
+      "proficiencyLevel": "Beginner",
+      "keywords": ["Wireshark", "network analysis", "packet capture", "network debugging", "protocol analysis"]
+    }
+    </script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+        .prose code { color: #eb5757; background: #f9f2f2; padding: 2px 4px; border-radius: 4px; }
+        .comparison-table { border-collapse: separate; border-spacing: 0; }
+        .comparison-table th, .comparison-table td { padding: 12px 16px; text-align: left; }
+        .comparison-table th { background: #f3f4f6; font-weight: 600; }
+        .comparison-table tr:not(:last-child) td { border-bottom: 1px solid #e5e7eb; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+            <a href="index.html" class="text-xl font-bold text-blue-600">📝 <span class="text-gray-700">Programming Notes</span></a>
+            <div class="space-x-6 hidden md:block">
+                <a href="index.html" class="hover:text-blue-500">Home</a>
+                <a href="about.html" class="hover:text-blue-500">About</a>
+                <a href="contact.html" class="hover:text-blue-500">Contact</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="bg-gradient-to-r from-blue-800 to-cyan-900 text-white py-16">
+        <div class="max-w-4xl mx-auto px-4 text-center">
+            <h1 class="text-4xl md:text-5xl font-extrabold mb-4">Wireshark: Network Traffic Analysis for Beginners</h1>
+            <p class="text-xl opacity-90">Stop guessing what's happening on your network. See every packet, every connection, every problem with the world's most popular network analyzer.</p>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto px-4 py-12 bg-white mt-[-40px] rounded-xl shadow-lg mb-20">
+
+        <article class="prose prose-blue max-w-none">
+
+            <p class="mb-6 text-lg text-gray-700 leading-relaxed">
+                Had a web app that was slow as hell. Users complaining, timeout errors everywhere. Checked the server logs - nothing unusual. Looked at database queries - all optimized. Even checked CDN settings - perfect.
+            </p>
+
+            <p class="mb-8 text-gray-700 leading-relaxed">
+                Finally installed <a href="https://www.wireshark.org/" class="text-blue-600 underline">Wireshark</a> and saw the real problem: the app was making 47 separate HTTP requests to load one page, each one waiting for the previous to finish. The actual fix took 5 minutes (enable HTTP/2). Finding it took 2 hours without Wireshark, 5 minutes with it.
+            </p>
+
+            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">What Wireshark actually does</h2>
+
+            <p class="mb-6 text-gray-700">
+                Wireshark captures network traffic and shows you what's actually happening at the packet level. Instead of guessing why your API calls are timing out or why your site is slow, you can see the actual data flowing between machines.
+            </p>
+
+            <p class="mb-8 text-gray-700">
+                It understands hundreds of protocols out of the box - HTTP, TCP, UDP, DNS, TLS, and plenty more I'd never heard of before using it. The packet dissection shows you what each byte means, which is way more useful than staring at hex dumps.
+            </p>
+
+            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">Getting it installed</h2>
+
+            <pre class="language-bash"><code># macOS
+brew install --cask wireshark
+
+# Linux (Ubuntu/Debian)
+sudo apt-get install wireshark
+
+# Add your user to wireshark group
+sudo usermod -aG wireshark $USER
+
+# Windows - download from wireshark.org</code></pre>
+
+            <p class="mt-4 text-gray-600 text-sm">
+                On macOS and Linux you'll need admin privileges to capture traffic. Wireshark will ask for permission when you first try to start a capture.
+            </p>
+
+            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">Starting your first capture</h2>
+
+            <p class="mb-4 text-gray-700">When you open Wireshark, you'll see a list of network interfaces:</p>
+
+            <pre class="language-bash"><code># Common interface names:
+en0       # macOS WiFi/Ethernet
+eth0      # Linux Ethernet
+wlan0     # Linux WiFi
+lo        # Loopback (localhost traffic)</code></pre>
+
+            <p class="mb-4 text-gray-700">Pick the active one (usually the one showing traffic counters increasing) and click the blue shark fin icon to start capturing.</p>
+
+            <p class="mb-6 text-gray-700">Open a browser and load a website. Stop the capture and you'll see thousands of packets. Now the real fun begins - making sense of all this data.</p>
+
+            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">Filters: The only thing that actually matters</h2>
+
+            <p class="mb-4 text-gray-700">Without filters, Wireshark is overwhelming. Here's what I use constantly:</p>
+
+            <pre class="language-bash"><code># Find traffic for a specific host
+ip.addr == 192.168.1.1
+
+# HTTP traffic only
+http
+
+# DNS queries
+dns
+
+# Specific port
+tcp.port == 443
+
+# Combine filters
+http and ip.addr == 10.0.0.5
+tcp.port == 443 or tcp.port == 80</code></pre>
+
+            <p class="mt-4 text-gray-600 text-sm">
+                Right-click any packet and select "Apply as Filter" → "Selected" to build filters automatically. I use this constantly instead of memorizing syntax.
+            </p>
+
+            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">Following TCP streams</h2>
+
+            <p class="mb-6 text-gray-700">
+                This is the feature that made Wireshark click for me. Right-click any TCP packet → "Follow" → "TCP Stream" and you see the entire conversation in order, with different colors for each direction.
+            </p>
+
+            <p class="mb-6 text-gray-700">
+                Suddenly you're not looking at individual packets anymore - you're seeing the full request/response cycle. You can read the HTTP headers, see where the connection slows down, find the exact point where something breaks.
+            </p>
+
+            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">Real problems I actually solved with Wireshark</h2>
+
+            <p class="mb-4 text-gray-700 font-bold">Slow API calls</p>
+
+            <p class="mb-4 text-gray-700">
+                API was taking 8 seconds to respond. Server logs showed the query completed in 200ms. Captured traffic in Wireshark and found the client was sending a request, waiting for TCP slow-start to complete, then finally sending the payload. Fixed by enabling TCP_NODELAY on the socket.
+            </p>
+
+            <p class="mb-4 text-gray-700 font-bold">Intermittent connection failures</p>
+
+            <p class="mb-4 text-gray-700">
+                Random 504 errors that we couldn't reproduce. Wireshark showed the load balancer was closing idle connections after 60 seconds, but the client was trying to reuse connections after 65 seconds. Adjusted the keepalive settings and problem disappeared.
+            </p>
+
+            <p class="mb-4 text-gray-700 font-bold">DNS resolution weirdness</p>
+
+            <p class="mb-6 text-gray-700">
+                Some domains worked, others didn't. Filtered for DNS traffic and saw our DNS server returning SERVFAIL for specific domains, but the same queries worked when we used 8.8.8.8. Turned out our ISP's DNS was blocking certain domains. Switched to Cloudflare DNS.
+            </p>
+
+            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">Understanding the packet list</h2>
+
+            <p class="mb-4 text-gray-700">The main window shows columns that are actually useful:</p>
+
+            <ul class="list-disc list-inside space-y-2 text-gray-700 mb-6">
+                <li><strong class="text-gray-900">Time:</strong> How long since capture started. Sort by this to find slow requests</li>
+                <li><strong class="text-gray-900">Source/Destination:</strong> Who's talking to whom</li>
+                <li><strong class="text-gray-900">Protocol:</strong> HTTP, TCP, UDP, DNS, etc.</li>
+                <li><strong class="text-gray-900">Length:</strong> Packet size in bytes</li>
+                <li><strong class="text-gray-900">Info:</strong> Protocol-specific details (HTTP method, DNS query, etc.)</li>
+            </ul>
+
+            <p class="text-gray-600 mb-6">
+                Right-click the column headers to add more. I often add "Delta Time" to see time between packets - helps spot where things are waiting.
+            </p>
+
+            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">HTTP vs HTTPS</h2>
+
+            <p class="mb-4 text-gray-700">
+                HTTP traffic is readable - you can see headers, request methods, response codes, even the response body. Filter with <code class="bg-gray-100 px-2 py-1 rounded">http</code> and you'll see every HTTP request.
+            </p>
+
+            <p class="mb-6 text-gray-700">
+                HTTPS is encrypted. You can see the connection setup (TLS handshake), SNI (which hostname you're connecting to), and packet sizes/timing, but not the actual content. For debugging most issues this is still enough - you can tell if a connection succeeded, how long it took, and roughly how much data was transferred.
+            </p>
+
+            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">Common filters I actually use</h2>
+
+            <pre class="language-bash"><code># Show me HTTP errors
+http.response.code >= 400
+
+# Find specific host
+http.host == "api.example.com"
+
+# TCP problems - retransmissions indicate packet loss
+tcp.analysis.retransmission
+
+# DNS issues
+dns.qry.type == 1  # A records
+dns.flags.rcode == 3  # NXDOMAIN
+
+# Show me everything except keepalive pings
+not icmp and not igmp and not mdns</code></pre>
+
+            <p class="mt-4 text-gray-600 text-sm">
+                These filters took me way too long to learn. Would've been nice if I'd found them all in one place instead of piecing them together from random blog posts.
+            </p>
+
+            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">Exporting HTTP objects</h2>
+
+            <p class="mb-4 text-gray-700">Sometimes useful for debugging:</p>
+
+            <ol class="list-decimal list-inside space-y-3 text-gray-700 mb-6">
+                <li>Apply filter: <code class="bg-gray-100 px-2 py-1 rounded">http</code></li>
+                <li>File → Export Objects → HTTP</li>
+                <li>See all images, scripts, files transferred</li>
+                <li>Save specific ones or export all</li>
+            </ol>
+
+            <p class="text-gray-600 mb-6">
+                Saved me once when I needed to figure out exactly what JavaScript files a third-party script was loading.
+            </p>
+
+            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">Stats that are actually useful</h2>
+
+            <p class="mb-4 text-gray-700">Under Statistics menu:</p>
+
+            <ul class="list-disc list-inside space-y-2 text-gray-700 mb-6">
+                <li><strong class="text-gray-900">Conversations:</strong> See which endpoints are talking to each other most</li>
+                <li><strong class="text-gray-900">Protocol Hierarchy:</strong> Breakdown of what protocols are being used</li>
+                <li><strong class="text-gray-900">IO Graph:</strong> Traffic over time - useful for spotting patterns</li>
+                <li><strong class="text-gray-900">HTTP → Packets → Requests:</strong> All HTTP requests with timing info</li>
+            </ul>
+
+            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">What I wish I'd known starting out</h2>
+
+            <ul class="list-disc list-inside space-y-2 text-gray-700 mb-6">
+                <li>You can capture in one place and analyze in another. Save captures (.pcap files) and open them later.</li>
+                <li>Captures get huge fast. Use capture filters (not just display filters) if you're running long captures.</li>
+                <li>Wireshark can decode protobuf if you have the .proto file. Saved me hours of manual decoding.</li>
+                <li>Coloring rules make a huge difference. Right-click the packet list → Coloring Rules.</li>
+                <li>Learn to recognize TCP handshake (SYN, SYN-ACK, ACK) - helps verify connections are actually starting.</li>
+            </ul>
+
+            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">When Wireshark is overkill</h2>
+
+            <table class="comparison-table w-full my-6 border border-gray-200 rounded-lg overflow-hidden">
+                <thead>
+                    <tr>
+                        <th>Use Wireshark when</th>
+                        <th>Use simpler tools when</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Need to see actual packet contents</td>
+                        <td>Just checking if something is reachable (ping)</td>
+                    </tr>
+                    <tr>
+                        <td>Debugging protocol-level issues</td>
+                        <td>Checking DNS resolution (nslookup/dig)</td>
+                    </tr>
+                    <tr>
+                        <td>Analyzing performance bottlenecks</td>
+                        <td>Basic HTTP testing (curl)</td>
+                    </tr>
+                    <tr>
+                        <td>Investigating security incidents</td>
+                        <td>Quick port checks (netstat)</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">Learning resources that helped</h2>
+
+            <ul class="list-disc list-inside space-y-2 text-gray-700 mb-6">
+                <li><a href="https://www.wireshark.org/docs/" class="text-blue-600 underline">Official docs</a> - better than you'd expect</li>
+                <li><a href="https://wiki.wireshark.org/" class="text-blue-600 underline">Wiki</a> - good for specific protocol questions</li>
+                <li><a href="https://www.cloudshark.org/" class="text-blue-600 underline">CloudShark</a> - online pcap analyzer (useful for sharing captures)</li>
+            </ul>
+
+            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">Bottom line</h2>
+
+            <p class="text-gray-700 leading-relaxed">
+                Wireshark has a learning curve, no question about it. First time I opened it I had no idea what I was looking at. But once you learn basic filters and understand the packet list layout, it becomes indispensable for network debugging.
+            </p>
+
+            <p class="text-gray-700 leading-relaxed mt-4">
+                The stuff that used to take hours - staring at logs, guessing where the bottleneck is, trying random fixes - now takes minutes with Wireshark. Worth the time to learn.
+            </p>
+
+        </article>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-8">
+        <div class="max-w-4xl mx-auto px-4 text-center">
+            <p class="mb-2">© 2026 Programming Notes. All rights reserved.</p>
+            <p class="text-gray-400 text-sm">Built with practical examples and real-world experience.</p>
+        </div>
+    </footer>
+
+    <!-- Prism.js for code highlighting -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+
+</body>
+</html>

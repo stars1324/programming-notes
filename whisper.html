@@ -10,7 +10,6 @@
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
-
       gtag('config', 'G-LMWN7814BX');
     </script>
 
@@ -49,8 +48,10 @@
     <style>
         body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
         .prose code { color: #eb5757; background: #f9f2f2; padding: 2px 4px; border-radius: 4px; }
-        .feature-box { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 24px; border-radius: 12px; margin: 24px 0; }
-        .node-card { background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 12px; padding: 16px; margin: 12px 0; }
+        .comparison-table { border-collapse: separate; border-spacing: 0; }
+        .comparison-table th, .comparison-table td { padding: 12px 16px; text-align: left; }
+        .comparison-table th { background: #f3f4f6; font-weight: 600; }
+        .comparison-table tr:not(:last-child) td { border-bottom: 1px solid #e5e7eb; }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-900">
@@ -79,103 +80,69 @@
 
         <article class="prose prose-blue max-w-none">
 
-            <section id="introduction">
-                <h2 class="text-3xl font-bold mb-4">Why I needed this</h2>
-                <p class="mb-4">
-                    Had hours of meeting recordings, interview audio, lecture videos. Needed them transcribed. Looked at options - Rev charges $1.25/minute, Otter.ai is $20/month, and the free alternatives were garbage.
-                </p>
-                <p class="mb-4">
-                    Then someone mentioned <a href="https://github.com/openai/whisper" class="text-blue-600 underline" target="_blank">Whisper</a>. OpenAI's open-source speech recognition model. Runs locally, free, supports like 90 languages. Sounded too good to be true.
-                </p>
-                <p class="mb-4">
-                    Tried it on a 2-hour meeting recording. 10 minutes later, had a near-perfect transcript. Speakers identified, punctuation correct, even caught technical terms. Was pretty blown away.
-                </p>
+            <p class="mb-6 text-lg text-gray-700 leading-relaxed">
+                Had hours of meeting recordings, interview audio, lecture videos. Needed them transcribed. Looked at options - Rev charges $1.25/minute, Otter.ai is $20/month, and the free alternatives were garbage.
+            </p>
 
-                <div class="feature-box">
-                    <p class="font-bold text-xl mb-2">What Whisper actually does</p>
-                    <p class="opacity-90">Speech to text that actually works. Handles multiple speakers, different languages, background noise, technical terms, accents. Runs on your computer - no API calls, no privacy concerns.</p>
-                    <p class="opacity-90 mt-2">Best part: it's completely free. Well, except for the electricity to run it.</p>
-                </div>
-            </section>
+            <p class="mb-8 text-gray-700 leading-relaxed">
+                Then someone mentioned <a href="https://github.com/openai/whisper" class="text-blue-600 underline">Whisper</a>. OpenAI's open-source speech recognition model. Runs locally, free, supports like 90 languages. Sounded too good to be true.
+            </p>
 
-            <section id="what-is-whisper" class="mt-12">
-                <h2 class="text-3xl font-bold mb-4">So what is Whisper</h2>
-                <p class="mb-4">
-                    Whisper is an automatic speech recognition (ASR) system trained by OpenAI on 680,000 hours of multilingual data. That's a lot - makes it way better than anything else out there.
-                </p>
-                <p class="mb-4">
-                    The cool stuff:
-                </p>
-                <ul class="list-disc ml-6 mb-4">
-                    <li><strong>Insanely accurate:</strong> Better than most paid services I've tried</li>
-                    <li><strong>Multiple languages:</strong> Works with 90+ languages out of the box</li>
-                    <li><strong>Speaker detection:</strong> Can identify different speakers automatically</li>
-                    <li><strong>Robust:</strong> Handles background noise, accents, technical terms</li>
-                    <li><strong>Runs locally:</strong> Your audio never leaves your machine</li>
-                    <li><strong>Free:</strong> Open source, no API costs</li>
-                    <li><strong>Multiple models:</strong> Tiny to giant - pick based on your hardware</li>
-                </ul>
+            <p class="mb-8 text-gray-700 leading-relaxed">
+                Tried it on a 2-hour meeting recording. 10 minutes later, had a near-perfect transcript. Speakers identified, punctuation correct, even caught technical terms. Was pretty blown away.
+            </p>
 
-                <p class="mb-4 mt-6">Model sizes (trading speed for accuracy):</p>
-                <ul class="list-disc ml-6 mb-4">
-                    <li><strong>tiny:</strong> Fastest, least accurate (~1GB RAM)</li>
-                    <li><strong>base:</strong> Good balance (~1GB RAM)</li>
-                    <li><strong>small:</strong> Better accuracy (~2GB RAM)</li>
-                    <li><strong>medium:</strong> Even better (~5GB RAM)</li>
-                    <li><strong>large:</strong> Best accuracy, slowest (~10GB RAM)</li>
-                </ul>
+            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">What Whisper actually does</h2>
 
-                <p class="text-gray-600 text-sm mt-4">
-                    I use "small" for most stuff. It's accurate enough and doesn't take forever. Only use "large" for important stuff where accuracy matters more than speed.
-                </p>
-            </section>
+            <p class="mb-6 text-gray-700">
+                Whisper is an automatic speech recognition system trained on 680,000 hours of multilingual data. That's a lot - makes it way better than anything else out there.
+            </p>
 
-            <section id="installation" class="mt-12">
-                <h2 class="text-3xl font-bold mb-4">Getting Whisper running</h2>
+            <p class="mb-8 text-gray-700">
+                It handles multiple speakers, different languages, background noise, technical terms, accents. Runs on your computer so your audio never leaves your machine. Completely free, open source.
+            </p>
 
-                <h3 class="text-xl font-bold mb-3 mt-6">Prerequisites</h3>
-                <p class="mb-4">You'll need:</p>
-                <ul class="list-disc ml-6 mb-4">
-                    <li>Python 3.8 or higher</li>
-                    <li>ffmpeg (for audio processing)</li>
-                    <li>A decent GPU (optional but 10x faster)</li>
-                    <li>Some RAM and disk space</li>
-                </ul>
+            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">Model sizes</h2>
 
-                <h3 class="text-xl font-bold mb-3 mt-6">Install ffmpeg</h3>
-                <p class="mb-4">Required for audio processing:</p>
+            <p class="mb-4 text-gray-700">Whisper comes in different sizes. Trading speed for accuracy:</p>
 
-                <pre class="language-bash"><code># macOS
+            <ul class="list-disc list-inside space-y-2 text-gray-700 mb-6">
+                <li><strong class="text-gray-900">tiny:</strong> Fastest, least accurate (~1GB RAM)</li>
+                <li><strong class="text-gray-900">base:</strong> Good balance (~1GB RAM)</li>
+                <li><strong class="text-gray-900">small:</strong> Better accuracy (~2GB RAM)</li>
+                <li><strong class="text-gray-900">medium:</strong> Even better (~5GB RAM)</li>
+                <li><strong class="text-gray-900">large:</strong> Best accuracy, slowest (~10GB RAM)</li>
+            </ul>
+
+            <p class="text-gray-600 mb-6">
+                I use "small" for most stuff. It's accurate enough and doesn't take forever. Only use "large" for important stuff where accuracy matters more than speed.
+            </p>
+
+            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">Getting it installed</h2>
+
+            <p class="mb-4 text-gray-700">You'll need Python 3.8+, ffmpeg, and ideally a GPU.</p>
+
+            <h3 class="text-xl font-bold text-gray-900 mt-8 mb-3">Install ffmpeg first</h3>
+
+            <pre class="language-bash"><code># macOS
 brew install ffmpeg
 
 # Ubuntu/Debian
 sudo apt update && sudo apt install ffmpeg
 
-# Windows
-# Download from https://ffmpeg.org/download.html</code></pre>
+# Windows - download from ffmpeg.org</code></pre>
 
-                <h3 class="text-xl font-bold mb-3 mt-6">Install Whisper</h3>
-                <p class="mb-4">Simplest way with pip:</p>
+            <h3 class="text-xl font-bold text-gray-900 mt-8 mb-3">Then install Whisper</h3>
 
-                <pre class="language-bash"><code>pip install openai-whisper</code></pre>
+            <pre class="language-bash"><code>pip install openai-whisper</code></pre>
 
-                <h3 class="text-xl font-bold mb-3 mt-6">That's it</h3>
-                <p class="mb-4">You can now transcribe audio:</p>
+            <p class="mt-4 text-gray-600 text-sm">
+                That's it. You can now transcribe audio with <code class="bg-gray-100 px-2 py-1 rounded">whisper audio.mp3</code>. First run downloads the model (~150MB for small, ~3GB for large).
+            </p>
 
-                <pre class="language-bash"><code>whisper audio.mp3</code></pre>
+            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">Basic usage</h2>
 
-                <p class="text-gray-600 text-sm mt-4">
-                    First run downloads the model (~150MB for small, ~3GB for large). After that, it's cached locally.
-                </p>
-            </section>
-
-            <section id="basic-usage" class="mt-12">
-                <h2 class="text-3xl font-bold mb-4">Using Whisper</h2>
-
-                <h3 class="text-xl font-bold mb-3 mt-6">Basic transcription</h3>
-                <p class="mb-4">Simple command line usage:</p>
-
-                <pre class="language-bash"><code># Transcribe with default model (base)
+            <pre class="language-bash"><code># Transcribe with default model (base)
 whisper audio.mp3
 
 # Use a specific model
@@ -184,16 +151,18 @@ whisper audio.mp3 --model small
 # Output to file
 whisper audio.mp3 --output_format txt > transcript.txt
 
-# All output formats
+# Get all output formats (txt, srt, vtt, json)
 whisper audio.mp3 --output_format all</code></pre>
 
-                <h3 class="text-xl font-bold mb-3 mt-6">With timestamps</h3>
-                <p class="mb-4">Get timestamps for each segment:</p>
+            <h3 class="text-xl font-bold text-gray-900 mt-8 mb-3">With timestamps</h3>
 
-                <pre class="language-bash"><code>whisper audio.mp3 --model small --output_format srt</code></pre>
+            <p class="mb-4 text-gray-700">Get timestamps for each segment:</p>
 
-                <p class="mb-4">Creates an SRT file with timestamps like:</p>
-                <pre class="text"><code>1
+            <pre class="language-bash"><code>whisper audio.mp3 --model small --output_format srt</code></pre>
+
+            <p class="mb-4 text-gray-700">Creates an SRT file with timestamps like:</p>
+
+            <pre class="text bg-gray-100 p-4 rounded"><code>1
 00:00:00,000 --> 00:00:05,000
 Hello everyone, welcome to today's meeting.
 
@@ -201,10 +170,11 @@ Hello everyone, welcome to today's meeting.
 00:00:05,000 --> 00:00:10,000
 Let's start by reviewing the project status.</code></pre>
 
-                <h3 class="text-xl font-bold mb-3 mt-6">Python API</h3>
-                <p class="mb-4">Use it in your Python code:</p>
+            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">Python API</h2>
 
-                <pre class="language-python"><code>import whisper
+            <p class="mb-4 text-gray-700">Use it in your Python code:</p>
+
+            <pre class="language-python"><code>import whisper
 
 # Load model (downloads on first run)
 model = whisper.load_model("small")
@@ -219,49 +189,46 @@ print(result["text"])
 for segment in result["segments"]:
     print(f"[{segment['start']:.2f}s -> {segment['end']:.2f}s] {segment['text']}")</code></pre>
 
-                <h3 class="text-xl font-bold mb-3 mt-6">Translate audio</h3>
-                <p class="mb-4">Transcribe and translate to English:</p>
+            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">Translation and languages</h2>
 
-                <pre class="language-bash"><code># Transcribe Spanish audio to English text
+            <p class="mb-4 text-gray-700">Transcribe and translate to English:</p>
+
+            <pre class="language-bash"><code># Transcribe Spanish audio to English text
 whisper spanish_audio.mp3 --model medium --task translate
 
 # Or in Python
 result = model.transcribe("spanish_audio.mp3", task="translate")</code></pre>
 
-                <h3 class="text-xl font-bold mb-3 mt-6">Different languages</h3>
-                <p class="mb-4">Whisper auto-detects language, but you can specify:</p>
+            <p class="mb-4 text-gray-700 mt-6">Whisper auto-detects language, but you can specify:</p>
 
-                <pre class="language-bash"><code># Specify language
-whisper audio.mp3 --language Japanese
+            <pre class="language-bash"><code>whisper audio.mp3 --language Japanese</code></pre>
 
-# List supported languages
-whisper --help | grep -A 100 "LANGUAGE"</code></pre>
-            </section>
+            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">Stuff I use it for</h2>
 
-            <section id="practical-examples" class="mt-12">
-                <h2 class="text-3xl font-bold mb-4">Stuff I use it for</h2>
+            <h3 class="text-xl font-bold text-gray-900 mt-8 mb-3">Meeting recordings</h3>
 
-                <h3 class="text-xl font-bold mb-3 mt-6">Meeting recordings</h3>
-                <p class="mb-4">Record Zoom/Google Meet meetings, transcribe automatically:</p>
+            <p class="mb-4 text-gray-700">Record Zoom/Google Meet meetings, transcribe automatically:</p>
 
-                <pre class="language-bash"><code># After meeting
+            <pre class="language-bash"><code># After meeting
 whisper meeting_recording.mp4 --model medium --output_format srt > meeting.txt
 
 # Search for specific topics
 grep "deadline" meeting.txt</code></pre>
 
-                <h3 class="text-xl font-bold mb-3 mt-6">Lecture videos</h3>
-                <p class="mb-4">Transcribe course videos for note-taking:</p>
+            <h3 class="text-xl font-bold text-gray-900 mt-8 mb-3">Lecture videos</h3>
 
-                <pre class="language-bash"><code># Batch process all videos in a folder
+            <p class="mb-4 text-gray-700">Transcribe course videos for note-taking:</p>
+
+            <pre class="language-bash"><code># Batch process all videos in a folder
 for video in lectures/*.mp4; do
     whisper "$video" --model small --output_format txt
 done</code></pre>
 
-                <h3 class="text-xl font-bold mb-3 mt-6">Podcast episodes</h3>
-                <p class="mb-4">Searchable transcripts of favorite podcasts:</p>
+            <h3 class="text-xl font-bold text-gray-900 mt-8 mb-3">Podcast episodes</h3>
 
-                <pre class="language-python"><code>import whisper
+            <p class="mb-4 text-gray-700">Searchable transcripts of favorite podcasts:</p>
+
+            <pre class="language-python"><code>import whisper
 
 model = whisper.load_model("medium")
 
@@ -272,62 +239,38 @@ result = model.transcribe("podcast_ep42.mp3")
 with open("podcast_ep42.txt", "w") as f:
     f.write(result["text"])
 
-# Now searchable!
-# Can also extract quotes, find topics, etc.</code></pre>
+# Now searchable!</code></pre>
 
-                <h3 class="text-xl font-bold mb-3 mt-6">Voice notes</h3>
-                <p class="mb-4">Record thoughts on phone, transcribe later:</p>
+            <h3 class="text-xl font-bold text-gray-900 mt-8 mb-3">Subtitles generation</h3>
 
-                <pre class="language-bash"><code># Quick voice memo transcription
-whisper voice_memo.m4a --model tiny --output_format txt > notes.txt
+            <p class="mb-4 text-gray-700">Auto-generate subtitles for videos:</p>
 
-# Tiny model is fast enough for real-time-ish use</code></pre>
-
-                <h3 class="text-xl font-bold mb-3 mt-6">Subtitles generation</h3>
-                <p class="mb-4">Auto-generate subtitles for videos:</p>
-
-                <pre class="language-bash"><code># Generate SRT subtitles
+            <pre class="language-bash"><code># Generate SRT subtitles
 whisper my_video.mp4 --model small --output_format srt
 
 # Creates my_video.srt ready to use with video players</code></pre>
-            </section>
 
-            <section id="advanced" class="mt-12">
-                <h2 class="text-3xl font-bold mb-4">Getting better results</h2>
+            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">Faster with GPU</h2>
 
-                <h3 class="text-xl font-bold mb-3 mt-6">Faster with GPU</h3>
-                <p class="mb-4">If you have an NVIDIA GPU:</p>
+            <p class="mb-4 text-gray-700">If you have an NVIDIA GPU:</p>
 
-                <pre class="language-python"><code>import whisper
+            <pre class="language-python"><code>import whisper
 
 # Use CUDA (NVIDIA GPU)
-model = whisper.load_model("small", device="cuda")
+model = whisper.load_model("small", device="cuda")</code></pre>
 
-# Or specify GPU
-model = whisper.load_model("small", device="cuda:0")</code></pre>
+            <p class="mb-4 text-gray-700 mt-6">Speed difference on my machine:</p>
 
-                <p class="mb-4 mt-6">Speed difference on my machine:</p>
-                <ul class="list-disc ml-6 mb-4">
-                    <li>CPU (M1 MacBook): ~10x real-time (10 min audio = 100 min processing)</li>
-                    <li>GPU (RTX 3080): ~0.1x real-time (10 min audio = 1 min processing)</li>
-                </ul>
+            <ul class="list-disc list-inside space-y-2 text-gray-700 mb-6">
+                <li>CPU (M1 MacBook): ~10x real-time (10 min audio = 100 min processing)</li>
+                <li>GPU (RTX 3080): ~0.1x real-time (10 min audio = 1 min processing)</li>
+            </ul>
 
-                <h3 class="text-xl font-bold mb-3 mt-6">Better accuracy</h3>
-                <p class="mb-4">Tips for improving transcription:</p>
+            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">Batch processing</h2>
 
-                <pre class="language-bash"><code># Use larger model for important stuff
-whisper critical_audio.mp3 --model large
+            <p class="mb-4 text-gray-700">Process multiple files efficiently:</p>
 
-# Specify language if known (avoids detection errors)
-whisper audio.mp3 --language English
-
-# Increase temperature for more creative (but less accurate) transcription
-whisper audio.mp3 --temperature 0.0  # more deterministic</code></pre>
-
-                <h3 class="text-xl font-bold mb-3 mt-6">Batch processing</h3>
-                <p class="mb-4">Process multiple files efficiently:</p>
-
-                <pre class="language-python"><code>import whisper
+            <pre class="language-python"><code>import whisper
 from pathlib import Path
 
 model = whisper.load_model("small")
@@ -346,23 +289,11 @@ for audio_file in audio_files:
 
 print("Done!")</code></pre>
 
-                <h3 class="text-xl font-bold mb-3 mt-6">Speaker diarization</h3>
-                <p class="mb-4">Whisper doesn't natively separate speakers, but you can combine it with other tools:</p>
+            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">Building a transcription service</h2>
 
-                <pre class="language-bash"><code># Use with pyannote.audio for speaker separation
-pip install pyannote.audio
+            <p class="mb-4 text-gray-700">Simple web API with FastAPI:</p>
 
-# Python code to combine Whisper + pyannote
-# (More complex, but works for multi-speaker audio)</code></pre>
-            </section>
-
-            <section id="deployment" class="mt-12">
-                <h2 class="text-3xl font-bold mb-4">Building stuff with Whisper</h2>
-
-                <h3 class="text-xl font-bold mb-3 mt-6">Simple transcription service</h3>
-                <p class="mb-4">Web API for transcription:</p>
-
-                <pre class="language-python"><code>from fastapi import FastAPI, UploadFile
+            <pre class="language-python"><code>from fastapi import FastAPI, UploadFile
 from fastapi.responses import JSONResponse
 import whisper
 
@@ -381,178 +312,119 @@ async def transcribe(file: UploadFile):
     return JSONResponse({
         "text": result["text"],
         "language": result["language"]
-    })
+    })</code></pre>
 
-# Run with: uvicorn main:app --reload</code></pre>
+            <p class="mt-4 text-gray-600 text-sm">
+                Run with: <code class="bg-gray-100 px-2 py-1 rounded">uvicorn main:app --reload</code>
+            </p>
 
-                <h3 class="text-xl font-bold mb-3 mt-6">Real-time transcription</h3>
-                <p class="mb-4">With a bit more work, you can do live transcription:</p>
+            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">Stuff that went wrong</h2>
 
-                <pre class="language-python"><code># Requires audio streaming and chunking
-# More complex but doable
+            <p class="mb-4 text-gray-700 font-bold">ffmpeg not found</p>
 
-import whisper
-import pyaudio
+            <p class="mb-4 text-gray-700">
+                Whisper kept complaining about missing ffmpeg. Fixed by installing ffmpeg (see above) or adding to PATH if already installed.
+            </p>
 
-model = whisper.load_model("tiny")
+            <p class="mb-4 text-gray-700 font-bold">Out of memory</p>
 
-# Stream audio from microphone
-# Process in chunks
-# Display real-time transcription</code></pre>
-            </section>
+            <p class="mb-4 text-gray-700">
+                Large model crashed on my 8GB RAM machine. Fixed by using smaller model (small instead of large), closing other programs, or processing shorter audio chunks.
+            </p>
 
-            <section id="issues" class="mt-12 bg-gray-50 p-6 rounded-lg">
-                <h2 class="text-2xl font-bold mb-4 text-gray-900">Stuff that went wrong</h2>
+            <p class="mb-4 text-gray-700 font-bold">Wrong language detection</p>
 
-                <h3 class="text-xl font-bold mb-3 mt-6 text-gray-800">ffmpeg not found</h3>
-                <p class="mb-2">Whisper kept complaining about missing ffmpeg.</p>
-                <pre class="language-bash"><code># Fixed by
-# Installing ffmpeg (see installation section)
-# Or adding to PATH if already installed</code></pre>
+            <p class="mb-6 text-gray-700">
+                Sometimes detected wrong language automatically. Fixed by specifying manually: <code class="bg-gray-100 px-2 py-1 rounded">whisper audio.mp3 --language English</code>
+            </p>
 
-                <h3 class="text-xl font-bold mb-3 mt-6 text-gray-800">Out of memory</h3>
-                <p class="mb-2">Large model crashed on my 8GB RAM machine.</p>
-                <pre class="language-bash"><code># Fixed by
-1. Using smaller model (small instead of large)
-2. Closing other programs
-3. Processing shorter audio chunks</code></pre>
+            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">Whisper vs alternatives</h2>
 
-                <h3 class="text-xl font-bold mb-3 mt-6 text-gray-800">Wrong language detection</h3>
-                <p class="mb-2">Sometimes detected wrong language automatically.</p>
-                <pre class="language-bash"><code># Fixed by
-whisper audio.mp3 --language English  # specify manually</code></pre>
+            <table class="comparison-table w-full my-6 border border-gray-200 rounded-lg overflow-hidden">
+                <thead>
+                    <tr>
+                        <th>Feature</th>
+                        <th>Whisper</th>
+                        <th>Paid Services</th>
+                        <th>Other Open Source</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="px-4 py-3 text-sm text-gray-700">Cost</td>
+                        <td class="px-4 py-3 text-sm text-green-600">Free</td>
+                        <td class="px-4 py-3 text-sm text-gray-700">$1-2/min</td>
+                        <td class="px-4 py-3 text-sm text-green-600">Free</td>
+                    </tr>
+                    <tr>
+                        <td class="px-4 py-3 text-sm text-gray-700">Accuracy</td>
+                        <td class="px-4 py-3 text-sm text-green-600">Excellent</td>
+                        <td class="px-4 py-3 text-sm text-green-600">Excellent</td>
+                        <td class="px-4 py-3 text-sm text-gray-700">Okay</td>
+                    </tr>
+                    <tr>
+                        <td class="px-4 py-3 text-sm text-gray-700">Languages</td>
+                        <td class="px-4 py-3 text-sm text-green-600">90+</td>
+                        <td class="px-4 py-3 text-sm text-gray-700">10-50</td>
+                        <td class="px-4 py-3 text-sm text-gray-700">10-30</td>
+                    </tr>
+                    <tr>
+                        <td class="px-4 py-3 text-sm text-gray-700">Privacy</td>
+                        <td class="px-4 py-3 text-sm text-green-600">100% local</td>
+                        <td class="px-4 py-3 text-sm text-gray-700">Cloud</td>
+                        <td class="px-4 py-3 text-sm text-green-600">Local</td>
+                    </tr>
+                    <tr>
+                        <td class="px-4 py-3 text-sm text-gray-700">Speed</td>
+                        <td class="px-4 py-3 text-sm text-gray-700">Slow CPU / Fast GPU</td>
+                        <td class="px-4 py-3 text-sm text-green-600">Fast</td>
+                        <td class="px-4 py-3 text-sm text-gray-700">Varies</td>
+                    </tr>
+                </tbody>
+            </table>
 
-                <h3 class="text-xl font-bold mb-3 mt-6 text-gray-800">Poor audio quality</h3>
-                <p class="mb-2">Noisy recordings had lots of errors.</p>
-                <pre class="language-bash"><code># Fixed by
-1. Improving audio quality at source
-2. Using larger model (medium/large)
-3. Pre-processing audio with noise reduction</code></pre>
+            <p class="text-gray-600 mb-6">
+                Whisper matches or beats paid services in accuracy. The only downside is speed if you don't have a GPU.
+            </p>
 
-                <h3 class="text-xl font-bold mb-3 mt-6 text-gray-800">Too slow on CPU</h3>
-                <p class="mb-2">Hour-long recording took all day.</p>
-                <pre class="language-bash"><code># Fixed by
-1. Using smaller model (tiny/base)
-2. Getting a GPU (huge speedup)
-3. Being patient (it's free after all)</code></pre>
-            </section>
+            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">Bottom line</h2>
 
-            <section id="comparison" class="mt-12">
-                <h2 class="text-3xl font-bold mb-4">Whisper vs alternatives</h2>
+            <p class="text-gray-700 leading-relaxed">
+                I've transcribed maybe 50 hours of audio with Whisper. Meetings, lectures, podcasts, voice notes. Accuracy is consistently good, even with technical content.
+            </p>
 
-                <table class="w-full my-6 border border-gray-200">
-                    <thead class="bg-gray-100">
-                        <tr>
-                            <th class="text-left p-3 border-b"></th>
-                            <th class="text-left p-3 border-b">Whisper</th>
-                            <th class="text-left p-3 border-b">Paid Services</th>
-                            <th class="text-left p-3 border-b">Other Open Source</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td class="p-3 border-b">Cost</td>
-                            <td class="p-3 border-b text-green-600">Free</td>
-                            <td class="p-3 border-b">$1-2/min</td>
-                            <td class="p-3 border-b text-green-600">Free</td>
-                        </tr>
-                        <tr>
-                            <td class="p-3 border-b">Accuracy</td>
-                            <td class="p-3 border-b text-green-600">★★★★★</td>
-                            <td class="p-3 border-b text-green-600">★★★★★</td>
-                            <td class="p-3 border-b">★★★☆☆</td>
-                        </tr>
-                        <tr>
-                            <td class="p-3 border-b">Languages</td>
-                            <td class="p-3 border-b text-green-600">90+</td>
-                            <td class="p-3 border-b">10-50</td>
-                            <td class="p-3 border-b">10-30</td>
-                        </tr>
-                        <tr>
-                            <td class="p-3 border-b">Privacy</td>
-                            <td class="p-3 border-b text-green-600">100% local</td>
-                            <td class="p-3 border-b">Cloud</td>
-                            <td class="p-3 border-b text-green-600">Local</td>
-                        </tr>
-                        <tr>
-                            <td class="p-3 border-b">Speed</td>
-                            <td class="p-3 border-b">Slow (CPU) / Fast (GPU)</td>
-                            <td class="p-3 border-b text-green-600">Fast</td>
-                            <td class="p-3 border-b">Varies</td>
-                        </tr>
-                        <tr>
-                            <td class="p-3 border-b">Setup</td>
-                            <td class="p-3 border-b">pip install</td>
-                            <td class="p-3 border-b text-green-600">Web upload</td>
-                            <td class="p-3 border-b">Varies</td>
-                        </tr>
-                    </tbody>
-                </table>
+            <p class="text-gray-700 leading-relaxed mt-4">
+                The fact that it runs locally is huge. I can process sensitive meetings without worrying about privacy. No uploading to cloud services, no API costs.
+            </p>
 
-                <p class="text-gray-600 mt-4">
-                    Whisper matches or beats paid services in accuracy. The only downside is speed if you don't have a GPU.
-                </p>
-            </section>
+            <p class="text-gray-700 leading-relaxed mt-4">
+                Speed is the only downside. Without a GPU, long recordings take a while. But I just start it and come back later. It's free - can't really complain.
+            </p>
 
-            <section id="thoughts" class="mt-12">
-                <h2 class="text-3xl font-bold mb-4">Would I recommend it?</h2>
-                <p class="mb-4">
-                    Absolutely. I've transcribed maybe 50 hours of audio with Whisper. Meetings, lectures, podcasts, voice notes. Accuracy is consistently good, even with technical content.
-                </p>
-                <p class="mb-4">
-                    The fact that it runs locally is huge. I can process sensitive meetings without worrying about privacy. No uploading to cloud services, no API costs.
-                </p>
-                <p class="mb-4">
-                    Speed is the only downside. Without a GPU, long recordings take a while. But I just start it and come back later. It's free - can't really complain.
-                </p>
-                <p class="mb-4">
-                    If you need transcription regularly, Whisper saves hundreds of dollars compared to paid services. And it's often more accurate.
-                </p>
-                <p class="mb-4">
-                    Links: <a href="https://github.com/openai/whisper" class="text-blue-600 underline">github.com/openai/whisper</a> | Paper: <a href="https://arxiv.org/abs/2212.04356" class="text-blue-600 underline">arxiv.org/abs/2212.04356</a>
-                </p>
-            </section>
+            <p class="text-gray-700 leading-relaxed mt-4">
+                If you need transcription regularly, Whisper saves hundreds of dollars compared to paid services. And it's often more accurate.
+            </p>
+
+            <p class="text-gray-600 mt-6">
+                Links: <a href="https://github.com/openai/whisper" class="text-blue-600 underline">github.com/openai/whisper</a> | Paper: <a href="https://arxiv.org/abs/2212.04356" class="text-blue-600 underline">arxiv.org/abs/2212.04356</a>
+            </p>
 
         </article>
 
-        <!-- 推荐阅读 -->
-        <section class="mt-16 pt-8 border-t border-gray-200">
-            <h3 class="text-2xl font-bold mb-6">📚 Recommended Reading</h3>
-            <div class="grid md:grid-cols-2 gap-6">
-                <div>
-                    <h4 class="font-semibold text-gray-700 mb-3">🎤 AI Audio & Voice</h4>
-                    <div class="space-y-3">
-                        <a href="gpt-sovits.html" class="block text-gray-600 hover:text-blue-600 text-sm group"><span class="group-hover:translate-x-1 inline-block">→</span> GPT-SoVITS: Clone Any Voice with 5s Audio</a>
-                        <a href="bark.html" class="block text-gray-600 hover:text-blue-600 text-sm group"><span class="group-hover:translate-x-1 inline-block">→</span> Bark: AI Voice Generation That Sounds Human</a>
-                    </div>
-                </div>
-                <div>
-                    <h4 class="font-semibold text-gray-700 mb-3">🤖 AI Chatbots & RAG</h4>
-                    <div class="space-y-3">
-                        <a href="embedchain.html" class="block text-gray-600 hover:text-blue-600 text-sm group"><span class="group-hover:translate-x-1 inline-block">→</span> Embedchain: Chatbot That Knows Your Stuff</a>
-                        <a href="flowise.html" class="block text-gray-600 hover:text-blue-600 text-sm group"><span class="group-hover:translate-x-1 inline-block">→</span> Flowise: AI Knowledge Bot in Minutes</a>
-                        <a href="dify.html" class="block text-gray-600 hover:text-blue-600 text-sm group"><span class="group-hover:translate-x-1 inline-block">→</span> Dify: Built AI Chatbot Without Coding</a>
-                        <a href="index.html" class="block text-blue-600 font-semibold text-sm group"><span class="group-hover:translate-x-1 inline-block">←</span> View All 45+ Articles</a>
-                    </div>
-                </div>
-            </div>
-        </section>
-
     </main>
 
-    <footer class="bg-gray-800 text-white py-12">
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-8">
         <div class="max-w-4xl mx-auto px-4 text-center">
-            <p class="opacity-70 mb-2">📝 Programming Notes</p>
-            <p class="text-sm opacity-50">
-                Personal learning notes & tutorials. Updated as I explore new technologies.
-            </p>
-            <p class="text-xs opacity-40 mt-4"><a href="privacy.html" class="hover:text-white">Privacy Policy</a></p>
+            <p class="mb-2">© 2026 Programming Notes. All rights reserved.</p>
+            <p class="text-gray-400 text-sm">Built with practical examples and real-world experience.</p>
         </div>
     </footer>
 
-    <!-- Code Highlighting Script -->
+    <!-- Prism.js for code highlighting -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+
 </body>
 </html>

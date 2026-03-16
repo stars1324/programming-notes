@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-LMWN7814BX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-LMWN7814BX');
+    </script>
+
+    <!-- SEO Meta Tags -->
+    <title>Homarr: Dashboard for Your Self-Hosted Apps</title>
+    <meta name="description" content="Replace browser bookmarks with a proper dashboard. Homarr gives you a clean interface to manage and access all your self-hosted apps from one place.">
+    <meta name="keywords" content="Homarr, self-hosted dashboard, docker dashboard, home server dashboard, manage self-hosted apps">
+    <link rel="canonical" href="https://pnt.jacbex.com/homarr.html">
+
+    <!-- Open Graph / Social Media -->
+    <meta property="og:title" content="Homarr: Dashboard for Your Self-Hosted Apps">
+    <meta property="og:description" content="Finally, a clean dashboard for all your self-hosted services. One URL instead of remembering 50 different ports.">
+    <meta property="og:type" content="article">
+
+    <!-- Tailwind CSS for modern UI -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Code Highlighting (Prism.js) -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+
+    <!-- Structured Data (Schema.org) for Google -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "Homarr: Dashboard for Your Self-Hosted Apps",
+      "description": "Complete guide to setting up Homarr dashboard for managing self-hosted applications. Covers Docker installation, configuration, and integration with common services.",
+      "author": {
+        "@type": "Person",
+        "name": "Programming Notes"
+      },
+      "proficiencyLevel": "Beginner",
+      "keywords": ["Homarr", "dashboard", "self-hosted", "Docker", "home server"]
+    }
+    </script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+        .prose code { color: #eb5757; background: #f9f2f2; padding: 2px 4px; border-radius: 4px; }
+        .comparison-table { border-collapse: separate; border-spacing: 0; }
+        .comparison-table th, .comparison-table td { padding: 12px 16px; text-align: left; }
+        .comparison-table th { background: #f3f4f6; font-weight: 600; }
+        .comparison-table tr:not(:last-child) td { border-bottom: 1px solid #e5e7eb; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+            <a href="index.html" class="text-xl font-bold text-blue-600">📝 <span class="text-gray-700">Programming Notes</span></a>
+            <div class="space-x-6 hidden md:block">
+                <a href="index.html" class="hover:text-blue-500">Home</a>
+                <a href="about.html" class="hover:text-blue-500">About</a>
+                <a href="contact.html" class="hover:text-blue-500">Contact</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="bg-gradient-to-r from-purple-700 to-indigo-800 text-white py-16">
+        <div class="max-w-4xl mx-auto px-4 text-center">
+            <h1 class="text-4xl md:text-5xl font-extrabold mb-4">Homarr: Dashboard for Your Self-Hosted Apps</h1>
+            <p class="text-xl opacity-90">Stop remembering 50 different URLs and ports. One clean interface for all your self-hosted services.</p>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto px-4 py-12 bg-white mt-[-40px] rounded-xl shadow-lg mb-20">
+
+        <article class="prose prose-blue max-w-none">
+
+            <p class="mb-6 text-lg text-gray-700 leading-relaxed">
+                Had self-hosted stuff scattered everywhere. Jellyfin on :8096, Nextcloud on :8080, Portainer on :9000, a bunch of random services I could never remember the ports for. Browser bookmarks were a mess, and typing IPs constantly got old fast.
+            </p>
+
+            <p class="mb-8 text-gray-700 leading-relaxed">
+                Installed <a href="https://homarr.dev/" class="text-blue-600 underline">Homarr</a> on a Saturday afternoon. Now everything's on one page - weather, calendar, service status, quick links to all my containers. Even my wife can use the media server without asking me for the URL every time.
+            </p>
+
+            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">What Homarr actually does</h2>
+
+            <p class="mb-6 text-gray-700">
+                Homarr is a self-hosted dashboard that gives you a central place to access all your services. Think of it as a start page for your home server - you add widgets and links, it pulls in data from your services, and you get a clean overview of everything running on your machine.
+            </p>
+
+            <p class="mb-8 text-gray-700">
+                What I actually use it for: quick access to all my Docker containers, status monitoring so I know when something's down, weather and calendar widgets on the homepage, and integration with services like Jellyfin and qBittorrent so I can manage them without leaving the dashboard.
+            </p>
+
+            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">Installing with Docker (recommended)</h2>
+
+            <p class="mb-4 text-gray-700">Docker is definitely the way to go:</p>
+
+            <pre class="language-bash"><code># Create a directory for Homarr config
+mkdir -p ~/homarr/config
+cd ~/homarr
+
+# Run the container
+docker run -d \
+  --name homarr \
+  -p 7575:7575 \
+  -v ~/homarr/config:/app/data/configs \
+  --restart=unless-stopped \
+  ghcr.io/homarr-labs/homarr:latest</code></pre>
+
+            <p class="mt-4 text-gray-600 text-sm">
+                Access it at http://your-server-ip:7575. First time it'll walk you through setup - create an admin account and you're good to go.
+            </p>
+
+            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">Docker Compose setup (better option)</h2>
+
+            <p class="mb-4 text-gray-700">If you're already using Compose:</p>
+
+            <pre class="language-bash"><code># docker-compose.yml
+version: "3.8"
+services:
+  homarr:
+    image: ghcr.io/homarr-labs/homarr:latest
+    container_name: homarr
+    ports:
+      - "7575:7575"
+    volumes:
+      - ./homarr/config:/app/data/configs
+    restart: unless-stopped</code></pre>
+
+            <p class="mt-4 text-gray-600 text-sm">
+                Run with <code class="bg-gray-100 px-2 py-1 rounded">docker-compose up -d</code> and it'll handle restarts automatically.
+            </p>
+
+            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">Adding your first services</h2>
+
+            <p class="mb-4 text-gray-700">Click the edit button (pencil icon) and start adding:</p>
+
+            <ol class="list-decimal list-inside space-y-3 text-gray-700 mb-6">
+                <li><strong class="text-gray-900">Add a workspace:</strong> Think of this as a category - I have "Media", "Productivity", "System"</li>
+                <li><strong class="text-gray-900">Add apps:</strong> For each service, give it a name and URL</li>
+                <li><strong class="text-gray-900">Choose an icon:</strong> Either upload one or pick from the built-in set</li>
+                <li><strong class="text-gray-900">Set the position:</strong> Drag and drop to arrange how you want</li>
+            </ol>
+
+            <p class="text-gray-600 mb-6">
+                Took me about 10 minutes to add all my common services. Now instead of remembering that Jellyfin is on port 8096, I just click the icon.
+            </p>
+
+            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">Useful widgets to add</h2>
+
+            <p class="mb-4 text-gray-700">Homarr comes with a bunch of widgets. Here's what I've found actually useful:</p>
+
+            <ul class="list-disc list-inside space-y-2 text-gray-700 mb-6">
+                <li><strong class="text-gray-900">Date & Time:</strong> Simple, but I actually use it</li>
+                <li><strong class="text-gray-900">Weather:</strong> Needs an OpenWeather API key (free tier works fine)</li>
+                <li><strong class="text-gray-900">Search:</strong> DuckDuckGo or Google search right from the dashboard</li>
+                <li><strong class="text-gray-900">Calendar:</strong> Shows upcoming events if you use CalDAV</li>
+                <li><strong class="text-gray-900">DNS:</strong> Shows your current IP address (handy for DynDNS updates)</li>
+            </ul>
+
+            <p class="text-gray-600 mb-6">
+                Don't go overboard here. I started adding tons of widgets and the page got cluttered fast. Less is more.
+            </p>
+
+            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">Integrations that actually work</h2>
+
+            <p class="mb-4 text-gray-700">Homarr can pull data from some services directly:</p>
+
+            <ul class="list-disc list-inside space-y-2 text-gray-700 mb-6">
+                <li><strong class="text-gray-900">Jellyfin/Emby:</strong> See recently added media, continue watching</li>
+                <li><strong class="text-gray-900">qBittorrent:</strong> See active downloads, pause/resume torrents</li>
+                <li><strong class="text-gray-900">Sonarr/Radarr:</strong> See recent additions and queue status</li>
+                <li><strong class="text-gray-900">Pi-hole:</strong> DNS query stats and ad-blocking overview</li>
+            </ul>
+
+            <p class="text-gray-600 mb-6">
+                Setup requires getting API keys from each service. Documentation is decent but you'll probably need to Google a few things.
+            </p>
+
+            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">Configuring reverse proxy (optional but recommended)</h2>
+
+            <p class="mb-4 text-gray-700">If you want to access Homarr via a domain instead of IP:port:</p>
+
+            <pre class="language-bash"><code># Nginx Proxy Manager example
+# Domain: dashboard.yourdomain.com
+# Scheme: http
+# Forward Host/IP: homarr
+# Forward Port: 7575</code></pre>
+
+            <p class="mt-4 text-gray-600 text-sm">
+                This is what I did - now I just go to dashboard.mydomain.com instead of remembering the port. Using Cloudflare tunneling so I can access it from outside my network too.
+            </p>
+
+            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">Customization tips</h2>
+
+            <p class="mb-4 text-gray-700">Stuff I learned through trial and error:</p>
+
+            <ul class="list-disc list-inside space-y-2 text-gray-700 mb-6">
+                <li>Upload custom icons instead of using the built-in ones - looks way more professional</li>
+                <li>Use the DNS widget to display your public IP if you're using DynDNS</li>
+                <li>Create multiple workspaces if you have a lot of services - keeps things organized</li>
+                <li>Enable "Open in new tab" for apps so you don't lose your dashboard</li>
+                <li>The <code class="bg-gray-100 px-2 py-1 rounded">docker inspect</code> trick helps find container IPs if you're using Docker networks</li>
+            </ul>
+
+            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">Common problems I hit</h2>
+
+            <p class="mb-4 text-gray-700 font-bold">Config not saving</p>
+
+            <p class="mb-4 text-gray-700">
+                Make sure the volume mount is correct. First time I set it up I mapped to the wrong directory and all my changes disappeared on restart. Check <code class="bg-gray-100 px-2 py-1 rounded">docker inspect homarr</code> to verify mounts.
+            </p>
+
+            <p class="mb-4 text-gray-700 font-bold">Apps showing as down when they're not</p>
+
+            <p class="mb-4 text-gray-700">
+                Homarr tries to ping services to show status. If you're using Docker networks, containers might not be reachable by localhost. Use the actual container IP or configure health checks properly.
+            </p>
+
+            <p class="mb-4 text-gray-700 font-bold">Weather widget not working</p>
+
+            <p class="mb-6 text-gray-700">
+                You need an OpenWeather API key. Sign up at openweathermap.org - the free tier gives you 1000 calls/day which is plenty. The API key takes like 10 minutes to activate after you sign up.
+            </p>
+
+            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">Backup and restore</h2>
+
+            <p class="mb-4 text-gray-700">Your config lives in the mounted volume:</p>
+
+            <pre class="language-bash"><code># Backup
+tar -czf homarr-backup-$(date +%Y%m%d).tar.gz ~/homarr/config/
+
+# Restore (after creating a fresh container)
+docker stop homarr
+docker rm homarr
+# Then extract the backup and restart the container</code></pre>
+
+            <p class="mt-4 text-gray-600 text-sm">
+                I back this up weekly along with my other Docker configs. Losing your dashboard configuration isn't the end of the world, but it's annoying to set up everything again.
+            </p>
+
+            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">What works well</h2>
+
+            <ul class="list-disc list-inside space-y-2 text-gray-700 mb-6">
+                <li>Clean interface without too much clutter</li>
+                <li>Responsive design works well on mobile</li>
+                <li>Integrations with Jellyfin and torrent clients are solid</li>
+                <li>Active development - updates are frequent</li>
+                <li>Low resource usage compared to some alternatives</li>
+            </ul>
+
+            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">What could be better</h2>
+
+            <ul class="list-disc list-inside space-y-2 text-gray-700 mb-6">
+                <li>Some integrations are a bit finicky to set up</li>
+                <li>Documentation is good but not great</li>
+                <li>Mobile app would be nice (web interface works fine though)</li>
+                <li>Widget customization could be more flexible</li>
+            </ul>
+
+            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">Alternatives I considered</h2>
+
+            <table class="comparison-table w-full my-6 border border-gray-200 rounded-lg overflow-hidden">
+                <thead>
+                    <tr>
+                        <th>Tool</th>
+                        <th>Why I chose Homarr instead</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Heimdall</td>
+                        <td>Older, more established, but Homarr's UI felt more modern</td>
+                    </tr>
+                    <tr>
+                        <td>Organizr</td>
+                        <td>More powerful but way more complex than I needed</td>
+                    </tr>
+                    <tr>
+                        <td>Homer</td>
+                        <td>Simpler, but Homarr's integrations won me over</td>
+                    </tr>
+                    <tr>
+                        <td>Flame</td>
+                        <td>Nice alternative, but Homarr was easier to set up</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h2 class="text-2xl font-bold text-gray-900 mt-10 mb-4">Bottom line</h2>
+
+            <p class="text-gray-700 leading-relaxed">
+                Homarr isn't doing anything revolutionary - it's just a dashboard. But having a central place to access all your self-hosted stuff makes running a home server feel less like a chore and more like a coherent system.
+            </p>
+
+            <p class="text-gray-700 leading-relaxed mt-4">
+                Setup takes maybe 30 minutes tops, and after that it just works. If you're running more than a few self-hosted services, it's worth installing.
+            </p>
+
+        </article>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-8">
+        <div class="max-w-4xl mx-auto px-4 text-center">
+            <p class="mb-2">© 2026 Programming Notes. All rights reserved.</p>
+            <p class="text-gray-400 text-sm">Built with practical examples and real-world experience.</p>
+        </div>
+    </footer>
+
+    <!-- Prism.js for code highlighting -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-yaml.min.js"></script>
+
+</body>
+</html>
