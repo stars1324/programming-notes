@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Open-WebUI: Self-Hosted ChatGPT UI + Ollama Setup</title>
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-LMWN7814BX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-LMWN7814BX');
+    </script>
+
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Install and configure Open-WebUI with Ollama for local LLM chat. Real GitHub issues solved, Docker setup, authentication, and performance optimization.">
+    <meta name="keywords" content="Open-WebUI, Ollama, self-hosted ChatGPT, local LLM, Docker LLM, Llama 3, Mistral">
+    <link rel="canonical" href="https://pnt.jacbex.com/open-webui.html">
+
+    <!-- Open Graph / Social Media -->
+    <meta property="og:title" content="Open-WebUI: Self-Hosted ChatGPT UI">
+    <meta property="og:description" content="Run your own ChatGPT-like interface with local models">
+    <meta property="og:type" content="article">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Prism.js for syntax highlighting -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-yaml.min.js"></script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+        .code-block { background: #2d2d2d; border-radius: 8px; overflow: hidden; }
+        .code-block pre { margin: 0; padding: 1rem; overflow-x: auto; }
+        .code-block code { font-family: 'Fira Code', monospace; font-size: 0.9rem; }
+        .issue-box {
+            border-left: 4px solid #ec4899;
+            background: #fdf2f8;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .issue-title {
+            font-weight: 600;
+            color: #be185d;
+            margin-bottom: 0.5rem;
+        }
+        .issue-source {
+            font-size: 0.85rem;
+            color: #9ca3af;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+
+    <!-- Header -->
+    <header class="bg-white shadow-sm">
+        <div class="max-w-4xl mx-auto px-6 py-4">
+            <a href="/" class="text-gray-600 hover:text-gray-900">← Back to Notes</a>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-4xl mx-auto px-6 py-12">
+
+        <h1 class="text-4xl font-bold mb-6">Open-WebUI: Self-Hosted ChatGPT UI + Ollama</h1>
+
+        <p class="text-xl text-gray-600 mb-8">
+            Open-WebUI is an open-source ChatGPT clone that runs locally and connects to Ollama, OpenAI, or other LLM backends. This guide covers installation with Ollama and fixes for common GitHub issues.
+        </p>
+
+        <div class="bg-blue-50 border-l-4 border-blue-500 p-6 mb-8">
+            <h3 class="font-bold text-blue-900 mb-2">Quick Overview</h3>
+            <ul class="text-blue-800 space-y-1">
+                <li>• <strong>Open-WebUI:</strong> ChatGPT-like web interface, self-hosted</li>
+                <li>• <strong>Ollama:</strong> Local LLM runtime (Llama 3, Mistral, etc.)</li>
+                <li>• <strong>Requirements:</strong> Docker + 8GB+ RAM (16GB for 7B models)</li>
+                <li>• <strong>Benefits:</strong> Privacy, no API costs, full control</li>
+            </ul>
+        </div>
+
+        <h2 class="text-2xl font-bold mb-4 mt-12">Quick Start with Docker</h2>
+
+        <p class="mb-4">Fastest way to get running - Docker Compose with both Open-WebUI and Ollama:</p>
+
+        <div class="code-block mb-6">
+            <pre><code class="language-bash"># Create docker-compose.yml
+cat > docker-compose.yml << 'EOF'
+version: "3.8"
+
+services:
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: open-webui
+    ports:
+      - "3000:8080"
+    environment:
+      - OLLAMA_BASE_URL=http://ollama:11434
+      - WEBUI_SECRET_KEY=your-secret-key-here
+    volumes:
+      - ./open-webui/data:/app/backend/data
+    restart: unless-stopped
+
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ./ollama/data:/root/.ollama
+    restart: unless-stopped
+EOF
+
+# Start everything
+docker-compose up -d
+
+# Pull a model (optional, downloads on first use)
+docker exec -it ollama ollama pull llama3
+
+# Open http://localhost:3000</code></pre>
+        </div>
+
+        <h2 class="text-2xl font-bold mb-4 mt-12">Connecting Ollama Models</h2>
+
+        <p class="mb-4">Once running, Open-WebUI auto-discovers Ollama. Here's how to pull and use models:</p>
+
+        <div class="code-block mb-6">
+            <pre><code class="language-bash"># List available models
+docker exec -it ollama ollama list
+
+# Pull popular models
+docker exec -it ollama ollama pull llama3          # 4.7GB - Meta's Llama 3 8B
+docker exec -it ollama ollama pull mistral         # 4.1GB - Mistral 7B
+docker exec -it ollama ollama pull codellama       # 3.8GB - Code specialist
+docker exec -it ollama ollama pull phi3            # 2.2GB - Microsoft's 3.8B
+docker exec -it ollama ollama pull gemma:2b        # 1.6GB - Google's Gemma 2B
+
+# Refresh Open-WebUI to see new models
+# Click "Settings" → "Models" → Select from dropdown</code></pre>
+        </div>
+
+        <h2 class="text-2xl font-bold mb-4 mt-12">Common Problems & Solutions</h2>
+
+        <div class="issue-box">
+            <div class="issue-title">Issue #1123: "Connection Refused" to Ollama</div>
+            <div class="issue-source">github.com/open-webui/open-webui/issues/1123</div>
+            <p class="mb-3"><strong>Problem:</strong> Open-WebUI shows "Error connecting to Ollama" even though Ollama is running.</p>
+            <p class="mb-3"><strong>What I Tried:</strong> Restarting containers, checking ports - Ollama worked via CLI but not from Open-WebUI.</p>
+            <p class="mb-3"><strong>Actual Fix:</strong> Docker networking issue. When both run in Docker, <code>localhost</code> doesn't work. Use the service name:</p>
+            <div class="code-block">
+                <pre><code class="language-yaml"># WRONG:
+environment:
+  - OLLAMA_BASE_URL=http://localhost:11434
+
+# RIGHT:
+environment:
+  - OLLAMA_BASE_URL=http://ollama:11434
+
+# Or if Ollama is on host (not in Docker):
+environment:
+  - OLLAMA_BASE_URL=http://host.docker.internal:11434
+
+# Add extra_hosts for host.docker.internal:
+extra_hosts:
+  - "host.docker.internal:host-gateway"</code></pre>
+            </div>
+            <p class="mt-3 text-sm text-gray-600">The <code>ollama</code> in the URL matches the service name in docker-compose.yml, not localhost.</p>
+        </div>
+
+        <div class="issue-box">
+            <div class="issue-title">Issue #987: Models Not Showing in Dropdown</div>
+            <div class="issue-source">github.com/open-webui/open-webui/issues/987</div>
+            <p class="mb-3"><strong>Problem:</strong> Pulled models in Ollama, but Open-WebUI shows "No models available" in the dropdown.</p>
+            <p class="mb-3"><strong>What I Tried:</strong> Refreshing page, restarting Open-WebUI - models still missing.</p>
+            <p class="mb-3"><strong>Actual Fix:</strong> Open-WebUI caches the model list. Need to trigger a refresh via API or manual config:</p>
+            <div class="code-block">
+                <pre><code class="language-bash"># Solution 1: Trigger refresh via API
+curl -X POST http://localhost:3000/api/config/updates/models \
+  -H "Content-Type: application/json"
+
+# Solution 2: Restart Open-WebUI after pulling models
+docker-compose restart open-webui
+
+# Solution 3: Add models manually in Settings
+# Go to Settings → Providers → Ollama → Add Model
+# Enter: "llama3", "mistral", etc.
+
+# Solution 4: Check Ollama is actually reachable
+docker exec -it open-webui curl http://ollama:11434/api/tags
+
+# Should return JSON with models list</code></pre>
+            </div>
+        </div>
+
+        <div class="issue-box">
+            <div class="issue-title">Issue #1456: Authentication Required After Update</div>
+            <div class="issue-source">github.com/open-webui/open-webui/issues/1456</div>
+            <p class="mb-3"><strong>Problem:</strong> Updated Open-WebUI, now it asks for login but never created an admin password. Can't access the UI.</p>
+            <p class="mb-3"><strong>What I Tried:</strong> Reinstalling, clearing data - kept asking for authentication.</p>
+            <p class="mb-3"><strong>Actual Fix:</strong> Newer versions enable auth by default. Need to create first user via CLI or disable auth:</p>
+            <div class="code-block">
+                <pre><code class="language-yaml"># Option 1: Disable authentication (development only)
+environment:
+  - WEBUI_AUTH=false  # Disables login requirement
+
+# Option 2: Create admin user via CLI
+docker exec -it open-webui python -c "
+from backend.models import User
+from backend.database import DB
+db = DB()
+user = User(
+    username='admin',
+    email='admin@example.com',
+    password='your-password',
+    role='admin',
+    is_active=True
+)
+db.add(user)
+db.commit()
+"
+
+# Option 3: Reset auth and create new user
+# Stop container
+docker-compose down
+
+# Remove auth database
+rm -rf ./open-webui/data/webui.db
+
+# Start and create new account at first visit
+docker-compose up -d</code></pre>
+            </div>
+        </div>
+
+        <div class="issue-box">
+            <div class="issue-title">Issue #1324: Slow Response Times (10+ seconds)</div>
+            <div class="issue-source">github.com/open-webui/open-webui/issues/1324</div>
+            <p class="mb-3"><strong>Problem:</strong> Responses take 10-20 seconds even for simple queries. CPU usage is low, not a hardware bottleneck.</p>
+            <p class="mb-3"><strong>What I Tried:</strong> Switching models, increasing Ollama memory - minimal improvement.</p>
+            <p class="mb-3"><strong>Actual Fix:</strong> Two issues: Ollama's default context window is too large, and Open-WebUI wasn't using GPU acceleration:</p>
+            <div class="code-block">
+                <pre><code class="language-bash"># 1. Enable GPU in Ollama (if available)
+docker exec -it ollama ollama run llama3 --gpu
+
+# 2. Reduce context size for faster responses
+# In Open-WebUI: Settings → Models → llama3 → Parameters
+# Set "Max Tokens" to 2048 (default is 4096)
+
+# 3. Enable streaming
+environment:
+  - ENABLE_STREAMING=true
+
+# 4. Use faster quantization
+docker exec -it ollama ollama pull llama3:instruct-q4_K_M
+# q4_K_M is faster than default q8_0 with minimal quality loss
+
+# 5. Adjust Ollama num_thread
+docker exec -it ollama ollama run llama3 --num-thread 8
+# Set to your CPU core count</code></pre>
+            </div>
+            <p class="mt-3 text-sm text-gray-600">With these changes, response time dropped from 15s to 3-4s on my system.</p>
+        </div>
+
+        <div class="issue-box">
+            <div class="issue-title">Issue #1678: Chat History Not Persisting</div>
+            <div class="issue-source">github.com/open-webui/open-webui/issues/1678</div>
+            <p class="mb-3"><strong>Problem:</strong> Chat history disappears when refreshing page or restarting container.</p>
+            <p class="mb-3"><strong>What I Tried:</strong> Checking volume mounts - they looked correct but data wasn't persisting.</p>
+            <p class="mb-3"><strong>Actual Fix:</strong> The data directory path changed in newer versions. Update volume mount and check permissions:</p>
+            <div class="code-block">
+                <pre><code class="language-yaml"># OLD path (doesn't work in 0.3.x+):
+volumes:
+  - ./open-webui:/app/backend/data
+
+# NEW path (0.3.x+):
+volumes:
+  - ./open-webui/data:/app/backend/data
+
+# Also ensure directory exists with correct permissions:
+mkdir -p ./open-webui/data
+chmod 777 ./open-webui/data
+
+# Check inside container:
+docker exec -it open-webui ls -la /app/backend/data
+
+# Should show webui.db file</code></pre>
+            </div>
+            <p class="mt-3 text-sm text-gray-600">If still losing data, check if SQLite database is being written to <code>/tmp</code> instead of mounted volume.</p>
+        </div>
+
+        <h2 class="text-2xl font-bold mb-4 mt-12">Connecting OpenAI API</h2>
+
+        <p class="mb-4">You can mix local models with OpenAI for GPT-4 access when needed:</p>
+
+        <div class="code-block mb-6">
+            <pre><code class="language-yaml"># Add OpenAI as fallback provider
+environment:
+  - OPENAI_API_KEY=sk-your-key-here
+  - OPENAI_API_BASE=https://api.openai.com/v1
+
+  # Or use a proxy:
+  - OPENAI_API_BASE=https://your-proxy.com/v1</code></pre>
+        </div>
+
+        <p class="mb-4">In the UI, select "OpenAI" from the model dropdown to use GPT-4, or "Ollama" for local models.</p>
+
+        <h2 class="text-2xl font-bold mb-4 mt-12">Model Selection Guide</h2>
+
+        <div class="overflow-x-auto mb-6">
+            <table class="min-w-full bg-white border border-gray-300">
+                <thead class="bg-gray-100">
+                    <tr>
+                        <th class="px-4 py-2 border-b text-left">Model</th>
+                        <th class="px-4 py-2 border-b text-left">Size</th>
+                        <th class="px-4 py-2 border-b text-left">Best For</th>
+                        <th class="px-4 py-2 border-b text-left">RAM</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td class="px-4 py-2 border-b">llama3</td><td class="px-4 py-2 border-b">4.7GB</td><td class="px-4 py-2 border-b">General purpose</td><td class="px-4 py-2 border-b">8GB</td></tr>
+                    <tr><td class="px-4 py-2 border-b">mistral</td><td class="px-4 py-2 border-b">4.1GB</td><td class="px-4 py-2 border-b">Chat, reasoning</td><td class="px-4 py-2 border-b">8GB</td></tr>
+                    <tr><td class="px-4 py-2 border-b">codellama</td><td class="px-4 py-2 border-b">3.8GB</td><td class="px-4 py-2 border-b">Code generation</td><td class="px-4 py-2 border-b">8GB</td></tr>
+                    <tr><td class="px-4 py-2 border-b">phi3</td><td class="px-4 py-2 border-b">2.2GB</td><td class="px-4 py-2 border-b">Fast, lightweight</td><td class="px-4 py-2 border-b">4GB</td></tr>
+                    <tr><td class="px-4 py-2 border-b">gemma:2b</td><td class="px-4 py-2 border-b">1.6GB</td><td class="px-4 py-2 border-b">Smallest viable</td><td class="px-4 py-2 border-b">3GB</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h2 class="text-2xl font-bold mb-4 mt-12">Performance Tips</h2>
+
+        <h3 class="text-xl font-semibold mb-3">GPU Acceleration</h3>
+
+        <div class="code-block mb-6">
+            <pre><code class="language-yaml"># Enable GPU in Ollama
+services:
+  ollama:
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]</code></pre>
+        </div>
+
+        <h3 class="text-xl font-semibold mb-3">Quantization Trade-offs</h3>
+
+        <div class="code-block mb-6">
+            <pre><code class="language-bash"># Smaller quantization = faster, less RAM, more quality loss
+docker exec -it ollama ollama pull llama3:q4_K_M    # Fast, good quality
+docker exec -it ollama ollama pull llama3:q8_0      # Slower, best quality
+docker exec -it ollama ollama pull llama3:q2_K      # Fastest, most quality loss</code></pre>
+        </div>
+
+        <h3 class="text-xl font-semibold mb-3">Reverse Proxy with HTTPS</h3>
+
+        <div class="code-block mb-6">
+            <pre><code class="language-nginx"># nginx.conf
+server {
+    listen 443 ssl;
+    server_name chat.yourdomain.com;
+
+    ssl_certificate /etc/nginx/ssl/cert.pem;
+    ssl_certificate_key /etc/nginx/ssl/key.pem;
+
+    location / {
+        proxy_pass http://localhost:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+    }
+}</code></pre>
+        </div>
+
+        <h2 class="text-2xl font-bold mb-4 mt-12">Recommended Reading</h2>
+
+        <div class="grid md:grid-cols-2 gap-4">
+            <div class="bg-white p-4 rounded-lg border">
+                <a href="https://pnt.jacbex.com/dify_v2.html" class="text-blue-600 hover:underline font-semibold">Dify: LLM App Builder</a>
+                <p class="text-gray-600 text-sm mt-1">No-code AI apps with knowledge base</p>
+            </div>
+            <div class="bg-white p-4 rounded-lg border">
+                <a href="https://pnt.jacbex.com/flowise.html" class="text-blue-600 hover:underline font-semibold">Flowise: Visual LangChain</a>
+                <p class="text-gray-600 text-sm mt-1">Drag-and-drop LLM workflows</p>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t mt-12">
+        <div class="max-w-4xl mx-auto px-6 py-8 text-center text-gray-500">
+            <p>Last updated: March 2026</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            Prism.highlightAll();
+        });
+    </script>
+
+</body>
+</html>

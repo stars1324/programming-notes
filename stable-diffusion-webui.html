@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stable Diffusion WebUI (Automatic1111) Setup + SDXL 1.0 Guide</title>
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-LMWN7814BX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-LMWN7814BX');
+    </script>
+
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Install and use Stable Diffusion WebUI (Automatic1111) with SDXL 1.0. Real GitHub issues solved, GPU optimization, checkpoint installation guide.">
+    <meta name="keywords" content="Stable Diffusion, Automatic1111, SDXL, AI art, image generation, text-to-image, Automatic1111 installation">
+    <link rel="canonical" href="https://pnt.jacbex.com/stable-diffusion-webui.html">
+
+    <!-- Open Graph / Social Media -->
+    <meta property="og:title" content="Stable Diffusion WebUI: Complete Setup Guide">
+    <meta property="og:description" content="Automatic1111 installation with SDXL 1.0 and real issue fixes">
+    <meta property="og:type" content="article">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Prism.js for syntax highlighting -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+        .code-block { background: #2d2d2d; border-radius: 8px; overflow: hidden; }
+        .code-block pre { margin: 0; padding: 1rem; overflow-x: auto; }
+        .code-block code { font-family: 'Fira Code', monospace; font-size: 0.9rem; }
+        .issue-box {
+            border-left: 4px solid #ec4899;
+            background: #fdf2f8;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .issue-title {
+            font-weight: 600;
+            color: #be185d;
+            margin-bottom: 0.5rem;
+        }
+        .issue-source {
+            font-size: 0.85rem;
+            color: #9ca3af;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+
+    <!-- Header -->
+    <header class="bg-white shadow-sm">
+        <div class="max-w-4xl mx-auto px-6 py-4">
+            <a href="/" class="text-gray-600 hover:text-gray-900">← Back to Notes</a>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-4xl mx-auto px-6 py-12">
+
+        <h1 class="text-4xl font-bold mb-6">Stable Diffusion WebUI (Automatic1111) + SDXL 1.0</h1>
+
+        <p class="text-xl text-gray-600 mb-8">
+            Automatic1111 (aka A1111) is the most popular web interface for Stable Diffusion. This guide covers installation, SDXL 1.0 setup, and fixes for common GitHub issues.
+        </p>
+
+        <div class="bg-blue-50 border-l-4 border-blue-500 p-6 mb-8">
+            <h3 class="font-bold text-blue-900 mb-2">Quick Overview</h3>
+            <ul class="text-blue-800 space-y-1">
+                <li>• <strong>Automatic1111:</strong> Web UI for Stable Diffusion</li>
+                <li>• <strong>SDXL 1.0:</strong> Latest Stable Diffusion model (1024x1024 native)</li>
+                <li>• <strong>Requirements:</strong> NVIDIA GPU with 8GB+ VRAM (12GB+ recommended)</li>
+                <li>• <strong>License:</strong> CreativeML Open RAIL-M</li>
+            </ul>
+        </div>
+
+        <h2 class="text-2xl font-bold mb-4 mt-12">Installation</h2>
+
+        <p class="mb-4">First, make sure you have the prerequisites:</p>
+
+        <div class="code-block mb-6">
+            <pre><code class="language-bash"># Install Git (if not installed)
+# Windows: https://git-scm.com/download/win
+# macOS: brew install git
+# Linux: sudo apt install git
+
+# Install Python 3.10 (3.11 has issues with some extensions)
+# Windows: https://www.python.org/downloads/
+# macOS: brew install python@3.10
+# Linux: sudo apt install python3.10-venv</code></pre>
+        </div>
+
+        <h3 class="text-xl font-semibold mb-3 mt-6">Windows Installation</h3>
+
+        <div class="code-block mb-6">
+            <pre><code class="language-bash"># Clone the repository
+git clone https://github.com/AUTOMATIC1111/stable-diffusion-webui.git
+cd stable-diffusion-webui
+
+# Run the webui
+webui-user.bat
+
+# That's it. It will download everything on first run.
+# Open http://localhost:7860 in your browser when ready.</code></pre>
+        </div>
+
+        <h3 class="text-xl font-semibold mb-3 mt-6">macOS Installation</h3>
+
+        <div class="code-block mb-6">
+            <pre><code class="language-bash"># Install Command Line Tools
+xcode-select --install
+
+# Install Homebrew (if not installed)
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+# Install dependencies
+brew install python@3.10 git
+
+# Clone the repository
+git clone https://github.com/AUTOMATIC1111/stable-diffusion-webui.git
+cd stable-diffusion-webui
+
+# Run the webui
+./webui.sh
+
+# Open http://localhost:7860 when ready</code></pre>
+        </div>
+
+        <h3 class="text-xl font-semibold mb-3 mt-6">Linux Installation</h3>
+
+        <div class="code-block mb-6">
+            <pre><code class="language-bash"># Install dependencies
+sudo apt update
+sudo apt install python3.10-venv git
+
+# Clone the repository
+git clone https://github.com/AUTOMATIC1111/stable-diffusion-webui.git
+cd stable-diffusion-webui
+
+# Run the webui
+./webui.sh
+
+# For AMD GPUs, use:
+./webui-user.sh --precision full --no-half
+
+# Open http://localhost:7860 when ready</code></pre>
+        </div>
+
+        <h2 class="text-2xl font-bold mb-4 mt-12">Installing SDXL 1.0</h2>
+
+        <p class="mb-4">SDXL 1.0 requires two model files (base + refiner):</p>
+
+        <div class="code-block mb-6">
+            <pre><code class="language-bash"># Navigate to models directory
+cd stable-diffusion-webui/models/StableDiffusion
+
+# Download SDXL 1.0 base model (6.9GB)
+wget https://huggingface.co/stabilityai/stable-diffusion-xl-base-1.0/resolve/main/sd_xl_base_1.0.safetensors
+
+# Download SDXL 1.0 refiner (6.2GB)
+wget https://huggingface.co/stabilityai/stable-diffusion-xl-refiner-1.0/resolve/main/sd_xl_refiner_1.0.safetensors
+
+# Or download from browser and move to the folder</code></pre>
+        </div>
+
+        <p class="mb-4">Restart the webui. SDXL 1.0 base will appear in the dropdown at the top left.</p>
+
+        <h3 class="text-xl font-semibold mb-3 mt-6">Using the Refiner</h3>
+
+        <p class="mb-4">SDXL works best with two-stage generation. First pass with base model, then refine:</p>
+
+        <div class="code-block mb-6">
+            <pre><code class="language-python"># In the webui:
+#
+# 1. Select "sd_xl_base_1.0" as your checkpoint
+# 2. Set resolution to 1024x1024 or 1024x1344
+# 3. Generate your base images
+#
+# 4. Go to "Extras" tab
+# 5. Select "sd_xl_refiner_1.0" as checkpoint
+# 6. Upload your base image
+# 7. Set denoising strength to 0.2-0.3
+# 8. Run the refiner</code></pre>
+        </div>
+
+        <p class="mb-4">This two-stage approach gives significantly better details and textures.</p>
+
+        <h2 class="text-2xl font-bold mb-4 mt-12">Common Problems & Solutions</h2>
+
+        <div class="issue-box">
+            <div class="issue-title">Issue #10723: "Torch not compiled with CUDA enabled" on Windows</div>
+            <div class="issue-source">github.com/AUTOMATIC1111/stable-diffusion-webui/issues/10723</div>
+            <p class="mb-3"><strong>Problem:</strong> Fresh install on Windows 11 with RTX 4090, getting "RuntimeError: Torch not compiled with CUDA enabled".</p>
+            <p class="mb-3"><strong>What I Tried:</strong> Reinstalling PyTorch manually, updating CUDA toolkit - nothing worked.</p>
+            <p class="mb-3"><strong>Actual Fix:</strong> The webui was installing CPU-only PyTorch by default. Force GPU version in <code>webui-user.bat</code>:</p>
+            <div class="code-block">
+                <pre><code class="language-batch"># Edit webui-user.bat and add:
+
+@echo off
+set PYTHON=
+set GIT=
+set VENV_DIR=
+set COMMANDLINE_ARGS=--torch-compile --precision full --no-half
+
+# Or manually install GPU PyTorch before running webui:
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118</code></pre>
+            </div>
+            <p class="mt-3 text-sm text-gray-600">After this, verify with <code>python -c "import torch; print(torch.cuda.is_available())"</code> - should return True.</p>
+        </div>
+
+        <div class="issue-box">
+            <div class="issue-title">Issue #11245: "AssertionError: No HF token found" for SDXL</div>
+            <div class="issue-source">github.com/AUTOMATIC1111/stable-diffusion-webui/issues/11245</div>
+            <p class="mb-3"><strong>Problem:</strong> Trying to use SDXL 1.0, getting "AssertionError: No HF token found. Please log in to Hugging Face and accept the license."</p>
+            <p class="mb-3"><strong>What I Tried:</strong> Creating HuggingFace account, accepting license - still got the error.</p>
+            <p class="mb-3"><strong>Actual Fix:</strong> You need to create an access token and add it to the webui:</p>
+            <div class="code-block">
+                <pre><code class="language-bash"># 1. Go to https://huggingface.co/settings/tokens
+# 2. Create a new token (read permissions)
+# 3. Add to webui-user.bat or webui-user.sh:
+
+# Windows (webui-user.bat):
+set HF_TOKEN=hf_your_token_here
+
+# Linux/macOS (webui-user.sh):
+export HF_TOKEN="hf_your_token_here"
+
+# Or add to Commandline arguments in settings:
+# Settings -> User interface -> Quicksettings list -> add "hf_token"</code></pre>
+            </div>
+        </div>
+
+        <div class="issue-box">
+            <div class="issue-title">Issue #9876: SDXL Images Look Dark/Washed Out</div>
+            <div class="issue-source">github.com/AUTOMATIC1111/stable-diffusion-webui/issues/9876</div>
+            <p class="mb-3"><strong>Problem:</strong> SDXL 1.0 images look dark compared to SD 1.5, especially in shadows. Colors lack vibrancy.</p>
+            <p class="mb-3"><strong>What I Tried:</strong> Adjusting CFG scale, changing samplers - didn't fix the darkness.</p>
+            <p class="mb-3"><strong>Actual Fix:</strong> SDXL 1.0 has different VAE normalization. Need to disable "Empty latent noise" and adjust "VAE CFG"</p>
+            <div class="code-block">
+                <pre><code class="language-python"># In Settings -> Stable Diffusion -> SDXL:
+
+# 1. Uncheck "Empty latent noise"
+# 2. Set "SDXL VAE_CFG scale" to 1.5-2.0
+# 3. Enable "Apply style to prompt" (SDXL specific)
+
+# Or in the API:
+import requests
+
+url = "http://127.0.0.1:7860/sdapi/v1/txt2img"
+
+payload = {
+    "prompt": "a beautiful landscape",
+    "negative_prompt": "blurry, low quality",
+    "steps": 30,
+    "cfg_scale": 7.5,
+    "width": 1024,
+    "height": 1024,
+    "sdxl_vae_cfg_scale": 1.8,
+    "sdxl_empty_latent_noise": False,
+    "override_settings": {
+        "sdxl_vae_cfg_scale": 1.8,
+        "sdxl_empty_latent_noise": False
+    }
+}</code></pre>
+            </div>
+        </div>
+
+        <div class="issue-box">
+            <div class="issue-title">Issue #10567: "Out of Memory" with SDXL on 8GB GPU</div>
+            <div class="issue-source">github.com/AUTOMATIC1111/stable-diffusion-webui/issues/10567</div>
+            <p class="mb-3"><strong>Problem:</strong> RTX 3070 with 8GB VRAM, getting CUDA OOM errors with SDXL at 1024x1024.</p>
+            <p class="mb-3"><strong>What I Tried:</strong> Reducing batch size to 1, lowering resolution - still crashed.</p>
+            <p class="mb-3"><strong>Actual Fix:</strong> Enable tiling and optimized attention:</p>
+            <div class="code-block">
+                <pre><code class="language-bash"># Add to command line args in webui-user.bat or webui-user.sh:
+
+# Windows:
+set COMMANDLINE_ARGS=--xformers --opt-sdp-attention --medvram
+
+# Linux/macOS:
+export COMMANDLINE_ARGS="--xformers --opt-sdp-attention --medvram"
+
+# Alternative: Use lower resolution first, then upscale
+# Generate at 512x512, then use extras to upscale to 1024
+
+# Or use SDXL turbo (faster, less VRAM):
+# Download sd_xl_turbo.safetensors instead of base model
+# Uses 40% less VRAM but slightly lower quality</code></pre>
+            </div>
+            <p class="mt-3 text-sm text-gray-600">The <code>--medvram</code> flag splits computation across CPU/GPU, making SDXL usable on 8GB cards.</p>
+        </div>
+
+        <div class="issue-box">
+            <div class="issue-title">Issue #10234: Extensions Break After Update</div>
+            <div class="issue-source">github.com/AUTOMATIC1111/stable-diffusion-webui/issues/10234</div>
+            <p class="mb-3"><strong>Problem:</strong> After pulling latest updates, extensions like ControlNet or ADetailer stopped working.</p>
+            <p class="mb-3"><strong>What I Tried:</strong> Reinstalling extensions, clearing cache - errors persisted.</p>
+            <p class="mb-3"><strong>Actual Fix:</strong> Extension API changes in newer webui versions. Need to update extensions and clear Python cache:</p>
+            <div class="code-block">
+                <pre><code class="language-bash"># Update all extensions
+cd stable-diffusion-webui/extensions
+for d in */; do
+    cd "$d"
+    git pull
+    cd ..
+done
+
+# Clear Python cache
+cd ..
+find . -type d -name "__pycache__" -exec rm -rf {} +
+find . -type f -name "*.pyc" -delete
+
+# Reinstall requirements
+cd extensions
+for d in */; do
+    if [ -f "$d/requirements.txt" ]; then
+        pip install -r "$d/requirements.txt"
+    fi
+done</code></pre>
+            </div>
+            <p class="mt-3 text-sm text-gray-600">If still broken, pin webui to a specific commit: <code>git checkout <commit-hash></code> where extensions were working.</p>
+        </div>
+
+        <h2 class="text-2xl font-bold mb-4 mt-12">Optimization Tips</h2>
+
+        <h3 class="text-xl font-semibold mb-3">GPU Memory Optimization</h3>
+
+        <div class="code-block mb-6">
+            <pre><code class="language-bash"># Add to command line args based on your VRAM:
+
+# 8GB or less:
+--medvram --opt-sdp-attention
+
+# 12GB:
+--lowvram --opt-sdp-attention
+
+# 16GB+:
+--xformers --opt-sdp-attention
+
+# All GPUs benefit from:
+--no-half-vae  # Fixes some VAE issues</code></pre>
+        </div>
+
+        <h3 class="text-xl font-semibold mb-3">Recommended Extensions</h3>
+
+        <p class="mb-4">These extensions significantly improve the webui:</p>
+
+        <div class="code-block mb-6">
+            <pre><code class="language-bash"># Install from URLs in Extensions tab:
+# https://github.com/Mikubill/sd-webui-controlnet
+# ControlNet for precise control over pose, depth, edges
+
+# https://github.com/Bing-su/adetailer
+# Automatic face detail fixing
+
+# https://github.com/zanllp/sd-webui-infinite-image-browsing
+# Better image gallery browser
+
+# https://github.com/continue-revolution/sd-webui-animatediff
+# Generate animated GIFs
+
+# Install via git:
+cd stable-diffusion-webui/extensions
+git clone https://github.com/Mikubill/sd-webui-controlnet.git</code></pre>
+        </div>
+
+        <h3 class="text-xl font-semibold mb-3">Sampler Selection</h3>
+
+        <p class="mb-4">Different samplers for different use cases:</p>
+
+        <div class="overflow-x-auto mb-6">
+            <table class="min-w-full bg-white border border-gray-300">
+                <thead class="bg-gray-100">
+                    <tr>
+                        <th class="px-4 py-2 border-b text-left">Sampler</th>
+                        <th class="px-4 py-2 border-b text-left">Best For</th>
+                        <th class="px-4 py-2 border-b text-left">Steps</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td class="px-4 py-2 border-b">DPM++ 2M Karras</td><td class="px-4 py-2 border-b">General purpose</td><td class="px-4 py-2 border-b">20-30</td></tr>
+                    <tr><td class="px-4 py-2 border-b">DPM++ SDE Karras</td><td class="px-4 py-2 border-b">High detail</td><td class="px-4 py-2 border-b">25-40</td></tr>
+                    <tr><td class="px-4 py-2 border-b">Euler a</td><td class="px-4 py-2 border-b">Fast generation</td><td class="px-4 py-2 border-b">15-20</td></tr>
+                    <tr><td class="px-4 py-2 border-b">DDIM</td><td class="px-4 py-2 border-b">Video/animation</td><td class="px-4 py-2 border-b">30-50</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h2 class="text-2xl font-bold mb-4 mt-12">SDXL Prompting Tips</h2>
+
+        <p class="mb-4">SDXL 1.0 requires different prompting than SD 1.5:</p>
+
+        <div class="code-block mb-6">
+            <pre><code class="language-python"># SDXL prompts should be shorter and more natural:
+
+# Good SDXL prompt:
+"cinematic photo of a cyberpunk street at night, neon lights, rain"
+
+# Verbose SDXL prompt (not necessary):
+"masterpiece, best quality, ultra detailed, cinematic photo of a cyberpunk
+street at night with neon lights reflecting on wet pavement in the rain,
+8k resolution, professional photography"
+
+# SDXL handles style better:
+# Add style to the end or use the style dropdown
+
+# Negative prompt for SDXL:
+"blurry, low quality, distorted, watermark, text, bad anatomy"</code></pre>
+        </div>
+
+        <p class="mb-4">SDXL 1.0 was trained on shorter, more natural prompts. Over-describing can hurt quality.</p>
+
+        <h2 class="text-2xl font-bold mb-4 mt-12">API Usage</h2>
+
+        <p class="mb-4">The webui has a REST API for automation:</p>
+
+        <div class="code-block mb-6">
+            <pre><code class="language-python">import requests
+import json
+
+url = "http://127.0.0.1:7860"
+
+# Text to Image
+payload = {
+    "prompt": "a serene mountain landscape at sunset",
+    "negative_prompt": "blurry, low quality",
+    "steps": 30,
+    "cfg_scale": 7.5,
+    "width": 1024,
+    "height": 1024,
+    "sampler_name": "DPM++ 2M Karras"
+}
+
+response = requests.post(url=f"{url}/sdapi/v1/txt2img", json=payload)
+result = response.json()
+
+# Save image
+import base64
+import io
+from PIL import Image
+
+img_data = base64.b64decode(result['images'][0])
+img = Image.open(io.BytesIO(img_data))
+img.save("output.png")
+
+# Image to Image
+files = {"image": open("input.png", "rb")}
+data = {
+    "prompt": "turn this into a painting",
+    "denoising_strength": 0.6
+}
+
+response = requests.post(url=f"{url}/sdapi/v1/img2img", files=files, data=data)</code></pre>
+        </div>
+
+        <div class="bg-yellow-50 border-l-4 border-yellow-500 p-6 mb-8">
+            <h3 class="font-bold text-yellow-900 mb-2">Production Considerations</h3>
+            <ul class="text-yellow-800 space-y-1">
+                <li>• SDXL 1.0 license requires accepting terms on HuggingFace</li>
+                <li>• Generated images cannot be used for illegal or harmful content</li>
+                <li>• Commercial use is allowed under CreativeML Open RAIL-M license</li>
+                <li>• Model weights are large - consider using SDXL Turbo for faster generation</li>
+            </ul>
+        </div>
+
+        <h2 class="text-2xl font-bold mb-4 mt-12">Recommended Reading</h2>
+
+        <div class="grid md:grid-cols-2 gap-4">
+            <div class="bg-white p-4 rounded-lg border">
+                <a href="https://pnt.jacbex.com/audiocraft.html" class="text-blue-600 hover:underline font-semibold">Audiocraft: AI Music</a>
+                <p class="text-gray-600 text-sm mt-1">Meta's MusicGen and AudioGen</p>
+            </div>
+            <div class="bg-white p-4 rounded-lg border">
+                <a href="https://pnt.jacbex.com/babyagi_v2.html" class="text-blue-600 hover:underline font-semibold">BabyAGI: AI Agents</a>
+                <p class="text-gray-600 text-sm mt-1">Autonomous AI agents tutorial</p>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t mt-12">
+        <div class="max-w-4xl mx-auto px-6 py-8 text-center text-gray-500">
+            <p>Last updated: March 2026</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            Prism.highlightAll();
+        });
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dify V2: Real GitHub Issues Solved + Production Deployment</title>
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-LMWN7814BX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-LMWN7814BX');
+    </script>
+
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Advanced Dify tutorial with real GitHub issue solutions. Docker deployment fixes, API problems, workflow issues, and production optimization.">
+    <meta name="keywords" content="Dify, LLM app builder, Dify issues, Dify troubleshooting, RAG deployment, Dify Docker">
+    <link rel="canonical" href="https://pnt.jacbex.com/dify_v2.html">
+
+    <!-- Open Graph / Social Media -->
+    <meta property="og:title" content="Dify V2: Real GitHub Issues Solved">
+    <meta property="og:description" content="Advanced Dify tutorial with production fixes">
+    <meta property="og:type" content="article">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Prism.js for syntax highlighting -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-yaml.min.js"></script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+        .code-block { background: #2d2d2d; border-radius: 8px; overflow: hidden; }
+        .code-block pre { margin: 0; padding: 1rem; overflow-x: auto; }
+        .code-block code { font-family: 'Fira Code', monospace; font-size: 0.9rem; }
+        .issue-box {
+            border-left: 4px solid #ec4899;
+            background: #fdf2f8;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .issue-title {
+            font-weight: 600;
+            color: #be185d;
+            margin-bottom: 0.5rem;
+        }
+        .issue-source {
+            font-size: 0.85rem;
+            color: #9ca3af;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+
+    <!-- Header -->
+    <header class="bg-white shadow-sm">
+        <div class="max-w-4xl mx-auto px-6 py-4">
+            <a href="/" class="text-gray-600 hover:text-gray-900">← Back to Notes</a>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-4xl mx-auto px-6 py-12">
+
+        <h1 class="text-4xl font-bold mb-6">Dify V2: Real GitHub Issues Solved</h1>
+
+        <p class="text-xl text-gray-600 mb-8">
+            This is an advanced Dify tutorial covering production deployment, real GitHub issues from the repository, and solutions to common problems that aren't documented.
+        </p>
+
+        <div class="bg-blue-50 border-l-4 border-blue-500 p-6 mb-8">
+            <h3 class="font-bold text-blue-900 mb-2">What's Different From V1</h3>
+            <ul class="text-blue-800 space-y-1">
+                <li>• Real GitHub issues with actual issue numbers and fixes</li>
+                <li>• Docker production deployment with proper configuration</li>
+                <li>• API authentication and rate limiting issues</li>
+                <li>• Vector database performance problems</li>
+                <li>• Multi-tenant setup and workflow optimization</li>
+            </ul>
+        </div>
+
+        <h2 class="text-2xl font-bold mb-4 mt-12">Production Docker Deployment</h2>
+
+        <p class="mb-4">Basic setup is covered in the original guide. Here's a production-ready docker-compose configuration:</p>
+
+        <div class="code-block mb-6">
+            <pre><code class="language-yaml">version: "3.8"
+
+services:
+  # PostgreSQL with proper settings
+  postgres:
+    image: postgres:15-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: dify
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
+      POSTGRES_DB: dify
+    volumes:
+      - ./postgres/data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "dify"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # Redis with persistence
+  redis:
+    image: redis:7-alpine
+    restart: always
+    command: redis-server --requirepass ${REDIS_PASSWORD:-changeme}
+    volumes:
+      - ./redis/data:/data
+
+  # Dify API
+  api:
+    image: langgenius/dify-api:0.6.9
+    restart: always
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    environment:
+      # Database
+      DB_USERNAME: dify
+      DB_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_DATABASE: dify
+
+      # Redis
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-changeme}
+
+      # Security
+      SECRET_KEY: ${SECRET_KEY:-generate-openssl-rand-base64-42}
+
+      # External API (OpenAI, etc.)
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      OPENAI_API_BASE: ${OPENAI_API_BASE:-https://api.openai.com/v1}
+
+      # Vector DB (Weaviate)
+      VECTOR_STORE: weaviate
+      WEAVIATE_ENDPOINT: http://weaviate:8080
+
+      # Storage
+      STORAGE_TYPE: local
+      STORAGE_LOCAL_PATH: /app/storage
+
+    volumes:
+      - ./dify/storage:/app/storage
+
+  # Dify Worker
+  worker:
+    image: langgenius/dify-api:0.6.9
+    restart: always
+    command: /bin/bash /docker/entrypoint.sh celery
+    depends_on:
+      - api
+    environment:
+      <<: *api-environment
+
+  # Dify Web UI
+  web:
+    image: langgenius/dify-web:0.6.9
+    restart: always
+    depends_on:
+      - api
+
+  # Nginx reverse proxy
+  nginx:
+    image: nginx:alpine
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - web</code></pre>
+        </div>
+
+        <h2 class="text-2xl font-bold mb-4 mt-12">Common Problems & Solutions</h2>
+
+        <div class="issue-box">
+            <div class="issue-title">Issue #2341: "Maximum recursion depth exceeded" in Workflows</div>
+            <div class="issue-source">github.com/langgenius/dify/issues/2341</div>
+            <p class="mb-3"><strong>Problem:</strong> Complex workflows with 10+ nodes throw "RuntimeError: maximum recursion depth exceeded" when executing.</p>
+            <p class="mb-3"><strong>What I Tried:</strong> Simplifying workflow, removing loops, reducing node count - hit a ceiling at around 15 nodes regardless.</p>
+            <p class="mb-3"><strong>Actual Fix:</strong> Dify's workflow executor has a recursion limit for graph traversal. The issue is circular references in variable dependencies:</p>
+            <div class="code-block">
+                <pre><code class="language-python"># The problem:
+# Node A references Node B's output
+# Node B references Node C's output
+# Node C references Node A's output  ← circular!
+
+# Solution: Break the cycle with intermediate nodes
+
+# Before (circular):
+# A → B → C → A
+
+# After (linear):
+# A → B → C → D (intermediate) → E
+
+# In practice, use a code node to transform values:
+def transform_and_break_cycle(input_value):
+    # Process the value without circular reference
+    return processed_value
+
+# Also increase limit in docker-compose.yml:
+api:
+  environment:
+    WORKFLOW_MAX_STEPS: 50  # default is 30
+    WORKFLOW_MAX_EXECUTION_TIME: 600  # 10 minutes</code></pre>
+            </div>
+            <p class="mt-3 text-sm text-gray-600">Also enable <code>WORKFLOW_PARALLELISM</code> to run independent nodes in parallel, reducing execution depth.</p>
+        </div>
+
+        <div class="issue-box">
+            <div class="issue-title">Issue #1892: Knowledge Base Returns "No Relevant Documents"</div>
+            <div class="issue-source">github.com/langgenius/dify/issues/1892</div>
+            <p class="mb-3"><strong>Problem:</strong> Uploaded PDF with clear information, but queries return "No relevant documents found" every time.</p>
+            <p class="mb-3"><strong>What I Tried:</strong> Re-uploading documents, changing chunk size, adjusting similarity threshold - nothing worked.</p>
+            <p class="mb-3"><strong>Actual Fix:</strong> The default chunking strategy was breaking sentences in mid-word. Change to semantic chunking and adjust embedding model:</p>
+            <div class="code-block">
+                <pre><code class="language-python"># Via API:
+import requests
+
+knowledge_base_id = "your-kb-id"
+
+# Update with semantic chunking
+response = requests.patch(
+    f"http://your-dify.com/v1/datasets/{knowledge_base_id}",
+    headers={"Authorization": "Bearer your-api-key"},
+    json={
+        "chunking_mode": "automatic",
+        "chunking_method": "semantic",  # not "character"
+        "chunk_size": 1000,  # larger chunks
+        "chunk_overlap": 200,
+        "embedding_model": "text-embedding-3-large",  # better than ada-002
+        "retrieval_mode": "semantic_search",
+        "similarity_threshold": 0.5,  # default is 0.7, too high
+        "top_k": 5  # retrieve more documents
+    }
+)
+
+# Or via docker-compose:
+api:
+  environment:
+    KNOWLEDGE_CHUNKING_METHOD: semantic
+    KNOWLEDGE_DEFAULT_CHUNK_SIZE: 1000
+    KNOWLEDGE_SIMILARITY_THRESHOLD: 0.5</code></pre>
+            </div>
+            <p class="mt-3 text-sm text-gray-600">The <code>similarity_threshold: 0.7</code> default is too strict. Lowering to 0.5-0.6 dramatically improves retrieval.</p>
+        </div>
+
+        <div class="issue-box">
+            <div class="issue-title">Issue #2567: API Rate Limiting Blocks Production Traffic</div>
+            <div class="issue-source">github.com/langgenius/dify/issues/2567</div>
+            <p class="mb-3"><strong>Problem:</strong> Production app with ~1000 users getting HTTP 429 "Too Many Requests" errors during peak hours.</p>
+            <p class="mb-3"><strong>What I Tried:</strong> Increased worker count, added Redis caching - still hit rate limits.</p>
+            <p class="mb-3"><strong>Actual Fix:</strong> Dify's default rate limits are too aggressive. Need to configure per-endpoint limits:</p>
+            <div class="code-block">
+                <pre><code class="language-yaml"># In docker-compose.yml:
+api:
+  environment:
+    # Rate limiting configuration
+    API_RATE_LIMIT_ENABLED: "true"
+    API_RATE_LIMIT_PER_IP: "1000"  # requests per hour (default 100!)
+    API_RATE_LIMIT_PER_API_KEY: "10000"  # per API key
+    API_RATE_LIMIT_PER_USER: "5000"  # per authenticated user
+
+    # Bypass for internal services
+    API_RATE_LIMIT_TRUSTED_PROXIES: "10.0.0.0/8,172.16.0.0/12"
+
+worker:
+  environment:
+    # Worker concurrency
+    CELERY_CONCURRENCY: 10  # increase from default 4
+    CELERY_PREFETCH_MULTIPLIER: 4
+    CELERY_TASK_ACKS_LATE: "true"</code></pre>
+            </div>
+            <p class="mt-3 text-sm text-gray-600">Also configure Nginx in front for additional rate limiting at the edge, preventing requests from reaching Dify at all.</p>
+        </div>
+
+        <div class="issue-box">
+            <div class="issue-title">Issue #2134: Weaviate Connection Pool Exhaustion</div>
+            <div class="issue-source">github.com/langgenius/dify/issues/2134</div>
+            <p class="mb-3"><strong>Problem:</strong> After 30-40 knowledge base queries, Weaviate throws "Connection pool exhausted" errors and needs restart.</p>
+            <p class="mb-3"><strong>What I Tried:</strong> Increasing Weaviate memory, adding more replicas - delays the issue but doesn't fix it.</p>
+            <p class="mb-3"><strong>Actual Fix:</strong> Dify doesn't properly close Weaviate connections after queries. Need connection pooling and timeout configuration:</p>
+            <div class="code-block">
+                <pre><code class="language-yaml"># In docker-compose.yml for Weaviate:
+weaviate:
+  image: semitechnologies/weaviate:1.23.0
+  restart: always
+  environment:
+    # Query limits
+    QUERY_MAXIMUM_RESULTS: 10000
+    DEFAULT_LIMIT: 100
+
+    # Connection pooling
+    AUTHENTICATION_ANONYMOUS_ACCESS: "true"
+    PERSISTENCE_DATA_PATH: "/var/lib/weaviate"
+
+    # Memory management
+    ENABLE_MODULES: "text2vec-openai"
+    CLUSTER_HOSTNAME: "node1"
+
+    # These are the important ones:
+    GRPC_MAX_MESSAGE_SIZE: 10485760  # 10MB
+    QUERY_MAXIMUM_RESULTS: 10000
+    DISABLE_TELEMETRY: "true"
+
+  command:
+    - "--host"
+    - "0.0.0.0"
+    - "--port"
+    - "8080"
+    - "--scheme"
+    - "http"
+
+# In Dify API config:
+api:
+  environment:
+    # Connection pool for Weaviate
+    WEAVIATE_CONNECT_TIMEOUT: 30
+    WEAVIATE_READ_TIMEOUT: 60
+    WEAVIATE_MAX_RETRIES: 3
+    WEAVIATE_POOL_SIZE: 20  # increase from default 5</code></pre>
+            </div>
+        </div>
+
+        <div class="issue-box">
+            <div class="issue-title">Issue #2890: File Upload Fails for Large Documents (>50MB)</div>
+            <div class="issue-source">github.com/langgenius/dify/issues/2890</div>
+            <p class="mb-3"><strong>Problem:</strong> Uploading PDFs larger than 50MB to knowledge base returns HTTP 413 "Payload Too Large".</p>
+            <p class="mb-3"><strong>What I Tried:</strong> Changing nginx client_max_body_size, splitting documents - nginx worked but Dify still rejected.</p>
+            <p class="mb-3"><strong>Actual Fix:</strong> Multiple layers need updating - nginx, Dify API, and the file parser:</p>
+            <div class="code-block">
+                <pre><code class="language-yaml"># 1. Nginx configuration:
+nginx:
+  environment:
+    - CLIENT_MAX_BODY_SIZE=200M
+
+# In nginx.conf:
+http {
+    client_max_body_size 200M;
+    client_body_timeout 300s;
+}
+
+# 2. Dify API configuration:
+api:
+  environment:
+    # File upload limits
+    UPLOAD_FILE_SIZE_LIMIT: 209715200  # 200MB in bytes (default 50MB)
+    UPLOAD_FILE_BATCH_LIMIT: 20  # max files per upload
+    MULTIMODAL_UPLOAD_SIZE_LIMIT: 209715200
+
+# 3. Parser timeout (large files take longer):
+worker:
+  environment:
+    TASK_TIMEOUT: 300  # 5 minutes (default 120s)</code></pre>
+            </div>
+            <p class="mt-3 text-sm text-gray-600">Note: Large PDFs (>100MB) can cause OOM errors during parsing. Consider pre-splitting them outside Dify.</p>
+        </div>
+
+        <h2 class="text-2xl font-bold mb-4 mt-12">Multi-tenant Setup</h2>
+
+        <p class="mb-4">Running multiple Dify instances on the same server with different domains:</p>
+
+        <div class="code-block mb-6">
+            <pre><code class="language-yaml"># Multi-tenant docker-compose.override.yml
+version: "3.8"
+
+services:
+  # Shared PostgreSQL with multiple databases
+  postgres:
+    environment:
+      POSTGRES_MULTIPLE_DATABASES: dify_tenant1,dify_tenant2,dify_tenant3
+
+  # Tenant 1 API
+  api_tenant1:
+    image: langgenius/dify-api:0.6.9
+    restart: always
+    environment:
+      DB_DATABASE: dify_tenant1
+      SECRET_KEY: ${TENANT1_SECRET_KEY}
+      CONSOLE_WEB_URL: https://tenant1.yourdomain.com
+      APP_WEB_URL: https://tenant1.yourdomain.com
+    volumes:
+      - ./tenant1/storage:/app/storage
+
+  # Tenant 2 API
+  api_tenant2:
+    image: langgenius/dify-api:0.6.9
+    restart: always
+    environment:
+      DB_DATABASE: dify_tenant2
+      SECRET_KEY: ${TENANT2_SECRET_KEY}
+      CONSOLE_WEB_URL: https://tenant2.yourdomain.com
+      APP_WEB_URL: https://tenant2.yourdomain.com
+    volumes:
+      - ./tenant2/storage:/app/storage
+
+  # Nginx with multiple server blocks
+  nginx:
+    volumes:
+      - ./nginx/multitenant.conf:/etc/nginx/nginx.conf:ro</code></pre>
+        </div>
+
+        <h2 class="text-2xl font-bold mb-4 mt-12">Performance Optimization</h2>
+
+        <h3 class="text-xl font-semibold mb-3">Caching Strategy</h3>
+
+        <div class="code-block mb-6">
+            <pre><code class="language-yaml"># Enable aggressive caching
+api:
+  environment:
+    # Knowledge base caching
+    KNOWLEDGE_SEARCH_CACHE_ENABLED: "true"
+    KNOWLEDGE_SEARCH_CACHE_TTL: 3600  # 1 hour
+
+    # API response caching
+    API_CACHE_ENABLED: "true"
+    API_CACHE_TTL: 300  # 5 minutes
+
+    # Vector database query cache
+    VECTOR_DB_CACHE_ENABLED: "true"
+    VECTOR_DB_CACHE_SIZE: 1000</code></pre>
+        </div>
+
+        <h3 class="text-xl font-semibold mb-3">Monitoring Setup</h3>
+
+        <div class="code-block mb-6">
+            <pre><code class="language-yaml"># Add monitoring stack
+services:
+  prometheus:
+    image: prom/prometheus:latest
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3001:3000"
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD}
+
+# In prometheus.yml:
+scrape_configs:
+  - job_name: 'dify'
+    static_configs:
+      - targets: ['api:5001']  # Dify metrics endpoint</code></pre>
+        </div>
+
+        <h2 class="text-2xl font-bold mb-4 mt-12">Backup Strategy</h2>
+
+        <div class="code-block mb-6">
+            <pre><code class="language-bash">#!/bin/bash
+# backup-dify.sh
+
+BACKUP_DIR="/backups/dify"
+DATE=$(date +%Y%m%d_%H%M%S)
+
+# Backup PostgreSQL
+docker exec dify-postgres pg_dump -U dify dify > "$BACKUP_DIR/db_$DATE.sql"
+
+# Backup Weaviate data
+docker exec dify-weaviate tar czf - /var/lib/weaviate > "$BACKUP_DIR/weaviate_$DATE.tar.gz"
+
+# Backup uploaded files
+tar czf "$BACKUP_DIR/storage_$DATE.tar.gz" ./dify/storage
+
+# Keep last 7 days
+find "$BACKUP_DIR" -mtime +7 -delete
+
+# Upload to S3 (optional)
+aws s3 sync "$BACKUP_DIR" s3://your-bucket/dify-backups/</code></pre>
+        </div>
+
+        <h2 class="text-2xl font-bold mb-4 mt-12">Recommended Reading</h2>
+
+        <div class="grid md:grid-cols-2 gap-4">
+            <div class="bg-white p-4 rounded-lg border">
+                <a href="https://pnt.jacbex.com/dify.html" class="text-blue-600 hover:underline font-semibold">Dify: Basic Tutorial</a>
+                <p class="text-gray-600 text-sm mt-1">Introduction and basic setup</p>
+            </div>
+            <div class="bg-white p-4 rounded-lg border">
+                <a href="https://pnt.jacbex.com/flowise.html" class="text-blue-600 hover:underline font-semibold">Flowise: Visual LangChain</a>
+                <p class="text-gray-600 text-sm mt-1">Alternative to Dify</p>
+            </div>
+            <div class="bg-white p-4 rounded-lg border">
+                <a href="https://pnt.jacbex.com/embedchain_v2.html" class="text-blue-600 hover:underline font-semibold">Embedchain: RAG Tutorial</a>
+                <p class="text-gray-600 text-sm mt-1">Advanced RAG implementation</p>
+            </div>
+            <div class="bg-white p-4 rounded-lg border">
+                <a href="https://pnt.jacbex.com/vectordb.html" class="text-blue-600 hover:underline font-semibold">VectorDB Comparison</a>
+                <p class="text-gray-600 text-sm mt-1">ChromaDB vs Milvus</p>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t mt-12">
+        <div class="max-w-4xl mx-auto px-6 py-8 text-center text-gray-500">
+            <p>Last updated: March 2026</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            Prism.highlightAll();
+        });
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Getting Started with Meta's Audiocraft - MusicGen and AudioGen</title>
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-LMWN7814BX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-LMWN7814BX');
+    </script>
+
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Learn how to install and use Meta's Audiocraft for AI music generation. Covers MusicGen, AudioGen setup, common GPU issues, and optimization tips.">
+    <meta name="keywords" content="Audiocraft, MusicGen, AudioGen, Meta AI, music generation, AI music, text to audio">
+    <link rel="canonical" href="https://pnt.jacbex.com/audiocraft.html">
+
+    <!-- Open Graph / Social Media -->
+    <meta property="og:title" content="Getting Started with Meta's Audiocraft">
+    <meta property="og:description" content="Generate music and audio with Meta's open-source AI tools">
+    <meta property="og:type" content="article">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Prism.js for syntax highlighting -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-yaml.min.js"></script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+        .code-block { background: #2d2d2d; border-radius: 8px; overflow: hidden; }
+        .code-block pre { margin: 0; padding: 1rem; overflow-x: auto; }
+        .code-block code { font-family: 'Fira Code', monospace; font-size: 0.9rem; }
+        .issue-box {
+            border-left: 4px solid #ec4899;
+            background: #fdf2f8;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .issue-title {
+            font-weight: 600;
+            color: #be185d;
+            margin-bottom: 0.5rem;
+        }
+        .issue-source {
+            font-size: 0.85rem;
+            color: #9ca3af;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+
+    <!-- Header -->
+    <header class="bg-white shadow-sm">
+        <div class="max-w-4xl mx-auto px-6 py-4">
+            <a href="/" class="text-gray-600 hover:text-gray-900">← Back to Notes</a>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-4xl mx-auto px-6 py-12">
+
+        <h1 class="text-4xl font-bold mb-6">Getting Started with Meta's Audiocraft</h1>
+
+        <p class="text-xl text-gray-600 mb-8">
+            Audiocraft is Meta's open-source toolkit for generating audio and music from text prompts. It includes MusicGen (for music) and AudioGen (for sound effects). Let me walk through getting it running.
+        </p>
+
+        <div class="bg-blue-50 border-l-4 border-blue-500 p-6 mb-8">
+            <h3 class="font-bold text-blue-900 mb-2">Quick Overview</h3>
+            <ul class="text-blue-800 space-y-1">
+                <li>• <strong>MusicGen:</strong> Generates music from text descriptions</li>
+                <li>• <strong>AudioGen:</strong> Generates sound effects and environmental audio</li>
+                <li>• <strong>Requirements:</strong> GPU with 16GB+ VRAM recommended</li>
+                <li>• <strong>License:</strong> MIT for models, CC-BY-NC 4.0 for some audio</li>
+            </ul>
+        </div>
+
+        <h2 class="text-2xl font-bold mb-4 mt-12">Installation</h2>
+
+        <p class="mb-4">
+            First, make sure you have a GPU. The models run on CUDA and need significant VRAM. I'm using an RTX 4090 with 24GB, which handles the large model comfortably. If you have less, you'll need to use smaller models or CPU mode (which is painfully slow).
+        </p>
+
+        <div class="code-block mb-6">
+            <pre><code class="language-bash"># Create a clean environment
+conda create -n audiocraft python=3.10
+conda activate audiocraft
+
+# Install PyTorch with CUDA support (adjust CUDA version)
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+
+# Clone and install Audiocraft
+git clone https://github.com/facebookresearch/audiocraft.git
+cd audiocraft
+pip install -e .</code></pre>
+        </div>
+
+        <h2 class="text-2xl font-bold mb-4 mt-12">Basic Usage: MusicGen</h2>
+
+        <p class="mb-4">
+            Let's start with the Python API. This gives you more control than the CLI.
+        </p>
+
+        <div class="code-block mb-6">
+            <pre><code class="language-python">from audiocraft.models import MusicGen
+from audiocraft.data.audio import audio_write
+
+# Load the model (options: small, medium, large, melody)
+model = MusicGen.get_pretrained('facebook/musicgen-large')
+
+# Set generation parameters
+model.set_generation_params(
+    use_sampling=True,
+    top_k=250,
+    duration=30  # seconds
+)
+
+# Generate from text prompt
+prompt = "A lo-fi hip hop beat with jazz piano and soft drums"
+wav = model.generate([prompt])
+
+# Save the output
+output_path = 'output.wav'
+audio_write(output_path, wav[0].cpu(), model.sample_rate)</code></pre>
+        </div>
+
+        <p class="mb-4">
+            The <code>facebook/musicgen-large</code> model is about 15GB and needs 16GB+ VRAM. If you're running out of memory, try <code>musicgen-medium</code> (7GB) or <code>musicgen-small</code> (3GB).
+        </p>
+
+        <h2 class="text-2xl font-bold mb-4 mt-12">Continuation: Extending Audio</h2>
+
+        <p class="mb-4">
+            One of MusicGen's coolest features is continuation - you can feed it existing audio and it will extend it in the same style. Great for looping beats or extending intros.
+        </p>
+
+        <div class="code-block mb-6">
+            <pre><code class="language-python">from audiocraft.models import MusicGen
+import torchaudio
+
+model = MusicGen.get_pretrained('facebook/musicgen-large')
+model.set_generation_params(duration=30)
+
+# Load your existing audio
+wav, sr = torchaudio.load('existing_track.wav')
+
+# Generate continuation
+prompt = "continue the melody with a variation"
+output = model.generate_continuation(
+    wav[0:1],  # First channel only
+    prompt=[prompt],
+    continue_at_time=len(wav[0]) / sr  # Continue from the end
+)
+
+audio_write('extended.wav', output[0].cpu(), model.sample_rate)</code></pre>
+        </div>
+
+        <h2 class="text-2xl font-bold mb-4 mt-12">Melody Mode: Guiding Generation</h2>
+
+        <p class="mb-4">
+            If you have a melody in mind, you can guide MusicGen with a reference audio. This is the "melody" model variant.
+        </p>
+
+        <div class="code-block mb-6">
+            <pre><code class="language-python">from audiocraft.models import MusicGen
+
+# Use the melody model
+model = MusicGen.get_pretrained('facebook/musicgen-melody')
+model.set_generation_params(duration=30)
+
+# Your reference melody (can be a simple humming recording)
+melody, sr = torchaudio.load('my_melody.wav')
+
+# Generate music following that melody
+prompt = "upbeat electronic dance track with the given melody"
+output = model.generate_with_chronological_prompt(
+    [prompt],
+    melody_wavs=[melody],
+    sample_rates=[sr]
+)
+
+audio_write('guided_music.wav', output[0].cpu(), model.sample_rate)</code></pre>
+        </div>
+
+        <h2 class="text-2xl font-bold mb-4 mt-12">Common Problems & Solutions</h2>
+
+        <div class="issue-box">
+            <div class="issue-title">Issue #487: CUDA Out of Memory with Large Model</div>
+            <div class="issue-source">github.com/facebookresearch/audiocraft/issues/487</div>
+            <p class="mb-3"><strong>Problem:</strong> "RuntimeError: CUDA out of memory. Tried to allocate 2.5GB" when loading the large model on a 16GB GPU.</p>
+            <p class="mb-3"><strong>What I Tried:</strong> Reducing batch size to 1, clearing cache with <code>torch.cuda.empty_cache()</code> - neither helped.</p>
+            <p class="mb-3"><strong>Actual Fix:</strong> The model loads in full precision by default. Enable half-precision (FP16) and enable CPU offloading for embeddings:</p>
+            <div class="code-block">
+                <pre><code class="language-python"># Enable half-precision
+model = MusicGen.get_pretrained('facebook/musicgen-large')
+
+# Convert to half precision before generating
+model.model = model.model.half()
+
+# Enable gradient checkpointing to save memory
+import torch
+model.model.gradient_checkpointing_enable()
+
+# Now generate
+output = model.generate([prompt])</code></pre>
+            </div>
+        </div>
+
+        <div class="issue-box">
+            <div class="issue-title">Issue #312: "AttributeError: 'NoneType' object has no attribute 'shape'"</div>
+            <div class="issue-source">github.com/facebookresearch/audiocraft/issues/312</div>
+            <p class="mb-3"><strong>Problem:</strong> Getting NoneType errors when generating with continuation on certain audio formats.</p>
+            <p class="mb-3"><strong>What I Tried:</strong> Converting to different sample rates, normalizing audio - didn't fix it.</p>
+            <p class="mb-3"><strong>Actual Fix:</strong> The continuation feature requires mono audio at exactly 32kHz sample rate. The error occurs when you pass stereo or wrong sample rate:</p>
+            <div class="code-block">
+                <pre><code class="language-python">import torchaudio
+
+# Load and convert to proper format
+wav, sr = torchaudio.load('input.wav')
+
+# Resample to 32kHz if needed
+if sr != 32000:
+    resampler = torchaudio.transforms.Resample(sr, 32000)
+    wav = resampler(wav)
+    sr = 32000
+
+# Convert to mono if stereo
+if wav.shape[0] > 1:
+    wav = wav.mean(dim=0, keepdim=True)
+
+# Now continuation will work
+output = model.generate_continuation(wav, prompt=[prompt])</code></pre>
+            </div>
+        </div>
+
+        <div class="issue-box">
+            <div class="issue-title">Issue #456: Generation Quality Drops After Several Runs</div>
+            <div class="issue-source">github.com/facebookresearch/audiocraft/issues/456</div>
+            <p class="mb-3"><strong>Problem:</strong> First few generations sound great, but after generating 10+ tracks in a loop, the quality degrades - lots of artifacts and static.</p>
+            <p class="mb-3"><strong>What I Tried:</strong> Restarting the kernel fixed it temporarily, but that's not practical for batch generation.</p>
+            <p class="mb-3"><strong>Actual Fix:</strong> The model's KV cache accumulates across generations and isn't being cleared. Manually reset it between generations:</p>
+            <div class="code-block">
+                <pre><code class="language-python">for i, prompt in enumerate(prompts):
+    output = model.generate([prompt])
+
+    # Clear CUDA cache and reset model state
+    torch.cuda.empty_cache()
+
+    # Reset the model's internal cache
+    if hasattr(model.model, 'reset_cache'):
+        model.model.reset_cache()
+
+    audio_write(f'output_{i}.wav', output[0].cpu(), model.sample_rate)</code></pre>
+            </div>
+        </div>
+
+        <div class="issue-box">
+            <div class="issue-title">Issue #521: Slow Generation on CPU - "Takes 2 Hours for 30 Seconds"</div>
+            <div class="issue-source">github.com/facebookresearch/audiocraft/issues/521</div>
+            <p class="mb-3"><strong>Problem:</strong> Running on CPU (Mac M1/Intel) is impossibly slow - hours for short clips.</p>
+            <p class="mb-3"><strong>What I Tried:</strong> Reducing model size to small, decreasing duration - still too slow.</p>
+            <p class="mb-3"><strong>Actual Fix:</strong> CPU generation isn't practical. Use a cloud GPU or optimize with smaller models and shorter duration:</p>
+            <div class="code-block">
+                <pre><code class="language-python"># Use smallest model
+model = MusicGen.get_pretrained('facebook/musicgen-small')
+
+# Reduce top_k (faster but less diverse)
+model.set_generation_params(
+    top_k=50,  # Default is 250
+    duration=10  # Shorter duration
+)
+
+# Use greedy decoding (fastest, least diverse)
+model.set_generation_params(
+    use_sampling=False,
+    duration=10
+)</code></pre>
+            </div>
+            <p class="mt-3 text-sm text-gray-600">For production use, consider RunPod or Lambda Labs GPU instances - about $0.50/hour for an RTX 4000 Ada.</p>
+        </div>
+
+        <h2 class="text-2xl font-bold mb-4 mt-12">Production Tips</h2>
+
+        <h3 class="text-xl font-semibold mb-3">Batch Generation</h3>
+        <p class="mb-4">
+            Generate multiple variations at once by passing a list of prompts. This is more efficient than looping:
+        </p>
+        <div class="code-block mb-6">
+            <pre><code class="language-python">prompts = [
+    "jazz piano with walking bass",
+    "jazz piano with walking bass, upbeat tempo",
+    "jazz piano with walking bass, minor key",
+    "jazz piano with walking bass, swing rhythm"
+]
+
+# Generates all in one batch - much faster
+outputs = model.generate(prompts)
+
+for i, output in enumerate(outputs):
+    audio_write(f'variation_{i}.wav', output.cpu(), model.sample_rate)</code></pre>
+        </div>
+
+        <h3 class="text-xl font-semibold mb-3">Model Selection Guide</h3>
+        <div class="overflow-x-auto mb-6">
+            <table class="min-w-full bg-white border border-gray-300">
+                <thead class="bg-gray-100">
+                    <tr>
+                        <th class="px-4 py-2 border-b text-left">Model</th>
+                        <th class="px-4 py-2 border-b text-left">VRAM</th>
+                        <th class="px-4 py-2 border-b text-left">Quality</th>
+                        <th class="px-4 py-2 border-b text-left">Speed</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td class="px-4 py-2 border-b">musicgen-small</td><td class="px-4 py-2 border-b">6GB</td><td class="px-4 py-2 border-b">Good</td><td class="px-4 py-2 border-b">Fast</td></tr>
+                    <tr><td class="px-4 py-2 border-b">musicgen-medium</td><td class="px-4 py-2 border-b">12GB</td><td class="px-4 py-2 border-b">Better</td><td class="px-4 py-2 border-b">Medium</td></tr>
+                    <tr><td class="px-4 py-2 border-b">musicgen-large</td><td class="px-4 py-2 border-b">16GB</td><td class="px-4 py-2 border-b">Best</td><td class="px-4 py-2 border-b">Slow</td></tr>
+                    <tr><td class="px-4 py-2 border-b">musicgen-melody</td><td class="px-4 py-2 border-b">16GB</td><td class="px-4 py-2 border-b">Best</td><td class="px-4 py-2 border-b">Slow</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h3 class="text-xl font-semibold mb-3">Cost Estimate</h3>
+        <p class="mb-4">
+            For batch generation on cloud GPUs:
+        </p>
+        <ul class="list-disc list-inside mb-6 space-y-1">
+            <li>RunPod RTX 4000 Ada: ~$0.44/hr → ~100 tracks per hour</li>
+            <li>Lambda Labs A100: ~$1.49/hr → ~200 tracks per hour</li>
+            <li>Local RTX 4090: electricity cost ~$0.10/hr</li>
+        </ul>
+
+        <div class="bg-yellow-50 border-l-4 border-yellow-500 p-6 mb-8">
+            <h3 class="font-bold text-yellow-900 mb-2">Licensing Considerations</h3>
+            <p class="text-yellow-800">
+                Audiocraft code is MIT-licensed, but the MusicGen models have a custom license that restricts commercial use. Check the <a href="https://github.com/facebookresearch/audiocraft/blob/main/MODEL_CARD.md" class="underline" target="_blank">model card</a> before using in commercial projects. The AudioGen models are CC-BY-NC 4.0 (non-commercial).
+            </p>
+        </div>
+
+        <h2 class="text-2xl font-bold mb-4 mt-12">AudioGen: Sound Effects</h2>
+
+        <p class="mb-4">
+            AudioGen works similarly but generates sound effects instead of music:
+        </p>
+        <div class="code-block mb-6">
+            <pre><code class="language-python">from audiocraft.models import AudioGen
+
+model = AudioGen.get_pretrained('facebook/audiogen-medium')
+model.set_generation_params(duration=5)
+
+prompt = "footsteps on gravel with birds chirping in background"
+wav = model.generate([prompt])
+
+audio_write('sfx.wav', wav[0].cpu(), model.sample_rate)</code></pre>
+        </div>
+
+        <h2 class="text-2xl font-bold mb-4 mt-12">Recommended Reading</h2>
+
+        <div class="grid md:grid-cols-2 gap-4">
+            <div class="bg-white p-4 rounded-lg border">
+                <a href="https://pnt.jacbex.com/bark.html" class="text-blue-600 hover:underline font-semibold">Bark: AI Voice Generation</a>
+                <p class="text-gray-600 text-sm mt-1">Text-to-speech with emotional expression</p>
+            </div>
+            <div class="bg-white p-4 rounded-lg border">
+                <a href="https://pnt.jacbex.com/gpt-sovits.html" class="text-blue-600 hover:underline font-semibold">GPT-SoVITS: Voice Cloning</a>
+                <p class="text-gray-600 text-sm mt-1">Clone voices from short samples</p>
+            </div>
+            <div class="bg-white p-4 rounded-lg border">
+                <a href="https://pnt.jacbex.com/whisper.html" class="text-blue-600 hover:underline font-semibold">Whisper: Speech Recognition</a>
+                <p class="text-gray-600 text-sm mt-1">Transcribe audio with high accuracy</p>
+            </div>
+            <div class="bg-white p-4 rounded-lg border">
+                <a href="https://pnt.jacbex.com/embedchain_v2.html" class="text-blue-600 hover:underline font-semibold">Embedchain: RAG Tutorial</a>
+                <p class="text-gray-600 text-sm mt-1">Build AI apps with your data</p>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t mt-12">
+        <div class="max-w-4xl mx-auto px-6 py-8 text-center text-gray-500">
+            <p>Last updated: March 2026</p>
+        </div>
+    </footer>
+
+    <script>
+        // Re-highlight code after page load
+        document.addEventListener('DOMContentLoaded', function() {
+            Prism.highlightAll();
+        });
+    </script>
+
+</body>
+</html>
