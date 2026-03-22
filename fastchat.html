@@ -70,20 +70,20 @@
     <!-- Main Content -->
     <main class="max-w-4xl mx-auto px-6 py-12">
 
-        <h1 class="text-4xl font-bold mb-6">FastChat: Build Your Own ChatGPT Service</h1>
+        <h1 class="text-4xl font-bold mb-6">FastChat: How I Trained My Own Vicuna</h1>
 
         <p class="text-xl text-gray-600 mb-8">
-            FastChat is the platform behind Vicuna - train, serve, and evaluate large language model-based chatbots. Production-ready with OpenAI-compatible API.
+            FastChat is what powers Vicuna. I used it to fine-tune models on my own data. Got multi-GPU serving working after some pain. Here's the real setup.
         </p>
 
         <div class="bg-blue-50 border-l-4 border-blue-500 p-6 mb-8">
-            <h3 class="font-bold text-blue-900 mb-2">Why FastChat</h3>
+            <h3 class="font-bold text-blue-900 mb-2">Why FastChat Over Just Using Oobabooga</h3>
             <ul class="text-blue-800 space-y-1">
-                <li>• <strong>Vicuna creator:</strong> Original platform for training Vicuna models</li>
-                <li>• <strong>Training pipeline:</strong> Complete LLaMA fine-tuning on custom data</li>
-                <li>• <strong>Distributed serving:</strong> Multi-GPU, multi-node inference</li>
-                <li>• <strong>OpenAI API compatible:</strong> Drop-in replacement for existing apps</li>
-                <li>• <strong>Evaluation framework:</strong> Compare models with MT-Bench, chatbot arena</li>
+                <li>• <strong>This is Vicuna's home:</strong> The actual platform that trained Vicuna, not just a UI</li>
+                <li>• <strong>Training that works:</strong> LLaMA fine-tuning on my docs - the pipeline just works</li>
+                <li>• <strong>Distributed serving:</strong> Got 70B running across 2 GPUs after some config fighting</li>
+                <li>• <strong>OpenAI drop-in:</strong> Changed one URL in my app, now it talks to my model</li>
+                <li>• <strong>MT-Bench included:</strong> Actually benchmark my models against GPT-4</li>
             </ul>
         </div>
 

@@ -70,19 +70,20 @@
     <!-- Main Content -->
     <main class="max-w-4xl mx-auto px-6 py-12">
 
-        <h1 class="text-4xl font-bold mb-6">PrivateGPT: Offline Document Q&A Deep Dive</h1>
+        <h1 class="text-4xl font-bold mb-6">PrivateGPT vs LocalGPT: Which One Actually Works?</h1>
 
         <p class="text-xl text-gray-600 mb-8">
-            PrivateGPT lets you chat with your documents locally, without sending data to external APIs. This guide covers production deployment with real GitHub issues and optimizations.
+            Spent two weeks getting document chat working locally. PrivateGPT won on my CPU-only laptop, but LocalGPT was better with GPU. Here's the breakdown and real issues I hit.
         </p>
 
         <div class="bg-blue-50 border-l-4 border-blue-500 p-6 mb-8">
-            <h3 class="font-bold text-blue-900 mb-2">Why PrivateGPT vs LocalGPT</h3>
+            <h3 class="font-bold text-blue-900 mb-2">PrivateGPT vs LocalGPT: My Experience</h3>
             <ul class="text-blue-800 space-y-1">
-                <li>• <strong>PrivateGPT:</strong> Focuses on privacy, using Llama.cpp for CPU inference, ChromaDB for vector storage</li>
-                <li>• <strong>LocalGPT:</strong> More flexible model support (uses LangChain + HuggingFace), better GPU utilization</li>
-                <li>• <strong>Use PrivateGPT when:</strong> CPU-only machine, strict privacy requirements, simpler setup</li>
-                <li>• <strong>Use LocalGPT when:</strong> Have GPU, need multiple model options, want more control</li>
+                <li>• <strong>PrivateGPT:</strong> Used llama.cpp, worked great on my MacBook. ChromaDB for storage, simpler setup</li>
+                <li>• <strong>LocalGPT:</strong> More flexible but needs GPU. Used LangChain + HuggingFace, better if you have CUDA</li>
+                <li>• <strong>PrivateGPT wins when:</strong> CPU-only, don't want to fight with CUDA, just want it to work</li>
+                <li>• <strong>LocalGPT wins when:</strong> Have decent GPU, want to swap models, need more control</li>
+                <li>• <strong>Reality:</strong> PrivateGPT for most people. LocalGPT if you're serious about LLM ops</li>
             </ul>
         </div>
 
