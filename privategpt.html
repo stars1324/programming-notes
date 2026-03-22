@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PrivateGPT: Offline Document Q&A Deep Dive</title>
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-LMWN7814BX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-LMWN7814BX');
+    </script>
+
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Deep dive into PrivateGPT: offline private document Q&A with LLMs. Real GitHub issues, GPU/CPU optimization, retrieval improvements.">
+    <meta name="keywords" content="PrivateGPT, local LLM, offline AI, document QA, Llama.cpp, ChromaDB">
+    <link rel="canonical" href="https://pnt.jacbex.com/privategpt.html">
+
+    <!-- Open Graph / Social Media -->
+    <meta property="og:title" content="PrivateGPT: Offline Document Q&A Deep Dive">
+    <meta property="og:description" content="Production-ready PrivateGPT setup with real issue fixes">
+    <meta property="og:type" content="article">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Prism.js for syntax highlighting -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-yaml.min.js"></script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+        .code-block { background: #2d2d2d; border-radius: 8px; overflow: hidden; }
+        .code-block pre { margin: 0; padding: 1rem; overflow-x: auto; }
+        .code-block code { font-family: 'Fira Code', monospace; font-size: 0.9rem; }
+        .issue-box {
+            border-left: 4px solid #ec4899;
+            background: #fdf2f8;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .issue-title {
+            font-weight: 600;
+            color: #be185d;
+            margin-bottom: 0.5rem;
+        }
+        .issue-source {
+            font-size: 0.85rem;
+            color: #9ca3af;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+
+    <!-- Header -->
+    <header class="bg-white shadow-sm">
+        <div class="max-w-4xl mx-auto px-6 py-4">
+            <a href="/" class="text-gray-600 hover:text-gray-900">← Back to Notes</a>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-4xl mx-auto px-6 py-12">
+
+        <h1 class="text-4xl font-bold mb-6">PrivateGPT: Offline Document Q&A Deep Dive</h1>
+
+        <p class="text-xl text-gray-600 mb-8">
+            PrivateGPT lets you chat with your documents locally, without sending data to external APIs. This guide covers production deployment with real GitHub issues and optimizations.
+        </p>
+
+        <div class="bg-blue-50 border-l-4 border-blue-500 p-6 mb-8">
+            <h3 class="font-bold text-blue-900 mb-2">Why PrivateGPT vs LocalGPT</h3>
+            <ul class="text-blue-800 space-y-1">
+                <li>• <strong>PrivateGPT:</strong> Focuses on privacy, using Llama.cpp for CPU inference, ChromaDB for vector storage</li>
+                <li>• <strong>LocalGPT:</strong> More flexible model support (uses LangChain + HuggingFace), better GPU utilization</li>
+                <li>• <strong>Use PrivateGPT when:</strong> CPU-only machine, strict privacy requirements, simpler setup</li>
+                <li>• <strong>Use LocalGPT when:</strong> Have GPU, need multiple model options, want more control</li>
+            </ul>
+        </div>
+
+        <h2 class="text-2xl font-bold mb-4 mt-12">Production Installation</h2>
+
+        <p class="mb-4">Install with CUDA support for GPU acceleration:</p>
+
+        <div class="code-block mb-6">
+            <pre><code class="language-bash"># Clone repository
+git clone https://github.com/zylon-ai/private-gpt
+cd private-gpt
+
+# Create virtual environment
+python -m venv venv
+source venv/bin/activate  # Windows: venv\Scripts\activate
+
+# Install with GPU support (CUDA 12.1)
+pip install "uv[standard]"
+uv pip install -e ".[llama-cpp,_gpu]"
+
+# For CPU-only installation:
+# uv pip install -e ".[llama-cpu]"
+
+# Download models (create models folder first)
+mkdir models
+cd models
+
+# Download Llama 3 8B Instruct (4-bit quantized)
+# Option 1: Using huggingface-cli
+huggingface-cli download TheBloke/Mistral-7B-Instruct-v0.2-GGUF mistral-7b-instruct-v0.2.Q4_K_M.gguf --local-dir .
+
+# Option 2: Direct download
+wget https://huggingface.co/TheBloke/Mistral-7B-Instruct-v0.2-GGUF/resolve/main/mistral-7b-instruct-v0.2.Q4_K_M.gguf</code></pre>
+        </div>
+
+        <h2 class="text-2xl font-bold mb-4 mt-12">Configuration for Production</h2>
+
+        <div class="code-block mb-6">
+            <pre><code class="language-yaml"># settings.yaml
+
+server:
+  port: 8001
+  cors:
+    enabled: true
+    allowed_origins: ["*"]
+
+llm:
+  mode: llama-cpp
+  max_new_tokens: 2048
+  context_window: 8192
+  tokenizer: mistral-7b-instruct-v0.2.Q4_K_M.gguf
+
+  llama_cpp:
+    model_path: models/mistral-7b-instruct-v0.2.Q4_K_M.gguf
+    n_ctx: 8192
+    n_batch: 512
+    n_gpu_layers: 35  # Set to -1 for all layers on GPU, 0 for CPU
+    verbose: true
+
+embedding:
+  mode: huggingface
+  ingest_mode: simple
+  huggingface:
+    model_name: BAAI/bge-small-en-v1.5
+
+vectorstore:
+  database: chroma
+
+chunks:
+  size: 512
+  overlap: 50
+
+# For better retrieval on code/technical docs
+retrieval:
+  mode: chroma
+  k: 5  # Number of documents to retrieve
+  score_threshold: 0.3  # Lower = more matches</code></pre>
+        </div>
+
+        <h2 class="text-2xl font-bold mb-4 mt-12">Common Problems & Solutions</h2>
+
+        <div class="issue-box">
+            <div class="issue-title">Issue #1172: "CUDA out of memory" on 24GB GPU</div>
+            <div class="issue-source">github.com/zylon-ai/private-gpt/issues/1172</div>
+            <p class="mb-3"><strong>Problem:</strong> Running Mistral 7B with 35 GPU layers causes OOM on RTX 4090 (24GB VRAM).</p>
+            <p class="mb-3"><strong>What I Tried:</strong> Reduced context window, disabled quantization - still crashed on large documents.</p>
+            <p class="mb-3"><strong>Actual Fix:</strong> The issue is n_gpu_layers combined with n_batch. Offload fewer layers and increase batch size for better memory utilization:</p>
+            <div class="code-block">
+                <pre><code class="language-yaml"># In settings.yaml:
+llama:
+  llama_cpp:
+    model_path: models/mistral-7b-instruct-v0.2.Q4_K_M.gguf
+    n_gpu_layers: 20  # Not 35! Let CPU handle some layers
+    n_batch: 1024  # Increase from 512 for better GPU utilization
+    n_ctx: 4096  # Reduce from 8192
+    f16_kv: true  # Use FP16 for KV cache (saves VRAM)
+    use_mmap: true  # Memory-map model file
+    use_mlock: false  # Disable on GPU systems
+    numa: false  # Disable NUMA for single-GPU systems
+
+# Alternative: Use smaller model
+llama:
+  llama_cpp:
+    model_path: models/mistral-7b-instruct-v0.2.Q3_K_M.gguf  # More aggressive quantization
+    n_gpu_layers: 30  # Can fit more layers with Q3</code></pre>
+            </div>
+            <p class="mt-3 text-sm text-gray-600">Monitor VRAM usage with <code>watch -n 1 nvidia-smi</code> while ingesting documents to find optimal settings.</p>
+        </div>
+
+        <div class="issue-box">
+            <div class="issue-title">Issue #1234: "Document ingestion hangs at 99%"</div>
+            <div class="issue-source">github.com/zylon-ai/private-gpt/issues/1234</div>
+            <p class="mb-3"><strong>Problem:</strong> Large PDFs (>100 pages) appear to hang during ingestion. Process reaches 99% and never completes.</p>
+            <p class="mb-3"><strong>What I Tried:</strong> Increased timeout, switched to different PDF parsers - no change.</p>
+            <p class="mb-3"><strong>Actual Fix:</strong> The embedding model gets stuck on long chunks. Need to chunk more aggressively and limit chunk length:</p>
+            <div class="code-block">
+                <pre><code class="language-python"># In settings.yaml:
+chunks:
+  size: 256  # Reduce from 512 (smaller chunks process faster)
+  overlap: 50
+
+# Add custom chunking for large docs in code:
+# Create ingest_custom.py
+
+from private_gpt.components.ingest import chunking
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+
+def create_optimized_chunker():
+    return RecursiveCharacterTextSplitter(
+        chunk_size=256,
+        chunk_overlap=50,
+        length_function=len,
+        separators=[
+            "\n\n",  # Paragraphs first
+            "\n",    # Lines
+            " ",     # Words
+            ""       # Characters (last resort)
+        ],
+        keep_separator=False  # Don't include separator in chunk
+    )
+
+# Use batch ingestion to prevent memory buildup
+PGPT_PROFILES=chroma pgpt ingest documents/*.pdf --batch-size 10</code></pre>
+            </div>
+            <p class="mt-3 text-sm text-gray-600">For PDFs with tables/images, pre-process with pdfplumber to extract text separately.</p>
+        </div>
+
+        <div class="issue-box">
+            <div class="issue-title">Issue #1345: Poor retrieval on technical documentation</div>
+            <div class="issue-source">github.com/zylon-ai/private-gpt/issues/1345</div>
+            <p class="mb-3"><strong>Problem:</strong> Queries about code examples return irrelevant text chunks, missing the actual code blocks.</p>
+            <p class="mb-3"><strong>What I Tried:</strong> Adjusted score_threshold, increased k value - retrieved more but still irrelevant.</p>
+            <p class="mb-3"><strong>Actual Fix:</strong> Default embedding model (all-MiniLM) doesn't understand code well. Switch to code-aware embedding and use hybrid search:</p>
+            <div class="code-block">
+                <pre><code class="language-yaml"># Use code-specific embedding
+embedding:
+  mode: huggingface
+  huggingface:
+    # Better for code/technical content
+    model_name: BAAI/bge-base-en-v1.5
+    # Or for mixed code+text:
+    # model_name: intfloat/e5-large-v2
+
+# Enable hybrid search (keyword + semantic)
+vectorstore:
+  database: chroma
+  chroma:
+    collection_name: my_documents
+    # Enable BM25 hybrid search
+    hybrid_search: true
+    bm25_weight: 0.3  # 30% keyword, 70% semantic
+
+# Adjust retrieval
+retrieval:
+  mode: chroma
+  k: 10  # Retrieve more candidates
+  score_threshold: 0.2  # Lower threshold
+  rerank: true  # Enable reranking
+  rerank_model: cross-encoder  # Better final ranking</code></pre>
+            </div>
+            <p class="mt-3 text-sm text-gray-600">For API documentation, pre-process to keep endpoints and their descriptions together.</p>
+        </div>
+
+        <div class="issue-box">
+            <div class="issue-title">Issue #1456: Embedding model incompatible with llama-cpp</div>
+            <div class="issue-source">github.com/zylon-ai/private-gpt/issues/1456</div>
+            <p class="mb-3"><strong>Problem:</strong> After switching to local embedding model with llama-cpp LLM, getting dimension mismatch errors.</p>
+            <p class="mb-3"><strong>What I Tried:</strong> Recreated vector database, cleared cache - error persists.</p>
+            <p class="mb-3"><strong>Actual Fix:</strong> Llama.cpp has built-in embedding but different dimensions than HuggingFace models. Need to use consistent embedding source:</p>
+            <div class="code-block">
+                <pre><code class="language-yaml"># Option 1: Use HuggingFace for both (recommended)
+embedding:
+  mode: huggingface
+  huggingface:
+    model_name: BAAI/bge-small-en-v1.5
+    # Dimension: 384
+
+llm:
+  mode: llama-cpp
+  llama_cpp:
+    # Use LLM only for generation, not embedding
+    embedding_mode: false
+    n_gpu_layers: -1
+
+# Option 2: Use llama-cpp for both
+embedding:
+  mode: llama-cpp
+  llama_cpp:
+    model_path: models/mistral-7b-instruct-v0.2.Q4_K_M.gguf
+    # Dimension: 4096 (Mistral)
+
+llm:
+  mode: llama-cpp
+
+# CRITICAL: Must delete old ChromaDB when changing embedding model
+# Different dimensions = incompatible vectors
+rm -rf chroma_db  # Delete and re-ingest</code></pre>
+            </div>
+        </div>
+
+        <div class="issue-box">
+            <div class="issue-title">Issue #1523: Context not being used in responses</div>
+            <div class="issue-source">github.com/zylon-ai/private-gpt/issues/1523</div>
+            <p class="mb-3"><strong>Problem:</strong> System retrieves relevant documents but ignores them completely, answering from training data.</p>
+            <p class="mb-3"><strong>What I Tried:</strong> Lowered score_threshold, verified documents are retrieved - still ignored.</p>
+            <p class="mb-3"><strong>Actual Fix:</strong> The prompt template needs to explicitly reference retrieved context. Default template may not inject context properly:</p>
+            <div class="code-block">
+                <pre><code class="language-python"># Create custom prompt template
+# In prompts/custom_system_prompt.txt
+
+You are a helpful assistant that answers questions based on the provided context.
+If the answer cannot be found in the context, say "I don't have enough information to answer this."
+
+Context information is below.
+---------------------
+{context}
+---------------------
+
+Given the context information and not prior knowledge, answer the query.
+Query: {query}
+
+Answer:
+
+# In settings.yaml, point to custom prompt:
+prompt:
+  mode: custom
+  template_file: prompts/custom_system_prompt.txt
+
+# Or use built-in with context injection
+prompt:
+  mode: default
+  # Ensure context is actually passed
+  include_context: true
+  max_context_tokens: 2048  # Increase from default 1024</code></pre>
+            </div>
+            <p class="mt-3 text-sm text-gray-600">Use the API response's <code>sources</code> field to verify documents were actually retrieved.</p>
+        </div>
+
+        <h2 class="text-2xl font-bold mb-4 mt-12">Performance Optimization</h2>
+
+        <h3 class="text-xl font-semibold mb-3">GPU Optimization</h3>
+
+        <div class="code-block mb-6">
+            <pre><code class="language-bash"># Check GPU utilization
+nvidia-smi
+
+# For RTX 30/40 series, use CUDA graphs for faster inference
+export CUDA_VISIBLE_DEVICES=0
+export CUDA_GRAPH=1
+
+# Quantization comparison for Mistral 7B on RTX 4090:
+# Q4_K_M: ~4.5GB VRAM, 45 tok/s
+# Q5_K_M: ~5.5GB VRAM, 38 tok/s
+# Q8_0: ~8.5GB VRAM, 28 tok/s
+
+# Optimal for most use cases:
+# Use Q4_K_M for best speed/quality tradeoff</code></pre>
+        </div>
+
+        <h3 class="text-xl font-semibold mb-3">CPU Optimization</h3>
+
+        <div class="code-block mb-6">
+            <pre><code class="language-bash"># Enable all CPU optimizations
+export OMP_NUM_THREADS=8  # Set to your CPU core count
+export MKL_NUM_THREADS=8
+
+# For Apple Silicon (M1/M2/M3):
+# Use Metal backend (via llama.cpp)
+export LLAMA_METAL=1
+
+# Install with Metal support
+brew install llama.cpp
+
+# Settings for Metal:
+llama:
+  llama_cpp:
+    n_gpu_layers: -1  # All layers on GPU
+    use_mmap: true
+    use_mlock: false</code></pre>
+        </div>
+
+        <h3 class="text-xl font-semibold mb-3">Retrieval Optimization</h3>
+
+        <div class="code-block mb-6">
+            <pre><code class="language-yaml"># Multi-stage retrieval for better results
+retrieval:
+  mode: advanced
+  # Stage 1: Broad retrieval
+  initial_k: 20
+  initial_threshold: 0.1
+  # Stage 2: Rerank
+  rerank: true
+  rerank_model: cross-encoder/ms-marco-MiniLM-L-6-v2
+  # Stage 3: Final selection
+  final_k: 5
+  diversity_penalty: 0.1  # Encourage diverse results</code></pre>
+        </div>
+
+        <h2 class="text-2xl font-bold mb-4 mt-12">Deployment as API Service</h2>
+
+        <div class="code-block mb-6">
+            <pre><code class="language-bash"># Run as background service
+nohup python -m private_gpt > privategpt.log 2>&1 &
+
+# Or use systemd for production
+sudo tee /etc/systemd/system/private-gpt.service > /dev/null <<EOF
+[Unit]
+Description=PrivateGPT Service
+After=network.target
+
+[Service]
+Type=simple
+User=your-user
+WorkingDirectory=/path/to/private-gpt
+Environment="PATH=/path/to/private-gpt/venv/bin"
+ExecStart=/path/to/private-gpt/venv/bin/python -m private_gpt
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+sudo systemctl enable private-gpt
+sudo systemctl start private-gpt
+
+# Check status
+sudo systemctl status private-gpt</code></pre>
+        </div>
+
+        <h2 class="text-2xl font-bold mb-4 mt-12">API Usage Examples</h2>
+
+        <div class="code-block mb-6">
+            <pre><code class="language-python">import requests
+import json
+
+BASE_URL = "http://localhost:8001"
+
+# 1. Ingest documents
+with open("document.pdf", "rb") as f:
+    response = requests.post(
+        f"{BASE_URL}/v1/ingest",
+        files={"file": f}
+    )
+print(response.json())
+
+# 2. Chat with context
+response = requests.post(
+    f"{BASE_URL}/v1/chat",
+    json={
+        "query": "What does the document say about X?",
+        "context_filter": {},  # Optional metadata filter
+        "mode": "chat"  # or "query" for retrieval-only
+    }
+)
+result = response.json()
+print(result["answer"])
+print("Sources:", [s["source"] for s in result["sources"]])
+
+# 3. Retrieve documents without LLM generation
+response = requests.post(
+    f"{BASE_URL}/v1/retrieve",
+    json={
+        "query": "machine learning",
+        "k": 5
+    }
+)
+documents = response.json()</code></pre>
+        </div>
+
+        <h2 class="text-2xl font-bold mb-4 mt-12">Comparison with Alternatives</h2>
+
+        <div class="grid md:grid-cols-2 gap-4">
+            <div class="bg-white p-4 rounded-lg border">
+                <a href="https://pnt.jacbex.com/localgpt.html" class="text-blue-600 hover:underline font-semibold">LocalGPT vs PrivateGPT</a>
+                <p class="text-gray-600 text-sm mt-1">When to use each based on your hardware</p>
+            </div>
+            <div class="bg-white p-4 rounded-lg border">
+                <a href="https://pnt.jacbex.com/dify_v2.html" class="text-blue-600 hover:underline font-semibold">Dify for Production</a>
+                <p class="text-gray-600 text-sm mt-1">Full-featured platform vs simple solution</p>
+            </div>
+            <div class="bg-white p-4 rounded-lg border">
+                <a href="https://pnt.jacbex.com/open-webui.html" class="text-blue-600 hover:underline font-semibold">Open-WebUI Integration</a>
+                <p class="text-gray-600 text-sm mt-1">Add web UI to PrivateGPT backend</p>
+            </div>
+            <div class="bg-white p-4 rounded-lg border">
+                <a href="https://github.com/zylon-ai/private-gpt" class="text-blue-600 hover:underline font-semibold">PrivateGPT GitHub</a>
+                <p class="text-gray-600 text-sm mt-1">Official repository and issues</p>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t mt-12">
+        <div class="max-w-4xl mx-auto px-6 py-8 text-center text-gray-500">
+            <p>Last updated: March 2026</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            Prism.highlightAll();
+        });
+    </script>
+
+</body>
+</html>

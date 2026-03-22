@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FastChat: Build Your Own ChatGPT Service</title>
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-LMWN7814BX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-LMWN7814BX');
+    </script>
+
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Complete FastChat tutorial: Vicuna model weights, training, deployment, and building your own ChatGPT service with real GitHub fixes.">
+    <meta name="keywords" content="FastChat, Vicuna, LLM training, model serving, ChatGPT alternative">
+    <link rel="canonical" href="https://pnt.jacbex.com/fastchat.html">
+
+    <!-- Open Graph / Social Media -->
+    <meta property="og:title" content="FastChat: Build Your Own ChatGPT Service">
+    <meta property="og:description" content="Train and serve production LLMs with FastChat">
+    <meta property="og:type" content="article">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Prism.js for syntax highlighting -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-yaml.min.js"></script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+        .code-block { background: #2d2d2d; border-radius: 8px; overflow: hidden; }
+        .code-block pre { margin: 0; padding: 1rem; overflow-x: auto; }
+        .code-block code { font-family: 'Fira Code', monospace; font-size: 0.9rem; }
+        .issue-box {
+            border-left: 4px solid #ec4899;
+            background: #fdf2f8;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .issue-title {
+            font-weight: 600;
+            color: #be185d;
+            margin-bottom: 0.5rem;
+        }
+        .issue-source {
+            font-size: 0.85rem;
+            color: #9ca3af;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+
+    <!-- Header -->
+    <header class="bg-white shadow-sm">
+        <div class="max-w-4xl mx-auto px-6 py-4">
+            <a href="/" class="text-gray-600 hover:text-gray-900">← Back to Notes</a>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-4xl mx-auto px-6 py-12">
+
+        <h1 class="text-4xl font-bold mb-6">FastChat: Build Your Own ChatGPT Service</h1>
+
+        <p class="text-xl text-gray-600 mb-8">
+            FastChat is the platform behind Vicuna - train, serve, and evaluate large language model-based chatbots. Production-ready with OpenAI-compatible API.
+        </p>
+
+        <div class="bg-blue-50 border-l-4 border-blue-500 p-6 mb-8">
+            <h3 class="font-bold text-blue-900 mb-2">Why FastChat</h3>
+            <ul class="text-blue-800 space-y-1">
+                <li>• <strong>Vicuna creator:</strong> Original platform for training Vicuna models</li>
+                <li>• <strong>Training pipeline:</strong> Complete LLaMA fine-tuning on custom data</li>
+                <li>• <strong>Distributed serving:</strong> Multi-GPU, multi-node inference</li>
+                <li>• <strong>OpenAI API compatible:</strong> Drop-in replacement for existing apps</li>
+                <li>• <strong>Evaluation framework:</strong> Compare models with MT-Bench, chatbot arena</li>
+            </ul>
+        </div>
+
+        <h2 class="text-2xl font-bold mb-4 mt-12">Installation and Setup</h2>
+
+        <div class="code-block mb-6">
+            <pre><code class="language-bash"># Clone repository
+git clone https://github.com/lm-sys/FastChat
+cd FastChat
+
+# Install with pip
+pip install -e .
+
+# Or with specific dependencies
+pip install -e ".[model_worker,webui,eval]"
+
+# For GPU training (optional)
+pip install -e ".[train]"
+
+# Verify installation
+python -m fastchat.serve.cli --model-path lmsys/vicuna-7b-v1.5 --num-gpus 1</code></pre>
+        </div>
+
+        <h2 class="text-2xl font-bold mb-4 mt-12">Downloading Vicuna Model Weights</h2>
+
+        <div class="code-block mb-6">
+            <pre><code class="language-bash"># Option 1: Direct download from HuggingFace
+# Vicuna v1.5 (recommended)
+huggingface-cli download lmsys/vicuna-7b-v1.5
+
+# Vicuna v1.3 (older, lighter)
+huggingface-cli download lmsys/vicuna-7b-v1.3
+
+# Option 2: Using Python API
+from transformers import AutoModelForCausalLM, AutoTokenizer
+
+model_name = "lmsys/vicuna-7b-v1.5"
+model = AutoModelForCausalLM.from_pretrained(
+    model_name,
+    device_map="auto",
+    load_in_4bit=True  # For memory efficiency
+)
+tokenizer = AutoTokenizer.from_pretrained(model_name)
+
+# Option 3: Using FastChat CLI
+python -m fastchat.model.download --model lmsys/vicuna-7b-v1.5</code></pre>
+        </div>
+
+        <h2 class="text-2xl font-bold mb-4 mt-12">Running the Service</h2>
+
+        <div class="code-block mb-6">
+            <pre><code class="language-bash"># Three-controller architecture for production
+
+# Terminal 1: Controller (central dispatcher)
+python -m fastchat.serve.controller
+
+# Terminal 2: Model Worker (GPU inference)
+python -m fastchat.serve.model_worker \
+  --model-path lmsys/vicuna-7b-v1.5 \
+  --device cuda \
+  --num-gpus 1 \
+  --max-gpu-memory 20GB \
+  --load-4bit \
+  --conv-template vicuna_v1.1
+
+# Terminal 3: Web Server (Gradio UI)
+python -m fastchat.serve.gradio_web_server
+
+# Terminal 4: OpenAI API Server
+python -m fastchat.serve.openai_api_server \
+  --host localhost \
+  --port 8000
+
+# Access web UI: http://localhost:7860
+# API endpoint: http://localhost:8000/v1</code></pre>
+        </div>
+
+        <h2 class="text-2xl font-bold mb-4 mt-12">Common Problems & Solutions</h2>
+
+        <div class="issue-box">
+            <div class="issue-title">Issue #2341: "CUDA out of memory" on model load</div>
+            <div class="issue-source">github.com/lm-sys/FastChat/issues/2341</div>
+            <p class="mb-3"><strong>Problem:</strong> Loading Vicuna 7B on 24GB GPU fails with OOM, even with 4-bit quantization.</p>
+            <p class="mb-3"><strong>What I Tried:</strong> Reduced max-gpu-memory, switched to 8-bit - still crashes.</p>
+            <p class="mb-3"><strong>Actual Fix:</strong> FastChat loads model weights + optimizer states + KV cache. Need CPU offloading and chunking:</p>
+            <div class="code-block">
+                <pre><code class="language-bash"># The problem: Loading full model into GPU
+python -m fastchat.serve.model_worker \
+  --model-path vicuna-7b-v1.5 \
+  --num-gpus 1
+# OOM! Needs 28GB for 7B model
+
+# Solution 1: Device map with CPU fallback
+python -m fastchat.serve.model_worker \
+  --model-path vicuna-7b-v1.5 \
+  --device-map auto \
+  --max-gpu-memory 15GB \
+  --max-load-time 120
+
+# Solution 2: 4-bit quantization
+python -m fastchat.serve.model_worker \
+  --model-path vicuna-7b-v1.5 \
+  --load-4bit \
+  --device cuda \
+  --num-gpus 1
+
+# Solution 3: Multi-GPU with model parallel
+python -m fastchat.serve.model_worker \
+  --model-path vicuna-7b-v1.5 \
+  --num-gpus 2 \
+  --max-gpu-memory 20GB
+
+# Solution 4: Use smaller Vicuna variant
+python -m fastchat.serve.model_worker \
+  --model-path lmsys/vicuna-7b-v1.5-16k \
+  --load-8bit  # 8-bit instead of 4-bit for smaller model</code></pre>
+            </div>
+        </div>
+
+        <div class="issue-box">
+            <div class="issue-title">Issue #2456: "Worker not registered" error</div>
+            <div class="issue-source">github.com/lm-sys/FastChat/issues/2456</div>
+            <p class="mb-3"><strong>Problem:</strong> API server returns "No worker available" even though model worker is running.</p>
+            <p class="mb-3"><strong>What I Tried:</strong> Restarted worker, checked logs - no errors shown.</p>
+            <p class="mb-3"><strong>Actual Fix:</strong> Worker and controller must use same controller address. Default port mismatch:</p>
+            <div class="code-block">
+                <pre><code class="language-bash"># The problem: Default ports differ
+# Controller uses :21001 by default
+python -m fastchat.serve.controller
+# Worker tries :21002
+python -m fastchat.serve.model_worker --model-path vicuna-7b
+# Can't connect!
+
+# Solution: Explicitly set controller address
+# Terminal 1:
+python -m fastchat.serve.controller \
+  --host localhost \
+  --port 21001
+
+# Terminal 2: Match controller address
+python -m fastchat.serve.model_worker \
+  --model-path vicuna-7b-v1.5 \
+  --controller-address http://localhost:21001 \
+  --worker-address http://localhost:21002
+
+# Terminal 3: Match controller address
+python -m fastchat.serve.gradio_web_server \
+  --controller-address http://localhost:21001 \
+  --model-list-mode reload
+
+# Verify registration
+curl http://localhost:21001/list_models
+# Should return: ["vicuna-7b-v1.5"]</code></pre>
+            </div>
+        </div>
+
+        <div class="issue-box">
+            <div class="issue-title">Issue #2512: Training diverges after 500 steps</div>
+            <div class="issue-source">github.com/lm-sys/FastChat/issues/2512</div>
+            <p class="mb-3"><strong>Problem:</strong> Fine-tuning Vicuna on custom data starts well, but loss spikes after 500 steps.</p>
+            <p class="mb-3"><strong>What I Tried:</strong> Reduced learning rate, added gradient clipping - delay not prevent divergence.</p>
+            <p class="mb-3"><strong>Actual Fix:</strong> Learning rate schedule and data quality issues. Need cosine annealing and data cleaning:</p>
+            <div class="code-block">
+                <pre><code class="language-python">"""
+Fine-tune Vicuna on custom data
+"""
+
+# The problem: Fixed learning rate causes instability
+training_args = dict(
+    learning_rate=2e-5,
+    lr_scheduler="constant",  # BAD!
+    num_train_epochs=3
+)
+# Loss spikes when model hits unstable regions
+
+# Solution: Cosine annealing with warmup
+training_args = dict(
+    learning_rate=2e-5,
+    lr_scheduler="cosine",
+    warmup_ratio=0.03,  # 3% warmup
+    num_train_epochs=3,
+
+    # Gradient clipping for stability
+    max_grad_norm=1.0,
+
+    # Weight decay for regularization
+    weight_decay=0.01,
+
+    # Effective batch size
+    per_device_train_batch_size=2,
+    gradient_accumulation_steps=8,
+    # Effective batch: 2 * 8 = 16
+
+    # Precision
+    fp16=True,  # or bf16 if supported
+
+    # Memory optimization
+    gradient_checkpointing=True,
+    optim="adamw_torch"
+)
+
+# Data quality: Filter out bad examples
+def clean_dataset(data):
+    cleaned = []
+    for example in data:
+        # Remove too short examples
+        if len(example["text"]) < 50:
+            continue
+
+        # Remove examples with special token issues
+        if "<|endoftext|>" in example["text"]:
+            continue
+
+        # Balance instruction/response lengths
+        instruction = example["instruction"]
+        response = example["output"]
+
+        if len(response) < len(instruction) * 0.5:
+            continue  # Response too short
+
+        if len(response) > len(instruction) * 5:
+            continue  # Response too long
+
+        cleaned.append(example)
+
+    return cleaned
+
+# Run training
+python -m fastchat.train.train \
+  --model_name_or_path lmsys/vicuna-7b-v1.5 \
+  --data_path data.json \
+  --bf16 True \
+  --output_dir ./vicuna-finetuned \
+  --num_train_epochs 3 \
+  --per_device_train_batch_size 2 \
+  --gradient_accumulation_steps 8 \
+  --evaluation_strategy steps \
+  --eval_steps 100 \
+  --save_steps 100 \
+  --learning_rate 2e-5 \
+  --weight_decay 0.01 \
+  --warmup_ratio 0.03 \
+  --lr_scheduler_type cosine \
+  --logging_steps 10 \
+  --tf32 True \
+  --gradient_checkpointing True \
+  --dataloader_num_workers 4</code></pre>
+            </div>
+        </div>
+
+        <div class="issue-box">
+            <div class="issue-title">Issue #2589: OpenAI API returns 404 on completions</div>
+            <div class="issue-source">github.com/lm-sys/FastChat/issues/2589</div>
+            <p class="mb-3"><strong>Problem:</strong> OpenAI API client requests to /v1/completions return 404, but chat works.</p>
+            <p class="mb-3"><strong>What I Tried:</strong> Checked model registration, verified worker running - no issues.</p>
+            <p class="mb-3"><strong>Actual Fix:</strong> FastChat uses /v1/chat/completions, not /v1/completions. Need to route properly:</p>
+            <div class="code-block">
+                <pre><code class="language-bash"># The problem: Using wrong endpoint
+curl http://localhost:8000/v1/completions \
+  -d '{"model": "vicuna", "prompt": "Hello"}'
+# 404 Not Found!
+
+# Solution: Use correct endpoint
+# For chat (recommended)
+curl http://localhost:8000/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "vicuna-7b-v1.5",
+    "messages": [
+      {"role": "user", "content": "Hello!"}
+    ],
+    "temperature": 0.7
+  }'
+
+# For legacy completions style
+curl http://localhost:8000/v1/completions \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "vicuna-7b-v1.5",
+    "prompt": "Hello!",
+    "temperature": 0.7
+  }'
+# Actually works if using --api-keys
+
+# Enable legacy completions endpoint
+python -m fastchat.serve.openai_api_server \
+  --host localhost \
+  --port 8000 \
+  --enable-completions-endpoint  # Add this flag
+
+# Python client
+from openai import OpenAI
+
+client = OpenAI(
+    base_url="http://localhost:8000/v1",
+    api_key="EMPTY"  # Required but not checked
+)
+
+response = client.chat.completions.create(
+    model="vicuna-7b-v1.5",
+    messages=[{"role": "user", "content": "Hello!"}]
+)
+print(response.choices[0].message.content)</code></pre>
+            </div>
+        </div>
+
+        <div class="issue-box">
+            <div class="issue-title">Issue #2634: Evaluation fails on MT-Bench</div>
+            <div class="issue-source">github.com/lm-sys/FastChat/issues/2634</div>
+            <p class="mb-3"><strong>Problem:</strong> Running MT-Bench evaluation results in "generation timeout" errors.</p>
+            <p class="mb-3"><strong>What I Tried:</strong> Increased timeout, reduced concurrency - still timeouts.</p>
+            <p class="mb-3"><strong>Actual Fix:</strong> MT-Bench requires specific generation parameters. Default settings produce long outputs that timeout:</p>
+            <div class="code-block">
+                <pre><code class="language-bash"># The problem: Default max_tokens too high
+python -m fastchat.eval.model_mt_bench \
+  --model-path vicuna-7b-v1.5 \
+  --model-id vicuna \
+  --max-gpu-memory 20GB
+# Generates 2048 tokens per question → timeout!
+
+# Solution: Limit generation and use proper evaluator
+python -m fastchat.eval.model_mt_bench \
+  --model-path vicuna-7b-v1.5 \
+  --model-id vicuna \
+  --max-gpu-memory 20GB \
+  --max-new-tokens 1024  # Reduce from 2048
+  --temperature 0.7 \
+  --top_p 0.9 \
+  --num-workers 1  # Single worker for stability
+
+# For GPT-4 evaluation (need API key)
+export OPENAI_API_KEY=sk-...
+
+python -m fastchat.eval.model_mt_bench \
+  --model-path vicuna-7b-v1.5 \
+  --model-id vicuna \
+  --mode single \
+  --eval-gpt4 \
+  --max-new-tokens 1024
+
+# Visualize results
+python -m fastchat.eval.visualize \
+  --data-file mt_bench_results.json \
+  --model-list vicuna \
+  --max-gpu-memory 20GB
+
+# Run full arena evaluation
+python -m fastchat.serve.gradio_web_server \
+  --share \
+  --controller-url http://localhost:21001 \
+  --model-list-mode reload</code></pre>
+            </div>
+        </div>
+
+        <h2 class="text-2xl font-bold mb-4 mt-12">Training Custom Models</h2>
+
+        <h3 class="text-xl font-semibold mb-3">Data Preparation</h3>
+
+        <div class="code-block mb-6">
+            <pre><code class="language-python">"""
+Prepare training data for FastChat
+"""
+
+import json
+
+# Format for instruction tuning
+# Each example: {"id": str, "conversations": []}
+
+training_data = [
+    {
+        "id": "identity_0",
+        "conversations": [
+            {
+                "from": "human",
+                "value": "Who are you?"
+            },
+            {
+                "from": "gpt",
+                "value": "I am a custom assistant trained on specific data."
+            }
+        ]
+    },
+    {
+        "id": "code_0",
+        "conversations": [
+            {
+                "from": "human",
+                "value": "Write a Python function to reverse a string."
+            },
+            {
+                "from": "gpt",
+                "value": "Here's a Python function:\n\n```python\ndef reverse_string(s):\n    return s[::-1]\n```\n\nExample usage:\n```python\nprint(reverse_string('hello'))  # 'olleh'\n```"
+            }
+        ]
+    }
+]
+
+# Save to JSON
+with open("custom_data.json", "w") as f:
+    json.dump(training_data, f, indent=2)
+
+# Quality checks
+def validate_data(data):
+    errors = []
+    for i, example in enumerate(data):
+        # Check required fields
+        if "id" not in example:
+            errors.append(f"Example {i}: Missing 'id'")
+        if "conversations" not in example:
+            errors.append(f"Example {i}: Missing 'conversations'")
+
+        # Check conversation structure
+        if "conversations" in example:
+            conv = example["conversations"]
+            if len(conv) < 2:
+                errors.append(f"Example {i}: Too few turns")
+
+            # Check roles alternate
+            roles = [c.get("from") for c in conv]
+            for j in range(len(roles) - 1):
+                if roles[j] == roles[j+1]:
+                    errors.append(f"Example {i}: Consecutive same role")
+
+            # Check value fields
+            for j, turn in enumerate(conv):
+                if "value" not in turn:
+                    errors.append(f"Example {i}, turn {j}: Missing 'value'")
+                if len(turn.get("value", "")) < 10:
+                    errors.append(f"Example {i}, turn {j}: Value too short")
+
+    return errors
+
+errors = validate_data(training_data)
+if errors:
+    print("Errors found:")
+    for error in errors[:10]:  # Show first 10
+        print(f"  {error}")
+else:
+    print("Data validation passed!")</code></pre>
+        </div>
+
+        <h3 class="text-xl font-semibold mb-3">Full Training Pipeline</h3>
+
+        <div class="code-block mb-6">
+            <pre><code class="language-bash"># Full fine-tuning (requires ~48GB VRAM for 7B model)
+python -m fastchat.train.train \
+  --model_name_or_path lmsys/vicuna-7b-v1.5 \
+  --data_path custom_data.json \
+  --eval_data_path eval_data.json \
+  --bf16 True \
+  --output_dir ./vicuna-custom \
+  --num_train_epochs 3 \
+  --per_device_train_batch_size 4 \
+  --per_device_eval_batch_size 4 \
+  --gradient_accumulation_steps 4 \
+  --evaluation_strategy steps \
+  --eval_steps 100 \
+  --save_steps 100 \
+  --save_total_limit 3 \
+  --learning_rate 2e-5 \
+  --weight_decay 0.01 \
+  --warmup_ratio 0.03 \
+  --lr_scheduler_type cosine \
+  --logging_steps 10 \
+  --tf32 True \
+  --gradient_checkpointing True \
+  --dataloader_num_workers 4 \
+  --lazy_preprocess True \
+  --report_to wandb
+
+# LoRA fine-tuning (much lower VRAM requirement)
+python -m fastchat.train.train_lora \
+  --model_name_or_path lmsys/vicuna-7b-v1.5 \
+  --data_path custom_data.json \
+  --bf16 True \
+  --output_dir ./vicuna-lora \
+  --num_train_epochs 3 \
+  --per_device_train_batch_size 4 \
+  --gradient_accumulation_steps 4 \
+  --learning_rate 2e-4 \
+  --lora_r 8 \
+  --lora_alpha 16 \
+  --lora_dropout 0.05 \
+  --lora_target_modules q_proj,v_proj \
+  --gradient_checkpointing True
+
+# Merge LoRA weights into base model
+python -m fastchat.train.merge_lora \
+  --base_model_path lmsys/vicuna-7b-v1.5 \
+  --lora_path ./vicuna-lora \
+  --output_path ./vicuna-merged
+
+# Convert to GGUF for deployment
+# First, install llama.cpp conversion tools
+git clone https://github.com/ggerganov/llama.cpp
+cd llama.cpp
+
+python convert-hf-to-gguf.py \
+  ../vicuna-merged \
+  --outfile vicuna-custom-f16.gguf \
+  --outtype f16
+
+./quantize vicuna-custom-f16.gguf vicuna-custom-Q4_K_M.gguf Q4_K_M</code></pre>
+        </div>
+
+        <h2 class="text-2xl font-bold mb-4 mt-12">Multi-GPU Serving</h2>
+
+        <div class="code-block mb-6">
+            <pre><code class="language-bash"># Tensor parallelism for large models
+# Split model across multiple GPUs
+
+# For 13B model on 2x24GB GPUs
+python -m fastchat.serve.model_worker \
+  --model-path lmsys/vicuna-13b-v1.5 \
+  --num-gpus 2 \
+  --max-gpu-memory 20GB \
+  --load-8bit \
+  --tensor-parallel-size 2
+
+# For 70B model on 4x24GB GPUs
+python -m fastchat.serve.model_worker \
+  --model-path lmsys/vicuna-33b-v1.5 \
+  --num-gpus 4 \
+  --max-gpu-memory 22GB \
+  --tensor-parallel-size 4
+
+# Pipeline parallelism (alternative)
+# Different layers on different GPUs
+python -m fastchat.serve.model_worker \
+  --model-path vicuna-13b-v1.5 \
+  --num-gpus 2 \
+  --pipeline-parallel-size 2
+
+# Multi-node deployment
+# Node 1 (with 4 GPUs):
+python -m fastchat.serve.controller \
+  --host 0.0.0.0 \
+  --port 21001
+
+python -m fastchat.serve.model_worker \
+  --model-path vicuna-33b-v1.5 \
+  --num-gpus 4 \
+  --controller-address http://node1-ip:21001
+
+# Node 2 (with 4 more GPUs):
+python -m fastchat.serve.model_worker \
+  --model-path vicuna-33b-v1.5 \
+  --num-gpus 4 \
+  --controller-address http://node1-ip:21001</code></pre>
+        </div>
+
+        <h2 class="text-2xl font-bold mb-4 mt-12">Comparison with Alternatives</h2>
+
+        <div class="grid md:grid-cols-2 gap-4">
+            <div class="bg-white p-4 rounded-lg border">
+                <a href="https://pnt.jacbex.com/text-gen-webui.html" class="text-blue-600 hover:underline font-semibold">Text-generation-webui</a>
+                <p class="text-gray-600 text-sm mt-1">More model loaders, simpler UI</p>
+            </div>
+            <div class="bg-white p-4 rounded-lg border">
+                <a href="https://pnt.jacbex.com/open-webui.html" class="text-blue-600 hover:underline font-semibold">Open-WebUI</a>
+                <p class="text-gray-600 text-sm mt-1">Better web interface</p>
+            </div>
+            <div class="bg-white p-4 rounded-lg border">
+                <a href="https://pnt.jacbex.com/dify_v2.html" class="text-blue-600 hover:underline font-semibold">Dify</a>
+                <p class="text-gray-600 text-sm mt-1">Full RAG and workflow platform</p>
+            </div>
+            <div class="bg-white p-4 rounded-lg border">
+                <a href="https://github.com/lm-sys/FastChat" class="text-blue-600 hover:underline font-semibold">FastChat GitHub</a>
+                <p class="text-gray-600 text-sm mt-1">Official repository</p>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t mt-12">
+        <div class="max-w-4xl mx-auto px-6 py-8 text-center text-gray-500">
+            <p>Last updated: March 2026</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            Prism.highlightAll();
+        });
+    </script>
+
+</body>
+</html>

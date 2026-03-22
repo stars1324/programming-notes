@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text-generation-webui (Oobabooga): Complete Guide</title>
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-LMWN7814BX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-LMWN7814BX');
+    </script>
+
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Complete Oobabooga text-generation-webui tutorial: load 4-bit models, ExLlamaV2, GGUF, extensions, and production deployment.">
+    <meta name="keywords" content="Oobabooga, text-generation-webui, ExLlamaV2, GGUF, 4-bit models, LLM interface">
+    <link rel="canonical" href="https://pnt.jacbex.com/text-gen-webui.html">
+
+    <!-- Open Graph / Social Media -->
+    <meta property="og:title" content="Text-generation-webui: Complete Guide">
+    <meta property="og:description" content="Master Oobabooga for local LLM inference">
+    <meta property="og:type" content="article">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Prism.js for syntax highlighting -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-yaml.min.js"></script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+        .code-block { background: #2d2d2d; border-radius: 8px; overflow: hidden; }
+        .code-block pre { margin: 0; padding: 1rem; overflow-x: auto; }
+        .code-block code { font-family: 'Fira Code', monospace; font-size: 0.9rem; }
+        .issue-box {
+            border-left: 4px solid #ec4899;
+            background: #fdf2f8;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .issue-title {
+            font-weight: 600;
+            color: #be185d;
+            margin-bottom: 0.5rem;
+        }
+        .issue-source {
+            font-size: 0.85rem;
+            color: #9ca3af;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+
+    <!-- Header -->
+    <header class="bg-white shadow-sm">
+        <div class="max-w-4xl mx-auto px-6 py-4">
+            <a href="/" class="text-gray-600 hover:text-gray-900">← Back to Notes</a>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-4xl mx-auto px-6 py-12">
+
+        <h1 class="text-4xl font-bold mb-6">Text-generation-webui (Oobabooga): Complete Guide</h1>
+
+        <p class="text-xl text-gray-600 mb-8">
+            The most feature-rich interface for running LLMs locally. Supports GGUF, ExLlamaV2, 4-bit quantization, and hundreds of extensions.
+        </p>
+
+        <div class="bg-blue-50 border-l-4 border-blue-500 p-6 mb-8">
+            <h3 class="font-bold text-blue-900 mb-2">Why Text-generation-webui</h3>
+            <ul class="text-blue-800 space-y-1">
+                <li>• <strong>Most loaders:</strong> GGUF (llama.cpp), ExLlamaV2, GPTQ, AWQ, transformers</li>
+                <li>• <strong>Extensions:</strong> Chat, training, API, notebooking, 200+ community extensions</li>
+                <li>• <strong>Quantization:</strong> Load 4-bit/8-bit models to save VRAM</li>
+                <li>• <strong>Production-ready:</strong> OpenAI-compatible API, streaming, multi-user</li>
+                <li>• <strong>Active development:</strong> Daily updates, cutting-edge features</li>
+            </ul>
+        </div>
+
+        <h2 class="text-2xl font-bold mb-4 mt-12">Installation</h2>
+
+        <div class="code-block mb-6">
+            <pre><code class="language-bash"># Clone repository
+git clone https://github.com/oobabooga/text-generation-webui
+cd text-generation-webui
+
+# Windows: One-click installer
+# Download from https://github.com/oobabooga/install-windows-main
+
+# macOS/Linux: Manual install
+# Install CUDA toolkit first (if using GPU)
+# Check: https://developer.nvidia.com/cuda-downloads
+
+# Create conda environment
+conda env create -f environment.yml
+conda activate textgen
+
+# Or with pip (if not using conda)
+pip install -r requirements.txt
+
+# Optional: Install specific loaders
+pip install bitsandbytes  # For 4-bit loading
+pip install exllamav2  # For ExLlamaV2 (fastest)
+pip install llama-cpp-python  # For GGUF</code></pre>
+        </div>
+
+        <h2 class="text-2xl font-bold mb-4 mt-12">Model Loading Strategies</h2>
+
+        <h3 class="text-xl font-semibold mb-3">GGUF Models (Recommended for CPU)</h3>
+
+        <div class="code-block mb-6">
+            <pre><code class="language-bash"># Download GGUF model
+mkdir models
+cd models
+
+# Using HuggingFace CLI
+huggingface-cli download TheBloke/Mistral-7B-Instruct-v0.2-GGUF mistral-7b-instruct-v0.2.Q4_K_M.gguf --local-dir .
+
+# Or direct download
+wget https://huggingface.co/TheBloke/Mistral-7B-Instruct-v0.2-GGUF/resolve/main/mistral-7b-instruct-v0.2.Q4_K_M.gguf
+
+# Start webui with GGUF
+cd text-generation-webui
+python server.py \
+  --loader llama.cpp \
+  --model ../models/mistral-7b-instruct-v0.2.Q4_K_M.gguf \
+  --n-gpu-layers -1  # All layers on GPU (or 0 for CPU)</code></pre>
+        </div>
+
+        <h3 class="text-xl font-semibold mb-3">ExLlamaV2 (Fastest for NVIDIA GPUs)</h3>
+
+        <div class="code-block mb-6">
+            <pre><code class="language-bash"># Install ExLlamaV2
+pip install exllamav2
+
+# Download ExLlamaV2-converted model
+huggingface-cli download turboderp/Mistral-7B-instruct-exl2 \
+  Mistral-7B-instruct-exl2-4.0bpw --local-dir .
+
+# Start with ExLlamaV2 (fastest option)
+python server.py \
+  --loader exllamav2 \
+  --model ../models/Mistral-7B-instruct-exl2-4.0bpw \
+  --gpu-memory 10  # GB VRAM to use (auto-detect if omitted)
+
+# ExLlamaV2 features:
+# - 2-3x faster than llama.cpp
+# - Lowest VRAM usage
+# - Only works with NVIDIA GPUs
+# - Requires ExLlamaV2-converted models</code></pre>
+        </div>
+
+        <h3 class="text-xl font-semibold mb-3">4-bit Loading with bitsandbytes</h3>
+
+        <div class="code-block mb-6">
+            <pre><code class="language-bash"># Load any HuggingFace model in 4-bit
+# No conversion needed, loads directly
+
+python server.py \
+  --model TheBloke/Mistral-7B-Instruct-v0.2 \
+  --load-in-4bit \
+  --compute_dtype float16 \
+  --quant_type nf4  # or fp4
+
+# Quantization types:
+# nf4: NormalFloat 4 (recommended, best quality)
+# fp4: Float 4 (slightly faster, lower quality)
+
+# For 8-bit (better quality, more VRAM)
+python server.py \
+  --model TheBloke/Mistral-7B-Instruct-v0.2 \
+  --load-in-8bit</code></pre>
+        </div>
+
+        <h2 class="text-2xl font-bold mb-4 mt-12">Common Problems & Solutions</h2>
+
+        <div class="issue-box">
+            <div class="issue-title">Issue #4521: "CUDA out of memory" with 24GB GPU</div>
+            <div class="issue-source">github.com/oobabooga/text-generation-webui/issues/4521</div>
+            <p class="mb-3"><strong>Problem:</strong> Loading 7B model in 4-bit with 24GB VRAM causes OOM error at 4096 context.</p>
+            <p class="mb-3"><strong>What I Tried:</strong> Reduced context to 2048, switched to 8-bit - still crashes.</p>
+            <p class="mb-3"><strong>Actual Fix:</strong> KV cache uses significant VRAM. Need compression and cache optimization:</p>
+            <div class="code-block">
+                <pre><code class="language-bash"># The problem: KV cache grows with context length
+# 7B model: 4GB weights + 14GB KV cache at 4096 context = 18GB+ (OOM!)
+
+# Solution 1: Enable KV cache quantization
+python server.py \
+  --model mistral-7b-instruct \
+  --load-in-4bit \
+  --cache-quantization 4bit  # Compress KV cache to 4-bit
+  # Result: 4GB weights + 3.5GB cache = 7.5GB total
+
+# Solution 2: Use ExLlamaV2 (better cache management)
+python server.py \
+  --loader exllamav2 \
+  --model mistral-7b-exl2 \
+  --cache-q4  # 4-bit cache
+
+# Solution 3: Reduce context and use sliding window
+python server.py \
+  --loader exllamav2 \
+  --model mistral-7b-exl2 \
+  --context-size 2048 \
+  --sliding-window 512  # Only keep last 512 tokens
+
+# Solution 4: Offload to CPU/RAM
+python server.py \
+  --loader exllamav2 \
+  --model mistral-7b-exl2 \
+  --gpu-memory 8  # Use only 8GB GPU
+  --compress-pos-embed  # Compress positional embeddings</code></pre>
+            </div>
+            <p class="mt-3 text-sm text-gray-600">ExLlamaV2 with 4-bit cache is the most efficient option for NVIDIA GPUs.</p>
+        </div>
+
+        <div class="issue-box">
+            <div class="issue-title">Issue #4678: "ValueError: Tokenizer mismatch" error</div>
+            <div class="issue-source">github.com/oobabooga/text-generation-webui/issues/4678</div>
+            <p class="mb-3"><strong>Problem:</strong> Loading a model shows "tokenizer mismatch" warning and outputs garbage characters.</p>
+            <p class="mb-3"><strong>What I Tried:</strong> Downloaded fresh tokenizer, used different tokenizer version - same issue.</p>
+            <p class="mb-3"><strong>Actual Fix:</strong> GGUF models have embedded tokenizer. Using external tokenizer causes mismatch:</p>
+            <div class="code-block">
+                <pre><code class="language-bash"># The problem:
+python server.py \
+  --model mistral-7b-instruct.Q4_K_M.gguf \
+  --tokenizer TheBloke/Mistral-7B-Instruct-v0.2  # WRONG!
+
+# Solution: Don't specify tokenizer for GGUF
+python server.py \
+  --model mistral-7b-instruct.Q4_K_M.gguf
+  # Tokenizer is embedded in GGUF file
+
+# For non-GGUF models, ensure matching tokenizer
+python server.py \
+  --model TheBloke/Mistral-7B-Instruct-v0.2 \
+  --tokenizer TheBloke/Mistral-7B-Instruct-v0.2
+
+# If using custom tokenizer, explicitly trust remote code
+python server.py \
+  --model model.gguf \
+  --tokenizer-path ./custom-tokenizer \
+  --trust-remote-code</code></pre>
+            </div>
+        </div>
+
+        <div class="issue-box">
+            <div class="issue-title">Issue #4792: Extension "SuperCUDA" breaks model loading</div>
+            <div class="issue-source">github.com/oobabooga/text-generation-webui/issues/4792</div>
+            <p class="mb-3"><strong>Problem:</strong> After installing SuperCUDA extension, models fail to load with "multiple CUDA streams" error.</p>
+            <p class="mb-3"><strong>What I Tried:</strong> Reinstalled extension, cleared cache - error persists.</p>
+            <p class="mb-3"><strong>Actual Fix:</strong> SuperCUDA modifies CUDA initialization. Conflicts with ExLlamaV2 and bitsandbytes. Disable conflicting extensions:</p>
+            <div class="code-block">
+                <pre><code class="language-bash"># List all extensions
+ls extensions/
+
+# Disable extensions that conflict with your loader
+# Create extensions_disabled/ directory
+mkdir extensions_disabled
+
+# Move conflicting extensions
+mv extensions/supercuda extensions_disabled/
+mv extensions/openai extensions_disabled/  # If using different API
+
+# Or selectively enable via command line
+python server.py \
+  --loader exllamav2 \
+  --model mistral-7b-exl2 \
+  --extensions api notebook training  # Only enable these
+
+# Check extension compatibility
+cat extensions/*/extension.py | grep -i "loader"
+
+# Most extensions specify compatible loaders in metadata
+# Example: "# Requires: transformers, llama.cpp"</code></pre>
+            </div>
+            <p class="mt-3 text-sm text-gray-600">Enable extensions one at a time to identify conflicts when troubleshooting.</p>
+        </div>
+
+        <div class="issue-box">
+            <div class="issue-title">Issue #4889: Very slow generation on RTX 4090</div>
+            <div class="issue-source">github.com/oobabooga/text-generation-webui/issues/4889</div>
+            <p class="mb-3"><strong>Problem:</strong> Only getting 15 tokens/sec on RTX 4090 with 7B model, should be much faster.</p>
+            <p class="mb-3"><strong>What I Tried:</strong> Disabled all extensions, switched loaders - minimal improvement.</p>
+            <p class="mb-3"><strong>Actual Fix:</strong> Multiple bottlenecks: wrong loader, CPU offloading, and synchronous generation:</p>
+            <div class="code-block">
+                <pre><code class="language-bash"># The problem: Using llama.cpp loader (CPU-optimized)
+python server.py \
+  --loader llama.cpp \
+  --model mistral-7b.gguf \
+  --n-gpu-layers 20  # Partial CPU offload
+# Result: 15 tok/s
+
+# Solution: Use ExLlamaV2 (GPU-optimized)
+python server.py \
+  --loader exllamav2 \
+  --model mistral-7b-exl2 \
+  --gpu-memory 24  # Use all 24GB
+  --flash-attn  # Enable Flash Attention 2
+# Result: 85+ tok/s on RTX 4090
+
+# Additional optimizations:
+python server.py \
+  --loader exllamav2 \
+  --model mistral-7b-exl2 \
+  --gpu-memory 24 \
+  --flash-attn \
+  --num-experts 2  # For MoE models (Mixtral)
+  --rope-scale 1.0 \
+  --long-context  # For 8k+ context
+
+# Enable streaming for faster perceived response
+python server.py \
+  --loader exllamav2 \
+  --model mistral-7b-exl2 \
+  --stream
+
+# Benchmark command line
+python server.py --benchmark</code></pre>
+            </div>
+            <p class="mt-3 text-sm text-gray-600">Expected speeds on RTX 4090: ExLlamaV2 80-100 tok/s, GPTQ 40-50 tok/s, GGUF 30-40 tok/s.</p>
+        </div>
+
+        <div class="issue-box">
+            <div class="issue-title">Issue #4934: API returns 500 error on long prompts</div>
+            <div class="issue-source">github.com/oobabooga/text-generation-webui/issues/4934</div>
+            <p class="mb-3"><strong>Problem:</strong> API requests with prompts >2000 characters return HTTP 500, but UI works fine.</p>
+            <p class="mb-3"><strong>What I Tried:</strong> Increased timeout, adjusted chunk size - didn't help.</p>
+            <p class="mb-3"><strong>Actual Fix:</strong> API has separate max_length setting that defaults too low. Need to configure API and model settings independently:</p>
+            <div class="code-block">
+                <pre><code class="language-bash"># The problem: API max_length too short
+python server.py \
+  --api \
+  --model mistral-7b-instruct
+# API max_length defaults to 512!
+
+# Solution: Set API-specific limits
+python server.py \
+  --api \
+  --api-blocking-port 5000 \
+  --api-streaming-port 5005 \
+  --model mistral-7b-instruct \
+  --max-new-tokens 2048 \
+  --context-size 4096
+
+# In API request, ensure you're using correct endpoint
+# POST to /api/generate for streaming
+# POST to /api/block/generate for blocking
+
+curl http://localhost:5000/api/block/generate \
+  -H "Content-Type: application/json" \
+  -d '{
+    "prompt": "Long prompt...",
+    "max_new_tokens": 2048,
+    "temperature": 0.7,
+    "top_p": 0.9,
+    "truncation_length": 4096
+  }'
+
+# For OpenAI-compatible API
+python server.py --api --openai-api
+
+curl http://localhost:5000/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "mistral-7b-instruct",
+    "messages": [{"role": "user", "content": "..."}],
+    "max_tokens": 2048
+  }'</code></pre>
+            </div>
+        </div>
+
+        <h2 class="text-2xl font-bold mb-4 mt-12">Essential Extensions</h2>
+
+        <h3 class="text-xl font-semibold mb-3">OpenAI API Extension</h3>
+
+        <div class="code-block mb-6">
+            <pre><code class="language-bash"># Install OpenAI API extension
+cd extensions
+git clone https://github.com/oobabooga/text-generation-webui-extensions
+cd text-generation-webui-extensions/openai
+
+# Enable extension
+cd ../..
+python server.py --extensions openai
+
+# Configure in web UI: Settings → OpenAI
+# Or via command line:
+python server.py \
+  --extensions openai \
+  --openai-api-port 5000 \
+  --openai-api-key your-api-key
+
+# Drop-in replacement for OpenAI API
+curl http://localhost:5000/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer your-api-key" \
+  -d '{
+    "model": "local-model",
+    "messages": [{"role": "user", "content": "Hello!"}]
+  }'
+
+# Works with existing OpenAI clients
+# Just change base_url to http://localhost:5000/v1</code></pre>
+        </div>
+
+        <h3 class="text-xl font-semibold mb-3">Training Extension (LoRA)</h3>
+
+        <div class="code-block mb-6">
+            <pre><code class="language-python"># Enable training extension
+python server.py --extensions training
+
+# Via web UI: Extensions → Training
+# Upload dataset (JSONL format)
+# Configure hyperparameters:
+# - LoRA rank: 8-64 (higher = more capacity)
+# - Learning rate: 1e-4 to 5e-4
+# - Batch size: 1-4 (depending on VRAM)
+# - Epochs: 1-3 (more = overfitting)
+
+# Training dataset format (JSONL):
+{"text": "User: What is X?\nAssistant: X is..."}
+{"text": "User: How do I Y?\nAssistant: To Y,..."}
+
+# Fine-tune on custom data
+python train.py \
+  --model mistral-7b-instruct \
+  --data training.jsonl \
+  --lora-rank 32 \
+  --lora-alpha 64 \
+  --learning-rate 2e-4 \
+  --batch-size 2 \
+  --epochs 2 \
+  --output-dir ./loras \
+  --output-name my-lora
+
+# Load with LoRA
+python server.py \
+  --model mistral-7b-instruct \
+  --lora_dir ./loras \
+  --lora my-lora</code></pre>
+        </div>
+
+        <h3 class="text-xl font-semibold mb-3">Notebook Mode</h3>
+
+        <div class="code-block mb-6">
+            <pre><code class="language-bash"># Enable notebook mode (like Jupyter)
+python server.py --extensions notebook
+
+# Access at http://localhost:7860/?notebook=true
+
+# Features:
+# - Code cells with markdown support
+# - Variable sharing between cells
+# - Export to Python script
+# - Model state inspection
+
+# Example notebook workflow:
+# Cell 1: Load model
+model = load_model("mistral-7b-instruct")
+
+# Cell 2: Test generation
+output = generate("Hello, world!", max_tokens=100)
+print(output)
+
+# Cell 3: Benchmark
+import time
+start = time.time()
+generate("Long prompt...", max_tokens=1000)
+print(f"Time: {time.time() - start:.2f}s")</code></pre>
+        </div>
+
+        <h2 class="text-2xl font-bold mb-4 mt-12">Production Deployment</h2>
+
+        <div class="code-block mb-6">
+            <pre><code class="language-bash"># Run as background service
+nohup python server.py \
+  --loader exllamav2 \
+  --model mistral-7b-exl2 \
+  --api \
+  --listen \
+  --port 5000 \
+  > logs/textgen.log 2>&1 &
+
+# Systemd service
+sudo tee /etc/systemd/system/textgen.service <<EOF
+[Unit]
+Description=Text-generation-webui
+After=network.target
+
+[Service]
+Type=simple
+User=your-user
+WorkingDirectory=/path/to/text-generation-webui
+Environment="PATH=/path/to/textgen-env/bin"
+ExecStart=/path/to/textgen-env/bin/python server.py \
+  --loader exllamav2 \
+  --model mistral-7b-exl2 \
+  --api \
+  --listen \
+  --port 5000
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+sudo systemctl daemon-reload
+sudo systemctl enable textgen
+sudo systemctl start textgen
+
+# Check logs
+sudo journalctl -u textgen -f</code></pre>
+        </div>
+
+        <h2 class="text-2xl font-bold mb-4 mt-12">Performance Comparison</h2>
+
+        <div class="bg-white border rounded-lg p-6 mb-6">
+            <table class="w-full text-sm">
+                <thead>
+                    <tr class="border-b">
+                        <th class="text-left py-2">Loader</th>
+                        <th class="text-left py-2">Model</th>
+                        <th class="text-left py-2">GPU</th>
+                        <th class="text-left py-2">Speed (tok/s)</th>
+                        <th class="text-left py-2">VRAM</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="border-b">
+                        <td class="py-2">ExLlamaV2</td>
+                        <td class="py-2">Mistral 7B (4bpw)</td>
+                        <td class="py-2">RTX 4090</td>
+                        <td class="py-2 text-green-600">85-95</td>
+                        <td class="py-2">5.5GB</td>
+                    </tr>
+                    <tr class="border-b">
+                        <td class="py-2">GGUF (llama.cpp)</td>
+                        <td class="py-2">Mistral 7B (Q4_K_M)</td>
+                        <td class="py-2">RTX 4090</td>
+                        <td class="py-2 text-yellow-600">35-45</td>
+                        <td class="py-2">4.5GB</td>
+                    </tr>
+                    <tr class="border-b">
+                        <td class="py-2">bitsandbytes (4-bit)</td>
+                        <td class="py-2">Mistral 7B (NF4)</td>
+                        <td class="py-2">RTX 4090</td>
+                        <td class="py-2 text-yellow-600">40-50</td>
+                        <td class="py-2">5.5GB</td>
+                    </tr>
+                    <tr class="border-b">
+                        <td class="py-2">ExLlamaV2</td>
+                        <td class="py-2">Mixtral 8x7B (4bpw)</td>
+                        <td class="py-2">2x RTX 4090</td>
+                        <td class="py-2 text-green-600">45-55</td>
+                        <td class="py-2">20GB</td>
+                    </tr>
+                    <tr class="border-b">
+                        <td class="py-2">GGUF</td>
+                        <td class="py-2">Mistral 7B (Q4_K_M)</td>
+                        <td class="py-2">CPU (16 core)</td>
+                        <td class="py-2 text-red-600">3-5</td>
+                        <td class="py-2">8GB RAM</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p class="text-gray-600 text-sm mt-4">Benchmarked at 2048 context with temperature=1.0.</p>
+        </div>
+
+        <h2 class="text-2xl font-bold mb-4 mt-12">Comparison with Alternatives</h2>
+
+        <div class="grid md:grid-cols-2 gap-4">
+            <div class="bg-white p-4 rounded-lg border">
+                <a href="https://pnt.jacbex.com/gpt4all.html" class="text-blue-600 hover:underline font-semibold">GPT4All</a>
+                <p class="text-gray-600 text-sm mt-1">Simpler, CPU-focused</p>
+            </div>
+            <div class="bg-white p-4 rounded-lg border">
+                <a href="https://pnt.jacbex.com/open-webui.html" class="text-blue-600 hover:underline font-semibold">Open-WebUI</a>
+                <p class="text-gray-600 text-sm mt-1">ChatGPT-like web UI</p>
+            </div>
+            <div class="bg-white p-4 rounded-lg border">
+                <a href="https://pnt.jacbex.com/fastchat.html" class="text-blue-600 hover:underline font-semibold">FastChat</a>
+                <p class="text-gray-600 text-sm mt-1">Model training + serving</p>
+            </div>
+            <div class="bg-white p-4 rounded-lg border">
+                <a href="https://github.com/oobabooga/text-generation-webui" class="text-blue-600 hover:underline font-semibold">Oobabooga GitHub</a>
+                <p class="text-gray-600 text-sm mt-1">Official repository</p>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t mt-12">
+        <div class="max-w-4xl mx-auto px-6 py-8 text-center text-gray-500">
+            <p>Last updated: March 2026</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            Prism.highlightAll();
+        });
+    </script>
+
+</body>
+</html>

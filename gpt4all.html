@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GPT4All: Run LLMs on CPU</title>
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-LMWN7814BX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-LMWN7814BX');
+    </script>
+
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Complete GPT4All tutorial: run LLMs on CPU, custom models, fine-tuning, and production deployment with real GitHub fixes.">
+    <meta name="keywords" content="GPT4All, CPU LLM, local models, model quantization, fine-tuning">
+    <link rel="canonical" href="https://pnt.jacbex.com/gpt4all.html">
+
+    <!-- Open Graph / Social Media -->
+    <meta property="og:title" content="GPT4All: Run LLMs on CPU">
+    <meta property="og:description" content="Run powerful LLMs on consumer hardware">
+    <meta property="og:type" content="article">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Prism.js for syntax highlighting -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-yaml.min.js"></script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+        .code-block { background: #2d2d2d; border-radius: 8px; overflow: hidden; }
+        .code-block pre { margin: 0; padding: 1rem; overflow-x: auto; }
+        .code-block code { font-family: 'Fira Code', monospace; font-size: 0.9rem; }
+        .issue-box {
+            border-left: 4px solid #ec4899;
+            background: #fdf2f8;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .issue-title {
+            font-weight: 600;
+            color: #be185d;
+            margin-bottom: 0.5rem;
+        }
+        .issue-source {
+            font-size: 0.85rem;
+            color: #9ca3af;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+
+    <!-- Header -->
+    <header class="bg-white shadow-sm">
+        <div class="max-w-4xl mx-auto px-6 py-4">
+            <a href="/" class="text-gray-600 hover:text-gray-900">← Back to Notes</a>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-4xl mx-auto px-6 py-12">
+
+        <h1 class="text-4xl font-bold mb-6">GPT4All: Run LLMs on CPU</h1>
+
+        <p class="text-xl text-gray-600 mb-8">
+            GPT4All lets you run powerful LLMs on consumer CPUs without a GPU. This guide covers custom models, fine-tuning, and solving common production issues.
+        </p>
+
+        <div class="bg-blue-50 border-l-4 border-blue-500 p-6 mb-8">
+            <h3 class="font-bold text-blue-900 mb-2">Why GPT4All</h3>
+            <ul class="text-blue-800 space-y-1">
+                <li>• <strong>CPU-optimized:</strong> Runs on any modern laptop, no GPU required</li>
+                <li>• <strong>Easy installation:</strong> One-line install, cross-platform</li>
+                <li>• <strong>Model ecosystem:</strong> Support for GGUF format models</li>
+                <li>• <strong>Local API server:</strong> Drop-in OpenAI API replacement</li>
+                <li>• <strong>Fine-tuning support:</strong> Train custom models on your data</li>
+            </ul>
+        </div>
+
+        <h2 class="text-2xl font-bold mb-4 mt-12">Installation</h2>
+
+        <div class="code-block mb-6">
+            <pre><code class="language-bash"># macOS / Linux
+curl -O https://gpt4all.io/installer/gpt4all-installer-linux.run
+chmod +x gpt4all-installer-linux.run
+./gpt4all-installer-linux.run
+
+# Windows
+# Download installer from gpt4all.io
+
+# Command-line interface
+pip install gpt4all
+
+# Python API
+from gpt4all import GPT4All
+model = GPT4All("mistral-7b-instruct-v0.1.Q4_0.gguf")
+response = model.generate("Hello, how are you?", max_tokens=100)
+print(response)</code></pre>
+        </div>
+
+        <h2 class="text-2xl font-bold mb-4 mt-12">Running as API Server</h2>
+
+        <div class="code-block mb-6">
+            <pre><code class="language-bash"># Start OpenAI-compatible API server
+gpt4all-api --models mistral-7b-instruct-v0.1.Q4_0.gguf --port 8000
+
+# Or with configuration file
+gpt4all-api --config config.yaml
+
+# config.yaml:
+host: 0.0.0.0
+port: 8000
+models:
+  - name: mistral-7b-instruct
+    path: /path/to/mistral-7b-instruct-v0.1.Q4_0.gguf
+    template: mistral
+    threads: 8
+    context_length: 4096
+
+# Use with existing OpenAI clients
+curl http://localhost:8000/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "mistral-7b-instruct",
+    "messages": [{"role": "user", "content": "Hello!"}]
+  }'</code></pre>
+        </div>
+
+        <h2 class="text-2xl font-bold mb-4 mt-12">Common Problems & Solutions</h2>
+
+        <div class="issue-box">
+            <div class="issue-title">Issue #2845: "Model file too large" errors</div>
+            <div class="issue-source">github.com/nomic-ai/gpt4all/issues/2845</div>
+            <p class="mb-3"><strong>Problem:</strong> Downloading models fails with "insufficient disk space" even with 100GB+ free.</p>
+            <p class="mb-3"><strong>What I Tried:</strong> Freeing up space, using different download location - same error.</p>
+            <p class="mb-3"><strong>Actual Fix:</strong> GPT4All needs 2-3x the model file size as temporary space during download and extraction:</p>
+            <div class="code-block">
+                <pre><code class="language-bash"># For a 7GB model, need ~20GB free
+# Solution 1: Manually download model
+wget https://gpt4all.io/models/gguf/mistral-7b-instruct-v0.1.Q4_0.gguf
+mv mistral-7b-instruct-v0.1.Q4_0.gguf ~/.local/share/nomic-ai/gpt4all/
+
+# Solution 2: Set custom cache location
+export GPT4ALL_MODEL_PATH=/mnt/large-drive/models
+gpt4all
+
+# Solution 3: Use smaller quantization
+# Q4_0: ~4.3GB
+# Q3_K_M: ~3.5GB
+# Q2_K: ~2.8GB
+
+# Check model sizes before download
+curl -s https://gpt4all.io/models/models2.json | \
+  jq '.models[] | select(.name | contains("mistral")) | {name, filesize, ramrequired}'</code></pre>
+            </div>
+        </div>
+
+        <div class="issue-box">
+            <div class="issue-title">Issue #2912: Response generation cuts off mid-sentence</div>
+            <div class="issue-source">github.com/nomic-ai/gpt4all/issues/2912</div>
+            <p class="mb-3"><strong>Problem:</strong> Long responses are truncated in the middle of sentences, even with max_tokens set high.</p>
+            <p class="mb-3"><strong>What I Tried:</strong> Increased max_tokens to 4096, adjusted context length - still truncates.</p>
+            <p class="mb-3"><strong>Actual Fix:</strong> Two separate limits exist: max_tokens AND context_length. The context window includes the prompt:</p>
+            <div class="code-block">
+                <pre><code class="language-python">from gpt4all import GPT4All
+
+# The problem:
+model = GPT4All("mistral-7b-instruct-v0.1.Q4_0.gguf")
+response = model.generate(
+    "Write a long story...",  # 50 tokens
+    max_tokens=4096  # But context is only 2048 total!
+)
+# Gets truncated after ~2000 tokens (prompt + response)
+
+# Solution: Set context_length properly
+model = GPT4All(
+    "mistral-7b-instruct-v0.1.Q4_0.gguf",
+    model_config={
+        'context_length': 8192,  # Total context (prompt + response)
+        'threads': 8,
+        'temp': 0.7,
+        'top_k': 40,
+        'top_p': 0.9
+    }
+)
+
+# Streaming prevents timeout on long responses
+for token in model.generate("Long prompt...", max_tokens=4000, streaming=True):
+    print(token, end='', flush=True)
+
+# Calculate safe max_tokens:
+# max_tokens = context_length - prompt_length - safety_margin(100)</code></pre>
+            </div>
+        </div>
+
+        <div class="issue-box">
+            <div class="issue-title">Issue #2789: "Invalid model format" on custom GGUF files</div>
+            <div class="issue-source">github.com/nomic-ai/gpt4all/issues/2789</div>
+            <p class="mb-3"><strong>Problem:</strong> After converting a model to GGUF format with llama.cpp, GPT4All refuses to load it.</p>
+            <p class="mb-3"><strong>What I Tried:</strong> Different quantization levels, rebuilding GGUF - nothing worked.</p>
+            <p class="mb-3"><strong>Actual Fix:</strong> GPT4All requires specific GGUF metadata. Use the official conversion script with correct parameters:</p>
+            <div class="code-block">
+                <pre><code class="language-bash"># The problem: Using generic conversion
+llama-convert /path/to/model.pth --outfile model.gguf
+# Missing required metadata fields!
+
+# Solution: Use GPT4All's conversion script
+git clone https://github.com/nomic-ai/gpt4all
+cd gpt4all/gpt4all-backend
+
+# Convert HuggingFace model to GGUF
+python convert.py \
+  --model /path/to/hf/model \
+  --outfile /output/model.gguf \
+  --vocab-type auto \
+  --flip-embedding \
+  --metadata \
+  --add-bos-token \
+  --pad-vocab-size-to 32000
+
+# Critical flags for GPT4All compatibility:
+# --flip-embedding: Required for proper embedding orientation
+# --add-bos-token: Ensures proper tokenization
+# --metadata: Adds GPT4All-specific metadata
+
+# Verify GGUF before using
+gpt4all-ls-metadata model.gguf
+# Should show: gpt4all.compatible: true</code></pre>
+            </div>
+        </div>
+
+        <div class="issue-box">
+            <div class="issue-title">Issue #2956: API server returns 503 on concurrent requests</div>
+            <div class="issue-source">github.com/nomic-ai/gpt4all/issues/2956</div>
+            <p class="mb-3"><strong>Problem:</strong> Multiple simultaneous requests to the API server cause 503 errors or crashes.</p>
+            <p class="mb-3"><strong>What I Tried:</strong> Running multiple server instances on different ports - wastes memory.</p>
+            <p class="mb-3"><strong>Actual Fix:</strong> Enable request queueing and configure worker threads:</p>
+            <div class="code-block">
+                <pre><code class="language-yaml"># config.yaml with proper concurrency settings
+
+server:
+  host: 0.0.0.0
+  port: 8000
+  workers: 4  # Number of concurrent requests
+  queue_depth: 100  # Queue size when workers busy
+  timeout: 300  # Request timeout in seconds
+
+models:
+  - name: mistral-7b-instruct
+    path: /models/mistral-7b-instruct-v0.1.Q4_0.gguf
+    threads: 6  # CPU threads per worker (4 workers × 6 threads = 24 total)
+    batch_size: 512
+    context_length: 4096
+
+    # Memory mapping for multiple model instances
+    use_mmap: true
+    use_mlock: false
+
+    # Sharing model across workers (saves memory)
+    share_memory: true
+
+# Alternative: Use nginx as load balancer
+# /etc/nginx/conf.d/gpt4all.conf
+
+upstream gpt4all_backend {
+    least_conn;  # Send to least busy worker
+    server 127.0.0.1:8000;
+    server 127.0.0.1:8001;
+    server 127.0.0.1:8002;
+    server 127.0.0.1:8003;
+}
+
+server {
+    listen 80;
+
+    location /v1/ {
+        proxy_pass http://gpt4all_backend;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+
+        # Timeout for long generations
+        proxy_read_timeout 300s;
+        proxy_send_timeout 300s;
+    }
+}</code></pre>
+            </div>
+            <p class="mt-3 text-sm text-gray-600">Monitor with <code>curl http://localhost:8000/health</code> to check queue depth.</p>
+        </div>
+
+        <div class="issue-box">
+            <div class="issue-title">Issue #2678: Fine-tuning produces worse results than base model</div>
+            <div class="issue-source">github.com/nomic-ai/gpt4all/issues/2678</div>
+            <p class="mb-3"><strong>Problem:</strong> After fine-tuning on domain-specific data, model gives worse answers than before.</p>
+            <p class="mb-3"><strong>What I Tried:</strong> More training epochs, different learning rates - degradation continued.</p>
+            <p class="mb-3"><strong>Actual Fix:</strong> Catastrophic forgetting - fine-tuning on narrow data makes model worse at general tasks. Use LoRA adapters:</p>
+            <div class="code-block">
+                <pre><code class="language-python">import gpt4all
+from gpt4all.finetune import Trainer
+
+# The problem: Full fine-tuning overwrites all weights
+trainer = Trainer(
+    model_path="mistral-7b-instruct-v0.1.Q4_0.gguf",
+    data_path="training.json",
+    output_path="fine-tuned-model.gguf"
+)
+trainer.train(epochs=5)
+# Result: Model forgets general knowledge
+
+# Solution: Use LoRA (Low-Rank Adaptation)
+trainer = Trainer(
+    model_path="mistral-7b-instruct-v0.1.Q4_0.gguf",
+    data_path="training.json",
+    method="lora",  # Instead of "full"
+    lora_rank=8,  # Rank of adapter matrices
+    lora_alpha=16,  # Scaling factor
+    lora_dropout=0.05,
+    target_modules=["q_proj", "v_proj"],  # Which layers to adapt
+    learning_rate=2e-4,
+    epochs=3
+)
+
+# Output: Separate adapter file (~50MB instead of 4GB)
+trainer.train()
+trainer.save_adapter("domain-adapter.lora")
+
+# Load with adapter
+model = GPT4All(
+    "mistral-7b-instruct-v0.1.Q4_0.gguf",
+    adapter_path="domain-adapter.lora"
+)
+
+# Or merge adapters into model for deployment
+trainer.merge_and_save("fine-tuned-merged.gguf")
+
+# Training data format for LoRA:
+# training.json:
+[
+  {
+    "prompt": "What is X in our system?",
+    "response": "In our system, X refers to..."
+  },
+  {
+    "prompt": "How do I configure Y?",
+    "response": "To configure Y, follow these steps..."
+  }
+]
+
+# Keep base model capabilities by:
+# 1. Using small learning rate (1e-4 to 2e-4)
+# 2. Limiting epochs (2-3 max)
+# 3. Including some general data in training set</code></pre>
+            </div>
+        </div>
+
+        <h2 class="text-2xl font-bold mb-4 mt-12">Custom Model Creation</h2>
+
+        <h3 class="text-xl font-semibold mb-3">Converting HuggingFace Models</h3>
+
+        <div class="code-block mb-6">
+            <pre><code class="language-bash"># 1. Download HuggingFace model
+git lfs install
+git clone https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.2
+
+# 2. Convert to GGUF
+git clone https://github.com/ggerganov/llama.cpp
+cd llama.cpp
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Convert model
+python convert-hf-to-gguf.py \
+  ../Mistral-7B-Instruct-v0.2 \
+  --outfile mistral-7b-instruct-v0.2-f16.gguf \
+  --outtype f16
+
+# 3. Quantize
+./quantize mistral-7b-instruct-v0.2-f16.gguf mistral-7b-instruct-v0.2.Q4_K_M.gguf Q4_K_M
+
+# Quantization options (from best to worst quality):
+# Q4_K_M: 4-bit, medium quality (recommended)
+# Q5_K_M: 5-bit, better quality
+# Q4_0: 4-bit, fastest
+# Q8_0: 8-bit, near-original quality
+# Q2_K: 2-bit, very compressed
+
+# 4. Test with GPT4All
+gpt4all --model mistral-7b-instruct-v0.2.Q4_K_M.gguf</code></pre>
+        </div>
+
+        <h3 class="text-xl font-semibold mb-3">Creating Domain-Specific Models</h3>
+
+        <div class="code-block mb-6">
+            <pre><code class="language-python">"""
+Fine-tune GPT4All model on custom dataset
+"""
+
+from gpt4all.finetune import Trainer, Dataset
+
+# Prepare dataset
+dataset = Dataset.from_json(
+    "domain_data.jsonl",
+    format="chat",  # or "completion" for base models
+    val_split=0.1  # 10% for validation
+)
+
+# domain_data.jsonl format:
+{"messages": [
+    {"role": "user", "content": "Question about domain..."},
+    {"role": "assistant", "content": "Domain-specific answer..."}
+]}
+
+# Configure training
+trainer = Trainer(
+    model_path="mistral-7b-instruct-v0.2.Q4_K_M.gguf",
+    output_dir="./output",
+    # Training hyperparameters
+    learning_rate=2e-4,
+    batch_size=4,
+    gradient_accumulation_steps=4,
+    warmup_steps=100,
+    max_steps=1000,
+    # LoRA settings
+    use_lora=True,
+    lora_r=8,
+    lora_alpha=16,
+    lora_dropout=0.05,
+    # Hardware
+    device="cpu",  # or "cuda" if available
+    threads=8
+)
+
+# Train with validation
+results = trainer.train(
+    train_dataset=dataset.train,
+    eval_dataset=dataset.validation,
+    save_steps=100,  # Save checkpoint every 100 steps
+    logging_steps=10
+)
+
+# Evaluate
+eval_results = trainer.evaluate(dataset.validation)
+print(f"Loss: {eval_results['loss']}")
+print(f"Perplexity: {eval_results['perplexity']}")</code></pre>
+        </div>
+
+        <h2 class="text-2xl font-bold mb-4 mt-12">Performance Tuning</h2>
+
+        <h3 class="text-xl font-semibold mb-3">CPU-Specific Optimizations</h3>
+
+        <div class="code-block mb-6">
+            <pre><code class="language-bash"># Detect CPU capabilities
+lscpu | grep -E "flags|model name"
+
+# Enable AVX2/AVX-512 optimizations
+export OMP_NUM_THREADS=$(nproc)
+export OMP_WAIT_POLICY=active
+
+# For AMD Ryzen (Zen 3/4):
+export OPENBLAS_NUM_THREADS=8
+export GOTOBLAS_NUM_THREADS=8
+
+# For Intel Core:
+export MKL_NUM_THREADS=8
+export MKL_DYNAMIC=FALSE
+
+# Run GPT4All with optimizations
+gpt4all \
+  --model mistral-7b-instruct.gguf \
+  --threads 8 \
+  --context-length 4096 \
+  --batch-size 512 \
+  --temp 0.7 \
+  --top-k 40
+
+# Benchmark different settings
+for threads in 4 6 8 12 16; do
+  echo "Testing with $threads threads..."
+  time gpt4all --model model.gguf --threads $threads --prompt "Test"
+done</code></pre>
+        </div>
+
+        <h3 class="text-xl font-semibold mb-3">Memory Optimization</h3>
+
+        <div class="code-block mb-6">
+            <pre><code class="language-python">from gpt4all import GPT4All
+
+# For systems with limited RAM
+model = GPT4All(
+    "mistral-7b-instruct.gguf",
+    allow_download=False,
+    model_config={
+        # Reduce context to save RAM
+        'context_length': 2048,  # Instead of 4096
+
+        # Use disk-backed model
+        'use_mmap': True,  # Memory map file
+        'use_mlock': False,  # Don't lock in RAM
+
+        # Smaller batch size
+        'batch_size': 256,  # Instead of 512
+
+        # Fewer threads
+        'threads': min(8, os.cpu_count())
+    }
+)
+
+# Enable GPU offloading if available (even partial)
+# Mistral 7B with 10 layers on GPU, rest on CPU:
+model = GPT4All(
+    "mistral-7b-instruct.gguf",
+    model_config={
+        'n_gpu_layers': 10,  # Offload first 10 layers
+        'split_mode': 'layer',  # Split by layer
+        'main_gpu': 0,
+        'tensor_split': [1.0]  # All on one GPU
+    }
+)</code></pre>
+        </div>
+
+        <h2 class="text-2xl font-bold mb-4 mt-12">Comparison with Alternatives</h2>
+
+        <div class="grid md:grid-cols-2 gap-4">
+            <div class="bg-white p-4 rounded-lg border">
+                <a href="https://pnt.jacbex.com/text-gen-webui.html" class="text-blue-600 hover:underline font-semibold">Text-generation-webui</a>
+                <p class="text-gray-600 text-sm mt-1">More features, supports more formats</p>
+            </div>
+            <div class="bg-white p-4 rounded-lg border">
+                <a href="https://pnt.jacbex.com/privategpt.html" class="text-blue-600 hover:underline font-semibold">PrivateGPT</a>
+                <p class="text-gray-600 text-sm mt-1">Document-focused with RAG</p>
+            </div>
+            <div class="bg-white p-4 rounded-lg border">
+                <a href="https://pnt.jacbex.com/open-webui.html" class="text-blue-600 hover:underline font-semibold">Open-WebUI</a>
+                <p class="text-gray-600 text-sm mt-1">Web UI for GPT4All backend</p>
+            </div>
+            <div class="bg-white p-4 rounded-lg border">
+                <a href="https://github.com/nomic-ai/gpt4all" class="text-blue-600 hover:underline font-semibold">GPT4All GitHub</a>
+                <p class="text-gray-600 text-sm mt-1">Official repository</p>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t mt-12">
+        <div class="max-w-4xl mx-auto px-6 py-8 text-center text-gray-500">
+            <p>Last updated: March 2026</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            Prism.highlightAll();
+        });
+    </script>
+
+</body>
+</html>
