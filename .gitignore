@@ -83,3 +83,4 @@ go.work
 *.temp
 .cache/
 docs
+.skills
