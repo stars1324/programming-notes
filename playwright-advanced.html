@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Playwright V2: Advanced Anti-Detection</title>
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-LMWN7814BX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-LMWN7814BX');
+    </script>
+
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Advanced Playwright stealth mode: bypass Cloudflare, anti-bot detection, CAPTCHA solving, browser fingerprinting evasion.">
+    <meta name="keywords" content="Playwright stealth, Cloudflare bypass, anti-bot detection, CAPTCHA solving, web scraping">
+    <link rel="canonical" href="https://pnt.jacbex.com/playwright_v2.html">
+
+    <!-- Open Graph / Social Media -->
+    <meta property="og:title" content="Playwright V2: Advanced Anti-Detection">
+    <meta property="og:description" content="Bypass any anti-bot system with Playwright">
+    <meta property="og:type" content="article">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Prism.js for syntax highlighting -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+        .code-block { background: #2d2d2d; border-radius: 8px; overflow: hidden; }
+        .code-block pre { margin: 0; padding: 1rem; overflow-x: auto; }
+        .code-block code { font-family: 'Fira Code', monospace; font-size: 0.9rem; }
+        .issue-box {
+            border-left: 4px solid #ec4899;
+            background: #fdf2f8;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .issue-title {
+            font-weight: 600;
+            color: #be185d;
+            margin-bottom: 0.5rem;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+
+    <!-- Header -->
+    <header class="bg-white shadow-sm">
+        <div class="max-w-4xl mx-auto px-6 py-4">
+            <a href="/" class="text-gray-600 hover:text-gray-900">← Back to Notes</a>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-4xl mx-auto px-6 py-12">
+
+        <h1 class="text-4xl font-bold mb-6">Playwright V2: Bypassed Every Anti-Bot System</h1>
+
+        <p class="text-xl text-gray-600 mb-8">
+            Basic stealth mode isn't enough anymore. Here's how I bypass Cloudflare Turnstile, Akamai, DataDome, and every major anti-bot system. With real CAPTCHA solving.
+        </p>
+
+        <div class="bg-blue-50 border-l-4 border-blue-500 p-6 mb-8">
+            <h3 class="font-bold text-blue-900 mb-2">What's Different From V1</h3>
+            <ul class="text-blue-800 space-y-1">
+                <li>• <strong>Cloudflare Turnstile bypass:</strong> Real solving, not just waiting</li>
+                <li>• <strong>Browser fingerprint randomization:</strong> WebGL, Canvas, AudioContext spoofing</li>
+                <li>• <strong>Real CAPTCHA solving:</strong> 2Captcha, YesCAPTCHA, anticaptcha integration</li>
+                <li>• <strong>Behavioral mimicry:</strong> Mouse movements, typing patterns, scroll timing</li>
+                <li>• <strong>Proxy rotation:</strong> Residential proxies with session stickiness</li>
+            </ul>
+        </div>
+
+        <h2 class="text-2xl font-bold mb-4 mt-12">Ultimate Stealth Setup</h2>
+
+        <div class="code-block mb-6">
+            <pre><code class="language-python">import asyncio
+from playwright.async_api import async_playwright
+import random
+import fingerprint_generator
+
+class StealthBrowser:
+    """
+    Playwright with advanced anti-detection
+    """
+
+    def __init__(self):
+        self.fingerprint = fingerprint_generator.generate()
+
+    async def start(self):
+        self.playwright = await async_playwright().start()
+
+        # Launch with stealth options
+        self.browser = await self.playwright.chromium.launch(
+            headless=False,  # Headless gets detected more
+            args=self._get_stealth_args(),
+            channel=self._get_browser_channel()  # Use installed Chrome
+        )
+
+        # Create context with spoofed fingerprint
+        self.context = await self.browser.new_context(
+            viewport=self.fingerprint['viewport'],
+            user_agent=self.fingerprint['user_agent'],
+            locale=self.fingerprint['locale'],
+            timezone_id=self.fingerprint['timezone'],
+            geolocation=self.fingerprint['geolocation'],
+            permissions=['geolocation'],
+            color_scheme=self.fingerprint['color_scheme'],
+            device_scale_factor=self.fingerprint['dpr'],
+        )
+
+        # Inject stealth scripts
+        await self.context.add_init_script("""
+            // Override navigator properties
+            Object.defineProperty(navigator, 'webdriver', {
+                get: () => undefined
+            });
+
+            // Override Chrome detection
+            window.chrome = {
+                runtime: {},
+                loadTimes: function() {},
+                csi: function() {},
+                app: {}
+            };
+
+            // Override permissions API
+            const originalQuery = window.navigator.permissions.query;
+            window.navigator.permissions.query = (parameters) => (
+                parameters.name === 'notifications' ?
+                    Promise.resolve({ state: Notification.permission }) :
+                    originalQuery(parameters)
+            );
+
+            // WebGL spoofing
+            const getParameter = WebGLRenderingContext.prototype.getParameter;
+            WebGLRenderingContext.prototype.getParameter = function(parameter) {
+                if (parameter === 37445) {
+                    return 'Intel Inc.';
+                }
+                if (parameter === 37446) {
+                    return 'Intel Iris OpenGL Engine';
+                }
+                return getParameter.call(this, parameter);
+            };
+
+            // Canvas fingerprint randomization
+            const originalToDataURL = HTMLCanvasElement.prototype.toDataURL;
+            HTMLCanvasElement.prototype.toDataURL = function(type) {
+                const context = this.getContext('2d');
+                if (context) {
+                    const imageData = context.getImageData(0, 0, this.width, this.height);
+                    for (let i = 0; i < imageData.data.length; i += 4) {
+                        imageData.data[i] = imageData.data[i] + Math.floor(Math.random() * 3) - 1;
+                    }
+                    context.putImageData(imageData, 0, 0);
+                }
+                return originalToDataURL.apply(this, arguments);
+            };
+
+            // AudioContext spoofing
+            const audioContext = window.AudioContext || window.webkitAudioContext;
+            if (audioContext) {
+                const originalCreateAnalyser = audioContext.prototype.createAnalyser;
+                audioContext.prototype.createAnalyser = function() {
+                    const analyser = originalCreateAnalyser.call(this);
+                    const originalGetFloatFrequencyData = analyser.getFloatFrequencyData;
+                    analyser.getFloatFrequencyData = function(array) {
+                        originalGetFloatFrequencyData.call(this, array);
+                        for (let i = 0; i < array.length; i++) {
+                            array[i] = array[i] + Math.random() * 0.0001;
+                        }
+                    };
+                    return analyser;
+                };
+            }
+        """)
+
+        self.page = await self.context.new_page()
+
+        return self.page
+
+    def _get_stealth_args(self):
+        return [
+            '--disable-blink-features=AutomationControlled',
+            '--disable-dev-shm-usage',
+            '--disable-background-timer-throttling',
+            '--disable-backgrounding-occluded-windows',
+            '--disable-renderer-backgrounding',
+            '--disable-features=IsolateOrigins,site-per-process',
+            '--disable-web-security',
+            '--disable-features=VizDisplayCompositor',
+            '--start-maximized',
+            '--no-sandbox',
+            '--disable-setuid-sandbox',
+            '--disable-infobars',
+            '--window-position=0,0',
+            '--ignore-certifcate-errors',
+            '--ignore-ssl-errors',
+            '--ignore-certificate-errors-spki-list',
+        ]
+
+    def _get_browser_channel(self):
+        """Use installed Chrome instead of bundled Chromium"""
+        import os
+        chrome_paths = [
+            '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',  # macOS
+            'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',  # Windows
+            '/usr/bin/google-chrome',  # Linux
+        ]
+        for path in chrome_paths:
+            if os.path.exists(path):
+                return 'chrome'
+        return None  # Fall back to chromium
+
+# Usage
+async def main():
+    browser = StealthBrowser()
+    page = await browser.start()
+
+    # Navigate with human-like behavior
+    await human_like_navigate(page, 'https://example.com')
+
+    await asyncio.sleep(300)  # Keep alive for debugging
+
+asyncio.run(main())</code></pre>
+        </div>
+
+        <h2 class="text-2xl font-bold mb-4 mt-12">Cloudflare Turnstile Bypass</h2>
+
+        <div class="code-block mb-6">
+            <pre><code class="language-python">import requests
+import base64
+
+async def bypass_cloudflare_turnstile(page, url):
+    """
+    Bypass Cloudflare Turnstile CAPTCHA using 2Captcha
+    """
+
+    # Navigate to page
+    await page.goto(url, wait_until='networkidle')
+
+    # Check if Turnstile is present
+    turnstile_present = await page.query_selector('.cf-turnstile')
+    if not turnstile_present:
+        return True  # No CAPTCHA needed
+
+    # Get site key
+    site_key = await page.evaluate('''() => {
+        const elem = document.querySelector('[data-sitekey]');
+        return elem ? elem.getAttribute('data-sitekey') : null;
+    }''')
+
+    if not site_key:
+        return False
+
+    # Solve CAPTCHA using 2Captcha
+    api_key = 'YOUR_2CAPTCHA_API_KEY'
+
+    # Submit CAPTCHA
+    submit_url = 'http://2captcha.com/in.php'
+    submit_data = {
+        'key': api_key,
+        'method': 'turnstile',
+        'sitekey': site_key,
+        'pageurl': url,
+        'json': 1
+    }
+
+    response = requests.post(submit_url, data=submit_data)
+    result = response.json()
+
+    if result['status'] != 1:
+        raise Exception(f"Failed to submit CAPTCHA: {result}")
+
+    captcha_id = result['request']
+
+    # Wait for solution
+    import time
+    for _ in range(60):  # Wait up to 60 seconds
+        await asyncio.sleep(3)
+
+        result_url = f'http://2captcha.com/res.php?key={api_key}&action=get&id={captcha_id}&json=1'
+        response = requests.get(result_url)
+        result = response.json()
+
+        if result['status'] == 1:
+            token = result['request']
+
+            # Inject token
+            await page.evaluate('''(token) => {
+                const textarea = document.querySelector('[name="cf-turnstile-response"]');
+                if (textarea) {
+                    textarea.value = token;
+                    // Trigger change event
+                    textarea.dispatchEvent(new Event('change', { bubbles: true }));
+                }
+            }''', token)
+
+            # Submit form
+            submit_button = await page.query_selector('button[type="submit"], input[type="submit"]')
+            if submit_button:
+                await submit_button.click()
+
+            return True
+
+    raise Exception("CAPTCHA solving timeout")
+
+# Alternative: Use YesCAPTCHA (faster, more expensive)
+async def solve_with_yescaptcha(page, url):
+    """
+    YesCAPTCHA has better success rate for Cloudflare
+    """
+    api_key = 'YESCAPTCHA_API_KEY'
+
+    # Get challenge
+    site_key = await page.evaluate('''() => {
+        const elem = document.querySelector('[data-sitekey]');
+        return elem ? elem.getAttribute('data-sitekey') : null;
+    }''')
+
+    # Submit to YesCAPTCHA
+    submit_data = {
+        'clientKey': api_key,
+        'task': {
+            'type': 'TurnstileTaskProxyless',
+            'websiteURL': url,
+            'websiteKey': site_key,
+        }
+    }
+
+    response = requests.post(
+        'https://api.yescaptcha.com/createTask',
+        json=submit_data
+    )
+    result = response.json()
+
+    task_id = result['taskId']
+
+    # Poll for result
+    while True:
+        await asyncio.sleep(2)
+
+        response = requests.post(
+            'https://api.yescaptcha.com/getTaskResult',
+            json={
+                'clientKey': api_key,
+                'taskId': task_id
+            }
+        )
+        result = response.json()
+
+        if result['status'] == 'ready':
+            token = result['solution']['token']
+
+            # Inject and submit
+            await page.evaluate('''(token) => {
+                document.querySelector('[name="cf-turnstile-response"]').value = token;
+            }''', token)
+
+            await page.click('button[type="submit"]')
+            return True</code></pre>
+        </div>
+
+        <h2 class="text-2xl font-bold mb-4 mt-12">Human-Like Behavior Simulation</h2>
+
+        <div class="code-block mb-6">
+            <pre><code class="language-python">import random
+import asyncio
+from scipy.stats import truncnorm
+
+async def human_like_type(page, selector, text, delay_range=(50, 200)):
+    """
+    Type text like a human: variable delays, typos, corrections
+    """
+    element = await page.query_selector(selector)
+    await element.click()
+
+    for char in text:
+        # Variable delay between keystrokes
+        delay = random.gauss(delay_range[0], 30)
+        delay = max(30, min(delay, 500))  # Clamp to reasonable range
+        await asyncio.sleep(delay / 1000)
+
+        # Occasional typo (5% chance)
+        if random.random() < 0.05:
+            wrong_char = random.choice('abcdefghijklmnopqrstuvwxyz')
+            await element.type(wrong_char)
+            await asyncio.sleep(random.uniform(0.1, 0.3))
+            # Backspace
+            await element.press('Backspace')
+            await asyncio.sleep(random.uniform(0.1, 0.2))
+
+        await element.type(char)
+
+async def human_like_mouse_move(page, target_element):
+    """
+    Move mouse with natural Bezier curves
+    """
+    box = await target_element.bounding_box()
+
+    # Generate random points
+    start_x, start_y = await page.mouse.position
+    end_x = box['x'] + box['width'] / 2
+    end_y = box['y'] + box['height'] / 2
+
+    # Bezier curve control points
+    cp1_x = start_x + random.uniform(-100, 100)
+    cp1_y = start_y + random.uniform(-100, 100)
+    cp2_x = end_x + random.uniform(-50, 50)
+    cp2_y = end_y + random.uniform(-50, 50)
+
+    # Move through Bezier curve
+    steps = 50
+    for i in range(steps + 1):
+        t = i / steps
+        # Cubic Bezier formula
+        x = (1-t)**3 * start_x + \
+            3 * (1-t)**2 * t * cp1_x + \
+            3 * (1-t) * t**2 * cp2_x + \
+            t**3 * end_x
+        y = (1-t)**3 * start_y + \
+            3 * (1-t)**2 * t * cp1_y + \
+            3 * (1-t) * t**2 * cp2_y + \
+            t**3 * end_y
+
+        await page.mouse.move(x, y)
+        await asyncio.sleep(0.01)  # 10ms per step
+
+async def human_like_scroll(page, target_position):
+    """
+    Scroll naturally with momentum and overshoot
+    """
+    current_position = await page.evaluate('window.pageYOffset')
+
+    # Scroll in bursts
+    while abs(current_position - target_position) > 50:
+        # Random scroll distance
+        scroll_amount = random.randint(100, 300)
+        if target_position < current_position:
+            scroll_amount = -scroll_amount
+
+        # Scroll
+        await page.evaluate(f'window.scrollBy(0, {scroll_amount})')
+
+        # Pause
+        await asyncio.sleep(random.uniform(0.3, 0.8))
+
+        # Occasional overshoot correction
+        if random.random() < 0.2:
+            await page.evaluate(f'window.scrollBy(0, {-scroll_amount * 0.1})')
+            await asyncio.sleep(0.2)
+
+        current_position = await page.evaluate('window.pageYOffset')
+
+async def human_like_navigate(page, url):
+    """
+    Navigate with human-like behavior patterns
+    """
+    # Load page
+    await page.goto(url, wait_until='domcontentloaded')
+
+    # Wait random time (reading)
+    await asyncio.sleep(random.uniform(1, 3))
+
+    # Scroll down
+    await human_like_scroll(page, random.randint(500, 1500))
+
+    # Wait more (reading content)
+    await asyncio.sleep(random.uniform(2, 5))
+
+    # Move mouse (like looking at something)
+    if random.random() < 0.3:
+        elements = await page.query_selector_all('a, button')
+        if elements:
+            await human_like_mouse_move(page, random.choice(elements))
+
+    # Scroll more
+    await human_like_scroll(page, random.randint(1000, 3000))</code></pre>
+        </div>
+
+        <h2 class="text-2xl font-bold mb-4 mt-12">Common Problems & Solutions</h2>
+
+        <div class="issue-box">
+            <div class="issue-title"><a href="https://github.com/microsoft/playwright-python/issues?q=is%3Aissue+Cloudflare+headless" target="_blank" class="text-pink-700 hover:underline">Cloudflare still detects headless browser</a></div>
+            <p class="mb-3"><strong>Problem:</strong> Even with all stealth plugins, Cloudflare blocks headless Chrome every time. Headful works fine.</p>
+            <p class="mb-3"><strong>What I Tried:</strong> puppeteer-extra, stealth plugins, different user agents - still detected.</p>
+            <p class="mb-3"><strong>Actual Fix:</strong> Cloudflare detects headless via multiple methods. Need to spoof all of them:</p>
+            <div class="code-block">
+                <pre><code class="language-python"># Solution: Don't use headless, or use Xvfb virtual display
+# Option 1: Run headful on server with Xvfb
+
+# Install Xvfb
+# Ubuntu: sudo apt-get install xvfb
+# macOS: XQuartz
+
+# Run with virtual display
+from xvfbwrapper import Xvfb
+
+with Xvfb(width=1920, height=1080):
+    browser = await playwright.chromium.launch(
+        headless=False,  # Actually headful but on virtual display
+        args=['--start-maximized']
+    )
+    # Works like headless but appears headful to detection
+
+# Option 2: Use puppeteer-stealth equivalent for Playwright
+# Install playwright-extra
+pip install playwright-stealth
+
+from playwright_stealth import stealth_sync
+
+# Apply stealth
+browser = await playwright.chromium.launch(headless=True)
+context = await browser.new_context()
+page = await context.new_page()
+
+await stealth_sync(page)
+
+# Option 3: Spooof headless detection checks
+await page.add_init_script('''
+    // Override headless checks
+    Object.defineProperty(navigator, 'plugins', {
+        get: () => [1, 2, 3, 4, 5]
+    });
+
+    Object.defineProperty(navigator, 'languages', {
+        get: () => ['en-US', 'en']
+    });
+
+    // Override WebGL vendor
+    const getParameter = WebGLRenderingContext.prototype.getParameter;
+    WebGLRenderingContext.prototype.getParameter = function(parameter) {
+        if (parameter === 37445) {
+            return 'Intel Inc.';
+        }
+        return getParameter.call(this, parameter);
+    };
+
+    // Spoof screen dimensions (headless often has 0x0)
+    Object.defineProperty(screen, 'width', {
+        get: () => 1920
+    });
+    Object.defineProperty(screen, 'height', {
+        get: () => 1080
+    });
+    Object.defineProperty(screen, 'availWidth', {
+        get: () => 1920
+    });
+    Object.defineProperty(screen, 'availHeight', {
+        get: () => 1080
+    });
+
+    // Spoof media devices
+    navigator.mediaDevices.enumerateDevices = () => Promise.resolve([
+        {deviceId: 'default', kind: 'audioinput', label: '', groupId: 'default'},
+        {deviceId: 'default', kind: 'videoinput', label: '', groupId: 'default'},
+    ]);
+''')
+
+# Option 4: Use residential proxy with good reputation
+# Cloudflare flags datacenter IPs
+browser = await playwright.chromium.launch(
+    proxy={
+        'server': 'http://residential-proxy.com:8000',
+        'username': 'user',
+        'password': 'pass'
+    }
+)</code></pre>
+            </div>
+        </div>
+
+        <div class="issue-box">
+            <div class="issue-title"><a href="https://github.com/microsoft/playwright-python/issues?q=is%3Aissue+DataDome" target="_blank" class="text-pink-700 hover:underline">DataDome blocks after 3 requests</a></div>
+            <p class="mb-3"><strong>Problem:</strong> DataDome allows first request, blocks subsequent ones with "Access denied". Cookies and headers don't help.</p>
+            <p class="mb-3"><strong>What I Tried:</strong> Rotated IPs, changed fingerprints - still blocked after N requests.</p>
+            <p class="mb-3"><strong>Actual Fix:</strong> DataDome uses behavioral analysis + device fingerprinting. Need complete browser profile:</p>
+            <div class="code-block">
+                <pre><code class="language-python"># Solution: Use persistent context with real browser profile
+# DataDome checks for consistent browser behavior
+
+# Create browser profile once
+import os
+
+profile_path = '/path/to/browser/profile'
+
+# First time: create profile with real browser session
+browser = await playwright.chromium.launch_persistent_context(
+    user_data_dir=profile_path,
+    headless=False,
+)
+
+# Manually solve CAPTCHA once, save session
+# Then reuse profile:
+
+async def get_datadome_session(url):
+    context = await playwright.chromium.launch_persistent_context(
+        user_data_dir=profile_path,
+        headless=False,
+        channel='chrome',  # Use real Chrome
+    )
+
+    page = await context.new_page()
+
+    # Load stored cookies if available
+    if os.path.exists('cookies.json'):
+        with open('cookies.json') as f:
+            cookies = json.load(f)
+            await context.add_cookies(cookies)
+
+    await page.goto(url)
+
+    # Check if blocked
+    if 'datadome' in await page.content():
+        # Need to solve CAPTCHA manually or with service
+        input("Solve CAPTCHA in browser, then press Enter")
+
+        # Save cookies after solving
+        cookies = await context.cookies()
+        with open('cookies.json', 'w') as f:
+            json.dump(cookies, f)
+
+    return page
+
+# For multiple requests, reuse same context
+async def datadome_requests(urls):
+    context = await playwright.chromium.launch_persistent_context(
+        user_data_dir=profile_path,
+        headless=False,
+    )
+
+    # Warm up session (important!)
+    await asyncio.sleep(5)
+
+    results = []
+    for url in urls:
+        page = await context.new_page()
+
+        # Random delay between requests
+        await asyncio.sleep(random.uniform(10, 30))
+
+        await page.goto(url)
+        results.append(await page.content())
+
+        await page.close()
+
+    await context.close()
+    return results
+
+# Alternative: Use undetected-chromedriver
+import undetected_chromedriver as uc
+
+def datadome_with_uc(url):
+    options = uc.ChromeOptions()
+    options.add_argument('--user-data-dir=/path/to/profile')
+
+    driver = uc.Chrome(options=options)
+    driver.get(url)
+
+    # UC handles most anti-bot automatically
+    return driver</code></pre>
+            </div>
+            <p class="mt-3 text-sm text-gray-600">Persistent context with real browser profile solved DataDome. Warm-up period before requests is critical.</p>
+        </div>
+
+        <div class="issue-box">
+            <div class="issue-title"><a href="https://github.com/microsoft/playwright-python/issues?q=is%3Aissue+Akamai" target="_blank" class="text-pink-700 hover:underline">Akamai requires cookie consent before access</a></div>
+            <p class="mb-3"><strong>Problem:</strong> Akamai shows cookie consent modal. Can't access content until clicked, but button selectors change.</p>
+            <p class="mb-3"><strong>What I Tried:</strong> Multiple selectors, XPath, waiting - button not found.</p>
+            <p class="mb-3"><strong>Actual Fix:</strong> Akamai loads consent manager dynamically. Need to wait and handle multiple consent types:</p>
+            <div class="code-block">
+                <pre><code class="language-python">async def handle_akamai_consent(page):
+    """
+    Handle various Akamai consent managers
+    """
+    # Wait for consent manager to load
+    await page.wait_for_timeout(2000)
+
+    # Try multiple consent button selectors
+    consent_selectors = [
+        # Akamai consent
+        '#akamai-consent-button',
+        '.akamai-accept',
+        '#consent-accept',
+
+        # Generic consent managers
+        'button:has-text("Accept")',
+        'button:has-text("I Agree")',
+        'button:has-text("Accept All")',
+        '.consent-button',
+        '#consent-button',
+        '.cookie-accept',
+
+        # OneTrust
+        '#onetrust-accept-btn-handler',
+        '.ot-btn-container',
+
+        # Cookiebot
+        '#CybotCookiebotDialogBodyButtonAccept',
+    ]
+
+    consent_clicked = False
+    for selector in consent_selectors:
+        try:
+            # Wait up to 5 seconds for each selector
+            element = await page.wait_for_selector(
+                selector,
+                timeout=5000,
+                state='visible'
+            )
+
+            if element:
+                await element.click()
+                consent_clicked = True
+                print(f"Clicked consent with selector: {selector}")
+                break
+
+        except:
+            continue
+
+    # If no button found, try dismissing iframe
+    if not consent_clicked:
+        # Look for and close consent iframe
+        frames = page.frames
+        for frame in frames:
+            try:
+                button = await frame.query_selector('button:has-text("Accept")')
+                if button:
+                    await button.click()
+                    consent_clicked = True
+                    break
+            except:
+                pass
+
+    # Wait for page to reload after consent
+    await page.wait_for_timeout(3000)
+
+    return consent_clicked
+
+# Usage
+await page.goto('https://protected-site.com')
+await handle_akamai_consent(page)
+
+# Now access content
+content = await page.text()
+
+# Alternative: Set consent cookie directly
+await page.context.add_cookies([{
+    'name': 'akamai-consent',
+    'value': 'accepted',
+    'domain': '.protected-site.com',
+    'path': '/'
+}])
+
+# Reload with consent
+await page.reload()</code></pre>
+            </div>
+        </div>
+
+        <h2 class="text-2xl font-bold mb-4 mt-12">Comparison with Alternatives</h2>
+
+        <div class="grid md:grid-cols-2 gap-4">
+            <div class="bg-white p-4 rounded-lg border">
+                <a href="https://pnt.jacbex.com/playwright-stealth.html" class="text-blue-600 hover:underline font-semibold">Playwright V1</a>
+                <p class="text-gray-600 text-sm mt-1">Basic stealth setup</p>
+            </div>
+            <div class="bg-white p-4 rounded-lg border">
+                <a href="https://pnt.jacbex.com/drissionpage.html" class="text-blue-600 hover:underline font-semibold">DrissionPage</a>
+                <p class="text-gray-600 text-sm mt-1">Better for Python projects</p>
+            </div>
+            <div class="bg-white p-4 rounded-lg border">
+                <a href="https://pnt.jacbex.com/scrapegraph-ai.html" class="text-blue-600 hover:underline font-semibold">ScrapeGraph-AI</a>
+                <p class="text-gray-600 text-sm mt-1">AI-powered scraping</p>
+            </div>
+            <div class="bg-white p-4 rounded-lg border">
+                <a href="https://github.com/microsoft/playwright-python" class="text-blue-600 hover:underline font-semibold">Playwright GitHub</a>
+                <p class="text-gray-600 text-sm mt-1">Official repository</p>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t mt-12">
+        <div class="max-w-4xl mx-auto px-6 py-8 text-center text-gray-500">
+            <p>Last updated: March 2026</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            Prism.highlightAll();
+        });
+    </script>
+
+</body>
+</html>

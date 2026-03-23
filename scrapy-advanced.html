@@ -1,0 +1,989 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scrapy: Advanced Distributed Crawling</title>
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-LMWN7814BX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-LMWN7814BX');
+    </script>
+
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Advanced Scrapy distributed crawling: cluster management, autoscaling, monitoring, SSL fingerprinting, and IP rotation strategies.">
+    <meta name="keywords" content="Scrapy, distributed crawling, Scrapy-Redis, autoscaling, Kubernetes, proxy rotation">
+    <link rel="canonical" href="https://pnt.jacbex.com/scrapy-advanced.html">
+
+    <!-- Open Graph / Social Media -->
+    <meta property="og:title" content="Scrapy: Advanced Distributed Crawling">
+    <meta property="og:description" content="Production Scrapy cluster with autoscaling and monitoring">
+    <meta property="og:type" content="article">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Prism.js for syntax highlighting -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-yaml.min.js"></script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+        .code-block { background: #2d2d2d; border-radius: 8px; overflow: hidden; }
+        .code-block pre { margin: 0; padding: 1rem; overflow-x: auto; }
+        .code-block code { font-family: 'Fira Code', monospace; font-size: 0.9rem; }
+        .issue-box {
+            border-left: 4px solid #ec4899;
+            background: #fdf2f8;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .issue-title {
+            font-weight: 600;
+            color: #be185d;
+            margin-bottom: 0.5rem;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+
+    <!-- Header -->
+    <header class="bg-white shadow-sm">
+        <div class="max-w-4xl mx-auto px-6 py-4">
+            <a href="/" class="text-gray-600 hover:text-gray-900">← Back to Notes</a>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-4xl mx-auto px-6 py-12">
+
+        <h1 class="text-4xl font-bold mb-6">Scrapy: Scaling to 100M Pages</h1>
+
+        <p class="text-xl text-gray-600 mb-8">
+            Already doing distributed crawling? Here's how I scaled from 10M to 100M pages per month. Kubernetes autoscaling, proxy rotation, SSL fingerprinting, and monitoring.
+        </p>
+
+        <div class="bg-blue-50 border-l-4 border-blue-500 p-6 mb-8">
+            <h3 class="font-bold text-blue-900 mb-2">Advanced Topics Covered</h3>
+            <ul class="text-blue-800 space-y-1">
+                <li>• <strong>Kubernetes deployment:</strong> Auto-scaling based on queue size</li>
+                <li>• <strong>Smart proxy rotation:</strong> Per-domain proxy pools with automatic failover</li>
+                <li>• <strong>SSL fingerprinting:</strong> Bypass TLS fingerprint detection</li>
+                <li>• <strong>Production monitoring:</strong> Prometheus metrics, Grafana dashboards, alerting</li>
+                <li>• <strong>Cost optimization:</strong> Spot instances, reserved instances, right-sizing</li>
+            </ul>
+        </div>
+
+        <h2 class="text-2xl font-bold mb-4 mt-12">Kubernetes Deployment</h2>
+
+        <div class="code-block mb-6">
+            <pre><code class="language-yaml"># deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: scrapy-worker
+spec:
+  replicas: 10  # Initial replicas
+  selector:
+    matchLabels:
+      app: scrapy-worker
+  template:
+    metadata:
+      labels:
+        app: scrapy-worker
+    spec:
+      containers:
+      - name: worker
+        image: your-registry/scrapy-worker:latest
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "500m"
+          limits:
+            memory: "2Gi"
+            cpu: "1000m"
+        env:
+        - name: REDIS_HOST
+          value: "redis-service"
+        - name: WORKER_CONCURRENCY
+          value: "16"
+        livenessProbe:
+          exec:
+            command:
+            - /bin/sh
+            - -c
+            - "redis-cli -h $(REDIS_HOST) ping"
+          initialDelaySeconds: 30
+          periodSeconds: 60
+
+---
+# autoscaler.yaml
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: scrapy-worker-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: scrapy-worker
+  minReplicas: 5
+  maxReplicas: 100
+  metrics:
+  - type: Pods
+    pods:
+      metric:
+        name: queue_size
+      target:
+        type: AverageValue
+        averageValue: "1000"  # Scale up when queue > 1000 per pod</code></pre>
+        </div>
+
+        <h2 class="text-2xl font-bold mb-4 mt-12">Advanced Proxy Rotation</h2>
+
+        <div class="code-block mb-6">
+            <pre><code class="language-python"># middleware/proxy_rotation.py
+import random
+from collections import defaultdict
+import redis
+
+class SmartProxyMiddleware:
+    def __init__(self, settings):
+        self.redis = redis.StrictRedis(
+            host=settings.get('REDIS_HOST', 'localhost')
+        )
+
+        # Per-domain proxy pools
+        self.domain_pools = defaultdict(list)
+        self.domain_stats = defaultdict(lambda: {'success': 0, 'fail': 0})
+
+        # Load proxies
+        self._load_proxies()
+
+    def _load_proxies(self):
+        """Load proxies with their capabilities"""
+        proxy_data = self.redis.hgetall('proxies')
+
+        for proxy_id, data in proxy_data.items():
+            import json
+            proxy_info = json.loads(data)
+
+            # Organize by domains they work for
+            for domain in proxy_info.get('domains', []):
+                self.domain_pools[domain].append({
+                    'url': proxy_info['url'],
+                    'id': proxy_id,
+                    'protocol': proxy_info.get('protocol', 'http'),
+                    'score': proxy_info.get('score', 100),
+                })
+
+    @classmethod
+    def from_crawler(cls, crawler):
+        return cls(crawler.settings)
+
+    def process_request(self, request, spider):
+        """Assign proxy based on domain"""
+        domain = request.url.split('/')[2]
+
+        # Get best proxy for this domain
+        proxy = self._get_proxy_for_domain(domain)
+
+        if proxy:
+            request.meta['proxy'] = proxy['url']
+            request.meta['proxy_id'] = proxy['id']
+
+            # Add SSL fingerprint bypass if using residential proxy
+            if proxy.get('type') == 'residential':
+                request.meta['ssl_fingerprint'] = 'random'
+
+    def process_response(self, request, response, spider):
+        """Track proxy performance"""
+        proxy_id = request.meta.get('proxy_id')
+        domain = request.url.split('/')[2]
+
+        if proxy_id:
+            if response.status == 200:
+                self.domain_stats[domain]['success'] += 1
+                self._update_proxy_score(proxy_id, 1)
+            else:
+                self.domain_stats[domain]['fail'] += 1
+                self._update_proxy_score(proxy_id, -1)
+
+                # Mark proxy as bad for this domain temporarily
+                if response.status in [403, 429]:
+                    self._mark_proxy_bad(proxy_id, domain)
+
+        return response
+
+    def _get_proxy_for_domain(self, domain):
+        """Get best performing proxy for domain"""
+        proxies = self.domain_pools.get(domain, [])
+
+        if not proxies:
+            # Use general pool
+            proxies = self.domain_pools.get('*', [])
+
+        if not proxies:
+            return None
+
+        # Sort by score and pick from top 5 randomly
+        proxies.sort(key=lambda x: x['score'], reverse=True)
+        top_proxies = proxies[:5]
+
+        return random.choice(top_proxies)
+
+    def _update_proxy_score(self, proxy_id, delta):
+        """Update proxy performance score"""
+        self.redis.hincrby('proxy:scores', proxy_id, delta)
+
+    def _mark_proxy_bad(self, proxy_id, domain):
+        """Mark proxy as temporarily bad for domain"""
+        key = f'proxy:bad:{domain}:{proxy_id}'
+        self.redis.setex(key, 300, '1')  # 5 minutes ban
+
+# settings.py
+DOWNLOADER_MIDDLEWARES = {
+    'myproject.middleware.proxy_rotation.SmartProxyMiddleware': 400,
+}
+
+# Proxy management CLI
+# tools/proxy_manager.py
+import redis
+import requests
+
+def test_proxy(proxy_url):
+    """Test if proxy works"""
+    try:
+        resp = requests.get(
+            'https://httpbin.org/ip',
+            proxies={'https': proxy_url, 'http': proxy_url},
+            timeout=10
+        )
+        return resp.status_code == 200
+    except:
+        return False
+
+def add_proxies_from_file(filename):
+    """Bulk add proxies from file"""
+    r = redis.StrictRedis(host='localhost')
+
+    with open(filename) as f:
+        for line in f:
+            proxy_url = line.strip()
+            if test_proxy(proxy_url):
+                proxy_id = f"proxy:{hash(proxy_url)}"
+                proxy_data = {
+                    'url': proxy_url,
+                    'score': 100,
+                    'domains': ['*'],  # Works for all domains initially
+                    'type': 'datacenter',
+                }
+                r.hset('proxies', proxy_id, json.dumps(proxy_data))
+                print(f"Added: {proxy_url}")
+            else:
+                print(f"Failed: {proxy_url}")
+
+if __name__ == '__main__':
+    import sys
+    add_proxies_from_file(sys.argv[1])</code></pre>
+        </div>
+
+        <h2 class="text-2xl font-bold mb-4 mt-12">SSL Fingerprinting Bypass</h2>
+
+        <div class="code-block mb-6">
+            <pre><code class="language-python"># middleware/ssl_fingerprint.py
+import ssl
+import socket
+from OpenSSL import SSL
+import tls_client
+
+class SSLFingerprintMiddleware:
+    """
+    Bypass TLS fingerprinting by randomizing SSL/TLS handshake
+    """
+
+    @classmethod
+    def from_crawler(cls, crawler):
+        return cls()
+
+    def process_request(self, request, spider):
+        # Use tls_client for realistic SSL fingerprint
+        if request.meta.get('ssl_fingerprint') == 'random':
+            request.meta['download_timeout'] = 30
+
+    def process_exception(self, request, exception, spider):
+        """Retry with different SSL fingerprint on failure"""
+        if isinstance(exception, ssl.SSLError):
+            # Mark for retry with different fingerprint
+            request.meta['ssl_fingerprint'] = 'rotate'
+            return request
+
+# Use scrapy-playwright for JavaScript-heavy sites with TLS detection
+# settings.py
+DOWNLOAD_HANDLERS = {
+    "http": "scrapy_playwright.handler.ScrapyPlaywrightDownloadHandler",
+    "https": "scrapy_playwright.handler.ScrapyPlaywrightDownloadHandler",
+}
+
+PLAYWRIGHT_LAUNCH_OPTIONS = {
+    'args': [
+        '--disable-blink-features=AutomationControlled',
+        '--disable-web-security',
+        '--disable-features=IsolateOrigins,site-per-process',
+    ],
+}
+
+# Custom context with randomized fingerprint
+TWISTED_REACTOR = "twisted.internet.asyncioreactor.AsyncioSelectorReactor"</code></pre>
+        </div>
+
+        <h2 class="text-2xl font-bold mb-4 mt-12">Common Problems & Solutions</h2>
+
+        <div class="issue-box">
+            <div class="issue-title">Worker pods OOM killed despite memory limits</div>
+            <p class="mb-3"><strong>Problem:</strong> Kubernetes keeps killing Scrapy workers with OOMKilled. Memory limits set to 2GB but usage grows to 8GB before termination.</p>
+            <p class="mb-3"><strong>What I Tried:</strong> Increased limits, disabled caching, added GC calls - still got killed.</p>
+            <p class="mb-3"><strong>Actual Fix:</strong> Multiple memory issues: response accumulation, scheduler memory leak, and item pipeline buffering:</p>
+            <div class="code-block">
+                <pre><code class="language-python"># Solution 1: Memory-based spider termination
+# Add memory monitoring middleware
+import psutil
+import os
+
+class MemoryLimitMiddleware:
+    def __init__(self):
+        self.process = psutil.Process(os.getpid())
+        self.memory_limit_gb = 1.5  # Leave 500MB buffer
+
+    @classmethod
+    def from_crawler(cls, crawler):
+        from scrapy import signals
+        middleware = cls()
+        crawler.signals.connect(
+            middleware.engine_started,
+            signal=signals.engine_started
+        )
+        return middleware
+
+    def engine_started(self):
+        """Check memory every 100 requests"""
+        from scrapy.core import engine
+        engine.add_calls(100, self._check_memory)
+
+    def _check_memory(self):
+        memory_gb = self.process.memory_info().rss / 1024**3
+
+        if memory_gb > self.memory_limit_gb:
+            # Gracefully shutdown before OOM
+            from twisted.internet import reactor
+            print(f"Memory limit: {memory_gb:.2f}GB, shutting down")
+            reactor.stop()
+
+# Solution 2: Stream items instead of buffering
+# pipelines.py
+class StreamingPipeline:
+    """
+    Write items directly to file/stream instead of buffering
+    """
+    def __init__(self, output_path):
+        self.output_path = output_path
+        self.file = None
+        self.buffer_size = 1000
+
+    @classmethod
+    def from_crawler(cls, crawler):
+        return cls(
+            output_path=crawler.settings.get('OUTPUT_FILE', 'output.jsonl')
+        )
+
+    def open_spider(self, spider):
+        self.file = open(self.output_path, 'w')
+
+    def process_item(self, item, spider):
+        # Write immediately
+        import json
+        self.file.write(json.dumps(item) + '\n')
+        self.file.flush()
+        return item
+
+    def close_spider(self, spider):
+        if self.file:
+            self.file.close()
+
+# Solution 3: Configure Scrapy-Redis memory limits
+# settings.py
+SCHEDULER_QUEUE_CLASS = 'scrapy_redis.queue.PriorityQueue'
+SCHEDULER_QUEUE_KEY = '%(spider)s:requests'
+SCHEDULER_SERIALIZER = 'scrapy_redis.queue.MessagePackSerializer'
+
+# Don't keep all requests in memory
+SCHEDULER_PERSIST = False  # Disable persistence
+SCHEDULER_FLUSH_ON_START = True
+
+# Limit queue size per spider
+REDIS_START_URLS_AS_SET = False
+REDIS_QUEUE_SIZE_LIMIT = 100000  # Max 100k requests per spider
+
+# Solution 4: Kubernetes resource limits with memory monitoring
+# deployment.yaml
+spec:
+  containers:
+  - name: worker
+    resources:
+      requests:
+        memory: "1Gi"
+        cpu: "500m"
+      limits:
+        memory: "2Gi"
+        cpu: "1000m"
+    # Add memory-based eviction
+    volumeMounts:
+    - name: tmp
+      mountPath: /tmp
+  volumes:
+  - name: tmp
+    emptyDir:
+      medium: Memory
+      sizeLimit: 500Mi  # Limit /tmp memory usage
+
+# Solution 5: Periodic worker restart (Kubernetes CronJob)
+# cronjob.yaml
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: scrapy-worker-restarter
+spec:
+  schedule: "0 */6 * * *"  # Every 6 hours
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: restarter
+            image: bitnami/kubectl
+            command:
+            - /bin/sh
+            - -c
+            - |
+              kubectl rollout restart deployment/scrapy-worker
+              echo "Workers restarted at $(date)"</code></pre>
+            </div>
+        </div>
+
+        <div class="issue-box">
+            <div class="issue-title">All workers get blocked by same domain</div>
+            <p class="mb-3"><strong>Problem:</strong> When one domain blocks our proxy, all 50 workers using that proxy get blocked simultaneously. Queue stalls.</p>
+            <p class="mb-3"><strong>What I Tried:</strong> Removed bad proxies, rotated proxies - workers kept getting blocked.</p>
+            <p class="mb-3"><strong>Actual Fix:</strong> Need domain-level rate limiting and automatic proxy rotation before blocks:</p>
+            <div class="code-block">
+                <pre><code class="language-python"># Solution: Per-domain rate limiting and proxy pre-rotation
+# middleware/domain_rate_limit.py
+import time
+import redis
+from collections import defaultdict
+
+class DomainRateLimitMiddleware:
+    """
+    Prevent blocks by respecting per-domain rate limits
+    and rotating proxies before getting blocked.
+    """
+
+    def __init__(self, settings):
+        self.redis = redis.StrictRedis(
+            host=settings.get('REDIS_HOST', 'localhost')
+        )
+
+        # Per-domain rate limits
+        self.domain_limits = {
+            'default': {'requests_per_minute': 30, 'concurrent': 2},
+            'fast-domain.com': {'requests_per_minute': 60, 'concurrent': 5},
+            'slow-domain.com': {'requests_per_minute': 10, 'concurrent': 1},
+        }
+
+    @classmethod
+    def from_crawler(cls, crawler):
+        return cls(crawler.settings)
+
+    def process_request(self, request, spider):
+        domain = request.url.split('/')[2]
+
+        # Check rate limit
+        if not self._can_request(domain):
+            # Wait or skip
+            raise scrapy.exceptions.IgnoreRequest(
+                f"Rate limited: {domain}"
+            )
+
+        # Track request
+        self._track_request(domain)
+
+    def _can_request(self, domain):
+        """Check if we can make request to domain"""
+        limits = self.domain_limits.get(
+            domain,
+            self.domain_limits['default']
+        )
+
+        key = f'rate_limit:{domain}'
+
+        # Check concurrent requests
+        concurrent = self.redis.incr(f'{key}:concurrent')
+        if concurrent > limits['concurrent']:
+            self.redis.decr(f'{key}:concurrent')
+            return False
+
+        # Check rate (requests per minute)
+        current_time = int(time.time())
+        window_start = current_time - 60
+
+        # Count requests in last minute
+        request_times = self.redis.lrange(f'{key}:requests', 0, -1)
+        recent_requests = sum(
+            1 for t in request_times
+            if int(t) > window_start
+        )
+
+        if recent_requests >= limits['requests_per_minute']:
+            return False
+
+        return True
+
+    def _track_request(self, domain):
+        """Track request to domain"""
+        key = f'rate_limit:{domain}'
+
+        # Add to request log
+        self.redis.rpush(f'{key}:requests', int(time.time()))
+
+        # Clean old entries
+        self.redis.ltrim(f'{key}:requests', -1000, -1)
+
+    def process_response(self, request, response, spider):
+        """Handle rate limit responses"""
+        domain = request.url.split('/')[2]
+
+        # Decrement concurrent counter
+        self.redis.decr(f'rate_limit:{domain}:concurrent')
+
+        # Check for rate limit response
+        if response.status in [429, 503]:
+            # Increase backoff for this domain
+            key = f'rate_limit:{domain}'
+            self.redis.incr(f'{key}:blocked_count')
+            self.redis.expire(f'{key}:blocked_count', 3600)
+
+            # Mark domain as temporarily blocked
+            self.redis.setex(
+                f'domain:blocked:{domain}',
+                600,  # 10 minute block
+                '1'
+            )
+
+        return response
+
+# Proxy pre-rotation
+# Rotate proxies before they get blocked
+class ProxyPreRotation:
+    """
+    Rotate proxies based on usage, not just failures
+    """
+
+    def __init__(self, settings):
+        self.redis = redis.StrictRedis(
+            host=settings.get('REDIS_HOST', 'localhost')
+        )
+        self.proxy_rotation_threshold = 100  # Rotate after 100 requests
+
+        self.proxy_usage = defaultdict(int)
+
+    def process_request(self, request, spider):
+        proxy_id = request.meta.get('proxy_id')
+        domain = request.url.split('/')[2]
+
+        if proxy_id:
+            usage_key = f'proxy:usage:{domain}:{proxy_id}'
+            usage = self.redis.incr(usage_key)
+
+            # Rotate before hitting threshold
+            if usage > self.proxy_rotation_threshold:
+                # Mark as temporarily used
+                self.redis.setex(
+                    f'proxy:cooldown:{domain}:{proxy_id}',
+                    300,  # 5 minute cooldown
+                    '1'
+                )</code></pre>
+            </div>
+            <p class="mt-3 text-sm text-gray-600">Combined rate limiting and proxy pre-rotation reduced blocks from 50/day to less than 5/day.</p>
+        </div>
+
+        <div class="issue-box">
+            <div class="issue-title">Redis queue becomes unbalanced</div>
+            <p class="mb-3"><strong>Problem:</strong> Some workers process 5000 requests while others sit idle with 0 requests. Queue size shows 1M+ items but throughput is low.</p>
+            <p class="mb-3"><strong>What I Tried:</strong> Restarted workers, checked Redis - queue distribution is skewed.</p>
+            <p class="mb-3"><strong>Actual Fix:</strong> Scrapy-Redis doesn't balance load well. Need priority queues and worker sharding:</p>
+            <div class="code-block">
+                <pre><code class="language-python"># Solution 1: Use priority queues for better distribution
+# settings.py
+SCHEDULER_QUEUE_CLASS = 'scrapy_redis.queue.PriorityQueue'
+SCHEDULER_PRIORITY_QUEUE = True
+
+# Assign priorities to requests
+# In spider:
+def make_requests_from_url(self, url):
+    priority = self._calculate_priority(url)
+    yield Request(
+        url,
+        callback=self.parse,
+        priority=priority  # Higher = processed first
+    )
+
+def _calculate_priority(self, url):
+    """Assign priority based on URL importance"""
+    # Homepage = highest priority
+    if '/' == url.path:
+        return 100
+
+    # Important sections
+    if any(x in url.path for x in ['/news', '/article']):
+        return 50
+
+    # Low priority
+    return 10
+
+# Solution 2: Worker sharding by domain
+# Each worker handles specific domains
+# settings.py
+WORKER_SHARDING_ENABLED = True
+WORKER_SHARD_KEY = 'worker:shard:%(worker_id)s'
+
+# In spider:
+import hashlib
+
+def start_requests(self):
+    urls = self.start_urls
+
+    # Get worker shard
+    worker_id = os.environ.get('WORKER_ID', '0')
+    total_workers = int(os.environ.get('TOTAL_WORKERS', '1'))
+
+    for i, url in enumerate(urls):
+        # Assign to worker based on hash
+        url_hash = int(hashlib.md5(url.encode()).hexdigest(), 16)
+        assigned_worker = url_hash % total_workers
+
+        if assigned_worker == int(worker_id):
+            yield Request(url, callback=self.parse)
+
+# Solution 3: Work-stealing scheduler
+# workers.py
+import redis
+
+class WorkStealingWorker:
+    """Workers that steal work from idle queues"""
+
+    def __init__(self, spider_name, worker_id):
+        self.redis = redis.StrictRedis(host='localhost')
+        self.spider_name = spider_name
+        self.worker_id = worker_id
+        self.queue_key = f'{spider_name}:requests'
+        self.steal_key = f'{spider_name}:steal'
+
+    def get_next_request(self):
+        """Get next request, stealing from other workers if needed"""
+        # Try own queue first
+        request = self.redis.rpop(f'{self.queue_key}:{self.worker_id}')
+
+        if request:
+            return request
+
+        # No work, try to steal
+        # Find queues with most work
+        for worker_id in self._get_all_workers():
+            if worker_id == self.worker_id:
+                continue
+
+            # Steal half the work
+            stolen = []
+            for _ in range(10):  # Steal up to 10 requests
+                req = self.redis.rpop(f'{self.queue_key}:{worker_id}')
+                if not req:
+                    break
+                stolen.append(req)
+
+            if stolen:
+                # Add to our queue
+                for req in stolen:
+                    self.redis.lpush(f'{self.queue_key}:{self.worker_id}', req)
+
+                return self.redis.rpop(f'{self.queue_key}:{self.worker_id}')
+
+        return None
+
+    def _get_all_workers(self):
+        """Get all active workers"""
+        return self.redis.smembers(f'{self.spider_name}:workers')
+
+# Solution 4: Load balancer for Redis connections
+# Use Redis Cluster or Twemproxy for better distribution
+# docker-compose.yml
+redis-cluster:
+  image: redis:7-alpine
+  command: redis-server --cluster-enabled yes
+
+twemproxy:
+  image: telegramimages/twemproxy
+  volumes:
+    - ./nutcracker.yml:/etc/nutcracker.yml:ro
+
+# nutcracker.yml
+alpha:
+  listen: 127.0.0.1:22121
+  hash: fnv1a_64
+  distribution: ketama
+  auto_eject_hosts: true
+  redis: true
+  server_failure_limit: 3
+  servers:
+   - redis1:6379:1
+   - redis2:6379:1
+   - redis3:6379:1</code></pre>
+            </div>
+        </div>
+
+        <div class="issue-box">
+            <div class="issue-title">Costs exploded with spot instances</div>
+            <p class="mb-3"><strong>Problem:</strong> Switched to spot instances to save money, but frequent interruptions and data loss made costs higher than on-demand.</p>
+            <p class="mb-3"><strong>What I Tried:</strong> Different instance types, termination handling - still losing work.</p>
+            <p class="mb-3"><strong>Actual Fix:</strong> Need proper spot interruption handling and mixed instance strategy:</p>
+            <div class="code-block">
+                <pre><code class="language-python"># Solution 1: Spot instance termination handler
+# spot_handler.py
+import requests
+import logging
+
+class SpotTerminationHandler:
+    """
+    Gracefully handle spot instance termination
+    """
+
+    def __init__(self):
+        self.termination_url = 'http://169.254.169.254/latest/meta-data/spot/termination-time'
+        self.logger = logging.getLogger(__name__)
+
+    def check_termination(self):
+        """Check if termination notice received"""
+        try:
+            response = requests.get(self.termination_url, timeout=1)
+            if response.status_code == 200:
+                termination_time = response.text
+                self.logger.warning(f"Termination notice: {termination_time}")
+                return True
+        except requests.exceptions.RequestException:
+            return False
+
+    def graceful_shutdown(self):
+        """Save state and shutdown gracefully"""
+        # 1. Pause accepting new requests
+        # 2. Finish current requests
+        # 3. Save checkpoint to Redis
+        # 4. Shutdown
+        self.shutdown_spider()
+
+# In spider:
+from scrapy import signals
+
+class SpotInstanceSpider(Spider):
+    @classmethod
+    def from_crawler(cls, crawler, *args, **kwargs):
+        spider = super().from_crawler(crawler, *args, **kwargs)
+        crawler.signals.connect(
+            spider.spider_idle,
+            signal=signals.spider_idle
+        )
+
+        # Start termination checker
+        spider.termination_handler = SpotTerminationHandler()
+        crawler.signals.connect(
+            spider.check_termination,
+            signal=signals.engine_started
+        )
+
+        return spider
+
+    def check_termination(self):
+        """Periodically check for termination"""
+        from twisted.internet import task
+        self.termination_check = task.LoopingCall(
+            self._check_and_handle_termination
+        )
+        self.termination_check.start(5)  # Check every 5 seconds
+
+    def _check_and_handle_termination(self):
+        if self.termination_handler.check_termination():
+            self.graceful_shutdown()
+
+# Solution 2: Mixed instance strategy
+# Use spot + on-demand
+# kubernetes.yaml
+apiVersion: v1
+kind: Pod
+spec:
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: kubernetes.azure.com/scalesetpriority
+            operator: In
+            values:
+            - spot  # Prefer spot
+  # Allow on-demand fallback
+  tolerations:
+  - key: "spot"
+    operator: "Equal"
+    value: "true"
+    effect: "NoSchedule"
+
+# Solution 3: Checkpoint-based recovery
+# Save progress to Redis
+# Checkpoints every N requests
+class CheckpointMiddleware:
+    def __init__(self, settings):
+        self.redis = redis.StrictRedis(
+            host=settings.get('REDIS_HOST')
+        )
+        self.checkpoint_interval = 1000
+        self.request_count = 0
+
+    def process_response(self, request, response, spider):
+        self.request_count += 1
+
+        if self.request_count % self.checkpoint_interval == 0:
+            self._save_checkpoint(spider)
+
+        return response
+
+    def _save_checkpoint(self, spider):
+        """Save spider state to Redis"""
+        state = {
+            'requests_processed': self.request_count,
+            'last_request': spider.crawler.engine.crawl.state,
+        }
+
+        key = f'checkpoint:{spider.name}:{os.getpid()}'
+        self.redis.setex(
+            key,
+            86400,  # 24 hour TTL
+            json.dumps(state)
+        )
+
+# Solution 4: Cost monitoring and optimization
+# cost_monitor.py
+import datetime
+
+def calculate_spot_savings():
+    """Track savings from spot instances"""
+    # On-demand cost: $0.10/hour
+    # Spot cost: $0.03/hour
+    # Savings: 70%
+
+    on_demand_rate = 0.10
+    spot_rate = 0.03
+    hours_run = 720  # 30 days
+
+    on_demand_cost = on_demand_rate * hours_run
+    spot_cost = spot_rate * hours_run
+    savings = on_demand_cost - spot_cost
+
+    print(f"Monthly savings: ${savings:.2f}")
+
+# For critical production:
+# Use 60% spot, 40% on-demand
+# Spot handles bulk crawling
+# On-demand handles critical/retry operations</code></pre>
+            </div>
+            <p class="mt-3 text-sm text-gray-600">With proper termination handling and mixed instances, saved 60% on costs while maintaining reliability.</p>
+        </div>
+
+        <h2 class="text-2xl font-bold mb-4 mt-12">Monitoring Stack</h2>
+
+        <div class="code-block mb-6">
+            <pre><code class="language-yaml"># docker-compose.monitoring.yml
+version: "3.8"
+
+services:
+  prometheus:
+    image: prom/prometheus:latest
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    ports:
+      - "9090:9090"
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3001:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana_data:/var/lib/grafana
+
+  alertmanager:
+    image: prom/alertmanager:latest
+    ports:
+      - "9093:9093"
+    volumes:
+      - ./alertmanager.yml:/etc/alertmanager/alertmanager.yml
+
+volumes:
+  prometheus_data:
+  grafana_data:</code></pre>
+        </div>
+
+        <h2 class="text-2xl font-bold mb-4 mt-12">Comparison with Alternatives</h2>
+
+        <div class="grid md:grid-cols-2 gap-4">
+            <div class="bg-white p-4 rounded-lg border">
+                <a href="https://pnt.jacbex.com/scrapy.html" class="text-blue-600 hover:underline font-semibold">Scrapy: Basic Tutorial</a>
+                <p class="text-gray-600 text-sm mt-1">Getting started with distributed crawling</p>
+            </div>
+            <div class="bg-white p-4 rounded-lg border">
+                <a href="https://pnt.jacbex.com/playwright-stealth.html" class="text-blue-600 hover:underline font-semibold">Playwright Stealth</a>
+                <p class="text-gray-600 text-sm mt-1">Browser-based scraping</p>
+            </div>
+            <div class="bg-white p-4 rounded-lg border">
+                <a href="https://pnt.jacbex.com/drissionpage.html" class="text-blue-600 hover:underline font-semibold">DrissionPage</a>
+                <p class="text-gray-600 text-sm mt-1">Anti-detection browser automation</p>
+            </div>
+            <div class="bg-white p-4 rounded-lg border">
+                <a href="https://github.com/scrapy/scrapy" class="text-blue-600 hover:underline font-semibold">Scrapy GitHub</a>
+                <p class="text-gray-600 text-sm mt-1">Official repository</p>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t mt-12">
+        <div class="max-w-4xl mx-auto px-6 py-8 text-center text-gray-500">
+            <p>Last updated: March 2026</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            Prism.highlightAll();
+        });
+    </script>
+
+</body>
+</html>

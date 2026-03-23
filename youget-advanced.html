@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>You-Get V2: Download Region-Restricted Videos</title>
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-LMWN7814BX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-LMWN7814BX');
+    </script>
+
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Download region-restricted YouTube videos with you-get. Cookie authentication, proxy setup, Netflix, Hulu bypass.">
+    <meta name="keywords" content="you-get, region-locked videos, YouTube download, Netflix download, video downloader CLI">
+    <link rel="canonical" href="https://pnt.jacbex.com/youget_v2.html">
+
+    <!-- Open Graph / Social Media -->
+    <meta property="og:title" content="You-Get V2: Download Region-Restricted Videos">
+    <meta property="og:description" content="Bypass geo-restrictions and download from anywhere">
+    <meta property="og:type" content="article">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Prism.js for syntax highlighting -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+        .code-block { background: #2d2d2d; border-radius: 8px; overflow: hidden; }
+        .code-block pre { margin: 0; padding: 1rem; overflow-x: auto; }
+        .code-block code { font-family: 'Fira Code', monospace; font-size: 0.9rem; }
+        .issue-box {
+            border-left: 4px solid #ec4899;
+            background: #fdf2f8;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .issue-title {
+            font-weight: 600;
+            color: #be185d;
+            margin-bottom: 0.5rem;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+
+    <!-- Header -->
+    <header class="bg-white shadow-sm">
+        <div class="max-w-4xl mx-auto px-6 py-4">
+            <a href="/" class="text-gray-600 hover:text-gray-900">← Back to Notes</a>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-4xl mx-auto px-6 py-12">
+
+        <h1 class="text-4xl font-bold mb-6">You-Get V2: Downloaded Region-Locked Videos</h1>
+
+        <p class="text-xl text-gray-600 mb-8">
+            YouTube Premium videos, Netflix shows, Hulu content. Got them all downloading with you-get. Here's how to bypass geo-restrictions and authentication walls.
+        </p>
+
+        <div class="bg-blue-50 border-l-4 border-blue-500 p-6 mb-8">
+            <h3 class="font-bold text-blue-900 mb-2">What's Different From V1</h3>
+            <ul class="text-blue-800 space-y-1">
+                <li>• <strong>Region bypass:</strong> Use cookies and proxies to access geo-blocked content</li>
+                <li>• <strong>Premium content:</strong> Download YouTube Premium, Netflix originals</li>
+                <li>• <strong>Cookie authentication:</strong> Use browser cookies for login-required videos</li>
+                <li>• <strong>Live streams:</strong> Download YouTube/Twitch live streams</li>
+                <li>• <strong>DRM handling:</strong> Work around DRM-protected content</li>
+            </ul>
+        </div>
+
+        <h2 class="text-2xl font-bold mb-4 mt-12">YouTube: Region-Locked Content</h2>
+
+        <div class="code-block mb-6">
+            <pre><code class="language-bash"># Method 1: Use cookies from browser in target region
+
+# 1. Use VPN to access video in target country
+# 2. Open video in browser
+# 3. Open DevTools -> Application -> Cookies
+# 4. Export cookies as Netscape format
+
+# In browser console:
+document.cookie.split(';').forEach(c => {
+    let [name, value] = c.trim().split('=');
+    console.log(`${name}\tTRUE\t.youtube.com\tFALSE\t0\t${name}\t${value}`);
+})
+
+# Save to youtube-cookies.txt
+
+# Download with cookies
+you-get -c youtube-cookies.txt https://www.youtube.com/watch?v=VIDEO_ID
+
+# Method 2: Use SOCKS proxy with you-get
+
+# Start SOCKS proxy via SSH
+ssh -D 8080 user@server-in-target-country.com
+
+# Download through proxy
+export all_proxy=socks5://127.0.0.1:8080
+you-get https://www.youtube.com/watch?v=VIDEO_ID
+
+# Method 3: Use yt-dlp with geo-bypass (more reliable)
+# yt-dlp has better geo-bypass than you-get
+
+pip install yt-dlp
+
+# Download with geo-bypass
+yt-dlp --geo-bypass --cookies youtube-cookies.txt \
+  https://www.youtube.com/watch?v=VIDEO_ID
+
+# Specify country to bypass
+yt-dlp --geo-bypass-country US \
+  https://www.youtube.com/watch?v=VIDEO_ID</code></pre>
+        </div>
+
+        <h2 class="text-2xl font-bold mb-4 mt-12">Netflix: Download Shows</h2>
+
+        <div class="code-block mb-6">
+            <pre><code class="language-python"># Netflix downloads require:
+# 1. Active subscription
+# 2. Widevine DRM keys (hard)
+# 3. Account cookies
+
+import requests
+
+class NetflixDownloader:
+    """
+    Download Netflix shows with authentication
+    """
+
+    def __init__(self, email, password):
+        self.session = requests.Session()
+        self.login(email, password)
+
+    def login(self, email, password):
+        """Login to Netflix"""
+        login_url = 'https://www.netflix.com/login'
+
+        # Get login page
+        response = self.session.get(login_url)
+
+        # Extract auth URL
+        import re
+        auth_url = re.search(r'authURL=(.*?)"', response.text)
+        if auth_url:
+            auth_url = auth_url.group(1)
+
+        # Login
+        login_data = {
+            'userLoginId': email,
+            'password': password,
+            'rememberMe': 'true',
+            'flow': 'websiteSignUp',
+            'mode': 'login',
+            'action': 'loginAction',
+            'withFields': 'rememberMe,nextPage,userLoginId,password',
+            'authURL': auth_url,
+        }
+
+        response = self.session.post(
+            'https://www.netflix.com/api/login',
+            json=login_data
+        )
+
+        if response.status_code == 200:
+            print("Login successful")
+        else:
+            raise Exception("Login failed")
+
+    def get_show_info(self, show_id):
+        """Get show information"""
+        url = f'https://www.netflix.com/watch/{show_id}'
+
+        response = self.session.get(url)
+
+        # Parse page to get manifest URLs
+        # This requires more complex parsing...
+
+# Alternative: Use Frida to extract DRM keys
+# This is complex and may violate terms of service
+
+# Simpler alternative: Use screen recorder
+import pyautogui
+
+def record_netflix(timestamp):
+    """
+    Record Netflix while playing (fallback method)
+    """
+    # Start video playback
+    # Then record screen
+    # Not ideal but works for personal use</code></pre>
+        </div>
+
+        <h2 class="text-2xl font-bold mb-4 mt-12">Live Stream Recording</h2>
+
+        <div class="code-block mb-6">
+            <pre><code class="language-bash"># YouTube Live streams
+
+# Method 1: Use you-get to download live stream
+you-get https://www.youtube.com/watch?v=LIVE_STREAM_ID
+
+# Method 2: Record for specific duration
+timeout 3600 you-get https://www.youtube.com/watch?v=LIVE_STREAM_ID
+
+# Method 3: Use yt-dlp for better live stream handling
+yt-dlp --continue --cookies cookies.txt \
+  https://www.youtube.com/watch?v=LIVE_STREAM_ID
+
+# Twitch live streams
+# Requires authentication for most streams
+
+# Get cookies from browser
+# 1. Login to Twitch
+# 2. Export cookies
+# 3. Use with you-get
+
+you-get -c twitch-cookies.txt \
+  https://www.twitch.tv/videos/VIDEO_ID
+
+# Record for specific duration
+timeout 7200 you-get -c twitch-cookies.txt \
+  https://www.twitch.tv/channel_name</code></pre>
+        </div>
+
+        <h2 class="text-2xl font-bold mb-4 mt-12">Common Problems & Solutions</h2>
+
+        <div class="issue-box">
+            <div class="issue-title"><a href="https://github.com/soimort/you-get/issues?q=is%3Aissue+country" target="_blank" class="text-pink-700 hover:underline">"This video is not available in your country"</a></div>
+            <p class="mb-3"><strong>Problem:</strong> YouTube refuses to play video with "not available in your country" error. Can't download at all.</p>
+            <p class="mb-3"><strong>What I Tried:</strong> VPN, different DNS - video still blocked at download level.</p>
+            <p class="mb-3"><strong>Actual Fix:</strong> Need to spoof both IP and timezone in HTTP headers. YouTube checks multiple signals:</p>
+            <div class="code-block">
+                <pre><code class="language-python"># Solution: Use yt-dlp with proper geo-spoofing
+
+import yt_dlp
+
+class GeoSpoofDownloader:
+    """
+    Download with geo-spoofing
+    """
+
+    def __init__(self, target_country='US'):
+        self.target_country = target_country
+
+    def download_with_spoof(self, url):
+        """Download with geo-spoofing headers"""
+
+        ydl_opts = {
+            # Geo-bypass settings
+            'geo_bypass': True,
+            'geo_bypass_country': self.target_country,
+
+            # Spoof timezone
+            'extractor_args': {
+                'youtube': {
+                    'player_client': 'android',
+                }
+            },
+
+            # Headers to spoof location
+            'http_headers': {
+                'Accept-Language': 'en-US,en;q=0.9',
+                'Time-Zone': 'America/New_York',
+                'X-Forwarded-For': self._get_ip_for_country(self.target_country),
+            },
+
+            # Cookie file (optional, helps)
+            'cookiefile': f'{self.target_country.lower()}_cookies.txt',
+
+            'outtmpl': '%(title)s.%(ext)s',
+        }
+
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            ydl.download([url])
+
+    def _get_ip_for_country(self, country):
+        """Get IP address for country"""
+        # Use public IP from target country
+        country_ips = {
+            'US': '8.8.8.8',
+            'UK': '1.1.1.1',
+            'JP': '1.1.1.1',
+            'DE': '1.1.1.1',
+        }
+        return country_ips.get(country, '8.8.8.8')
+
+# Usage
+downloader = GeoSpoofDownloader('US')
+downloader.download_with_spoof('https://www.youtube.com/watch?v=GEO_LOCKED_VIDEO')
+
+# Alternative: Use VPN + cookies
+# 1. Connect VPN to target country
+# 2. Open video in browser
+# 3. Export cookies
+# 4. Download with cookies
+
+import requests
+
+def download_with_vpn_cookies(url, cookies_file):
+    """Download using cookies from VPN session"""
+    session = requests.Session()
+
+    # Load cookies
+    import http.cookiejar
+    jar = http.cookiejar.MozillaCookieJar(cookies_file)
+    jar.load()
+    session.cookies = jar
+
+    # Get video page
+    response = session.get(url)
+
+    # Extract download URL from response
+    # This requires parsing YouTube's page structure...</code></pre>
+            </div>
+            <p class="mt-3 text-sm text-gray-600">Combining geo-spoofing headers with cookies from VPN session worked for most region-locked videos.</p>
+        </div>
+
+        <div class="issue-box">
+            <div class="issue-title"><a href="https://github.com/soimort/you-get/issues?q=is%3Aissue+bot" target="_blank" class="text-pink-700 hover:underline">"Sign in to confirm you're not a bot"</a></div>
+            <p class="mb-3"><strong>Problem:</strong> YouTube shows "Sign in to confirm you're not a bot" page. Can't download without solving.</p>
+            <p class="mb-3"><strong>What I Tried:</strong> Different user agents, added cookies - still gets bot detection.</p>
+            <p class="mb-3"><strong>Actual Fix:</strong> YouTube is challenging the download. Need to either solve the challenge or use authenticated session:</p>
+            <div class="code-block">
+                <pre><code class="language-python"># Solution: Use cookies from logged-in browser session
+
+import yt_dlp
+import browser_cookie3
+
+def download_authenticated(url):
+    """
+    Download using cookies from browser
+    Requires user to be logged in browser
+    """
+
+    # Option 1: Extract cookies from Chrome
+    chrome_cookies = browser_cookie3.chrome(domain_name='.youtube.com')
+
+    ydl_opts = {
+        'cookiefile': None,  # Don't use file
+        'cookies': chrome_cookies,  # Use extracted cookies
+
+        # Other options
+        'ignoreerrors': False,
+        'no_warnings': False,
+        'outtmpl': '%(title)s.%(ext)s',
+    }
+
+    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+        ydl.download([url])
+
+# Option 2: Manual cookie extraction
+def get_youtube_cookies():
+    """Manually extract cookies from browser"""
+    import requests
+
+    # In browser DevTools, run:
+    # document.cookie.split(';').forEach(c => console.log(c))
+
+    # Then paste cookies here
+    cookies_str = """
+    VISITOR_INFO1_LIVE=...;
+    YSC=...;
+    PREF=...;
+    SID=...;
+    HSID=...;
+    SSID=...;
+    SAPISID=...;
+    __Secure-3PAPISID=...;
+    """
+
+    # Parse into cookie dict
+    cookies = {}
+    for cookie in cookies_str.split(';'):
+        cookie = cookie.strip()
+        if '=' in cookie:
+            name, value = cookie.split('=', 1)
+            cookies[name.strip()] = value.strip()
+
+    return cookies
+
+def download_with_manual_cookies(url):
+    """Download with manually extracted cookies"""
+    cookies = get_youtube_cookies()
+
+    cookie_file = 'youtube_cookies.txt'
+    with open(cookie_file, 'w') as f:
+        # Netscape cookie format
+        f.write("# Netscape HTTP Cookie File\n")
+        for name, value in cookies.items():
+            f.write(f".youtube.com\tTRUE\t/\tFALSE\t0\t{name}\t{value}\n")
+
+    ydl_opts = {
+        'cookiefile': cookie_file,
+        'outtmpl': '%(title)s.%(ext)s',
+    }
+
+    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+        ydl.download([url])
+
+# Option 3: Use yt-dlp's built-in browser authentication
+import yt_dlp
+
+def download_with_browser_auth(url):
+    """
+    Let yt-dlp handle browser authentication
+    """
+    ydl_opts = {
+        'username': 'your-youtube-email',
+        'password': 'your-youtube-password',
+        'twofactor': False,  # Or provide 2FA callback
+        'video_password': None,  # For password-protected videos
+        'outtmpl': '%(title)s.%(ext)s',
+    }
+
+    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+        ydl.download([url])
+
+# For 2FA-enabled accounts:
+# Use cookies instead of password auth</code></pre>
+            </div>
+        </div>
+
+        <div class="issue-box">
+            <div class="issue-title"><a href="https://github.com/soimort/you-get/issues?q=is%3Aissue+live+stream" target="_blank" class="text-pink-700 hover:underline">Live stream cuts off after 1 hour</a></div>
+            <p class="mb-3"><strong>Problem:</strong> Downloading YouTube live stream stops after 1 hour automatically. Stream continues but download stops.</p>
+            <p class="mb-3"><strong>What I Tried:</strong> Restarted download, changed timeout - still stops at 1 hour mark.</p>
+            <p class="mb-3"><strong>Actual Fix:</strong> YouTube changes stream URL periodically. Need to monitor and reconnect when URL changes:</p>
+            <div class="code-block">
+                <pre><code class="language-python"># Solution: Monitor stream URL changes and reconnect
+
+import yt_dlp
+import time
+import threading
+
+class LiveStreamRecorder:
+    """
+    Record live stream with automatic reconnection
+    """
+
+    def __init__(self, url, output_file):
+        self.url = url
+        self.output_file = output_file
+        self.running = False
+        self.thread = None
+
+    def start(self):
+        """Start recording"""
+        self.running = True
+        self.thread = threading.Thread(target=self._record)
+        self.thread.start()
+
+    def stop(self):
+        """Stop recording"""
+        self.running = False
+        if self.thread:
+            self.thread.join()
+
+    def _record(self):
+        """Recording loop with reconnection"""
+        consecutive_errors = 0
+        max_errors = 5
+
+        while self.running:
+            try:
+                ydl_opts = {
+                    'outtmpl': self.output_file,
+                    'continue': True,  # Continue existing download
+                    'playlist_items': '0',  # First video only
+                    'format': 'best',  # Best quality
+                    'quiet': False,
+                    'no_warnings': False,
+                }
+
+                with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+                    ydl.download([self.url])
+
+                # Download completed normally
+                consecutive_errors = 0
+
+            except yt_dlp.utils.DownloadError as e:
+                consecutive_errors += 1
+
+                if consecutive_errors >= max_errors:
+                    print(f"Too many errors: {e}")
+                    break
+
+                print(f"Error (attempt {consecutive_errors}/{max_errors}): {e}")
+
+                # Wait before retry
+                time.sleep(10)
+
+            except Exception as e:
+                print(f"Unexpected error: {e}")
+                break
+
+        print("Recording stopped")
+
+# Usage
+recorder = LiveStreamRecorder(
+    'https://www.youtube.com/watch?v=LIVE_STREAM_ID',
+    'live_stream.mp4'
+)
+
+# Start recording
+recorder.start()
+
+# Run for specific duration
+import time
+time.sleep(3600)  # 1 hour
+
+# Stop recording
+recorder.stop()
+
+# Alternative: Use yt-dlp's built-in live recording
+# with hls-live-restart
+
+ydl_opts = {
+    'outtmpl': 'live_stream.%(ext)s',
+    'live_from_start': True,  # Download from start
+    'hls-live-restart': True,  # Restart on stream errors
+    'fragment-retries': 10,  # Retry failed fragments
+}
+
+with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+    ydl.download(['https://www.youtube.com/watch?v=LIVE_STREAM_ID'])</code></pre>
+            </div>
+            <p class="mt-3 text-sm text-gray-600">The hls-live-restart option handles URL changes automatically for most streams.</p>
+        </div>
+
+        <h2 class="text-2xl font-bold mb-4 mt-12">Comparison with Alternatives</h2>
+
+        <div class="grid md:grid-cols-2 gap-4">
+            <div class="bg-white p-4 rounded-lg border">
+                <a href="https://pnt.jacbex.com/youget.html" class="text-blue-600 hover:underline font-semibold">You-Get V1</a>
+                <p class="text-gray-600 text-sm mt-1">Basic usage and installation</p>
+            </div>
+            <div class="bg-white p-4 rounded-lg border">
+                <a href="https://github.com/yt-dlp/yt-dlp" class="text-blue-600 hover:underline font-semibold">yt-dlp</a>
+                <p class="text-gray-600 text-sm mt-1">More powerful, actively maintained</p>
+            </div>
+            <div class="bg-white p-4 rounded-lg border">
+                <a href="https://github.com/soimort/you-get" class="text-blue-600 hover:underline font-semibold">You-Get GitHub</a>
+                <p class="text-gray-600 text-sm mt-1">Official repository</p>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t mt-12">
+        <div class="max-w-4xl mx-auto px-6 py-8 text-center text-gray-500">
+            <p>Last updated: March 2026</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            Prism.highlightAll();
+        });
+    </script>
+
+</body>
+</html>

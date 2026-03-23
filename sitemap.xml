@@ -414,4 +414,40 @@
         <changefreq>weekly</changefreq>
         <priority>0.9</priority>
     </url>
+    <url>
+        <loc>https://pnt.jacbex.com/scrapy.html</loc>
+        <lastmod>2026-03-23</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.9</priority>
+    </url>
+    <url>
+        <loc>https://pnt.jacbex.com/newspaper3k.html</loc>
+        <lastmod>2026-03-23</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.9</priority>
+    </url>
+    <url>
+        <loc>https://pnt.jacbex.com/scrapy-advanced.html</loc>
+        <lastmod>2026-03-23</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.9</priority>
+    </url>
+    <url>
+        <loc>https://pnt.jacbex.com/playwright-advanced.html</loc>
+        <lastmod>2026-03-23</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.9</priority>
+    </url>
+    <url>
+        <loc>https://pnt.jacbex.com/gallery-advanced.html</loc>
+        <lastmod>2026-03-23</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.9</priority>
+    </url>
+    <url>
+        <loc>https://pnt.jacbex.com/youget-advanced.html</loc>
+        <lastmod>2026-03-23</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.9</priority>
+    </url>
 </urlset>

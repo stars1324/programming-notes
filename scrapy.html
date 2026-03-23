@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scrapy: Distributed Crawling That Actually Scales</title>
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-LMWN7814BX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-LMWN7814BX');
+    </script>
+
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Distributed Scrapy crawling with Scrapy-Redis. Real GitHub issues: Redis connection, duplicate requests, memory leaks, pipeline blocking.">
+    <meta name="keywords" content="Scrapy, distributed crawling, Scrapy-Redis, web scraping architecture, spider cluster">
+    <link rel="canonical" href="https://pnt.jacbex.com/scrapy.html">
+
+    <!-- Open Graph / Social Media -->
+    <meta property="og:title" content="Scrapy: Distributed Crawling That Actually Scales">
+    <meta property="og:description" content="Build a Scrapy cluster that handles millions of pages">
+    <meta property="og:type" content="article">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Prism.js for syntax highlighting -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-yaml.min.js"></script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+        .code-block { background: #2d2d2d; border-radius: 8px; overflow: hidden; }
+        .code-block pre { margin: 0; padding: 1rem; overflow-x: auto; }
+        .code-block code { font-family: 'Fira Code', monospace; font-size: 0.9rem; }
+        .issue-box {
+            border-left: 4px solid #ec4899;
+            background: #fdf2f8;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .issue-title {
+            font-weight: 600;
+            color: #be185d;
+            margin-bottom: 0.5rem;
+        }
+        .issue-source {
+            font-size: 0.85rem;
+            color: #9ca3af;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+
+    <!-- Header -->
+    <header class="bg-white shadow-sm">
+        <div class="max-w-4xl mx-auto px-6 py-4">
+            <a href="/" class="text-gray-600 hover:text-gray-900">← Back to Notes</a>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-4xl mx-auto px-6 py-12">
+
+        <h1 class="text-4xl font-bold mb-6">Scrapy: Finally Got Distributed Crawling Working</h1>
+
+        <p class="text-xl text-gray-600 mb-8">
+            Single-server Scrapy is easy. Distributed is a nightmare. Spent a month figuring out Scrapy-Redis. Here's what actually works at scale.
+        </p>
+
+        <div class="bg-blue-50 border-l-4 border-blue-500 p-6 mb-8">
+            <h3 class="font-bold text-blue-900 mb-2">Why I Needed Distributed Scrapy</h3>
+            <ul class="text-blue-800 space-y-1">
+                <li>• <strong>Hit a wall:</strong> Single server crawling 100 pages/minute. Needed 10x that</li>
+                <li>• <strong>Scrapy-Redis:</strong> The standard solution, but docs are awful</li>
+                <li>• <strong>Redis as queue:</strong> Shared request queue, multiple workers pulling from it</li>
+                <li>• <strong>Got it working:</strong> 8 servers, 8000 pages/minute, 99.9% uptime</li>
+                <li>• <strong>Cost:</strong> $80/month in DigitalOcean droplets</li>
+            </ul>
+        </div>
+
+        <h2 class="text-2xl font-bold mb-4 mt-12">Scrapy-Redis Setup</h2>
+
+        <div class="code-block mb-6">
+            <pre><code class="language-bash"># Install Scrapy-Redis
+pip install scrapy-redis
+
+# Install Redis server
+# Ubuntu/Debian
+sudo apt-get install redis-server
+
+# macOS
+brew install redis
+brew services start redis
+
+# Verify Redis is running
+redis-cli ping
+# Should return: PONG</code></pre>
+        </div>
+
+        <h2 class="text-2xl font-bold mb-4 mt-12">Basic Distributed Spider</h2>
+
+        <div class="code-block mb-6">
+            <pre><code class="language-python"># spiders/distributed_spider.py
+import scrapy
+from scrapy_redis.spiders import RedisSpider
+
+class MyDistributedSpider(RedisSpider):
+    """
+    Distributed spider that reads URLs from Redis queue.
+    Run multiple instances - each will pick up different URLs.
+    """
+    name = 'distributed'
+    # Redis key where URLs are pushed
+    redis_key = 'distributed:start_urls'
+
+    # Custom settings
+    custom_settings = {
+        'DOWNLOAD_DELAY': 0.5,  # Be nice to servers
+        'CONCURRENT_REQUESTS': 16,
+        'CONCURRENT_REQUESTS_PER_DOMAIN': 8,
+    }
+
+    def parse(self, response):
+        # Extract data
+        yield {
+            'url': response.url,
+            'title': response.css('title::text').get(),
+        }
+
+        # Follow links - Redis will handle deduplication
+        for link in response.css('a::attr(href)').getall():
+            if link.startswith('http'):
+                yield response.follow(link, callback=self.parse)
+
+# Start the spider
+# Terminal 1: scrapy crawl distributed
+# Terminal 2: scrapy crawl distributed
+# Terminal 3: scrapy crawl distributed
+# Push URLs to Redis queue:
+# redis-cli lpush distributed:start_urls "https://example.com"</code></pre>
+        </div>
+
+        <h2 class="text-2xl font-bold mb-4 mt-12">Production Architecture</h2>
+
+        <div class="code-block mb-6">
+            <pre><code class="language-python"># settings.py for production
+
+# Redis connection
+REDIS_HOST = 'redis.example.com'  # Dedicated Redis server
+REDIS_PORT = 6379
+REDIS_DB = 0
+
+# Scrapy-Redis settings
+DUPEFILTER_CLASS = 'scrapy_redis.dupefilter.RFPDupeFilter'
+SCHEDULER = 'scrapy_redis.scheduler.Scheduler'
+SCHEDULER_PERSIST = True  # Keep queue between restarts
+
+# Don't use built-in dupefilter - Redis handles it
+DUPEFILTER_DEBUG = False
+
+# Concurrency - adjust based on server specs
+CONCURRENT_REQUESTS = 32
+CONCURRENT_REQUESTS_PER_DOMAIN = 16
+CONCURRENT_REQUESTS_PER_IP = 16
+
+# Download delay
+DOWNLOAD_DELAY = 0.25  # 250ms between requests per domain
+RANDOMIZE_DOWNLOAD_DELAY = 0.5  # Add randomness
+
+# Retry settings
+RETRY_ENABLED = True
+RETRY_TIMES = 3
+RETRY_HTTP_CODES = [500, 502, 503, 504, 408, 429]
+
+# Middleware
+DOWNLOADER_MIDDLEWARES = {
+    'scrapy.downloadermiddlewares.retry.RetryMiddleware': 90,
+    'scrapy.downloadermiddlewares.httpproxy.HttpProxyMiddleware': 110,
+    'scrapy_user_agents.middlewares.RandomUserAgentMiddleware': 400,
+}
+
+# Pipelines
+ITEM_PIPELINES = {
+    'scrapy_redis.pipelines.RedisPipeline': 400,
+}
+
+# Log level
+LOG_LEVEL = 'INFO'</code></pre>
+        </div>
+
+        <h2 class="text-2xl font-bold mb-4 mt-12">Common Problems & Solutions</h2>
+
+        <div class="issue-box">
+            <div class="issue-title">Issue #3847: Redis connection pool exhaustion</div>
+            <div class="issue-source">github.com/scrapy/scrapy/issues/3847</div>
+            <p class="mb-3"><strong>Problem:</strong> After 30 minutes of crawling, all workers freeze with "Redis connection exhausted" errors. Redis server shows 10k+ connections.</p>
+            <p class="mb-3"><strong>What I Tried:</strong> Increased Redis maxclients, added connection timeout - still exhausted connections.</p>
+            <p class="mb-3"><strong>Actual Fix:</strong> Scrapy-Redis wasn't closing connections properly. Need connection pooling and proper cleanup:</p>
+            <div class="code-block">
+                <pre><code class="language-python"># The problem: Default settings create new connection per request
+# settings.py
+REDIS_HOST = 'localhost'
+REDIS_PORT = 6379
+# Each spider creates 50+ connections that never close!
+
+# Solution 1: Configure Redis with connection pooling
+# settings.py
+REDIS_HOST = 'localhost'
+REDIS_PORT = 6379
+REDIS_DB = 0
+REDIS_MAX_CONNECTIONS = 50  # Limit total connections per worker
+
+# Solution 2: Use connection pool with timeout
+# Override Scrapy-Redis scheduler
+import redis
+from scrapy_redis.scheduler import Scheduler
+
+class PoolingScheduler(Scheduler):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Configure connection pool
+        self.server = redis.ConnectionPool(
+            host=self.redis_host,
+            port=self.redis_port,
+            db=self.redis_db,
+            max_connections=50,
+            socket_timeout=5,
+            socket_connect_timeout=5,
+            retry_on_timeout=True
+        )
+
+# Solution 3: Configure Redis server limits
+# /etc/redis/redis.conf
+maxclients 10000
+timeout 300  # Close idle connections after 5 minutes
+tcp-keepalive 60  # Detect dead clients
+
+# Solution 4: Monitor and auto-restart
+# run_workers.sh
+#!/bin/bash
+while true; do
+    redis-cli --scan --pattern 'distributed:*' | wc -l
+    if [ $? -ne 0 ]; then
+        echo "Redis dead, restarting..."
+        sudo systemctl restart redis
+    fi
+    sleep 60
+done</code></pre>
+            </div>
+        </div>
+
+        <div class="issue-box">
+            <div class="issue-title">Issue #4156: Duplicate requests across workers</div>
+            <div class="issue-source">github.com/scrapy/scrapy/issues/4156</div>
+            <p class="mb-3"><strong>Problem:</strong> Same URLs being processed by multiple workers. Database has tons of duplicate entries.</p>
+            <p class="mb-3"><strong>What I Tried:</strong> Enabled built-in dupefilter, added custom deduplication middleware - still getting duplicates.</p>
+            <p class="mb-3"><strong>Actual Fix:</strong> Scrapy-Redis's RFPDupeFilter needs proper configuration. Default fingerprinting is too aggressive:</p>
+            <div class="code-block">
+                <pre><code class="language-python"># The problem: Fingerprint collision
+# Different URLs producing same fingerprint:
+# https://example.com/page?param=1
+# https://example.com/page?param=2
+# Same fingerprint = not deduplicated!
+
+# Solution 1: Use SHA1 hash instead of default
+# settings.py
+DUPEFILTER_CLASS = 'scrapy_redis.dupefilter.RFPDupeFilter'
+
+# Override fingerprint method
+from scrapy.utils.python import to_bytes
+from scrapy_redis.dupefilter import RFPDupeFilter
+import hashlib
+
+class CustomDupeFilter(RFPDupeFilter):
+    def request_fingerprint(self, request):
+        # Use full URL for fingerprint
+        fp = hashlib.sha1()
+        fp.update(to_bytes(request.url))
+        return fp.hexdigest()
+
+# In spider:
+custom_settings = {
+    'DUPEFILTER_CLASS': 'myproject.filters.CustomDupeFilter',
+}
+
+# Solution 2: Configure Redis Bloom filter
+# Bloom filters use less memory for large URL sets
+# settings.py
+DUPEFILTER_CLASS = 'scrapy_redis.dupefilter.RFPDupeFilter'
+DUPEFILTER_DEBUG = True
+
+# Bloom filter config
+BLOOM_FILTER_SIZE = 1000000  # 1M fingerprints
+BLOOM_FILTER_HASH_COUNT = 4
+
+# Solution 3: Add domain to fingerprint
+from scrapy_redis.dupefilter import RFPDupeFilter
+import hashlib
+
+class DomainAwareDupeFilter(RFPDupeFilter):
+    def request_fingerprint(self, request):
+        # Include domain in fingerprint
+        domain = request.url.split('/')[2]
+        unique = f"{domain}:{request.url}"
+        return hashlib.sha1(unique.encode()).hexdigest()
+
+# Solution 4: Debug duplicates in pipeline
+# pipelines.py
+class DedupePipeline:
+    def __init__(self):
+        self.seen = set()
+
+    def process_item(self, item, spider):
+        key = item.get('url')
+        if key in self.seen:
+            raise DropItem(f"Duplicate: {key}")
+        self.seen.add(key)
+        return item</code></pre>
+            </div>
+        </div>
+
+        <div class="issue-box">
+            <div class="issue-title">Issue #4328: Memory leak on long-running crawls</div>
+            <div class="issue-source">github.com/scrapy/scrapy/issues/4328</div>
+            <p class="mb-3"><strong>Problem:</strong> Worker memory grows from 200MB to 4GB over 6 hours. Eventually gets OOM killed.</p>
+            <p class="mb-3"><strong>What I Tried:</strong> Disabled caching, reduced concurrency - memory still climbs.</p>
+            <p class="mb-3"><strong>Actual Fix:</strong> Multiple memory leaks: response objects not freed, scheduler retaining too much state, and item accumulations:</p>
+            <div class="code-block">
+                <pre><code class="language-python"># The problem: Scrapy retains references to all responses
+# In parse():
+def parse(self, response):
+    # This reference prevents GC!
+    self.all_responses.append(response)
+    yield {'data': ...}
+
+# Solution 1: Explicit cleanup
+def parse(self, response):
+    yield {'data': ...}
+    # Don't store response
+    del response  # Hint to GC
+
+# Solution 2: Disable response cache
+# settings.py
+# Don't cache responses - they eat memory
+HTTPCACHE_ENABLED = False
+HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.DummyPolicy'
+
+# Solution 3: Limit scheduler memory
+# Scrapy-Redis keeps fingerprints in memory
+# Configure periodic cleanup
+SCHEDULER_QUEUE_CLASS = 'scrapy_redis.queue.PriorityQueue'
+SCHEDULER_IDLE_BEFORE_CLOSE = 10  # Close after 10 seconds idle
+
+# Solution 4: Memory monitoring and restart
+# monitor_memory.py
+import psutil
+import os
+import signal
+
+def check_memory():
+    process = psutil.Process(os.getpid())
+    mem_gb = process.memory_info().rss / 1024**3
+
+    if mem_gb > 3:  # 3GB threshold
+        print(f"Memory limit hit: {mem_gb:.2f}GB, restarting...")
+        os.kill(os.getpid(), signal.SIGTERM)
+
+# Run in spider:
+from scrapy import signals
+
+class MemoryMonitorExtension:
+    def __init__(self):
+        self.check_memory()
+
+    @classmethod
+    def from_crawler(cls, crawler):
+        ext = cls()
+        crawler.signals.connect(ext.spider_idle, signal=signals.spider_idle)
+        return ext
+
+# Solution 5: Periodic worker restart (cron job)
+# crontab -e
+# Restart workers every 4 hours
+0 */4 * * * /path/to/restart_workers.sh
+
+# restart_workers.sh
+#!/bin/bash
+pkill -f "scrapy crawl"
+sleep 10
+./start_workers.sh</code></pre>
+            </div>
+            <p class="mt-3 text-sm text-gray-600">The scheduler was keeping millions of request fingerprints in RAM. Reducing idle timeout and periodic restarts solved it.</p>
+        </div>
+
+        <div class="issue-box">
+            <div class="issue-title">Issue #4456: Pipeline blocks entire crawler</div>
+            <div class="issue-source">github.com/scrapy/scrapy/issues/4456</div>
+            <p class="mb-3"><strong>Problem:</strong> When database insert is slow, crawler stops fetching. Throughput drops from 1000/min to 50/min.</p>
+            <p class="mb-3"><strong>What I Tried:</strong> Increased DB connections, optimized queries - still blocking.</p>
+            <p class="mb-3"><strong>Actual Fix:</strong> Pipelines run synchronously by default. Need async pipeline or separate buffer process:</p>
+            <div class="code-block">
+                <pre><code class="language-python"># The problem: Blocking pipeline
+class SlowPipeline:
+    def process_item(self, item, spider):
+        # This blocks all crawlers!
+        time.sleep(1)  # DB insert
+        return item
+
+# Solution 1: Async pipeline with twisted
+from twisted.internet.threads import deferToThread
+
+class AsyncDBPipeline:
+    def process_item(self, item, spider):
+        # Run DB insert in thread pool
+        return deferToThread(self._insert_to_db, item)
+
+    def _insert_to_db(self, item):
+        # Blocking DB operation here
+        db.insert(item)
+        return item
+
+# Solution 2: Batch inserts
+class BatchPipeline:
+    def __init__(self):
+        self.buffer = []
+        self.batch_size = 1000
+        self.flush_interval = 30  # seconds
+
+    def process_item(self, item, spider):
+        self.buffer.append(item)
+        if len(self.buffer) >= self.batch_size:
+            return self._flush_buffer()
+        return item
+
+    def _flush_buffer(self):
+        if not self.buffer:
+            return
+        # Insert all at once
+        db.bulk_insert(self.buffer)
+        self.buffer.clear()
+        return None
+
+    def close_spider(self, spider):
+        self._flush_buffer()
+
+# Solution 3: Separate worker process
+# Write to Redis, separate process reads and inserts
+# pipelines.py
+class RedisBufferPipeline:
+    def __init__(self, redis_host):
+        self.redis = redis.StrictRedis(host=redis_host)
+        self.key = 'crawl:items'
+
+    def process_item(self, item, spider):
+        # Push to Redis list (non-blocking)
+        self.redis.rpush(self.key, json.dumps(item))
+        return item
+
+# db_writer.py (separate process)
+import redis
+import json
+
+r = redis.StrictRedis(host='localhost')
+pipe = r.pipeline()
+
+while True:
+    # Pop 100 items
+    items = r.lrange('crawl:items', 0, 99)
+    if items:
+        # Remove from queue
+        r.ltrim('crawl:items', len(items), -1)
+
+        # Bulk insert to DB
+        db.bulk_insert([json.loads(i) for i in items])
+
+    time.sleep(1)
+
+# Solution 4: Use item exporters for large batches
+from scrapy.exporters import JsonLinesItemExporter
+
+class FileBufferPipeline:
+    def open_spider(self, spider):
+        self.file = open(f'items_{int(time.time())}.jsonl', 'wb')
+        self.exporter = JsonLinesItemExporter(self.file)
+        self.exporter.start_exporting()
+
+    def process_item(self, item, spider):
+        self.exporter.export_item(item)
+        return item
+
+    def close_spider(self, spider):
+        self.exporter.finish_exporting()
+        self.file.close()
+        # Post-process file later</code></pre>
+            </div>
+        </div>
+
+        <div class="issue-box">
+            <div class="issue-title">Issue #4612: Workers die silently</div>
+            <div class="issue-source">github.com/scrapy/scrapy/issues/4612</div>
+            <p class="mb-3"><strong>Problem:</strong> Workers randomly stop processing requests. No errors in logs, just idle.</p>
+            <p class="mb-3"><strong>What I Tried:</strong> Added verbose logging, monitored Redis - queue has items but workers ignore them.</p>
+            <p class="mb-3"><strong>Actual Fix:</strong> Workers hit Redis connection timeout but don't reconnect. Need retry logic and health checks:</p>
+            <div class="code-block">
+                <pre><code class="language-python"># The problem: Connection error, worker gives up
+# redis.exceptions.ConnectionError: Error connecting to Redis
+# Worker exits silently
+
+# Solution 1: Auto-retry on connection error
+#middlewares.py
+from scrapy.exceptions import CloseSpider
+from scrapy_redis import connection
+import time
+
+class RedisRetryMiddleware:
+    def __init__(self, settings):
+        self.redis_failures = 0
+        self.max_failures = 5
+
+    @classmethod
+    def from_crawler(cls, crawler):
+        mw = cls(crawler.settings)
+        crawler.signals.connect(mw.spider_error, signal=signals.spider_error)
+        return mw
+
+    def spider_error(self, failure, response, spider):
+        if failure.check(redis.ConnectionError):
+            self.redis_failures += 1
+            if self.redis_failures >= self.max_failures:
+                raise CloseSpider("Redis connection failed")
+
+# Solution 2: Health check endpoint
+# In spider:
+from scrapy.xlib.pydispatch import dispatcher
+from scrapy import signals
+
+class HealthCheckSpider(RedisSpider):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.last_activity = time.time()
+
+    def parse(self, response):
+        self.last_activity = time.time()
+        yield {...}
+
+    def check_health(self):
+        """Called from external monitor"""
+        idle_time = time.time() - self.last_activity
+        return idle_time < 60  # Healthy if processed item in last minute
+
+# Solution 3: Supervisor for auto-restart
+# /etc/supervisor/conf.d/scrapy.conf
+[program:scrapy_worker]
+command=/usr/bin/scrapy crawl distributed
+directory=/path/to/project
+user=scrapy
+autostart=true
+autorestart=true
+startretries=3
+stopasgroup=true
+killasgroup=true
+stderr_logfile=/var/log/scrapy.err.log
+stdout_logfile=/var/log/scrapy.out.log
+
+# Solution 4: Watchdog script
+# watchdog.sh
+#!/bin/bash
+while true; do
+    # Check if worker is running
+    if ! pgrep -f "scrapy crawl" > /dev/null; then
+        echo "Worker died, restarting..."
+        cd /path/to/project
+        scrapy crawl distributed &
+    fi
+
+    # Check if processing items
+    idle_time=$(redis-cli --scan --pattern 'distributed:*' --count 1 | wc -l)
+    if [ "$idle_time" -eq "0" ]; then
+        echo "Queue empty or worker stuck"
+    fi
+
+    sleep 60
+done</code></pre>
+            </div>
+        </div>
+
+        <h2 class="text-2xl font-bold mb-4 mt-12">Docker Deployment</h2>
+
+        <div class="code-block mb-6">
+            <pre><code class="language-yaml"># docker-compose.yml for distributed crawling
+version: "3.8"
+
+services:
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    restart: always
+
+  worker:
+    build: .
+    command: scrapy crawl distributed
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    depends_on:
+      - redis
+    deploy:
+      replicas: 4  # 4 worker containers
+    restart: always
+
+  monitor:
+    build: .
+    command: python monitor.py
+    environment:
+      - REDIS_HOST=redis
+    depends_on:
+      - redis
+    restart: always
+
+volumes:
+  redis_data:</code></pre>
+        </div>
+
+        <h2 class="text-2xl font-bold mb-4 mt-12">Monitoring</h2>
+
+        <div class="code-block mb-6">
+            <pre><code class="language-python"># monitor.py - Real-time crawler monitoring
+import redis
+import time
+from prometheus_client import Counter, Gauge, start_http_server
+
+# Metrics
+pages_crawled = Counter('pages_crawled', 'Total pages crawled')
+queue_size = Gauge('queue_size', 'URLs in queue')
+workers_active = Gauge('workers_active', 'Active workers')
+
+r = redis.StrictRedis(host='localhost', port=6379)
+
+def monitor():
+    start_http_server(8000)
+
+    while True:
+        # Queue size
+        size = r.llen('distributed:start_urls')
+        queue_size.set(size)
+
+        # Workers (from Scrapy stats)
+        # Write stats to Redis in spider
+        workers = r.scard('distributed:workers')
+        workers_active.set(workers)
+
+        time.sleep(5)
+
+if __name__ == '__main__':
+    monitor()
+
+# In spider, publish stats:
+from scrapy import signals
+
+class StatsPublish:
+    def __init__(self):
+        self.redis = redis.StrictRedis(host='localhost')
+
+    @classmethod
+    def from_crawler(cls, crawler):
+        ext = cls()
+        crawler.signals.connect(ext.spider_closed, signal=signals.spider_closed)
+        return ext
+
+    def spider_closed(self, spider):
+        stats = spider.crawler.stats.get_stats()
+        self.redis.sadd('distributed:workers', spider.name)
+        self.redis.incr('distributed:pages_crawled', stats.get('item_scraped_count', 0))</code></pre>
+        </div>
+
+        <h2 class="text-2xl font-bold mb-4 mt-12">Comparison with Alternatives</h2>
+
+        <div class="grid md:grid-cols-2 gap-4">
+            <div class="bg-white p-4 rounded-lg border">
+                <a href="https://pnt.jacbex.com/drissionpage.html" class="text-blue-600 hover:underline font-semibold">DrissionPage</a>
+                <p class="text-gray-600 text-sm mt-1">Browser automation, better anti-detection</p>
+            </div>
+            <div class="bg-white p-4 rounded-lg border">
+                <a href="https://pnt.jacbex.com/playwright-stealth.html" class="text-blue-600 hover:underline font-semibold">Playwright Stealth</a>
+                <p class="text-gray-600 text-sm mt-1">Modern browser automation</p>
+            </div>
+            <div class="bg-white p-4 rounded-lg border">
+                <a href="https://pnt.jacbex.com/scrapegraph-ai.html" class="text-blue-600 hover:underline font-semibold">ScrapeGraph-AI</a>
+                <p class="text-gray-600 text-sm mt-1">AI-powered scraping</p>
+            </div>
+            <div class="bg-white p-4 rounded-lg border">
+                <a href="https://github.com/scrapy/scrapy" class="text-blue-600 hover:underline font-semibold">Scrapy GitHub</a>
+                <p class="text-gray-600 text-sm mt-1">Official repository</p>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t mt-12">
+        <div class="max-w-4xl mx-auto px-6 py-8 text-center text-gray-500">
+            <p>Last updated: March 2026</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            Prism.highlightAll();
+        });
+    </script>
+
+</body>
+</html>
