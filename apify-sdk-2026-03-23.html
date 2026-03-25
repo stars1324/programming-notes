@@ -1,0 +1,753 @@
+<!--
+    Apify SDK: Scalable Scraping That Actually Works
+
+    File: apify-sdk-2026-03-23.html
+    Created: 2026-03-23
+    Focus: Migrating to Apify, scalable scraping, Apify vs Selenium comparison
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apify SDK: Finally Got Scraping to Scale</title>
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-LMWN7814BX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-LMWN7814BX');
+    </script>
+
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Real solutions for scalable scraping with Apify SDK. Migrating from Selenium, handling distributed crawling, and production deployment that actually works.">
+    <meta name="keywords" content="Apify SDK, Apify vs Selenium, scalable scraping, distributed crawling, production scraping">
+    <link rel="canonical" href="https://pnt.jacbex.com/apify-sdk-2026-03-23.html">
+
+    <!-- Open Graph / Social Media -->
+    <meta property="og:title" content="Apify SDK: Finally Got Scraping to Scale">
+    <meta property="og:description" content="Real solutions for scalable scraping with Apify SDK. Migrating from Selenium and production deployment that actually works.">
+    <meta property="og:type" content="article">
+
+    <!-- JSON-LD Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "Apify SDK: Finally Got Scraping to Scale",
+      "description": "Real solutions for scalable scraping with Apify SDK. Migrating from Selenium, handling distributed crawling, and production deployment that actually works.",
+      "author": {
+        "@type": "Person",
+        "name": "Programming Notes"
+      },
+      "datePublished": "2026-03-23",
+      "keywords": ["Apify SDK", "scalable scraping", "distributed crawling", "production"],
+      "url": "https://pnt.jacbex.com/apify-sdk-2026-03-23.html"
+    }
+    </script>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Prism.js for syntax highlighting -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+        .code-block { background: #2d2d2d; border-radius: 8px; overflow: hidden; }
+        .code-block pre { margin: 0; padding: 1rem; overflow-x: auto; }
+        .code-block code { font-family: 'Fira Code', monospace; font-size: 0.9rem; }
+        .issue-box {
+            border-left: 4px solid #ec4899;
+            background: #fdf2f8;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .issue-title { font-weight: 600; color: #be185d; }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <article class="max-w-4xl mx-auto px-4 py-8">
+        <!-- Header -->
+        <header class="mb-12">
+            <h1 class="text-4xl font-bold text-gray-900 mb-4">Apify SDK: Finally Got Scraping to Scale</h1>
+            <p class="text-xl text-gray-600">
+                My Selenium setup worked for 10K pages but fell apart at 100K. Memory leaks, blocked IPs, and single-machine bottlenecks killed it. Apify SDK handled the migration and scaling with minimal code changes.
+            </p>
+        </header>
+
+        <!-- Context -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Why I Migrated to Apify</h2>
+            <p class="text-gray-700 mb-4">
+                When scraping at scale, Selenium/BeautifulSoup setups hit hard limits:
+            </p>
+            <ul class="list-disc pl-6 space-y-2 text-gray-700 mb-4">
+                <li><strong>Single machine bottleneck:</strong> One machine can only handle so many concurrent requests</li>
+                <li><strong>State management:</strong> No built-in queue, retry logic, or state persistence</li>
+                <li><strong>Proxy rotation:</strong> Manual proxy management is complex and error-prone</li>
+                <li><strong>Memory leaks:</strong> Long-running Selenium processes eventually OOM</li>
+                <li><strong>Deployment:</strong> No easy way to distribute across multiple machines</li>
+            </ul>
+            <p class="text-gray-700">
+                Apify SDK solves these with built-in queues, distributed execution, proxy management, and storage.
+            </p>
+        </section>
+
+        <!-- GitHub Issue #1 -->
+        <div class="issue-box">
+            <div class="issue-title">
+                <a href="https://github.com/apify/apify-sdk-python/issues?q=is%3Aissue+migration+selenium"
+                   target="_blank"
+                   class="text-pink-700 hover:underline">
+                    Migrating existing Selenium scrapers to Apify
+                </a>
+            </div>
+            <div class="issue-body mt-4">
+                <h4 class="font-semibold text-gray-800 mb-2">Problem</h4>
+                <p class="text-gray-700 mb-3">
+                    I had 20+ Selenium scrapers running in production. Rewriting them completely for Apify would take weeks. I needed a migration path that didn't require rewriting all scraping logic.
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">What I Tried</h4>
+                <p class="text-gray-700 mb-3">
+                    <strong>Attempt 1:</strong> Rewrote scrapers from scratch using Apify Cheerio - Took too long, lost functionality<br>
+                    <strong>Attempt 2:</strong> Used Apify SDK just for queue/storage - Missed out on proxy/autoscaling benefits<br>
+                    <strong>Attempt 3:</strong> Mixed approach with Puppeteer - Complex architecture, hard to maintain
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">Actual Fix</h4>
+                <p class="text-gray-700 mb-3">
+                    Apify SDK supports Playwright out of the box, which is similar to Selenium. The migration was mostly about wrapping existing logic in Apify's structure:
+                </p>
+                <div class="code-block mt-3">
+                    <pre><code class="language-python">from apify import Actor, Request
+from apify_playwright import PlaywrightCrawlingContext
+from playwright.async_api import Page
+import asyncio
+
+# Before: Selenium scraper
+def selenium_scraper(url: str):
+    from selenium import webdriver
+    from selenium.webdriver.common.by import By
+
+    driver = webdriver.Chrome()
+    driver.get(url)
+
+    # Scraping logic
+    title = driver.find_element(By.TAG_NAME, 'h1').text
+    price = driver.find_element(By.CSS_SELECTOR, '.price').text
+
+    driver.quit()
+
+    return {'title': title, 'price': price}
+
+# After: Apify with Playwright (minimal changes)
+async def apify_scraper(context: PlaywrightCrawlingContext):
+    """
+    Apify scraper using Playwright
+    Similar to Selenium but with built-in scaling
+    """
+    page: Page = context.page
+
+    # Same scraping logic, different API
+    title = await page.locator('h1').text_content()
+    price = await page.locator('.price').text_content()
+
+    # Push to dataset (automatic storage)
+    await context.push_data({
+        'url': context.request.url,
+        'title': title,
+        'price': price
+    })
+
+# Main entry point
+async def main():
+    async with Actor:
+        # Configure crawler
+        actor_context = Actor.config
+
+        # Initialize crawler
+        crawler = actor_context.crawler(
+            PlaywrightCrawlingContext,
+            # Similar to Selenium options
+            headless=True,
+            browser_type='chromium'
+        )
+
+        # Add URLs to crawl
+        await crawler.add_requests([
+            'https://example.com/product/1',
+            'https://example.com/product/2',
+            'https://example.com/product/3'
+        ])
+
+        # Run crawler
+        await crawler.run(apify_scraper)
+
+# Run
+if __name__ == '__main__':
+    import asyncio
+    asyncio.run(main())</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- GitHub Issue #2 -->
+        <div class="issue-box">
+            <div class="issue-title">
+                <a href="https://github.com/apify/apify-sdk-python/issues?q=is%3Aissue+request+queue"
+                   target="_blank"
+                   class="text-pink-700 hover:underline">
+                    Request queue not persisting across restarts
+                </a>
+            </div>
+            <div class="issue-body mt-4">
+                <h4 class="font-semibold text-gray-800 mb-2">Problem</h4>
+                <p class="text-gray-700 mb-3">
+                    When my crawler crashed or was restarted, it would lose track of which URLs were processed. The in-memory queue didn't persist, causing duplicate work and missing pages.
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">What I Tried</h4>
+                <p class="text-gray-700 mb-3">
+                    <strong>Attempt 1:</strong> Stored processed URLs in database - Worked but added complexity<br>
+                    <strong>Attempt 2:</strong> Used Redis queue - Better but required separate infrastructure<br>
+                    <strong>Attempt 3:</strong> Checkpoint to file - Messy with concurrent crawlers
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">Actual Fix</h4>
+                <p class="text-gray-700 mb-3">
+                    Apify's RequestQueue persists automatically. It survives restarts and supports distributed crawling:
+                </p>
+                <div class="code-block mt-3">
+                    <pre><code class="language-python">from apify import Actor, RequestQueue
+
+async def main():
+    async with Actor:
+        # Initialize request queue (auto-persists)
+        queue = await Actor.open_request_queue()
+
+        # Add requests (only adds if not already processed)
+        await queue.add_request(
+            Request.from_url('https://example.com/page1')
+        )
+        await queue.add_request(
+            Request.from_url('https://example.com/page2')
+        )
+
+        # Process queue
+        while not queue.is_finished():
+            request = await queue.fetch_next_request()
+
+            if request:
+                try:
+                    # Process the request
+                    data = await scrape_page(request.url)
+
+                    # Save to dataset
+                    await Actor.push_data(data)
+
+                    # Mark as handled (persists to storage)
+                    await queue.mark_request_as_handled(request)
+
+                except Exception as e:
+                    # Mark for retry (with backoff)
+                    await queue.reclaim_request(request)
+
+        # Queue state persists - restart and it continues from where it left off
+
+# With automatic checkpointing
+async def crawler_with_checkpoint(context):
+    """
+    Apify automatically checkpoints queue state
+    Restart crawler and it continues from last position
+    """
+    # Process page
+    data = await scrape_page(context.request.url)
+
+    # Save data
+    await context.push_data(data)
+
+    # Queue automatically persisted after each batch</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- GitHub Issue #3 -->
+        <div class="issue-box">
+            <div class="issue-title">
+                <a href="https://github.com/apify/apify-sdk-python/issues?q=is%3Aissue+proxy+rotation"
+                   target="_blank"
+                   class="text-pink-700 hover:underline">
+                    Proxy rotation not working consistently
+                </a>
+            </div>
+            <div class="issue-body mt-4">
+                <h4 class="font-semibold text-gray-800 mb-2">Problem</h4>
+                <p class="text-gray-700 mb-3">
+                    When scraping at scale, individual proxies would get blocked. I needed automatic rotation with smart fallback, but Apify's proxy configuration was confusing.
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">What I Tried</h4>
+                <p class="text-gray-700 mb-3">
+                    <strong>Attempt 1:</strong> Used Apify Proxy without configuration - Blocked quickly<br>
+                    <strong>Attempt 2:</strong> Bought cheap proxy list and rotated manually - Most proxies already burned<br>
+                    <strong>Attempt 3:</strong> Used single datacenter proxy - Got blocked after 1K requests
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">Actual Fix</h4>
+                <p class="text-gray-700 mb-3">
+                    Configure Apify Proxy with proper session management and smart rotation:
+                </p>
+                <div class="code-block mt-3">
+                    <pre><code class="language-python">from apify import Actor
+from apify_playwright import PlaywrightCrawlingContext
+
+async def main():
+    async with Actor:
+        # Configure proxy (Apify Proxy or custom)
+        proxy_configuration = {
+            'proxyUrls': [
+                'http://proxy1.example.com:8000',
+                'http://proxy2.example.com:8000',
+                'http://proxy3.example.com:8000'
+            ],
+            # Or use Apify's residential proxy
+            # 'apifyProxy': {
+            #     'groups': ['RESIDENTIAL'],
+            #     'countryCode': 'US'
+            # }
+        }
+
+        # Initialize crawler with proxy
+        crawler = Actor.config.crawler(
+            PlaywrightCrawlingContext,
+            proxy_configuration=proxy_configuration,
+            # Session management (key for proxy rotation)
+            use_session_pool=True,
+            session_pool_options={
+                'max_pool_size': 100,  # Max concurrent sessions
+                'session_options': {
+                    'max_usage_count': 10,  # Reuse session 10 times
+                    'error_score_threshold': 0.5  # Abandon session after errors
+                }
+            }
+        )
+
+        # Run crawler
+        await crawler.run(scrape_with_rotation)
+
+async def scrape_with_rotation(context: PlaywrightCrawlingContext):
+    """
+    Each session gets its own proxy
+    Sessions are automatically rotated
+    """
+    page = context.page
+
+    # Scrape with current session/proxy
+    data = await scrape_page(page)
+
+    # If this session has too many errors,
+    # Apify automatically abandons it and starts a new one
+
+    await context.push_data(data)
+
+# Alternative: Custom proxy rotation
+async def custom_proxy_rotation():
+    """Rotate proxies based on success/error"""
+    from itertools import cycle
+
+    proxies = cycle([
+        'http://proxy1.com:8000',
+        'http://proxy2.com:8000',
+        'http://proxy3.com:8000'
+    ])
+
+    async with Actor:
+        crawler = Actor.config.crawler(
+            PlaywrightCrawlingContext,
+            # Custom proxy rotation function
+            proxy_configuration=lambda req: next(proxies)
+        )
+
+        await crawler.run(scrape_with_rotation)</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- What I Learned -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">What I Learned</h2>
+            <ul class="list-disc pl-6 space-y-3 text-gray-700">
+                <li><strong>Lesson 1:</strong> Apify's RequestQueue is the killer feature - automatic persistence and distributed support.</li>
+                <li><strong>Lesson 650:</strong> Migration from Selenium is easier than expected - Playwright is similar, and Apify wraps the complexity.</li>
+                <li><strong>Lesson 3:</strong> Built-in proxy rotation is worth it - custom implementations always have edge cases.</li>
+                <li><strong>Lesson 4:</strong> Storage is automatic - no more database schemas for scraped data.</li>
+                <li><strong>Overall:</strong> For production scraping, Apify SDK's batteries-included approach saves weeks of engineering time.</li>
+            </ul>
+        </section>
+
+        <!-- Apify vs Selenium -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Apify vs Selenium: Feature Comparison</h2>
+
+            <div class="overflow-x-auto">
+                <table class="min-w-full bg-white border border-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Feature</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Selenium</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Apify SDK</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200">
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Request Queue</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Manual (Redis, DB)</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Built-in, persists</td>
+                        </tr>
+                        <tr class="bg-gray-50">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Distributed Crawling</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Manual (Redis, Celery)</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Built-in</td>
+                        </tr>
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Proxy Rotation</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Manual</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Built-in with smart rotation</td>
+                        </tr>
+                        <tr class="bg-gray-50">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Storage</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Manual (files, DB)</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Built-in Dataset, KeyValueStore</td>
+                        </tr>
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Retry Logic</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Manual</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Built-in with backoff</td>
+                        </tr>
+                        <tr class="bg-gray-50">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Checkpointing</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Manual</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Automatic</td>
+                        </tr>
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Autoscaling</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Manual (K8s, etc.)</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Built-in on Apify Platform</td>
+                        </tr>
+                        <tr class="bg-gray-50">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Deployment</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Manual (Docker, etc.)</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">One command to Apify Platform</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Production Setup -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Production Setup That Works</h2>
+            <div class="code-block">
+                <pre><code class="language-python"># apify_scraper.py - Production configuration
+
+from apify import Actor, Request
+from apify_playwright import PlaywrightCrawlingContext
+from typing import Dict
+import logging
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+class ProductScraper:
+    """
+    Production scraper with Apify SDK
+
+    Features:
+    - Automatic queue management
+    - Proxy rotation
+    - Error handling with retries
+    - Automatic storage
+    """
+
+    def __init__(self):
+        self.actor_config = None
+
+    async def run(self):
+        """Main entry point"""
+        async with Actor:
+            self.actor_config = Actor.config
+
+            # Configure crawler
+            crawler = self.actor_config.crawler(
+                PlaywrightCrawlingContext,
+                # Browser configuration
+                headless=True,
+                browser_type='chromium',
+                max_pages_per_crawl=1000,
+                # Concurrency
+                max_concurrency=10,
+                # Proxy configuration
+                proxy_configuration={
+                    'apifyProxy': {
+                        'groups': ['RESIDENTIAL'],  # Use residential proxies
+                        'countryCode': 'US'
+                    }
+                },
+                # Session management
+                use_session_pool=True,
+                session_pool_options={
+                    'max_pool_size': 100,
+                    'session_options': {
+                        'max_usage_count': 10,  # Reuse each session 10 times
+                        'error_score_threshold': 0.5  # Abandon after errors
+                    }
+                },
+                # Retry configuration
+                retry_on_blocked=True,
+                max_request_retries=3
+            )
+
+            # Add initial URLs
+            await crawler.add_requests([
+                'https://example.com/products?page=1',
+                'https://example.com/products?page=2',
+                'https://example.com/products?page=3'
+            ])
+
+            # Run crawler
+            await crawler.run(self.handle_page)
+
+    async def handle_page(self, context: PlaywrightCrawlingContext):
+        """
+        Handle each page
+
+        Args:
+            context: Playwright crawling context
+        """
+        page = context.page
+        request: Request = context.request
+
+        try:
+            logger.info(f"Processing: {request.url}")
+
+            # Wait for content to load
+            await page.wait_for_selector('.product-list', timeout=10000)
+
+            # Extract product data
+            products = await page.eval_on_selector_all(
+                '.product-item',
+                '''elements => elements.map(el => ({
+                    id: el.getAttribute('data-id'),
+                    name: el.querySelector('.name')?.textContent,
+                    price: el.querySelector('.price')?.textContent,
+                    in_stock: el.querySelector('.stock')?.textContent === 'In Stock'
+                }))'''
+            )
+
+            # Add metadata
+            for product in products:
+                product['url'] = request.url
+                product['scraped_at'] = Actor.config.started_at.isoformat()
+
+            # Save to dataset (automatic storage)
+            if products:
+                await context.push_data(products)
+                logger.info(f"Saved {len(products)} products")
+
+            # Find and enqueue next pages
+            next_pages = await page.eval_on_selector_all(
+                'a.pagination-link[href*="/products?page="]',
+                '''elements => elements.map(el => el.href)'''
+            )
+
+            for next_page_url in next_pages:
+                await context.add_requests(
+                    [Request.from_url(next_page_url)]
+                )
+
+        except Exception as e:
+            logger.error(f"Error processing {request.url}: {e}")
+            # Apify will retry this request automatically
+
+# Deployment helper
+def deploy_to_apify():
+    """
+    Deploy scraper to Apify Platform
+
+    Requires:
+    - Apify account
+    - APIFY_TOKEN environment variable
+    """
+    import subprocess
+
+    # Login (first time only)
+    subprocess.run(['apify', 'login'], check=True)
+
+    # Push to Apify Platform
+    subprocess.run(['apify', 'push'], check=True)
+
+    print("Deployed to Apify Platform!")
+    print("View at: https://console.apify.com/actors")
+
+# Local development helper
+async def run_locally():
+    """Run scraper locally for testing"""
+    import asyncio
+
+    scraper = ProductScraper()
+    await scraper.run()
+
+# Main entry point
+if __name__ == '__main__':
+    import asyncio
+
+    # Run locally
+    asyncio.run(run_locally())
+
+    # Or deploy to Apify
+    # deploy_to_apify()</code></pre>
+            </div>
+        </section>
+
+        <!-- Storage and Data Export -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Working with Apify Storage</h2>
+
+            <h3 class="text-xl font-semibold text-gray-800 mt-6 mb-3">Dataset Operations</h3>
+            <div class="code-block">
+                <pre><code class="language-python">from apify import Actor
+
+async def dataset_operations():
+    """Work with Apify datasets"""
+    async with Actor:
+        # Push individual items
+        await Actor.push_data({
+            'url': 'https://example.com',
+            'title': 'Example'
+        })
+
+        # Push multiple items
+        await Actor.push_data([
+            {'id': 1, 'name': 'Item 1'},
+            {'id': 2, 'name': 'Item 2'},
+            {'id': 3, 'name': 'Item 3'}
+        ])
+
+        # Get dataset info
+        dataset = await Actor.open_dataset()
+        info = await dataset.get_info()
+        print(f"Dataset has {info.item_count} items")
+
+        # Export to various formats
+        await dataset.export_to_csv('output.csv')
+        await dataset.export_to_json('output.json')
+        await dataset.export_to_xml('output.xml')
+
+        # Stream items (for large datasets)
+        async for item in dataset.iterate_items():
+            process_item(item)</code></pre>
+            </div>
+
+            <h3 class="text-xl font-semibold text-gray-800 mt-6 mb-3">KeyValueStore for Files</h3>
+            <div class="code-block">
+                <pre><code class="language-python">async def key_value_store_operations():
+    """Store files, screenshots, etc."""
+    async with Actor:
+        store = await Actor.open_key_value_store()
+
+        # Store screenshots
+        # await page.screenshot(path='screenshot.png')
+        # await store.set_value(
+        #     'homepage.png',
+        #     open('screenshot.png', 'rb'),
+        #     content_type='image/png'
+        # )
+
+        # Store JSON config
+        await store.set_value('config', {
+            'last_run': '2026-03-23',
+            'pages_processed': 1000
+        })
+
+        # Store HTML
+        await store.set_value('page.html', '<html>...</html>')
+
+        # Retrieve values
+        config = await store.get_value('config')
+        print(f"Config: {config}")</code></pre>
+            </div>
+        </section>
+
+        <!-- Monitoring & Debugging -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Monitoring & Debugging</h2>
+
+            <h3 class="text-xl font-semibold text-gray-800 mt-6 mb-3">Local Testing</h3>
+            <div class="code-block">
+                <pre><code class="language-bash"># Install Apify CLI
+npm install -g apify-cli
+
+# Initialize new actor
+apify init my-scraper
+
+# Run locally (with live reload)
+apify run
+
+# Test with specific input
+echo '{"urls": ["https://example.com"]}' | apify run</code></pre>
+            </div>
+
+            <h3 class="text-xl font-semibold text-gray-800 mt-6 mb-3">Common Issues</h3>
+            <ul class="list-disc pl-6 space-y-2 text-gray-700">
+                <li><strong>Queue not persisting:</strong> Ensure you're using Actor.open_request_queue(), not in-memory queue</li>
+                <li><strong>Proxy blocked:</strong> Switch proxy groups (RESIDENTIAL, DATACENTER)</li>
+                <li><strong>Memory issues:</strong> Reduce max_concurrency or increase memory in Actor config</li>
+                <li><strong>Slow crawling:</strong> Increase concurrency or optimize page waits</li>
+            </ul>
+        </section>
+
+        <!-- Related Links -->
+        <section class="bg-blue-50 rounded-lg p-6 border border-blue-200">
+            <h3 class="font-semibold text-gray-800 mb-3">Related Resources</h3>
+            <ul class="space-y-2">
+                <li><a href="https://docs.apify.com/sdk/python/" target="_blank" class="text-blue-600 hover:underline">Apify SDK Python Documentation</a></li>
+                <li><a href="https://github.com/apify/apify-sdk-python" target="_blank" class="text-blue-600 hover:underline">Apify SDK Python on GitHub</a></li>
+                <li><a href="https://console.apify.com/" target="_blank" class="text-blue-600 hover:underline">Apify Console (Web Dashboard)</a></li>
+                <li><a href="https://apify.com/store" target="_blank" class="text-blue-600 hover:underline">Apify Store (Pre-built Actors)</a></li>
+            </ul>
+        </section>
+
+        <!-- Migration Checklist -->
+        <section class="mt-12 p-6 bg-green-50 rounded-lg border border-green-200">
+            <h3 class="font-semibold text-gray-800 mb-2">✓ Migration Checklist: Selenium to Apify</h3>
+            <ul class="space-y-1 text-sm text-gray-700">
+                <li>✓ Install Apify SDK: <code class="bg-gray-100 px-2 py-1 rounded">pip install apify apify-playwright</code></li>
+                <li>✓ Convert scraping logic to async/await</li>
+                <li>✓ Replace Selenium selectors with Playwright equivalents</li>
+                <li>✓ Wrap in Actor context</li>
+                <li>✓ Use Actor.push_data() instead of manual storage</li>
+                <li>✓ Configure proxy rotation</li>
+                <li>✓ Test locally with <code class="bg-gray-100 px-2 py-1 rounded">apify run</code></li>
+                <li>✓ Deploy to Apify Platform with <code class="bg-gray-100 px-2 py-1 rounded">apify push</code></li>
+            </ul>
+        </section>
+    </article>
+
+    <script>
+        // Initialize Prism.js
+        if (typeof Prism !== 'undefined') {
+            Prism.highlightAll();
+        }
+    </script>
+</body>
+</html>

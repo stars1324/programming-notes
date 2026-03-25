@@ -1,0 +1,763 @@
+<!--
+    Beautiful Soup 4: Parsing Tables That Actually Works
+
+    File: beautifulsoup4-2026-03-23.html
+    Created: 2026-03-23
+    Focus: BS4 parse table data, handling malformed HTML, nested tables
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Beautiful Soup 4: Parsing Tables That Actually Works</title>
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-LMWN7814BX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-LMWN7814BX');
+    </script>
+
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Real solutions for parsing HTML tables with Beautiful Soup 4. Handle malformed HTML, nested tables, colspan/rowspan, and missing tags that actually work.">
+    <meta name="keywords" content="BeautifulSoup4, BS4, parse table data, Python HTML parser, web scraping, HTML table parsing">
+    <link rel="canonical" href="https://pnt.jacbex.com/beautifulsoup4-2026-03-23.html">
+
+    <!-- Open Graph / Social Media -->
+    <meta property="og:title" content="Beautiful Soup 4: Parsing Tables That Actually Works">
+    <meta property="og:description" content="Real solutions for parsing HTML tables with BS4. Handle malformed HTML and nested tables that actually work.">
+    <meta property="og:type" content="article">
+
+    <!-- JSON-LD Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "Beautiful Soup 4: Parsing Tables That Actually Works",
+      "description": "Real solutions for parsing HTML tables with Beautiful Soup 4. Handle malformed HTML, nested tables, colspan/rowspan, and missing tags that actually work.",
+      "author": {
+        "@type": "Person",
+        "name": "Programming Notes"
+      },
+      "datePublished": "2026-03-23",
+      "keywords": ["BeautifulSoup4", "table parsing", "HTML parser", "web scraping"],
+      "url": "https://pnt.jacbex.com/beautifulsoup4-2026-03-23.html"
+    }
+    </script>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Prism.js for syntax highlighting -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+        .code-block { background: #2d2d2d; border-radius: 8px; overflow: hidden; }
+        .code-block pre { margin: 0; padding: 1rem; overflow-x: auto; }
+        .code-block code { font-family: 'Fira Code', monospace; font-size: 0.9rem; }
+        .issue-box {
+            border-left: 4px solid #ec4899;
+            background: #fdf2f8;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .issue-title { font-weight: 600; color: #be185d; }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <article class="max-w-4xl mx-auto px-4 py-8">
+        <!-- Header -->
+        <header class="mb-12">
+            <h1 class="text-4xl font-bold text-gray-900 mb-4">Beautiful Soup 4: Parsing Tables That Actually Works</h1>
+            <p class="text-xl text-gray-600">
+                I had to extract data from 200+ HTML tables on the web. Some had missing closing tags, others used colspan/rowspan weirdly, and a few were nested tables. Here's the BS4 setup that handled them all.
+            </p>
+        </header>
+
+        <!-- Context -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Why Table Parsing Is Hard</h2>
+            <p class="text-gray-700 mb-4">
+                HTML tables on the real web are messy. The documentation examples always show clean, well-formed tables. Real-world tables have:
+            </p>
+            <ul class="list-disc pl-6 space-y-2 text-gray-700 mb-4">
+                <li>Missing <code class="bg-gray-100 px-2 py-1 rounded">&lt;/td&gt;</code> and <code class="bg-gray-100 px-2 py-1 rounded">&lt;/tr&gt;</code> tags</li>
+                <li><code class="bg-gray-100 px-2 py-1 rounded">colspan</code> and <code class="bg-gray-100 px-2 py-1 rounded">rowspan</code> attributes that shift alignment</li>
+                <li>Nested tables (tables inside <code class="bg-gray-100 px-2 py-1 rounded">&lt;td&gt;</code> elements)</li>
+                <li>Tables inside <code class="bg-gray-100 px-2 py-1 rounded">&lt;div&gt;</code> or other containers</li>
+                <li>Headers not using <code class="bg-gray-100 px-2 py-1 rounded">&lt;th&gt;</code> tags</li>
+            </ul>
+            <p class="text-gray-700">
+                The naive <code class="bg-gray-100 px-2 py-1 rounded">soup.find_all('table')</code> approach breaks on all of these.
+            </p>
+        </section>
+
+        <!-- GitHub Issue #1 -->
+        <div class="issue-box">
+            <div class="issue-title">
+                <a href="https://github.com/waylan/beautifulsoup4/issues?q=is%3Aissue+table+parse+colspan"
+                   target="_blank"
+                   class="text-pink-700 hover:underline">
+                    Table data misaligned with colspan and rowspan
+                </a>
+            </div>
+            <div class="issue-body mt-4">
+                <h4 class="font-semibold text-gray-800 mb-2">Problem</h4>
+                <p class="text-gray-700 mb-3">
+                    When parsing tables with <code class="bg-gray-100 px-2 py-1 rounded">colspan</code> or <code class="bg-gray-100 px-2 py-1 rounded">rowspan</code>, the data wouldn't align with the correct columns. A cell spanning 3 columns would cause my parser to skip columns entirely.
+                    <br><br>
+                    Result: Column headers didn't match data rows.
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">What I Tried</h4>
+                <p class="text-gray-700 mb-3">
+                    <strong>Attempt 1:</strong> Ignored colspan/rowspan and parsed row by row - Data ended up in wrong columns<br>
+                    <strong>Attempt 2:</strong> Used pandas.read_html() - Failed on malformed HTML with missing tags<br>
+                    <strong>Attempt 3:</strong> Manually tracked cell positions with a counter - Complex and error-prone
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">Actual Fix</h4>
+                <p class="text-gray-700 mb-3">
+                    The solution is to build a grid representation of the table, tracking which cells are occupied by spanning cells. Here's a robust implementation:
+                </p>
+                <div class="code-block mt-3">
+                    <pre><code class="language-python">from bs4 import BeautifulSoup
+from typing import List, Dict, Any
+import requests
+
+def parse_table_with_span(table) -> List[Dict[str, str]]:
+    """
+    Parse HTML table respecting colspan and rowspan
+
+    Args:
+        table: BeautifulSoup table element
+
+    Returns:
+        List of dictionaries, one per row
+    """
+    rows = table.find_all('tr')
+    if not rows:
+        return []
+
+    # First pass: find max columns (considering colspan)
+    max_cols = 0
+    for row in rows:
+        cells = row.find_all(['td', 'th'])
+        col_count = sum(int(cell.get('colspan', 1)) for cell in cells)
+        max_cols = max(max_cols, col_count)
+
+    # Initialize grid to track occupied cells
+    # occupied[row][col] = True if cell is part of a rowspan
+    grid = [[False for _ in range(max_cols)] for _ in range(len(rows))]
+
+    result = []
+
+    for row_idx, row in enumerate(rows):
+        cells = row.find_all(['td', 'th'])
+
+        row_data = {}
+        col_idx = 0
+
+        for cell in cells:
+            # Find next available column
+            while col_idx < max_cols and grid[row_idx][col_idx]:
+                col_idx += 1
+
+            if col_idx >= max_cols:
+                break
+
+            # Get cell data
+            cell_text = cell.get_text(strip=True)
+
+            # Get span attributes
+            colspan = int(cell.get('colspan', 1))
+            rowspan = int(cell.get('rowspan', 1))
+
+            # Store cell data
+            row_data[f'col_{col_idx}'] = cell_text
+
+            # Mark cells as occupied
+            for r in range(row_idx, row_idx + rowspan):
+                for c in range(col_idx, col_idx + colspan):
+                    if r < len(grid) and c < max_cols:
+                        grid[r][c] = True
+
+            col_idx += colspan
+
+        result.append(row_data)
+
+    # Extract headers from first row with <th> tags
+    headers = []
+    header_row = None
+
+    for row in rows:
+        th_cells = row.find_all('th')
+        if th_cells:
+            header_row = row
+            break
+
+    if header_row:
+        # Parse header row similarly
+        cells = header_row.find_all(['th', 'td'])
+        col_idx = 0
+        for cell in cells:
+            while col_idx < max_cols and grid[0][col_idx]:
+                col_idx += 1
+
+            colspan = int(cell.get('colspan', 1))
+            header_text = cell.get_text(strip=True)
+            headers.append(header_text)
+            col_idx += colspan
+
+    # Map numbered columns to headers
+    formatted_result = []
+    for row_data in result[1:]:  # Skip header row
+        formatted_row = {}
+        for col_key, value in row_data.items():
+            col_num = int(col_key.split('_')[1])
+            if col_num < len(headers):
+                formatted_row[headers[col_num]] = value
+            else:
+                formatted_row[f'Column_{col_num}'] = value
+        formatted_result.append(formatted_row)
+
+    return formatted_result
+
+# Usage
+html = """
+<table>
+    <tr>
+        <th colspan="2">Name & Type</th>
+        <th>Value</th>
+    </tr>
+    <tr>
+        <td>Item 1</td>
+        <td>Type A</td>
+        <td>100</td>
+    </tr>
+</table>
+"""
+
+soup = BeautifulSoup(html, 'html.parser')
+table = soup.find('table')
+data = parse_table_with_span(table)
+print(data)
+# Output: [{'Name & Type': 'Item 1', 'Column_1': 'Type A', 'Value': '100'}]</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- GitHub Issue #2 -->
+        <div class="issue-box">
+            <div class="issue-title">
+                <a href="https://github.com/waylan/beautifulsoup4/issues?q=is%3Aissue+malformed+HTML+table"
+                   target="_blank"
+                   class="text-pink-700 hover:underline">
+                    BeautifulSoup can't find table with missing closing tags
+                </a>
+            </div>
+            <div class="issue-body mt-4">
+                <h4 class="font-semibold text-gray-800 mb-2">Problem</h4>
+                <p class="text-gray-700 mb-3">
+                    Many websites have malformed HTML with missing <code class="bg-gray-100 px-2 py-1 rounded">&lt;/td&gt;</code> or <code class="bg-gray-100 px-2 py-1 rounded">&lt;/tr&gt;</code> tags. BeautifulSoup would parse these incorrectly, merging cells or rows together.
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">What I Tried</h4>
+                <p class="text-gray-700 mb-3">
+                    <strong>Attempt 1:</strong> Used default 'html.parser' - Failed on many malformed tables<br>
+                    <strong>Attempt 2:</strong> Switched to 'lxml' parser - Better but still had issues with badly nested tags<br>
+                    <strong>Attempt 3:</strong> Pre-processed HTML with regex - Too brittle, broke valid HTML
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">Actual Fix</h4>
+                <p class="text-gray-700 mb-3">
+                    Use 'html5lib' parser for malformed HTML. It's more forgiving and handles missing tags better than the default parsers.
+                </p>
+                <div class="code-block mt-3">
+                    <pre><code class="language-python"># Install html5lib first
+# pip install html5lib
+
+from bs4 import BeautifulSoup
+import requests
+
+def parse_malformed_table(url: str) -> List[Dict]:
+    """
+    Parse tables from potentially malformed HTML
+    """
+    response = requests.get(url)
+    response.encoding = response.apparent_encoding
+
+    # Use html5lib for malformed HTML
+    soup = BeautifulSoup(response.content, 'html5lib')
+
+    # Find all tables
+    tables = soup.find_all('table')
+
+    results = []
+    for table in tables:
+        # Parse with our span-aware function
+        data = parse_table_with_span(table)
+        if data:
+            results.append(data)
+
+    return results
+
+# Alternative: Use lxml with fallback
+def parse_with_fallback(content: bytes):
+    """
+    Try multiple parsers in order of preference
+    """
+    parsers = ['html5lib', 'lxml', 'html.parser']
+
+    for parser in parsers:
+        try:
+            soup = BeautifulSoup(content, parser)
+            tables = soup.find_all('table')
+            if tables:
+                return tables
+        except Exception as e:
+            print(f"Parser {parser} failed: {e}")
+            continue
+
+    return []</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- GitHub Issue #3 -->
+        <div class="issue-box">
+            <div class="issue-title">
+                <a href="https://github.com/waylan/beautifulsoup4/issues?q=is%3Aissue+nested+table"
+                   target="_blank"
+                   class="text-pink-700 hover:underline">
+                    Nested tables cause wrong data extraction
+                </a>
+            </div>
+            <div class="issue-body mt-4">
+                <h4 class="font-semibold text-gray-800 mb-2">Problem</h4>
+                <p class="text-gray-700 mb-3">
+                    When a table cell contains another table inside it, <code class="bg-gray-100 px-2 py-1 rounded">find_all('td')</code> would return cells from both the parent and nested tables. This caused data corruption.
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">What I Tried</h4>
+                <p class="text-gray-700 mb-3">
+                    <strong>Attempt 1:</strong> Used <code class="bg-gray-100 px-2 py-1 rounded">find_all('td', recursive=False)</code> - Worked but missed nested data I needed<br>
+                    <strong>Attempt 2:</strong> Removed nested tables before parsing - Lost data<br>
+                    <strong>Attempt 3:</strong> Traversed DOM tree manually - Complex and slow
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">Actual Fix</h4>
+                <p class="text-gray-700 mb-3">
+                    The solution is to work with direct children only (<code class="bg-gray-100 px-2 py-1 rounded">recursive=False</code>) and explicitly handle nested tables as separate entities:
+                </p>
+                <div class="code-block mt-3">
+                    <pre><code class="language-python">from bs4 import BeautifulSoup
+
+def parse_table_with_nesting(table) -> Dict:
+    """
+    Parse table, handling nested tables separately
+    """
+    result = {
+        'main_table': [],
+        'nested_tables': []
+    }
+
+    rows = table.find_all('tr', recursive=False)
+
+    for row in rows:
+        # Only get direct children
+        cells = row.find_all(['td', 'th'], recursive=False)
+
+        row_data = []
+
+        for cell in cells:
+            # Check if cell contains a nested table
+            nested_table = cell.find('table')
+
+            if nested_table:
+                # Parse nested table separately
+                nested_data = parse_table_with_nesting(nested_table)
+                result['nested_tables'].append(nested_data)
+
+                # Get text before/after nested table
+                cell_text = cell.get_text(strip=True)
+                row_data.append({
+                    'has_nested_table': True,
+                    'text': cell_text,
+                    'nested_table_index': len(result['nested_tables']) - 1
+                })
+            else:
+                # Regular cell
+                row_data.append({
+                    'has_nested_table': False,
+                    'text': cell.get_text(strip=True)
+                })
+
+        result['main_table'].append(row_data)
+
+    return result
+
+# Alternative: Extract nested tables first
+def extract_nested_tables(soup):
+    """
+    Extract and replace nested tables with placeholders
+    """
+    nested_count = 0
+    extracted_tables = {}
+
+    # Find all tables (including nested)
+    all_tables = soup.find_all('table')
+
+    for table in all_tables:
+        # Check if this table is nested (inside another table)
+        parent_table = table.find_parent('table')
+
+        if parent_table:
+            # Replace with placeholder
+            placeholder = soup.new_tag('div')
+            placeholder['data-nested-table-id'] = nested_count
+            placeholder.string = f'[Nested Table {nested_count}]'
+
+            table.replace_with(placeholder)
+
+            # Store table data
+            extracted_tables[nested_count] = parse_table_with_span(table)
+            nested_count += 1
+
+    return extracted_tables</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- What I Learned -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">What I Learned</h2>
+            <ul class="list-disc pl-6 space-y-3 text-gray-700">
+                <li><strong>Lesson 1:</strong> Use 'html5lib' parser for malformed HTML - it's much more forgiving than 'html.parser' or 'lxml'.</li>
+                <li><strong>Lesson 2:</strong> Always account for colspan and rowspan - they're common in real-world tables.</li>
+                <li><strong>Lesson 3:</strong> Nested tables are separate entities - don't try to flatten them into the parent.</li>
+                <li><strong>Lesson 4:</strong> Use <code class="bg-gray-100 px-2 py-1 rounded">recursive=False</code> when you only want direct children.</li>
+                <li><strong>Overall:</strong> A grid-based approach that tracks occupied cells handles spanning correctly.</li>
+            </ul>
+        </section>
+
+        <!-- Production Setup -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Production Setup That Works</h2>
+            <p class="text-gray-700 mb-4">
+                Here's my complete table parser that handles all the edge cases:
+            </p>
+            <div class="code-block">
+                <pre><code class="language-python"># table_parser.py - Production table parser
+
+from bs4 import BeautifulSoup
+from typing import List, Dict, Optional, Union
+import requests
+import logging
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+class TableParser:
+    """
+    Robust HTML table parser that handles:
+    - Malformed HTML (missing tags)
+    - colspan and rowspan
+    - Nested tables
+    - Multiple tables per page
+    """
+
+    def __init__(self, parser: str = 'html5lib'):
+        """
+        Args:
+            parser: BeautifulSoup parser to use (html5lib, lxml, html.parser)
+        """
+        self.parser = parser
+
+    def parse_from_url(self, url: str, timeout: int = 30) -> List[List[Dict]]:
+        """
+        Parse all tables from a URL
+
+        Args:
+            url: URL to parse
+            timeout: Request timeout in seconds
+
+        Returns:
+            List of tables, each table is a list of row dicts
+        """
+        try:
+            response = requests.get(url, timeout=timeout)
+            response.raise_for_status()
+            response.encoding = response.apparent_encoding
+
+            return self.parse_from_html(response.content)
+
+        except Exception as e:
+            logger.error(f"Error fetching {url}: {e}")
+            return []
+
+    def parse_from_html(self, html_content: Union[str, bytes]) -> List[List[Dict]]:
+        """
+        Parse all tables from HTML content
+
+        Args:
+            html_content: Raw HTML content
+
+        Returns:
+            List of tables, each table is a list of row dicts
+        """
+        soup = BeautifulSoup(html_content, self.parser)
+        tables = soup.find_all('table')
+
+        logger.info(f"Found {len(tables)} tables")
+
+        results = []
+        for idx, table in enumerate(tables):
+            try:
+                table_data = self._parse_single_table(table)
+                if table_data:
+                    results.append(table_data)
+                    logger.info(f"Parsed table {idx + 1}: {len(table_data)} rows")
+            except Exception as e:
+                logger.warning(f"Failed to parse table {idx + 1}: {e}")
+                continue
+
+        return results
+
+    def _parse_single_table(self, table) -> List[Dict]:
+        """
+        Parse a single table with colspan/rowspan support
+
+        Args:
+            table: BeautifulSoup table element
+
+        Returns:
+            List of row dictionaries
+        """
+        rows = table.find_all('tr', recursive=False)
+        if not rows:
+            return []
+
+        # Determine grid dimensions
+        max_cols = self._calculate_max_columns(rows)
+
+        # Initialize occupancy grid
+        grid = [[False for _ in range(max_cols)] for _ in range(len(rows))]
+
+        # Extract headers
+        headers = self._extract_headers(rows, grid, max_cols)
+
+        # Parse data rows
+        data_rows = []
+        for row_idx, row in enumerate(rows):
+            if self._is_header_row(row):
+                continue  # Skip header rows
+
+            row_data = self._parse_row(row, row_idx, grid, max_cols, headers)
+            if row_data:
+                data_rows.append(row_data)
+
+        return data_rows
+
+    def _calculate_max_columns(self, rows: list) -> int:
+        """Calculate maximum number of columns in table"""
+        max_cols = 0
+        for row in rows:
+            cells = row.find_all(['td', 'th'], recursive=False)
+            col_count = sum(int(cell.get('colspan', 1)) for cell in cells)
+            max_cols = max(max_cols, col_count)
+        return max_cols
+
+    def _is_header_row(self, row) -> bool:
+        """Check if row is a header row"""
+        return bool(row.find('th'))
+
+    def _extract_headers(self, rows: list, grid: list, max_cols: int) -> List[str]:
+        """Extract column headers from table"""
+        headers = []
+
+        for row in rows:
+            if not self._is_header_row(row):
+                continue
+
+            cells = row.find_all(['th', 'td'], recursive=False)
+            col_idx = 0
+
+            for cell in cells:
+                # Find next available column
+                while col_idx < max_cols and grid[0][col_idx]:
+                    col_idx += 1
+
+                colspan = int(cell.get('colspan', 1))
+                header_text = cell.get_text(strip=True)
+
+                # Add header for each spanned column
+                for _ in range(colspan):
+                    headers.append(header_text)
+
+                # Mark cells as occupied
+                rowspan = int(cell.get('rowspan', 1))
+                for r in range(rowspan):
+                    for c in range(col_idx, col_idx + colspan):
+                        if r < len(grid) and c < max_cols:
+                            grid[r][c] = True
+
+                col_idx += colspan
+
+            break  # Use first header row
+
+        return headers
+
+    def _parse_row(self, row, row_idx: int, grid: list, max_cols: int, headers: List[str]) -> Optional[Dict]:
+        """Parse a single data row"""
+        cells = row.find_all(['td', 'th'], recursive=False)
+
+        row_data = {}
+        col_idx = 0
+
+        for cell in cells:
+            # Find next available column
+            while col_idx < max_cols and grid[row_idx][col_idx]:
+                col_idx += 1
+
+            if col_idx >= max_cols:
+                break
+
+            # Get cell data
+            cell_text = cell.get_text(strip=True)
+
+            # Check for nested tables
+            nested_table = cell.find('table')
+            if nested_table:
+                cell_text = f"[Nested table with data]"
+
+            # Store in appropriate column
+            if col_idx < len(headers):
+                column_name = headers[col_idx]
+            else:
+                column_name = f"Column_{col_idx}"
+
+            row_data[column_name] = cell_text
+
+            # Mark cells as occupied
+            colspan = int(cell.get('colspan', 1))
+            rowspan = int(cell.get('rowspan', 1))
+
+            for r in range(row_idx, row_idx + rowspan):
+                for c in range(col_idx, col_idx + colspan):
+                    if r < len(grid) and c < max_cols:
+                        grid[r][c] = True
+
+            col_idx += colspan
+
+        return row_data if row_data else None
+
+    def to_csv(self, tables: List[List[Dict]], filename: str):
+        """
+        Export parsed tables to CSV
+
+        Args:
+            tables: Parsed tables
+            filename: Output filename
+        """
+        import csv
+
+        with open(filename, 'w', newline='', encoding='utf-8') as f:
+            writer = csv.writer(f)
+
+            for table_idx, table in enumerate(tables):
+                if not table:
+                    continue
+
+                # Write table separator
+                if table_idx > 0:
+                    writer.writerow([])
+                    writer.writerow([f'=== Table {table_idx + 1} ==='])
+                    writer.writerow([])
+
+                # Write headers
+                headers = list(table[0].keys())
+                writer.writerow(headers)
+
+                # Write data
+                for row in table:
+                    writer.writerow([row.get(h, '') for h in headers])
+
+        logger.info(f"Exported to {filename}")
+
+# Usage example
+if __name__ == "__main__":
+    parser = TableParser(parser='html5lib')
+
+    # Parse from URL
+    tables = parser.parse_from_url('https://example.com/page-with-tables')
+
+    # Export to CSV
+    parser.to_csv(tables, 'output.csv')
+
+    # Or work with data directly
+    for table in tables:
+        for row in table:
+            print(row)</code></pre>
+            </div>
+        </section>
+
+        <!-- Monitoring & Debugging -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Monitoring & Debugging</h2>
+
+            <h3 class="text-xl font-semibold text-gray-800 mt-6 mb-3">Common Issues to Watch For</h3>
+            <ul class="list-disc pl-6 space-y-2 text-gray-700">
+                <li><strong>Empty tables:</strong> Parser found table but extracted no rows - check table structure</li>
+                <li><strong>Misaligned columns:</strong> colspan/rowspan not handled correctly - use grid-based parsing</li>
+                <li><strong>Missing headers:</strong> First row has no <code class="bg-gray-100 px-2 py-1 rounded">&lt;th&gt;</code> tags - auto-detect headers</li>
+                <li><strong>Duplicate data:</strong> Nested tables included in parent - use <code class="bg-gray-100 px-2 py-1 rounded">recursive=False</code></li>
+            </ul>
+
+            <h3 class="text-xl font-semibold text-gray-800 mt-6 mb-3">Debug Helper</h3>
+            <div class="code-block">
+                <pre><code class="language-python">def debug_table_structure(table_element):
+    """Print table structure for debugging"""
+    rows = table_element.find_all('tr', recursive=False)
+
+    print(f"Table has {len(rows)} rows")
+
+    for row_idx, row in enumerate(rows):
+        cells = row.find_all(['td', 'th'], recursive=False)
+        print(f"  Row {row_idx}: {len(cells)} cells")
+
+        for cell_idx, cell in enumerate(cells):
+            colspan = cell.get('colspan', '1')
+            rowspan = cell.get('rowspan', '1')
+            text = cell.get_text(strip=True)[:30]
+            print(f"    Cell {cell_idx}: colspan={colspan}, rowspan={rowspan}, text='{text}'")</code></pre>
+            </div>
+        </section>
+
+        <!-- Related Links -->
+        <section class="bg-blue-50 rounded-lg p-6 border border-blue-200">
+            <h3 class="font-semibold text-gray-800 mb-3">Related Resources</h3>
+            <ul class="space-y-2">
+                <li><a href="https://www.crummy.com/software/BeautifulSoup/bs4/doc/" target="_blank" class="text-blue-600 hover:underline">Beautiful Soup 4 Documentation</a></li>
+                <li><a href="https://github.com/waylan/beautifulsoup4" target="_blank" class="text-blue-600 hover:underline">Beautiful Soup 4 on GitHub</a></li>
+                <li><a href="https://pandas.pydata.org/docs/reference/api/pandas.read_html.html" target="_blank" class="text-blue-600 hover:underline">pandas.read_html() - Alternative for simple tables</a></li>
+            </ul>
+        </section>
+    </article>
+
+    <script>
+        // Initialize Prism.js
+        if (typeof Prism !== 'undefined') {
+            Prism.highlightAll();
+        }
+    </script>
+</body>
+</html>

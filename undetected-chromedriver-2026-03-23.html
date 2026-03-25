@@ -1,0 +1,818 @@
+<!--
+    Undetected Chromedriver: Bypassing Bot Detection That Actually Works
+
+    File: undetected-chromedriver-2026-03-23.html
+    Created: 2026-03-23
+    Focus: Bypass Google Bot Detection, Cloudflare, and other anti-bot systems
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Undetected Chromedriver: Actually Bypassed Bot Detection</title>
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-LMWN7814BX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-LMWN7814BX');
+    </script>
+
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Real solutions for bypassing bot detection with Undetected Chromedriver. Handle Cloudflare, Google bot detection, and anti-scraping measures that actually work.">
+    <meta name="keywords" content="Undetected Chromedriver, bypass bot detection, Cloudflare bypass, selenium stealth, anti-bot">
+    <link rel="canonical" href="https://pnt.jacbex.com/undetected-chromedriver-2026-03-23.html">
+
+    <!-- Open Graph / Social Media -->
+    <meta property="og:title" content="Undetected Chromedriver: Actually Bypassed Bot Detection">
+    <meta property="og:description" content="Real solutions for bypassing bot detection. Handle Cloudflare and anti-scraping measures that actually work.">
+    <meta property="og:type" content="article">
+
+    <!-- JSON-LD Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "Undetected Chromedriver: Actually Bypassed Bot Detection",
+      "description": "Real solutions for bypassing bot detection with Undetected Chromedriver. Handle Cloudflare, Google bot detection, and anti-scraping measures that actually work.",
+      "author": {
+        "@type": "Person",
+        "name": "Programming Notes"
+      },
+      "datePublished": "2026-03-23",
+      "keywords": ["Undetected Chromedriver", "bot detection", "Cloudflare", "selenium stealth"],
+      "url": "https://pnt.jacbex.com/undetected-chromedriver-2026-03-23.html"
+    }
+    </script>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Prism.js for syntax highlighting -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+        .code-block { background: #2d2d2d; border-radius: 8px; overflow: hidden; }
+        .code-block pre { margin: 0; padding: 1rem; overflow-x: auto; }
+        .code-block code { font-family: 'Fira Code', monospace; font-size: 0.9rem; }
+        .issue-box {
+            border-left: 4px solid #ec4899;
+            background: #fdf2f8;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .issue-title { font-weight: 600; color: #be185d; }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <article class="max-w-4xl mx-auto px-4 py-8">
+        <!-- Header -->
+        <header class="mb-12">
+            <h1 class="text-4xl font-bold text-gray-900 mb-4">Undetected Chromedriver: Actually Bypassed Bot Detection</h1>
+            <p class="text-xl text-gray-600">
+                Regular Selenium gets detected immediately. Cloudflare shows the "Checking your browser" page forever, and sites return empty content. Undetected Chromedriver fixes this by patching the driver's fingerprint. Here's what worked for me.
+            </p>
+        </header>
+
+        <!-- Context -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Why Regular Selenium Gets Detected</h2>
+            <p class="text-gray-700 mb-4">
+                Modern bot detection systems check multiple fingerprints. Regular Selenium/Chromedriver fails all of them:
+            </p>
+            <ul class="list-disc pl-6 space-y-2 text-gray-700 mb-4">
+                <li><strong>Navigator properties:</strong> <code class="bg-gray-100 px-2 py-1 rounded">navigator.webdriver</code> is <code class="bg-gray-100 px-2 py-1 rounded">true</code></li>
+                <li><strong>ChromeDriver flags:</strong> <code class="bg-gray-100 px-2 py-1 rounded">window.chrome</code> is missing</li>
+                <li><strong>Permission API:</strong> Returns inconsistent values</li>
+                <li><strong>Device memory:</strong> Shows 0 instead of actual value</li>
+                <li><strong>User agent:</strong> Contains "HeadlessChrome" or "Selenium"</li>
+                <li><strong>CDP (Chrome DevTools Protocol):</strong> Available indicators of automation</li>
+            </ul>
+            <p class="text-gray-700">
+                Undetected Chromedriver patches all of these to mimic a real browser.
+            </p>
+        </section>
+
+        <!-- GitHub Issue #1 -->
+        <div class="issue-box">
+            <div class="issue-title">
+                <a href="https://github.com/ultrafunkamsterdam/undetected-chromedriver/issues?q=is%3Aissue+Cloudflare+challenge"
+                   target="_blank"
+                   class="text-pink-700 hover:underline">
+                    Cloudflare "Checking your browser" loop
+                </a>
+            </div>
+            <div class="issue-body mt-4">
+                <h4 class="font-semibold text-gray-800 mb-2">Problem</h4>
+                <p class="text-gray-700 mb-3">
+                    When scraping sites protected by Cloudflare, the browser would get stuck on the "Checking your browser before accessing" page. The challenge never completes, even with manual waiting.
+                    <br><br>
+                    URL contains: <code class="bg-gray-100 px-2 py-1 rounded">__cf_chl_tk=</code> and <code class="bg-gray-100 px-2 py-1 rounded">__cf_chl_f_tk=</code>
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">What I Tried</h4>
+                <p class="text-gray-700 mb-3">
+                    <strong>Attempt 1:</strong> Used regular Selenium with <code class="bg-gray-100 px-2 py-1 rounded">--disable-blink-features=AutomationControlled</code> - Still stuck<br>
+                    <strong>Attempt 2:</strong> Waited 60+ seconds for challenge to complete - Never resolved<br>
+                    <strong>Attempt 3:</strong> Used proxies - Same issue (automation detected, not IP-based)
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">Actual Fix</h4>
+                <p class="text-gray-700 mb-3">
+                    Undetected Chromedriver bypasses Cloudflare by properly patching the browser fingerprint. The key is configuring it correctly:
+                </p>
+                <div class="code-block mt-3">
+                    <pre><code class="language-python">import undetected_chromedriver as uc
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+import time
+
+# Configure undetected chrome
+options = uc.ChromeOptions()
+
+# Add realistic options
+options.add_argument('--disable-blink-features=AutomationControlled')
+options.add_argument('--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36')
+options.add_argument('--disable-dev-shm-usage')
+options.add_argument('--no-sandbox')
+
+# Optional: Use specific Chrome version (helps with consistency)
+# options.version = 120  # Use Chrome 120
+
+# Initialize driver
+driver = uc.Chrome(options=options)
+
+def scrape_cloudflare_site(url: str):
+    """
+    Scrape Cloudflare-protected site
+    """
+    try:
+        print(f"Navigating to {url}")
+        driver.get(url)
+
+        # Cloudflare challenge typically takes 5-10 seconds
+        # Undetected chromedriver handles this automatically
+        print("Waiting for Cloudflare challenge...")
+        time.sleep(10)
+
+        # Check if we passed the challenge
+        current_url = driver.current_url
+        if '__cf_chl_' in current_url:
+            print("Still on Cloudflare challenge page")
+            print("Try: 1) Update undetected-chromedriver, 2) Use proxy, 3) Check if site has additional detection")
+            return None
+
+        # Wait for page content
+        WebDriverWait(driver, 15).until(
+            EC.presence_of_element_located((By.TAG_NAME, "body"))
+        )
+
+        # Extract content
+        content = driver.page_source
+        print(f"Page loaded: {len(content)} characters")
+
+        return content
+
+    except Exception as e:
+        print(f"Error: {e}")
+        return None
+
+    finally:
+        driver.quit()
+
+# Usage
+content = scrape_cloudflare_site('https://example.com')
+if content:
+    # Process content
+    print("Successfully bypassed Cloudflare")</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- GitHub Issue #2 -->
+        <div class="issue-box">
+            <div class="issue-title">
+                <a href="https://github.com/ultrafunkamsterdam/undetected-chromedriver/issues?q=is%3Aissue+version+mismatch"
+                   target="_blank"
+                   class="text-pink-700 hover:underline">
+                    Chrome version mismatch errors
+                </a>
+            </div>
+            <div class="issue-body mt-4">
+                <h4 class="font-semibold text-gray-800 mb-2">Problem</h4>
+                <p class="text-gray-700 mb-3">
+                    Undetected Chromedriver would fail with "This version of ChromeDriver only supports Chrome version X". The auto-download wasn't working or the wrong version was cached.
+                    <br><br>
+                    Error: <code class="bg-gray-100 px-2 py-1 rounded">SessionNotCreatedException: Message: This version of ChromeDriver only supports Chrome version 119</code>
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">What I Tried</h4>
+                <p class="text-gray-700 mb-3">
+                    <strong>Attempt 1:</strong> Manually downloaded Chromedriver - Still had detection issues<br>
+                    <strong>Attempt 2:</strong> Deleted <code class="bg-gray-100 px-2 py-1 rounded">.chromedriver</code> cache - Fixed temporarily, broke on update<br>
+                    <strong>Attempt 3:</strong> Pinned Chrome version - Worked but required Docker setup
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">Actual Fix</h4>
+                <p class="text-gray-700 mb-3">
+                    The solution is to let undetected-chromedriver manage the driver version, but fix the cache issue:
+                </p>
+                <div class="code-block mt-3">
+                    <pre><code class="language-python">import undetected_chromedriver as uc
+import os
+
+# Fix 1: Clear chromedriver cache if you have version issues
+def clear_chrome_driver_cache():
+    """Clear cached chromedriver to force re-download"""
+    import shutil
+    cache_dir = os.path.expanduser('~/.wdm')
+
+    if os.path.exists(cache_dir):
+        shutil.rmtree(cache_dir)
+        print("Cleared ChromeDriver cache")
+
+# Fix 2: Specify Chrome version explicitly
+def get_driver_with_version(version_main: int = None):
+    """
+    Get undetected chromedriver with specific version
+
+    Args:
+        version_main: Chrome major version (e.g., 120)
+                     If None, uses installed Chrome version
+    """
+    options = uc.ChromeOptions()
+
+    if version_main:
+        # Pin to specific version
+        options.version_main = version_main
+        print(f"Using Chrome version: {version_main}")
+
+    # Create driver
+    driver = uc.Chrome(options=options, version_main=version_main)
+
+    # Check Chrome version
+    chrome_version = driver.execute_script("return navigator.userAgent.match(/Chrome\\d+/)[0];")
+    print(f"Chrome version: {chrome_version}")
+
+    return driver
+
+# Fix 3: Auto-detect installed Chrome version
+def get_driver_auto_version():
+    """
+    Auto-detect Chrome version and download matching driver
+    """
+    try:
+        # Undetected chromedriver auto-detects by default
+        driver = uc.Chrome()
+
+        # Verify it works
+        driver.get('chrome://version')
+        version_elem = driver.find_element(By.ID, 'version')
+        print(f"Chrome version: {version_elem.text}")
+
+        return driver
+
+    except Exception as e:
+        print(f"Error: {e}")
+        print("\nTry:")
+        print("1. pip install --upgrade undetected-chromedriver")
+        print("2. clear_chrome_driver_cache()")
+        print("3. Update Chrome browser to latest version")
+        return None
+
+# Usage
+if __name__ == "__main__":
+    # Clear cache if you have issues
+    # clear_chrome_driver_cache()
+
+    # Auto-detect (recommended)
+    driver = get_driver_auto_version()
+
+    # Or specify version
+    # driver = get_driver_with_version(version_main=120)
+
+    if driver:
+        try:
+            driver.get('https://example.com')
+            print("Page loaded successfully")
+        finally:
+            driver.quit()</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- GitHub Issue #3 -->
+        <div class="issue-box">
+            <div class="issue-title">
+                <a href="https://github.com/ultrafunkamsterdam/undetected-chromedriver/issues?q=is%3Aissue+headless+detection"
+                   target="_blank"
+                   class="text-pink-700 hover:underline">
+                    Headless mode still gets detected
+                </a>
+            </div>
+            <div class="issue-body mt-4">
+                <h4 class="font-semibold text-gray-800 mb-2">Problem</h4>
+                <p class="text-gray-700 mb-3">
+                    When running in headless mode, sites would detect automation even with undetected-chromedriver. The headless browser has different characteristics that can be detected.
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">What I Tried</h4>
+                <p class="text-gray-700 mb-3">
+                    <strong>Attempt 1:</strong> Added <code class="bg-gray-100 px-2 py-1 rounded">--headless=new</code> - Detected<br>
+                    <strong>Attempt 2:</strong> Used virtual display (Xvfb) - Still detected<br>
+                    <strong>Attempt 3:</strong> Combined with proxy - Partially helped but complex
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">Actual Fix</h4>
+                <p class="text-gray-700 mb-3">
+                    Headless detection is harder to bypass. The best approach is a combination of undetected-chromedriver with realistic window size and additional patches:
+                </p>
+                <div class="code-block mt-3">
+                    <pre><code class="language-python">import undetected_chromedriver as uc
+
+def get_stealth_headless_driver():
+    """
+    Get headless driver that's harder to detect
+    Note: Headless is always more detectable than headed
+    """
+    options = uc.ChromeOptions()
+
+    # Use new headless mode (more realistic)
+    options.add_argument('--headless=new')
+
+    # Set realistic window size
+    options.add_argument('--window-size=1920,1080')
+    options.add_argument('--start-maximized')
+
+    # Set language
+    options.add_argument('--lang=en-US,en')
+    options.add_experimental_option('prefs', {
+        'intl.accept_languages': 'en-US,en'
+    })
+
+    # Disable various detection indicators
+    options.add_argument('--disable-extensions')
+    options.add_argument('--disable-plugins')
+    options.add_argument('--disable-images')  # Optional: speed up scraping
+
+    # Additional anti-detection
+    options.add_argument('--disable-dev-shm-usage')
+    options.add_argument('--no-sandbox')
+    options.add_argument('--disable-gpu')
+
+    # Initialize driver
+    driver = uc.Chrome(options=options)
+
+    # Execute JavaScript to patch navigator
+    driver.execute_script("""
+        Object.defineProperty(navigator, 'plugins', {
+            get: () => [1, 2, 3, 4, 5]
+        });
+        Object.defineProperty(navigator, 'languages', {
+            get: () => ['en-US', 'en']
+        });
+    """)
+
+    return driver
+
+# Alternative: Run headed but hidden (for production)
+def get_virtual_display_driver():
+    """
+    Run headed browser on virtual display
+    Most reliable for avoiding detection
+    """
+    from pyvirtualdisplay import Display
+
+    # Start virtual display
+    display = Display(visible=0, size=(1920, 1080))
+    display.start()
+
+    # Create driver (headed, but on virtual display)
+    driver = uc.Chrome()
+
+    return driver, display</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- What I Learned -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">What I Learned</h2>
+            <ul class="list-disc pl-6 space-y-3 text-gray-700">
+                <li><strong>Lesson 1:</strong> Undetected Chromedriver is essential for any serious Selenium scraping in 2026.</li>
+                <li><strong>Lesson 2:</strong> Headless mode is always more detectable - use virtual display if needed.</li>
+                <li><strong>Lesson 3:</strong> Cloudflare challenges complete automatically with undetected-chromedriver - no manual waiting needed.</li>
+                <li><strong>Lesson 4:</strong> Keep undetected-chromedriver updated - browser updates break old versions quickly.</li>
+                <li><strong>Overall:</strong> For large-scale production, combine undetected-chromedriver with proxy rotation.</li>
+            </ul>
+        </section>
+
+        <!-- Detection Evasion Techniques -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Advanced Detection Evasion</h2>
+
+            <h3 class="text-xl font-semibold text-gray-800 mt-6 mb-3">1. Profile Management</h3>
+            <div class="code-block">
+                <pre><code class="language-python">import undetected_chromedriver as uc
+import os
+
+def get_driver_with_profile(profile_name: str = "scraping_profile"):
+    """
+    Use persistent Chrome profile
+    Helps with sites that track browser fingerprints
+    """
+    # Create profile directory
+    profile_dir = os.path.expanduser(f'~/chrome_profiles/{profile_name}')
+    os.makedirs(profile_dir, exist_ok=True)
+
+    options = uc.ChromeOptions()
+
+    # Set user data directory
+    options.add_argument(f'--user-data-dir={profile_dir}')
+
+    # Disable some fingerprinting
+    options.add_argument('--disable-blink-features=AutomationControlled')
+
+    driver = uc.Chrome(options=options)
+
+    # First run will be clean, subsequent runs preserve cookies/fingerprint
+    return driver</code></pre>
+            </div>
+
+            <h3 class="text-xl font-semibold text-gray-800 mt-6 mb-3">2. Proxy Integration</h3>
+            <div class="code-block">
+                <pre><code class="language-python">def get_driver_with_proxy(proxy_url: str):
+    """
+    Use proxy with undetected chromedriver
+
+    Args:
+        proxy_url: Proxy URL (e.g., "http://user:pass@proxy.com:8080")
+    """
+    options = uc.ChromeOptions()
+
+    # Add proxy
+    options.add_argument(f'--proxy-server={proxy_url}')
+
+    # Disable SSL verification for proxy
+    options.add_argument('--ignore-certificate-errors')
+
+    driver = uc.Chrome(options=options)
+
+    # Verify proxy is working
+    driver.get('https://api.ipify.org?format=json')
+    print(f"IP: {driver.find_element('tag name', 'pre').text}")
+
+    return driver
+
+# Usage
+driver = get_driver_with_proxy('http://proxy.example.com:8080')
+driver.get('https://example.com')</code></pre>
+            </div>
+
+            <h3 class="text-xl font-semibold text-gray-800 mt-6 mb-3">3. Fingerprint Randomization</h3>
+            <div class="code-block">
+                <pre><code class="language-python">import random
+
+def random_fingerprint_driver():
+    """
+    Randomize browser fingerprint for each session
+    """
+    options = uc.ChromeOptions()
+
+    # Random user agents
+    user_agents = [
+        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+    ]
+
+    options.add_argument(f'--user-agent={random.choice(user_agents)}')
+
+    # Random window size
+    width = random.choice([1920, 1366, 1440, 1536])
+    height = random.choice([1080, 768, 900, 864])
+    options.add_argument(f'--window-size={width},{height}')
+
+    # Random language
+    languages = ['en-US,en', 'en-GB,en', 'en-CA,en']
+    options.add_argument(f'--lang={random.choice(languages)}')
+
+    driver = uc.Chrome(options=options)
+
+    return driver</code></pre>
+            </div>
+        </section>
+
+        <!-- Production Setup -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Production Setup That Works</h2>
+            <div class="code-block">
+                <pre><code class="language-python"># undetected_scraper.py - Production configuration
+
+import undetected_chromedriver as uc
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+import time
+import random
+import logging
+from typing import Optional
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+class UndetectedScraper:
+    """
+    Production scraper using undetected-chromedriver with:
+    - Automatic Cloudflare bypass
+    - Proxy support
+    - Random delays
+    - Error recovery
+    """
+
+    def __init__(
+        self,
+        headless: bool = True,
+        proxy: Optional[str] = None,
+        profile_dir: Optional[str] = None
+    ):
+        """
+        Args:
+            headless: Run in headless mode
+            proxy: Optional proxy URL
+            profile_dir: Optional Chrome profile directory
+        """
+        self.headless = headless
+        self.proxy = proxy
+        self.profile_dir = profile_dir
+        self.driver = None
+
+    def _create_driver(self) -> uc.Chrome:
+        """Create configured undetected chromedriver"""
+        options = uc.ChromeOptions()
+
+        # Headless mode (with realistic settings)
+        if self.headless:
+            options.add_argument('--headless=new')
+            options.add_argument('--window-size=1920,1080')
+
+        # Proxy
+        if self.proxy:
+            options.add_argument(f'--proxy-server={self.proxy}')
+            options.add_argument('--ignore-certificate-errors')
+
+        # Profile directory
+        if self.profile_dir:
+            options.add_argument(f'--user-data-dir={self.profile_dir}')
+
+        # Anti-detection options
+        options.add_argument('--disable-blink-features=AutomationControlled')
+        options.add_argument('--disable-dev-shm-usage')
+        options.add_argument('--no-sandbox')
+        options.add_argument('--disable-gpu')
+
+        # Language
+        options.add_argument('--lang=en-US,en')
+        options.add_experimental_option('prefs', {
+            'intl.accept_languages': 'en-US,en'
+        })
+
+        # Create driver
+        driver = uc.Chrome(options=options)
+
+        # Additional JavaScript patches
+        driver.execute_script("""
+            Object.defineProperty(navigator, 'webdriver', {
+                get: () => undefined
+            });
+        """)
+
+        return driver
+
+    def scrape(
+        self,
+        url: str,
+        wait_selector: Optional[str] = None,
+        wait_timeout: int = 30
+    ) -> Optional[str]:
+        """
+        Scrape a URL
+
+        Args:
+            url: URL to scrape
+            wait_selector: Optional CSS selector to wait for
+            wait_timeout: Maximum wait time in seconds
+
+        Returns:
+            Page HTML content or None
+        """
+        if not self.driver:
+            self.driver = self._create_driver()
+
+        try:
+            logger.info(f"Scraping: {url}")
+
+            # Navigate to URL
+            self.driver.get(url)
+
+            # Wait for Cloudflare challenge if present
+            if '__cf_chl_' in self.driver.current_url:
+                logger.info("Cloudflare challenge detected, waiting...")
+                time.sleep(10)  # Let undetected-chromedriver handle it
+
+                # Check if challenge passed
+                if '__cf_chl_' in self.driver.current_url:
+                    logger.warning("Cloudflare challenge failed")
+                    return None
+
+            # Wait for specific element if requested
+            if wait_selector:
+                WebDriverWait(self.driver, wait_timeout).until(
+                    EC.presence_of_element_located((By.CSS_SELECTOR, wait_selector))
+                )
+
+            # Random delay to mimic human
+            time.sleep(random.uniform(2, 5))
+
+            # Get page content
+            content = self.driver.page_source
+            logger.info(f"Scraped {len(content)} characters")
+
+            return content
+
+        except Exception as e:
+            logger.error(f"Error scraping {url}: {e}")
+            return None
+
+    def scrape_multiple(
+        self,
+        urls: list,
+        delay_between: tuple = (3, 8)
+    ) -> dict:
+        """
+        Scrape multiple URLs with delays
+
+        Args:
+            urls: List of URLs to scrape
+            delay_between: Min/max delay between requests (seconds)
+
+        Returns:
+            Dict mapping URLs to content
+        """
+        results = {}
+
+        for idx, url in enumerate(urls):
+            logger.info(f"URL {idx + 1}/{len(urls)}")
+
+            content = self.scrape(url)
+            results[url] = content
+
+            # Delay between requests
+            if idx < len(urls) - 1:
+                delay = random.uniform(*delay_between)
+                logger.info(f"Waiting {delay:.1f}s...")
+                time.sleep(delay)
+
+        return results
+
+    def close(self):
+        """Close the driver"""
+        if self.driver:
+            self.driver.quit()
+            self.driver = None
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.close()
+
+# Usage
+if __name__ == "__main__":
+    # Basic usage
+    with UndetectedScraper(headless=True) as scraper:
+        content = scraper.scrape(
+            url='https://example.com',
+            wait_selector='main'
+        )
+
+        if content:
+            print("Successfully scraped page")
+
+    # With proxy
+    with UndetectedScraper(headless=True, proxy='http://proxy.example.com:8080') as scraper:
+        urls = [
+            'https://example.com/page1',
+            'https://example.com/page2',
+            'https://example.com/page3'
+        ]
+
+        results = scraper.scrape_multiple(urls)
+
+        for url, content in results.items():
+            if content:
+                print(f"{url}: {len(content)} chars")</code></pre>
+            </div>
+        </section>
+
+        <!-- Monitoring & Debugging -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Monitoring & Debugging</h2>
+
+            <h3 class="text-xl font-semibold text-gray-800 mt-6 mb-3">Detection Check Script</h3>
+            <div class="code-block">
+                <pre><code class="language-python">def check_detection(driver):
+    """Check if browser is being detected"""
+    # Check common detection points
+    checks = {}
+
+    # Navigator.webdriver
+    checks['navigator.webdriver'] = driver.execute_script(
+        "return navigator.webdriver"
+    )
+
+    # Chrome object
+    checks['window.chrome'] = driver.execute_script(
+        "return typeof window.chrome !== 'undefined'"
+    )
+
+    # Permissions
+    checks['permissions'] = driver.execute_script("""
+        const permission = navigator.permissions.query({name:'notifications'});
+        return permission.state;
+    """)
+
+    # User agent
+    checks['user_agent'] = driver.execute_script(
+        "return navigator.userAgent"
+    )
+
+    # Platform
+    checks['platform'] = driver.execute_script(
+        "return navigator.platform"
+    )
+
+    # Print results
+    print("Detection Check Results:")
+    for key, value in checks.items():
+        status = "❌ DETECTED" if (
+            key == 'navigator.webdriver' and value is True
+        ) or (
+            key == 'window.chrome' and value is False
+        ) else "✓ OK"
+        print(f"  {key}: {value} {status}")
+
+    return checks
+
+# Usage
+driver = uc.Chrome()
+driver.get('https://example.com')
+check_detection(driver)
+driver.quit()</code></pre>
+            </div>
+
+            <h3 class="text-xl font-semibold text-gray-800 mt-6 mb-3">Common Issues</h3>
+            <ul class="list-disc pl-6 space-y-2 text-gray-700">
+                <li><strong>Still getting detected:</strong> Update undetected-chromedriver, site may have custom detection</li>
+                <li><strong>Chrome version mismatch:</strong> Clear cache or pin version</li>
+                <li><strong>Cloudflare loop:</strong> Try with proxy or check if site has additional protections</li>
+                <li><strong>Memory leaks:</strong> Restart driver periodically</li>
+            </ul>
+        </section>
+
+        <!-- Related Links -->
+        <section class="bg-blue-50 rounded-lg p-6 border border-blue-200">
+            <h3 class="font-semibold text-gray-800 mb-3">Related Resources</h3>
+            <ul class="space-y-2">
+                <li><a href="https://github.com/ultrafunkamsterdam/undetected-chromedriver" target="_blank" class="text-blue-600 hover:underline">Undetected Chromedriver on GitHub</a></li>
+                <li><a href="https://pypi.org/project/undetected-chromedriver/" target="_blank" class="text-blue-600 hover:underline">PyPI Package</a></li>
+                <li><a href="https://selenium.dev/documentation/" target="_blank" class="text-blue-600 hover:underline">Selenium Documentation</a></li>
+            </ul>
+        </section>
+
+        <!-- Footer Note -->
+        <section class="mt-12 p-6 bg-yellow-50 rounded-lg border border-yellow-200">
+            <h3 class="font-semibold text-gray-800 mb-2">⚠️ Legal Note</h3>
+            <p class="text-gray-700 text-sm">
+                Bypassing bot detection may violate website Terms of Service. This article is for educational purposes. Always respect robots.txt, ToS, and rate limits. Consider using official APIs when available.
+            </p>
+        </section>
+    </article>
+
+    <script>
+        // Initialize Prism.js
+        if (typeof Prism !== 'undefined') {
+            Prism.highlightAll();
+        }
+    </script>
+</body>
+</html>

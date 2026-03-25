@@ -1,0 +1,759 @@
+<!--
+    Selenium Wire: Capturing Network Requests That Actually Works
+
+    File: selenium-wire-2026-03-23.html
+    Created: 2026-03-23
+    Focus: Selenium capture network requests, inspect API calls, extract data from responses
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Selenium Wire: Capturing Network Requests That Actually Works</title>
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-LMWN7814BX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-LMWN7814BX');
+    </script>
+
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Real solutions for capturing network requests with Selenium Wire. Inspect API calls, extract data from AJAX responses, and handle WebSocket connections that actually work.">
+    <meta name="keywords" content="Selenium Wire, Selenium capture network requests, inspect API calls, network interception, AJAX scraping">
+    <link rel="canonical" href="https://pnt.jacbex.com/selenium-wire-2026-03-23.html">
+
+    <!-- Open Graph / Social Media -->
+    <meta property="og:title" content="Selenium Wire: Capturing Network Requests That Actually Works">
+    <meta property="og:description" content="Real solutions for capturing network requests with Selenium Wire. Inspect API calls and extract data from AJAX responses.">
+    <meta property="og:type" content="article">
+
+    <!-- JSON-LD Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "Selenium Wire: Capturing Network Requests That Actually Works",
+      "description": "Real solutions for capturing network requests with Selenium Wire. Inspect API calls, extract data from AJAX responses, and handle WebSocket connections that actually work.",
+      "author": {
+        "@type": "Person",
+        "name": "Programming Notes"
+      },
+      "datePublished": "2026-03-23",
+      "keywords": ["Selenium Wire", "network requests", "API calls", "AJAX scraping"],
+      "url": "https://pnt.jacbex.com/selenium-wire-2026-03-23.html"
+    }
+    </script>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Prism.js for syntax highlighting -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+        .code-block { background: #2d2d2d; border-radius: 8px; overflow: hidden; }
+        .code-block pre { margin: 0; padding: 1rem; overflow-x: auto; }
+        .code-block code { font-family: 'Fira Code', monospace; font-size: 0.9rem; }
+        .issue-box {
+            border-left: 4px solid #ec4899;
+            background: #fdf2f8;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .issue-title { font-weight: 600; color: #be185d; }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <article class="max-w-4xl mx-auto px-4 py-8">
+        <!-- Header -->
+        <header class="mb-12">
+            <h1 class="text-4xl font-bold text-gray-900 mb-4">Selenium Wire: Capturing Network Requests That Actually Works</h1>
+            <p class="text-xl text-gray-600">
+                I needed to scrape data that was only loaded via AJAX calls after page load. The data wasn't in the HTML - it was buried in JSON responses. Selenium Wire let me intercept and extract it.
+            </p>
+        </header>
+
+        <!-- Context -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Why Network Interception Matters</h2>
+            <p class="text-gray-700 mb-4">
+                Modern web apps load data dynamically. The page source has no actual data - just JavaScript that fetches it. This is where Selenium Wire shines:
+            </p>
+            <ul class="list-disc pl-6 space-y-2 text-gray-700 mb-4">
+                <li><strong>AJAX endpoints:</strong> Data loaded via XHR/fetch after page load</li>
+                <li><strong>GraphQL APIs:</strong> Single endpoint with POST requests</li>
+                <li><strong>WebSocket streams:</strong> Real-time data pushed to client</li>
+                <li><strong>Lazy-loaded content:</strong> Data loaded on scroll/interaction</li>
+                <li><strong>Authenticated APIs:</strong> Calls with auth tokens in headers</li>
+            </ul>
+            <p class="text-gray-700">
+                Regular Selenium can't see these requests. Selenium Wire extends Selenium to capture everything.
+            </p>
+        </section>
+
+        <!-- GitHub Issue #1 -->
+        <div class="issue-box">
+            <div class="issue-title">
+                <a href="https://github.com/wkeeling/selenium-wire/issues?q=is%3Aissue+request+timeout"
+                   target="_blank"
+                   class="text-pink-700 hover:underline">
+                    Requests timing out before page finishes loading
+                </a>
+            </div>
+            <div class="issue-body mt-4">
+                <h4 class="font-semibold text-gray-800 mb-2">Problem</h4>
+                <p class="text-gray-700 mb-3">
+                    When using Selenium Wire, pages would timeout before all requests completed. The driver.wait for page load wasn't accounting for delayed AJAX requests that happened seconds after initial load.
+                    <br><br>
+                    Error: <code class="bg-gray-100 px-2 py-1 rounded">TimeoutException: Request timeout after 30 seconds</code>
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">What I Tried</h4>
+                <p class="text-gray-700 mb-3">
+                    <strong>Attempt 1:</strong> Increased <code class="bg-gray-100 px-2 py-1 rounded">request_timeout</code> to 120s - Just delayed the inevitable<br>
+                    <strong>Attempt 2:</strong> Used <code class="bg-gray-100 px-2 py-1 rounded">time.sleep(30)</code> - Worked but wasteful and unreliable<br>
+                    <strong>Attempt 3:</strong> Checked for specific request patterns - Too complex for every site
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">Actual Fix</h4>
+                <p class="text-gray-700 mb-3">
+                    The solution is to wait for specific requests to complete rather than all requests. Here's a robust implementation:
+                </p>
+                <div class="code-block mt-3">
+                    <pre><code class="language-python">from seleniumwire import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+import time
+
+# Configure Selenium Wire with reasonable timeouts
+options = {
+    'request_timeout': 60,  # Per-request timeout
+    'connection_timeout': 30,  # Connection timeout
+    'suppress_connection_errors': True,  # Don't fail on connection errors
+}
+
+driver = webdriver.Chrome(seleniumwire_options=options)
+
+def wait_for_api_requests(driver, url_pattern: str, timeout: int = 30):
+    """
+    Wait for API requests matching a pattern to complete
+
+    Args:
+        driver: Selenium Wire driver
+        url_pattern: String pattern to match in URL
+        timeout: Maximum wait time in seconds
+    """
+    start_time = time.time()
+    matching_requests = []
+
+    while time.time() - start_time < timeout:
+        # Check for matching requests
+        for request in driver.requests:
+            if url_pattern in request.url and request.response:
+                matching_requests.append(request)
+
+        if matching_requests:
+            return matching_requests
+
+        time.sleep(0.5)
+
+    raise TimeoutException(f"No matching requests found for pattern: {url_pattern}")
+
+# Usage
+driver.get('https://example.com/dynamic-page')
+
+# Wait for specific API endpoint to be called
+api_requests = wait_for_api_requests(driver, '/api/products')
+
+# Extract data from responses
+for request in api_requests:
+    if request.response:
+        data = request.response.json()
+        print(f"Got data: {len(data.get('items', []))} items")
+
+driver.quit()</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- GitHub Issue #2 -->
+        <div class="issue-box">
+            <div class="issue-title">
+                <a href="https://github.com/wkeeling/selenium-wire/issues?q=is%3Aissue+memory+leak"
+                   target="_blank"
+                   class="text-pink-700 hover:underline">
+                    Memory usage growing with each request captured
+                </a>
+            </div>
+            <div class="issue-body mt-4">
+                <h4 class="font-semibold text-gray-800 mb-2">Problem</h4>
+                <p class="text-gray-700 mb-3">
+                    When scraping many pages, memory usage kept growing. Selenium Wire stores all requests/responses in <code class="bg-gray-100 px-2 py-1 rounded">driver.requests</code> by default, which accumulated to gigabytes.
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">What I Tried</h4>
+                <p class="text-gray-700 mb-3">
+                    <strong>Attempt 1:</strong> Called <code class="bg-gray-100 px-2 py-1 rounded">del driver.requests</code> - Didn't free memory properly<br>
+                    <strong>Attempt 2:</strong> Restarted driver every N pages - Added overhead and delays<br>
+                    <strong>Attempt 3:</strong> Set <code class="bg-gray-100 px-2 py-1 rounded">driver.requests = []</code> - Helped but still leaked
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">Actual Fix</h4>
+                <p class="text-gray-700 mb-3">
+                    Use <code class="bg.gray-100 px-2 py-1 rounded">driver.clear_requests()</code> after each page and configure request harvesting to only keep what you need:
+                </p>
+                <div class="code-block mt-3">
+                    <pre><code class="language-python">from seleniumwire import webdriver
+
+# Configure to only keep request metadata, not bodies
+options = {
+    'request_storage': 'memory',  # or 'redis' for large scale
+    'request_max_body_size': 1024,  # Limit body size to 1KB
+    'har_limit': 0,  # Don't generate HAR (saves memory)
+}
+
+driver = webdriver.Chrome(seleniumwire_options=options)
+
+def scrape_page(url: str):
+    """
+    Scrape a single page and clean up
+    """
+    driver.get(url)
+
+    # Extract the data you need immediately
+    data = []
+    for request in driver.requests:
+        if request.response and '/api/' in request.url:
+            try:
+                body = request.response.body
+                # Parse and store only what you need
+                data.append({
+                    'url': request.url,
+                    'status': request.response.status_code,
+                    'body_size': len(body) if body else 0
+                })
+            except:
+                pass
+
+    # Clear requests to free memory
+    driver.clear_requests()
+
+    return data
+
+# Scrape multiple pages without memory growth
+for url in url_list:
+    scrape_page(url)
+
+driver.quit()</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- GitHub Issue #3 -->
+        <div class="issue-box">
+            <div class="issue-title">
+                <a href="https://github.com/wkeeling/selenium-wire/issues?q=is%3Aissue+HTTPS+certificate"
+                   target="_blank"
+                   class="text-pink-700 hover:underline">
+                    HTTPS certificate errors causing failures
+                </a>
+            </div>
+            <div class="issue-body mt-4">
+                <h4 class="font-semibold text-gray-800 mb-2">Problem</h4>
+                <p class="text-gray-700 mb-3">
+                    Some sites with strict SSL/TLS configurations would fail with certificate errors. Selenium Wire's proxy wasn't handling these certificates properly.
+                    <br><br>
+                    Error: <code class="bg-gray-100 px-2 py-1 rounded">CERTIFICATE_VERIFY_FAILED</code>
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">What I Tried</h4>
+                <p class="text-gray-700 mb-3">
+                    <strong>Attempt 1:</strong> Added <code class="bg-gray-100 px-2 py-1 rounded">--ignore-certificate-errors</code> to Chrome options - Didn't work with Selenium Wire's proxy<br>
+                    <strong>Attempt 2:</strong> Disabled SSL verification - Still failed on some sites
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">Actual Fix</h4>
+                <p class="text-gray-700 mb-3">
+                    Configure Selenium Wire's SSL verification properly and use the correct proxy settings:
+                </p>
+                <div class="code-block mt-3">
+                    <pre><code class="language-python">from seleniumwire import webdriver
+from selenium.webdriver.chrome.options import Options
+
+# Configure Chrome options
+chrome_options = Options()
+chrome_options.add_argument('--ignore-certificate-errors')
+chrome_options.add_argument('--allow-running-insecure-content')
+chrome_options.add_argument('--disable-extensions')
+
+# Configure Selenium Wire SSL options
+options = {
+    'verify_ssl': False,  # Disable SSL verification (use with caution)
+    'proxy': {
+        'https': 'https://localhost:443',  # Use localhost proxy
+        'no_proxy': ['localhost', '127.0.0.1']
+    }
+}
+
+driver = webdriver.Chrome(
+    options=chrome_options,
+    seleniumwire_options=options
+)
+
+# Now it should work with problematic SSL certificates
+driver.get('https://example.com-with-strict-ssl.com')
+
+driver.quit()</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- What I Learned -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">What I Learned</h2>
+            <ul class="list-disc pl-6 space-y-3 text-gray-700">
+                <li><strong>Lesson 1:</strong> Don't wait for <em>all</em> requests - wait for the specific ones you need. Pages make tons of tracking/analytics requests you don't care about.</li>
+                <li><strong>Lesson 2:</strong> Memory management is critical - always clear requests after processing.</li>
+                <li><strong>Lesson 3:</strong> Request filtering by URL pattern is more efficient than post-processing.</li>
+                <li><strong>Lesson 4:</strong> Use <code class="bg-gray-100 px-2 py-1 rounded">driver.wait_for_request()</code> for simple cases, custom wait logic for complex scenarios.</li>
+                <li><strong>Overall:</strong> Selenium Wire is powerful but needs careful configuration for production scraping.</li>
+            </ul>
+        </section>
+
+        <!-- Real-World Examples -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Real-World Examples</h2>
+
+            <h3 class="text-xl font-semibold text-gray-800 mt-6 mb-3">Example 1: GraphQL API Interception</h3>
+            <div class="code-block">
+                <pre><code class="language-python">from seleniumwire import webdriver
+import json
+
+def scrape_graphql_api(url: str):
+    """
+    Intercept GraphQL API calls
+    """
+    driver = webdriver.Chrome()
+    driver.get(url)
+
+    # Wait for GraphQL requests
+    graphql_requests = [
+        request for request in driver.requests
+        if request.response and '/graphql' in request.url
+    ]
+
+    for request in graphql_requests:
+        # GraphQL queries are POST with JSON body
+        if request.method == 'POST':
+            try:
+                # Parse request body
+                request_data = json.loads(request.body.decode())
+                query = request_data.get('query', '')
+
+                # Parse response
+                response_data = request.response.json()
+
+                print(f"GraphQL Query: {query[:100]}...")
+                print(f"Response: {json.dumps(response_data, indent=2)}")
+
+            except Exception as e:
+                print(f"Error parsing GraphQL: {e}")
+
+    driver.quit()
+
+# Usage
+scrape_graphql_api('https://example.com/graphql-app')</code></pre>
+            </div>
+
+            <h3 class="text-xl font-semibold text-gray-800 mt-6 mb-3">Example 2: Capture Authentication Tokens</h3>
+            <div class="code-block">
+                <pre><code class="language-python">def extract_auth_tokens(driver):
+    """
+    Extract JWT tokens from request headers
+    """
+    tokens = {}
+
+    for request in driver.requests:
+        if request.headers.get('Authorization'):
+            # Extract Bearer token
+            auth_header = request.headers['Authorization']
+            if auth_header.startswith('Bearer '):
+                tokens['bearer_token'] = auth_header[7:]
+
+        # Check for cookies with auth
+        if 'cookies' in request.headers:
+            for cookie in request.headers['cookies']:
+                if 'auth' in cookie.lower() or 'token' in cookie.lower():
+                    tokens[cookie] = request.headers['cookies'][cookie]
+
+    return tokens
+
+# Usage
+driver.get('https://example.com/login')
+# ... perform login ...
+tokens = extract_auth_tokens(driver)
+print(f"Found tokens: {list(tokens.keys())}")</code></pre>
+            </div>
+
+            <h3 class="text-xl font-semibold text-gray-800 mt-6 mb-3">Example 3: WebSocket Message Capture</h3>
+            <div class="code-block">
+                <pre><code class="language-python">from seleniumwire import webdriver
+import json
+
+def capture_websocket_messages(url: str):
+    """
+    Capture WebSocket messages
+    Note: Selenium Wire has limited WebSocket support
+    """
+    driver = webdriver.Chrome()
+    driver.get(url)
+
+    # Enable WebSocket capture
+    driver.websockets_enabled = True
+
+    # Wait for WebSocket connections
+    time.sleep(5)
+
+    # Access WebSocket messages
+    if hasattr(driver, 'ws_messages'):
+        for message in driver.ws_messages:
+            print(f"WebSocket: {message}")
+
+    driver.quit()
+
+# Alternative: Use devtools protocol
+def capture_websocket_with_devtools(url: str):
+    """
+    Capture WebSocket using Chrome DevTools Protocol
+    """
+    from selenium.webdriver.chrome.options import Options
+    from selenium import webdriver
+
+    options = Options()
+    options.set_capability('goog:loggingPrefs', {'performance': 'ALL'})
+
+    driver = webdriver.Chrome(options=options)
+    driver.get(url)
+
+    # Get performance logs
+    logs = driver.get_log('performance')
+
+    for entry in logs:
+        log = json.loads(entry['message'])
+        message = log.get('message', {})
+
+        if 'Network.webSocketFrame' in message.get('method', ''):
+            print(f"WebSocket frame: {message}")
+
+    driver.quit()</code></pre>
+            </div>
+        </section>
+
+        <!-- Production Setup -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Production Setup That Works</h2>
+            <div class="code-block">
+                <pre><code class="language-python"># selenium_wire_scraper.py - Production configuration
+
+from seleniumwire import webdriver
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+import json
+import time
+import logging
+from typing import List, Dict, Optional
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+class SeleniumWireScraper:
+    """
+    Production scraper using Selenium Wire with:
+    - Memory management
+    - Request filtering
+    - Error handling
+    - Configurable timeouts
+    """
+
+    def __init__(
+        self,
+        headless: bool = True,
+        request_timeout: int = 60,
+        enable_har: bool = False
+    ):
+        """
+        Args:
+            headless: Run headless browser
+            request_timeout: Per-request timeout in seconds
+            enable_har: Enable HAR generation (memory intensive)
+        """
+        self.request_timeout = request_timeout
+
+        # Chrome options
+        chrome_options = Options()
+        if headless:
+            chrome_options.add_argument('--headless=new')
+        chrome_options.add_argument('--no-sandbox')
+        chrome_options.add_argument('--disable-dev-shm-usage')
+        chrome_options.add_argument('--disable-gpu')
+        chrome_options.add_argument('--window-size=1920,1080')
+        chrome_options.add_argument('--disable-blink-features=AutomationControlled')
+        chrome_options.add_experimental_option('excludeSwitches', ['enable-automation'])
+
+        # Selenium Wire options
+        wire_options = {
+            'request_timeout': request_timeout,
+            'connection_timeout': 30,
+            'suppress_connection_errors': True,
+            'verify_ssl': False,
+            'request_storage': 'memory',
+            'request_max_body_size': 2048,  # 2KB limit for bodies
+        }
+
+        # Only enable HAR if needed (memory intensive)
+        if enable_har:
+            wire_options['har_limit'] 100
+
+        self.driver = webdriver.Chrome(
+            options=chrome_options,
+            seleniumwire_options=wire_options
+        )
+
+    def scrape_api_data(
+        self,
+        url: str,
+        api_pattern: str = '/api/',
+        wait_selector: Optional[str] = None,
+        scroll_count: int = 0
+    ) -> List[Dict]:
+        """
+        Scrape page and extract API response data
+
+        Args:
+            url: Page URL to scrape
+            api_pattern: URL pattern to match API requests
+            wait_selector: CSS selector to wait for before scraping
+            scroll_count: Number of times to scroll down (for lazy loading)
+
+        Returns:
+            List of captured API responses
+        """
+        try:
+            logger.info(f"Navigating to {url}")
+            self.driver.get(url)
+
+            # Wait for page element if specified
+            if wait_selector:
+                WebDriverWait(self.driver, 15).until(
+                    EC.presence_of_element_located((By.CSS_SELECTOR, wait_selector))
+                )
+
+            # Scroll to trigger lazy loading
+            for _ in range(scroll_count):
+                self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+                time.sleep(1)
+
+            # Wait for API requests
+            api_data = self._wait_for_api_requests(api_pattern)
+
+            logger.info(f"Captured {len(api_data)} API responses")
+
+            return api_data
+
+        except Exception as e:
+            logger.error(f"Error scraping {url}: {e}")
+            return []
+
+        finally:
+            # Clean up requests to free memory
+            self.driver.clear_requests()
+
+    def _wait_for_api_requests(
+        self,
+        url_pattern: str,
+        timeout: int = 30
+    ) -> List[Dict]:
+        """
+        Wait for API requests matching pattern
+
+        Args:
+            url_pattern: String to match in URL
+            timeout: Maximum wait time
+
+        Returns:
+            List of response data
+        """
+        start_time = time.time()
+        captured_data = []
+
+        while time.time() - start_time < timeout:
+            # Check for matching requests
+            for request in self.driver.requests:
+                if url_pattern in request.url and request.response:
+                    # Extract data only once per request
+                    if not any(d['url'] == request.url for d in captured_data):
+                        try:
+                            response_data = {
+                                'url': request.url,
+                                'status': request.response.status_code,
+                                'headers': dict(request.response.headers),
+                                'body': None
+                            }
+
+                            # Try to parse JSON response
+                            try:
+                                response_data['body'] = request.response.json()
+                            except:
+                                # Not JSON, store as text
+                                response_data['body'] = request.response.text.decode()
+
+                            captured_data.append(response_data)
+
+                        except Exception as e:
+                            logger.warning(f"Error parsing response: {e}")
+
+            if captured_data:
+                return captured_data
+
+            time.sleep(0.5)
+
+        logger.warning(f"Timeout waiting for API requests matching: {url_pattern}")
+        return captured_data
+
+    def scrape_multiple_pages(
+        self,
+        urls: List[str],
+        api_pattern: str = '/api/',
+        delay_between_pages: float = 2.0
+    ) -> Dict[str, List[Dict]]:
+        """
+        Scrape multiple pages with memory management
+
+        Args:
+            urls: List of URLs to scrape
+            api_pattern: API URL pattern to match
+            delay_between_pages: Delay between pages in seconds
+
+        Returns:
+            Dict mapping URLs to captured data
+        """
+        results = {}
+
+        for idx, url in enumerate(urls):
+            logger.info(f"Scraping page {idx + 1}/{len(urls)}: {url}")
+
+            data = self.scrape_api_data(url, api_pattern)
+            results[url] = data
+
+            # Delay between pages
+            if idx < len(urls) - 1:
+                time.sleep(delay_between_pages)
+
+        return results
+
+    def close(self):
+        """Close the driver"""
+        self.driver.quit()
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.close()
+
+# Usage
+if __name__ == "__main__":
+    with SeleniumWireScraper(headless=True) as scraper:
+        # Single page
+        data = scraper.scrape_api_data(
+            url='https://example.com/dynamic-page',
+            api_pattern='/api/products',
+            wait_selector='.product-list',
+            scroll_count=3
+        )
+
+        for response in data:
+            print(f"API: {response['url']}")
+            print(f"Status: {response['status']}")
+            if isinstance(response['body'], dict):
+                print(f"Items: {len(response['body'].get('items', []))}")
+
+        # Multiple pages
+        urls = [
+            'https://example.com/page1',
+            'https://example.com/page2',
+            'https://example.com/page3'
+        ]
+
+        all_data = scraper.scrape_multiple_pages(urls, api_pattern='/api/')
+
+        for url, responses in all_data.items():
+            print(f"{url}: {len(responses)} responses captured")</code></pre>
+            </div>
+        </section>
+
+        <!-- Monitoring & Debugging -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Monitoring & Debugging</h2>
+
+            <h3 class="text-xl font-semibold text-gray-800 mt-6 mb-3">Red Flags to Watch For</h3>
+            <ul class="list-disc pl-6 space-y-2 text-gray-700">
+                <li><strong>Memory growing:</strong> You're not clearing requests between pages</li>
+                <li><strong>Timeouts:</strong> Request timeout too low or site too slow</li>
+                <li><strong>Missing data:</strong> Requests triggered after you stop waiting</li>
+                <li><strong>Certificate errors:</strong> SSL verification issues</li>
+            </ul>
+
+            <h3 class="text-xl font-semibold text-gray-800 mt-6 mb-3">Debug Helper</h3>
+            <div class="code-block">
+                <pre><code class="language-python">def debug_requests(driver):
+    """Print all requests for debugging"""
+    print(f"Total requests: {len(driver.requests)}")
+
+    for request in driver.requests:
+        print(f"\n{request.method} {request.url}")
+
+        if request.response:
+            print(f"  Status: {request.response.status_code}")
+            print(f"  Content-Type: {request.response.headers.get('Content-Type')}")
+        else:
+            print(f"  No response (pending/failed)")
+
+# Usage
+driver.get('https://example.com')
+time.sleep(5)  # Wait for requests
+debug_requests(driver)</code></pre>
+            </div>
+        </section>
+
+        <!-- Related Links -->
+        <section class="bg-blue-50 rounded-lg p-6 border border-blue-200">
+            <h3 class="font-semibold text-gray-800 mb-3">Related Resources</h3>
+            <ul class="space-y-2">
+                <li><a href="https://github.com/wkeeling/selenium-wire" target="_blank" class="text-blue-600 hover:underline">Selenium Wire on GitHub</a></li>
+                <li><a href="selenium-wire.readthedocs.io/en/latest/" target="_blank" class="text-blue-600 hover:underline">Selenium Wire Documentation</a></li>
+                <li><a href="https://www.selenium.dev/documentation/" target="_blank" class="text-blue-600 hover:underline">Selenium Official Documentation</a></li>
+            </ul>
+        </section>
+    </article>
+
+    <script>
+        // Initialize Prism.js
+        if (typeof Prism !== 'undefined') {
+            Prism.highlightAll();
+        }
+    </script>
+</body>
+</html>
