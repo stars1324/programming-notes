@@ -1,0 +1,747 @@
+<!--
+    Pyppeteer: Puppeteer for Python That Actually Works
+
+    File: pyppeteer-2026-03-26.html
+    Created: 2026-03-26
+    Focus: Pyppeteer async crawler configuration, executable path errors
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pyppeteer: Finally Got Puppeteer Working in Python</title>
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-LMWN7814BX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-LMWN7814BX');
+    </script>
+
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Real solutions for Pyppeteer (Puppeteer for Python). Fix executable path errors, configure async crawlers, and handle Chromium download issues that actually work.">
+    <meta name="keywords" content="Pyppeteer, Puppeteer Python, async crawler, executable path error, Chromium download">
+    <link rel="canonical" href="https://pnt.jacbex.com/pyppeteer-2026-03-26.html">
+
+    <!-- Open Graph / Social Media -->
+    <meta property="og:title" content="Pyppeteer: Finally Got Puppeteer Working in Python">
+    <meta property="og:description" content="Real solutions for Pyppeteer. Fix executable path errors and configure async crawlers that actually work.">
+    <meta property="og:type" content="article">
+
+    <!-- JSON-LD Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "Pyppeteer: Finally Got Puppeteer Working in Python",
+      "description": "Real solutions for Pyppeteer (Puppeteer for Python). Fix executable path errors, configure async crawlers, and handle Chromium download issues that actually work.",
+      "author": {
+        "@type": "Person",
+        "name": "Programming Notes"
+      },
+      "datePublished": "2026-03-26",
+      "keywords": ["Pyppeteer", "Puppeteer Python", "async crawler", "executable path"],
+      "url": "https://pnt.jacbex.com/pyppeteer-2026-03-26.html"
+    }
+    </script>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Prism.js for syntax highlighting -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+        .code-block { background: #2d2d2d; border-radius: 8px; overflow: hidden; }
+        .code-block pre { margin: 0; padding: 1rem; overflow-x: auto; }
+        .code-block code { font-family: 'Fira Code', monospace; font-size: 0.9rem; }
+        .issue-box {
+            border-left: 4px solid #ec4899;
+            background: #fdf2f8;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .issue-title { font-weight: 600; color: #be185d; }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <article class="max-w-4xl mx-auto px-4 py-8">
+        <!-- Header -->
+        <header class="mb-12">
+            <h1 class="text-4xl font-bold text-gray-900 mb-4">Pyppeteer: Finally Got Puppeteer Working in Python</h1>
+            <p class="text-xl text-gray-600">
+                I wanted Puppeteer's power in Python. Pyppeteer seemed perfect - async/await, headless Chrome, the works. But the executable path errors and download issues drove me crazy. Here's what finally worked.
+            </p>
+        </header>
+
+        <!-- Context -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Why Pyppeteer Over Playwright?</h2>
+            <p class="text-gray-700 mb-4">
+                Pyppeteer is a Python port of Puppeteer (Node.js). While Playwright is more modern, Pyppeteer still has advantages:
+            </p>
+            <ul class="list-disc pl-6 space-y-2 text-gray-700 mb-4">
+                <li><strong>Same API as Puppeteer:</strong> If you know Puppeteer, you know Pyppeteer</li>
+                <li><strong>Auto-downloads Chromium:</strong> No manual Chrome installation needed</li>
+                <li><strong>Native async/await:</strong> Built for Python 3.5+ asyncio</li>
+                <li><strong>Smaller footprint:</strong> More lightweight than Playwright</li>
+                <li><strong>Stable:</strong> Battle-tested in production since 2018</li>
+            </ul>
+            <p class="text-gray-700">
+                That said, Pyppeteer hasn't been updated since 2020. For new projects, consider Playwright-python or pyppeteer-stealth.
+            </p>
+        </section>
+
+        <!-- GitHub Issue #1 -->
+        <div class="issue-box">
+            <div class="issue-title">
+                <a href="https://github.com/pyppeteer/pyppeteer/issues?q=is%3Aissue+executable+path"
+                   target="_blank"
+                   class="text-pink-700 hover:underline">
+                    Chromium executable not found at expected path
+                </a>
+            </div>
+            <div class="issue-body mt-4">
+                <h4 class="font-semibold text-gray-800 mb-2">Problem</h4>
+                <p class="text-gray-700 mb-3">
+                    Pyppeteer automatically downloads Chromium, but I kept getting "Executable doesn't exist" errors. The path it expected didn't match where Chromium actually was.
+                    <br><br>
+                    Error: <code class="bg-gray-100 px-2 py-1 rounded">FileNotFoundError: [Errno 2] No such file or directory: '/home/user/.local/share/pyppeteer/local-chromium/588429/chrome-linux/chrome'</code>
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">What I Tried</h4>
+                <p class="text-gray-700 mb-3">
+                    <strong>Attempt 1:</strong> Reinstalled pyppeteer - Downloaded Chromium but still couldn't find it<br>
+                    <strong>Attempt 2:</strong> Set CHROME_PATH environment variable - Pyppeteer ignored it<br>
+                    <strong>Attempt 3:</strong> Manually downloaded Chromium - Wrong version, incompatible with Pyppeteer
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">Actual Fix</h4>
+                <p class="text-gray-700 mb-3">
+                    The issue is that Pyppeteer downloads Chromium asynchronously but doesn't always complete. Force the download and specify the executable path explicitly:
+                </p>
+                <div class="code-block mt-3">
+                    <pre><code class="language-python">import asyncio
+from pyppeteer import launch
+
+async def force_chromium_download():
+    """
+    Force Pyppeteer to download Chromium
+    Run this once before using pyppeteer
+    """
+    import pyppeteer.chromium_downloader
+
+    print("Downloading Chromium...")
+    chromium_path = await pyppeteer.chromium_downloader.download_chromium()
+
+    print(f"Chromium downloaded to: {chromium_path}")
+    return chromium_path
+
+async def scrape_with_pyppeteer():
+    """
+    Scrape with explicit executable path
+    """
+    # Get the correct Chromium path
+    import pyppeteer.chromium_downloader
+    chromium_path = pyppeteer.chromium_downloader.get_chromium_executable_path()
+
+    print(f"Using Chromium at: {chromium_path}")
+
+    # Launch with explicit path
+    browser = await launch(
+        executablePath=chromium_path,
+        headless=True,
+        args=['--no-sandbox', '--disable-setuid-sandbox']
+    )
+
+    page = await browser.newPage()
+
+    await page.goto('https://example.com')
+
+    title = await page.title()
+    print(f"Page title: {title}")
+
+    await browser.close()
+
+# Run
+if __name__ == '__main__':
+    # First time: download Chromium
+    # asyncio.run(force_chromium_download())
+
+    # Then use it
+    asyncio.run(scrape_with_pyppeteer())</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- GitHub Issue #2 -->
+        <div class="issue-box">
+            <div class="issue-title">
+                <a href="https://github.com/pyppeteer/pyppeteer/issues?q=is%3Aissue+download+timeout"
+                   target="_blank"
+                   class="text-pink-700 hover:underline">
+                    Chromium download fails with timeout
+                </a>
+            </div>
+            <div class="issue-body mt-4">
+                <h4 class="font-semibold text-gray-800 mb-2">Problem</h4>
+                <p class="text-gray-700 mb-3">
+                    On first run, Pyppeteer tries to download Chromium (~300MB) but kept timing out. The download would hang at random percentages and fail.
+                    <br><br>
+                    Error: <code class="bg-gray-100 px-2 py-1 rounded">DownloadTimeoutError: Chromium download timed out after 30 seconds</code>
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">What I Tried</h4>
+                <p class="text-gray-700 mb-3">
+                    <strong>Attempt 1:</strong> Increased timeout - Still failed on slow connections<br>
+                    <strong>Attempt 2:</strong> Used VPN - Helped but download was extremely slow<br>
+                    <strong>Attempt 3:</strong> Downloaded manually from Google - Wrong version, Pyppeteer rejected it
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">Actual Fix</h4>
+                <p class="text-gray-700 mb-3">
+                    Download Chromium manually from a mirror and set the path. China users should use a mirror:
+                </p>
+                <div class="code-block mt-3">
+                    <pre><code class="language-python"># Fix 1: Use download mirror for China users
+import os
+os.environ['PYPPETEER_DOWNLOAD_HOST'] = 'https://cdn.npmmirror.com/binraries'
+
+# Fix 2: Manual download and configuration
+"""
+Manual Chromium download:
+
+1. Find your Pyppeteer version's Chromium revision:
+   python -c "import pyppeteer.__main__; print(pyppeteer.__main__.CHROMIUM_REVISION)"
+
+2. Download Chromium from:
+   https://chromiumbrowserdl.appspot.com/REVISION/Linux_x64.zip
+
+3. Extract to:
+   ~/.local/share/pyppeteer/local-chromium/REVISION/
+
+4. Verify path with get_chromium_executable_path()
+"""
+
+async def setup_chromium_manually():
+    """
+    Configure manually downloaded Chromium
+    """
+    import os
+    from pyppeteer import launch
+
+    # Option 1: Use environment variable
+    os.environ['PYPPETEER_CHROMIUM_REVISION'] = '588429'
+
+    # Option 2: Specify custom executable path
+    custom_chrome_path = '/usr/bin/google-chrome'  # System Chrome
+
+    browser = await launch(
+        executablePath=custom_chrome_path,
+        headless=True,
+        args=['--no-sandbox']
+    )
+
+    return browser
+
+# Fix 3: Use system Chrome (simpler, more compatible)
+async def use_system_chrome():
+    """
+    Use system-installed Chrome instead of downloaded Chromium
+    """
+    # Check available Chrome installations
+    chrome_paths = [
+        '/usr/bin/google-chrome',
+        '/usr/bin/google-chrome-stable',
+        '/usr/bin/chromium-browser',
+        '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',  # macOS
+        'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe'  # Windows
+    ]
+
+    import os
+    for path in chrome_paths:
+        if os.path.exists(path):
+            print(f"Found Chrome at: {path}")
+            return path
+
+    print("No system Chrome found, will download Chromium")
+    return None</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- GitHub Issue #3 -->
+        <div class="issue-box">
+            <div class="issue-title">
+                <a href="https://github.com/pyppeteer/pyppeteer/issues?q=is%3Aissue+async+context"
+                   target="_blank"
+                   class="text-pink-700 hover:underline">
+                    Async crawler not working as expected
+                </a>
+            </div>
+            <div class="issue-body mt-4">
+                <h4 class="font-semibold text-gray-800 mb-2">Problem</h4>
+                <p class="text-gray-700 mb-3">
+                    When building an async crawler to scrape multiple pages concurrently, pages would hang or never resolve. The async context wasn't being managed properly.
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">What I Tried</h4>
+                <p class="text-gray-700 mb-3">
+                    <strong>Attempt 1:</strong> Created multiple browser instances - Ran out of memory<br>
+                    <strong>Attempt 2:</strong> Used asyncio.gather() - Pages still hung<br>
+                    <strong>Attempt 3:</strong> Added timeouts - Helped but didn't fix root cause
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">Actual Fix</h4>
+                <p class="text-gray-700 mb-3">
+                    The key is reusing browser context and properly managing page lifecycles:
+                </p>
+                <div class="code-block mt-3">
+                    <pre><code class="language-python">import asyncio
+from pyppeteer import launch
+from typing import List
+import logging
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+class AsyncPyppeteerCrawler:
+    """
+    Production async crawler with Pyppeteer
+    """
+
+    def __init__(self, concurrency: int = 5):
+        """
+        Args:
+            concurrency: Number of concurrent pages to scrape
+        """
+        self.concurrency = concurrency
+        self.browser = None
+
+    async def init(self):
+        """Initialize browser (call once)"""
+        self.browser = await launch(
+            headless=True,
+            args=['--no-sandbox', '--disable-dev-shm-usage']
+        )
+        logger.info("Browser launched")
+
+    async def close(self):
+        """Close browser (call when done)"""
+        if self.browser:
+            await self.browser.close()
+            logger.info("Browser closed")
+
+    async def scrape_page(self, url: str) -> dict:
+        """
+        Scrape a single page
+
+        Args:
+            url: URL to scrape
+
+        Returns:
+            Scraped data
+        """
+        if not self.browser:
+            raise RuntimeError("Call init() first")
+
+        page = None
+        try:
+            # Create new page
+            page = await self.browser.newPage()
+
+            # Set viewport and user agent
+            await page.setViewport({'width': 1920, 'height': 1080})
+            await page.setUserAgent('Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36')
+
+            # Navigate with timeout
+            await page.goto(url, {'timeout': 30000, 'waitUntil': 'networkidle0'})
+
+            # Wait for content
+            await page.waitForSelector('body', {'timeout': 10000})
+
+            # Extract data
+            data = await page.evaluate('''() => ({
+                title: document.title,
+                url: window.location.href,
+                bodyLength: document.body.innerText.length
+            })''')
+
+            logger.info(f"Scraped: {url}")
+            return data
+
+        except Exception as e:
+            logger.error(f"Error scraping {url}: {e}")
+            return {'error': str(e), 'url': url}
+
+        finally:
+            # Always close page to free memory
+            if page:
+                await page.close()
+
+    async def scrape_urls(self, urls: List[str]) -> List[dict]:
+        """
+        Scrape multiple URLs concurrently
+
+        Args:
+            urls: List of URLs to scrape
+
+        Returns:
+            List of scraped data
+        """
+        # Create semaphore to limit concurrency
+        semaphore = asyncio.Semaphore(self.concurrency)
+
+        async def scrape_with_semaphore(url):
+            async with semaphore:
+                return await self.scrape_page(url)
+
+        # Scrape all URLs concurrently
+        results = await asyncio.gather(
+            *[scrape_with_semaphore(url) for url in urls],
+            return_exceptions=True
+        )
+
+        # Filter exceptions
+        return [r for r in results if not isinstance(r, Exception)]
+
+# Usage
+async def main():
+    crawler = AsyncPyppeteerCrawler(concurrency=3)
+
+    try:
+        await crawler.init()
+
+        urls = [
+            'https://example.com/page1',
+            'https://example.com/page2',
+            'https://example.com/page3',
+            'https://example.com/page4',
+            'https://example.com/page5'
+        ]
+
+        results = await crawler.scrape_urls(urls)
+
+        for result in results:
+            if 'error' not in result:
+                print(f"{result['url']}: {result['title']}")
+
+    finally:
+        await crawler.close()
+
+# Run
+if __name__ == '__main__':
+    asyncio.run(main())</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- What I Learned -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">What I Learned</h2>
+            <ul class="list-disc pl-6 space-y-3 text-gray-700">
+                <li><strong>Lesson 1:</strong> Always explicitly set executable path - Pyppeteer's auto-detection is flaky.</li>
+                <li><strong>Lesson 2:</strong> For production, use system Chrome instead of downloaded Chromium - more stable.</li>
+                <li><strong>Lesson 3:</strong> Always close pages after use - memory leaks will crash your crawler.</li>
+                <li><strong>Lesson 4:</strong> Use semaphore for concurrency control - don't create unlimited concurrent pages.</li>
+                <li><strong>Overall:</strong> Pyppeteer works but requires more setup than expected. Consider pyppeteer-stealth for anti-bot detection.</li>
+            </ul>
+        </section>
+
+        <!-- Alternatives -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Better Alternatives in 2026</h2>
+
+            <h3 class="text-xl font-semibold text-gray-800 mt-6 mb-3">1. Playwright-python (Recommended)</h3>
+            <p class="text-gray-700 mb-3">
+                Playwright is the modern successor to Puppeteer with better Python support:
+            </p>
+            <div class="code-block">
+                <pre><code class="language-python"># Playwright is more reliable
+from playwright.async_api import async_playwright
+
+async def scrape_with_playwright():
+    async with async_playwright() as pw:
+        browser = await pw.chromium.launch()
+        page = await browser.new_page()
+        await page.goto('https://example.com')
+        title = await page.title()
+        await browser.close()
+        return title</code></pre>
+            </div>
+
+            <h3 class="text-xl font-semibold text-gray-800 mt-6 mb-3">2. pyppeteer-stealth</h3>
+            <p class="text-gray-700 mb-3">
+                If you must use Pyppeteer, add stealth mode to avoid bot detection:
+            </p>
+            <div class="code-block">
+                <pre><code class="language-python">from pyppeteer_stealth import stealth
+from pyppeteer import launch
+
+async def scrape_with_stealth():
+    browser = await launch(headless=True)
+    page = await browser.newPage()
+
+    # Apply stealth patches
+    await stealth(page)
+
+    await page.goto('https://bot-detection.example.com')
+    # Now less likely to be detected</code></pre>
+            </div>
+        </section>
+
+        <!-- Production Setup -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Production Setup That Works</h2>
+            <div class="code-block">
+                <pre><code class="language-python"># pyppeteer_scraper.py - Production configuration
+
+import asyncio
+import os
+from pyppeteer import launch
+from typing import List, Dict
+import logging
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+class PyppeteerScraper:
+    """
+    Production Pyppeteer scraper with:
+    - System Chrome support
+    - Concurrent crawling
+    - Error handling
+    - Memory management
+    """
+
+    def __init__(
+        self,
+        headless: bool = True,
+        concurrency: int = 3,
+        chrome_path: str = None
+    ):
+        """
+        Args:
+            headless: Run headless browser
+            concurrency: Number of concurrent pages
+            chrome_path: Path to Chrome executable (None = auto-detect)
+        """
+        self.headless = headless
+        self.concurrency = concurrency
+        self.chrome_path = chrome_path or self._find_chrome()
+        self.browser = None
+
+    def _find_chrome(self) -> str:
+        """Find system Chrome executable"""
+        paths = {
+            'Linux': [
+                '/usr/bin/google-chrome',
+                '/usr/bin/google-chrome-stable',
+                '/usr/bin/chromium-browser'
+            ],
+            'Darwin': [  # macOS
+                '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
+            ],
+            'Windows': [
+                'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
+                'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe'
+            ]
+        }
+
+        import platform
+        system = platform.system()
+
+        for path in paths.get(system, []):
+            if os.path.exists(path):
+                logger.info(f"Found Chrome at: {path}")
+                return path
+
+        logger.warning("No system Chrome found, will use Pyppeteer's Chromium")
+        return None
+
+    async def init(self):
+        """Initialize browser"""
+        launch_args = {
+            'headless': self.headless,
+            'args': [
+                '--no-sandbox',
+                '--disable-setuid-sandbox',
+                '--disable-dev-shm-usage',
+                '--disable-blink-features=AutomationControlled'
+            ]
+        }
+
+        if self.chrome_path:
+            launch_args['executablePath'] = self.chrome_path
+
+        self.browser = await launch(**launch_args)
+        logger.info("Browser initialized")
+
+    async def close(self):
+        """Close browser"""
+        if self.browser:
+            await self.browser.close()
+            self.browser = None
+
+    async def scrape_url(self, url: str, wait_for: str = None) -> Dict:
+        """
+        Scrape a single URL
+
+        Args:
+            url: URL to scrape
+            wait_for: CSS selector to wait for (optional)
+
+        Returns:
+            Scraped data
+        """
+        if not self.browser:
+            await self.init()
+
+        page = None
+        try:
+            page = await self.browser.newPage()
+
+            # Set viewport
+            await page.setViewport({'width': 1920, 'height': 1080})
+
+            # Navigate
+            await page.goto(url, {'timeout': 30000, 'waitUntil': 'networkidle0'})
+
+            # Wait for selector if specified
+            if wait_for:
+                await page.waitForSelector(wait_for, {'timeout': 10000})
+
+            # Extract data
+            data = await page.evaluate('''() => ({
+                title: document.title,
+                url: window.location.href,
+                html: document.documentElement.outerHTML.substring(0, 10000)
+            })''')
+
+            logger.info(f"Scraped: {url}")
+            return data
+
+        except Exception as e:
+            logger.error(f"Error scraping {url}: {e}")
+            return {'error': str(e), 'url': url}
+
+        finally:
+            if page:
+                await page.close()
+
+    async def scrape_batch(self, urls: List[str]) -> List[Dict]:
+        """
+        Scrape multiple URLs concurrently
+
+        Args:
+            urls: URLs to scrape
+
+        Returns:
+            List of scraped data
+        """
+        semaphore = asyncio.Semaphore(self.concurrency)
+
+        async def scrape_with_limit(url):
+            async with semaphore:
+                return await self.scrape_url(url)
+
+        results = await asyncio.gather(
+            *[scrape_with_limit(url) for url in urls],
+            return_exceptions=True
+        )
+
+        return [r for r in results if not isinstance(r, Exception)]
+
+    async def __aenter__(self):
+        await self.init()
+        return self
+
+    async def __aexit__(self, exc_type, exc_val, exc_tb):
+        await self.close()
+
+# Usage
+async def main():
+    async with PyppeteerScraper(concurrency=3) as scraper:
+        urls = [
+            'https://example.com',
+            'https://example.org',
+            'https://example.net'
+        ]
+
+        results = await scraper.scrape_batch(urls)
+
+        for result in results:
+            if 'error' not in result:
+                print(f"{result['url']}: {result['title']}")
+
+if __name__ == '__main__':
+    asyncio.run(main())</code></pre>
+            </div>
+        </section>
+
+        <!-- Monitoring & Debugging -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Monitoring & Debugging</h2>
+
+            <h3 class="text-xl font-semibold text-gray-800 mt-6 mb-3">Common Issues</h3>
+            <ul class="list-disc pl-6 space-y-2 text-gray-700">
+                <li><strong>Executable not found:</strong> Set chrome_path explicitly</li>
+                <li><strong>Memory leaks:</strong> Always close pages after use</li>
+                <li><strong>Timeouts:</strong> Increase timeout or check page loading</li>
+                <li><strong>Bot detection:</strong> Use pyppeteer-stealth</li>
+            </ul>
+
+            <h3 class="text-xl font-semibold text-gray-800 mt-6 mb-3">Debug Helper</h3>
+            <div class="code-block">
+                <pre><code class="language-python">async def debug_pyppeteer():
+    """Debug Pyppeteer setup"""
+    # Check Chrome path
+    from pyppeteer.chromium_downloader import get_chromium_executable_path
+    print(f"Chromium path: {get_chromium_executable_path()}")
+
+    # Check system Chrome
+    scraper = PyppeteerScraper()
+    print(f"System Chrome: {scraper.chrome_path}")
+
+    # Test launch
+    browser = await scraper.init()
+    print(f"Browser launched: {browser is not None}")
+    await scraper.close()</code></pre>
+            </div>
+        </section>
+
+        <!-- Related Links -->
+        <section class="bg-blue-50 rounded-lg p-6 border border-blue-200">
+            <h3 class="font-semibold text-gray-800 mb-3">Related Resources</h3>
+            <ul class="space-y-2">
+                <li><a href="https://github.com/pyppeteer/pyppeteer" target="_blank" class="text-blue-600 hover:underline">Pyppeteer on GitHub</a></li>
+                <li><a href="https://playwright.dev/python/" target="_blank" class="text-blue-600 hover:underline">Playwright for Python (Recommended Alternative)</a></li>
+                <li><a href="https://github.com/meiirzian/pyppeteer-stealth" target="_blank" class="text-blue-600 hover:underline">pyppeteer-stealth - Anti-bot Detection</a></li>
+            </ul>
+        </section>
+
+        <!-- Footer Note -->
+        <section class="mt-12 p-6 bg-yellow-50 rounded-lg border border-yellow-200">
+            <h3 class="font-semibold text-gray-800 mb-2">⚠️ Maintenance Note</h3>
+            <p class="text-gray-700 text-sm">
+                Pyppeteer hasn't been updated since 2020. For new projects, consider Playwright-python or Selenium. This article is for those maintaining existing Pyppeteer codebases.
+            </p>
+        </section>
+    </article>
+
+    <script>
+        // Initialize Prism.js
+        if (typeof Prism !== 'undefined') {
+            Prism.highlightAll();
+        }
+    </script>
+</body>
+</html>

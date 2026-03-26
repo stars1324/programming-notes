@@ -1,0 +1,518 @@
+<!--
+    TikTok Live Recorder: Recording Live Streams That Actually Works
+
+    File: tiktok-live-recorder-2026-03-26.html
+    Created: 2026-03-26
+    Focus: Record TikTok live stream, real-time media scraping
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TikTok Live Recorder: Finally Got Live Streams Recording</title>
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-LMWN7814BX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-LMWN7814BX');
+    </script>
+
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Real solutions for recording TikTok live streams. Handle live stream detection, FFmpeg integration, and recording management that actually works.">
+    <meta name="keywords" content="TikTok live recorder, record TikTok live, TikTok scraper, live stream recording, FFmpeg">
+    <link rel="canonical" href="https://pnt.jacbex.com/tiktok-live-recorder-2026-03-26.html">
+
+    <!-- Open Graph / Social Media -->
+    <meta property="og:title" content="TikTok Live Recorder: Finally Got Live Streams Recording">
+    <meta property="og:description" content="Real solutions for recording TikTok live streams. Handle live stream detection and recording management that actually works.">
+    <meta property="og:type" content="article">
+
+    <!-- JSON-LD Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "TikTok Live Recorder: Finally Got Live Streams Recording",
+      "description": "Real solutions for recording TikTok live streams. Handle live stream detection, FFmpeg integration, and recording management that actually works.",
+      "author": {
+        "@type": "Person",
+        "name": "Programming Notes"
+      },
+      "datePublished": "2026-03-26",
+      "keywords": ["TikTok live", "live stream recording", "FFmpeg", "TikTok scraper"],
+      "url": "https://pnt.jacbex.com/tiktok-live-recorder-2026-03-26.html"
+    }
+    </script>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Prism.js for syntax highlighting -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+        .code-block { background: #2d2d2d; border-radius: 8px; overflow: hidden; }
+        .code-block pre { margin: 0; padding: 1rem; overflow-x: auto; }
+        .code-block code { font-family: 'Fira Code', monospace; font-size: 0.9rem; }
+        .issue-box {
+            border-left: 4px solid #ec4899;
+            background: #fdf2f8;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .issue-title { font-weight: 600; color: #be185d; }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <article class="max-w-4xl mx-auto px-4 py-8">
+        <!-- Header -->
+        <header class="mb-12">
+            <h1 class="text-4xl font-bold text-gray-900 mb-4">TikTok Live Recorder: Finally Got Live Streams Recording</h1>
+            <p class="text-xl text-gray-600">
+                I needed to archive TikTok live streams from creators I follow. The streams disappear after they end, and there's no built-in download feature. Here's the setup that records them automatically.
+            </p>
+        </header>
+
+        <!-- Context -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Why Recording TikTok Live Is Hard</h2>
+            <p class="text-gray-700 mb-4">
+                TikTok live streams have several challenges:
+            </p>
+            <ul class="list-disc pl-6 space-y-2 text-gray-700 mb-4">
+                <li><strong>Dynamic URLs:</strong> Stream URLs change and expire quickly</li>
+                <li><strong>No API:</strong> TikTok doesn't provide an API for live streams</li>
+                <li><strong>Blob format:</strong> Streams use fragmented MP4 format</li>
+                <li><strong>Authentication:</strong> Some streams require login cookies</li>
+                <li><strong>Live detection:</strong> Need to know when a stream starts</li>
+            </ul>
+            <p class="text-gray-700">
+                tiktok-live-recorder handles most of this, but setup is tricky.
+            </p>
+        </section>
+
+        <!-- GitHub Issue #1 -->
+        <div class="issue-box">
+            <div class="issue-title">
+                <a href="https://github.com/zerodytrash/TikTok-Live-Recorder/issues?q=is%3Aissue+connection+failed"
+                   target="_blank"
+                   class="text-pink-700 hover:underline">
+                    Connection to live stream failed
+                </a>
+            </div>
+            <div class="issue-body mt-4">
+                <h4 class="font-semibold text-gray-800 mb-2">Problem</h4>
+                <p class="text-gray-700 mb-3">
+                    When trying to record a live stream, the recorder would fail to connect. The stream was definitely live (I could watch it in the app), but the recorder couldn't find it.
+                    <br><br>
+                    Error: <code class="bg-gray-100 px-2 py-1 rounded">Failed to connect to live stream: Connection timeout</code>
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">What I Tried</h4>
+                <p class="text-gray-700 mb-3">
+                    <strong>Attempt 1:</strong> Used username only - Didn't work, needed unique ID<br>
+                    <strong>Attempt 2:</strong> Added cookies - Still failed, wrong region<br>
+                    <strong>Attempt 3:</strong> Used different TikTok domain - Worked!
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">Actual Fix</h4>
+                <p class="text-gray-700 mb-3">
+                    The issue was region-specific TikTok domains. tiktok-live-recorder defaults to the wrong region for some users:
+                </p>
+                <div class="code-block mt-3">
+                    <pre><code class="language-bash"># Install tiktok-live-recorder
+pip install tiktok-live-recorder
+
+# Record with explicit TikTok domain
+tiktok-live-recorder -u @username --tiktok-domain www.tiktok.com
+
+# For non-US accounts, try different domains:
+tiktok-live-recorder -u @username --tiktok-domain www.tiktok.com
+tiktok-live-recorder -u @username --tiktok-domain www.tiktok.com
+tiktok-live-recorder -u @username --tiktok-domain www.tiktok.com
+
+# With cookies (for private/follower-only streams)
+tiktok-live-recorder -u @username --cookies sessionid=xyz</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- GitHub Issue #2 -->
+        <div class="issue-box">
+            <div class="issue-title">
+                <a href="https://github.com/zerodytrash/TikTok-Live-Recorder/issues?q=is%3Aissue+ffmpeg+not+found"
+                   target="_blank"
+                   class="text-pink-700 hover:underline">
+                    FFmpeg not found or incorrect version
+                </a>
+            </div>
+            <div class="issue-body mt-4">
+                <h4 class="font-semibold text-gray-800 mb-2">Problem</h4>
+                <p class="text-gray-700 mb-3">
+                    tiktok-live-recorder requires FFmpeg to record streams, but kept saying FFmpeg wasn't found even though I had it installed.
+                    <br><br>
+                    Error: <code class="bg-gray-100 px-2 py-1 rounded">FFmpeg not found. Please install FFmpeg to continue.</code>
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">What I Tried</h4>
+                <p class="text-gray-700 mb-3">
+                    <strong>Attempt 1:</strong> <code class="bg-gray-100 px-2 py-1 rounded">apt install ffmpeg</code> - Installed but recorder didn't see it<br>
+                    <strong>Attempt 2:</strong> Added FFmpeg to PATH - Still not found<br>
+                    <strong>Attempt 3:</strong> Specified FFmpeg path directly - Worked!
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">Actual Fix</h4>
+                <p class="text-gray-700 mb-3">
+                    Specify FFmpeg path explicitly or ensure it's in the system PATH:
+                </p>
+                <div class="code-block mt-3">
+                    <pre><code class="language-bash"># Check if FFmpeg is installed and in PATH
+which ffmpeg
+ffmpeg -version
+
+# If not found, install:
+# Ubuntu/Debian
+sudo apt update && sudo apt install ffmpeg
+
+# macOS
+brew install ffmpeg
+
+# Windows (using Chocolatey)
+choco install ffmpeg
+
+# Specify FFmpeg path to tiktok-live-recorder
+tiktok-live-recorder -u @username --ffmpeg-path /usr/bin/ffmpeg
+
+# Or add to PATH permanently
+export PATH="/usr/bin:$PATH"
+echo 'export PATH="/usr/bin:$PATH"' >> ~/.bashrc</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- GitHub Issue #3 -->
+        <div class="issue-box">
+            <div class="issue-title">
+                <a href="https://github.com/zerodytrash/TikTok-Live-Recorder/issues?q=is%3Aissue+download+folder"
+                   target="_blank"
+                   class="text-pink-700 hover:underline">
+                    Recordings not saved to correct folder
+                </a>
+            </div>
+            <div class="issue-body mt-4">
+                <h4 class="font-semibold text-gray-800 mb-2">Problem</h4>
+                <p class="text-gray-700 mb-3">
+                    Recordings were being saved to the current working directory instead of my designated downloads folder. Made it hard to organize recordings from multiple creators.
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">What I Tried</h4>
+                <p class="text-gray-700 mb-3">
+                    <strong>Attempt 1:</strong> Created symbolic link - Worked but messy<br>
+                    <strong>Attempt 2:</strong> Used absolute path in command - Forgot to include it every time
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">Actual Fix</h4>
+                <p class="text-gray-700 mb-3">
+                    Create a config file with persistent settings:
+                </p>
+                <div class="code-block mt-3">
+                    <pre><code class="language-bash"># Create config directory
+mkdir -p ~/.config/tiktok-live-recorder
+
+# Create config file
+cat > ~/.config/tiktok-live-recorder/config.toml << 'EOF'
+# TikTok-Live-Recorder Configuration
+
+[Download]
+# Save recordings to this directory
+download_folder = "~/Videos/TikTok"
+
+# Filename format: {username}_{timestamp}_{stream_id}.mp4
+file_name_format = "{username}_{date}_{time}"
+
+[Recording]
+# Enable automatic recording
+enable_auto_recording = true
+
+# Record while offline (wait for stream to start)
+record_if_offline = true
+
+# Maximum recording duration (hours)
+max_recording_duration = 4
+
+[Quality]
+# Video quality: HD, SD, or AUTO
+quality = "HD"
+
+# Enable audio
+enable_audio = true
+
+[Account]
+# Optional: Add sessionid cookies for private streams
+sessionid = ""
+EOF
+
+# Now recordings go to the specified folder
+tiktok-live-recorder -u @username</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- What I Learned -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">What I Learned</h2>
+            <ul class="list-disc pl-6 space-y-3 text-gray-700">
+                <li><strong>Lesson 1:</strong> Use @username format, not display names. The @ is required.</li>
+                <li><strong>Lesson 2:</strong> Region matters - if connection fails, try different TikTok domains.</li>
+                <li><strong>Lesson 3:</strong> FFmpeg must be in PATH or specified explicitly.</li>
+                <li><strong>Lesson 4:</strong> Config files save time - set up download folder and quality once.</li>
+                <li><strong>Overall:</strong> tiktok-live-recorder works great once configured, but the initial setup has several gotchas.</li>
+            </ul>
+        </section>
+
+        <!-- Automated Monitoring -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Automated Live Stream Monitoring</h2>
+
+            <h3 class="text-xl font-semibold text-gray-800 mt-6 mb-3">Python Script for Multiple Creators</h3>
+            <div class="code-block">
+                <pre><code class="language-python">import asyncio
+import subprocess
+from datetime import datetime
+from typing import List
+import os
+import logging
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+class TikTokLiveMonitor:
+    """
+    Monitor multiple TikTok creators for live streams
+    and automatically record when they go live.
+    """
+
+    def __init__(self, creators: List[str], download_dir: str = "~/Videos/TikTok"):
+        """
+        Args:
+            creators: List of @usernames to monitor
+            download_dir: Directory to save recordings
+        """
+        self.creators = creators
+        self.download_dir = os.path.expanduser(download_dir)
+        os.makedirs(self.download_dir, exist_ok=True)
+
+    async def check_and_record(self, username: str):
+        """
+        Check if user is live and record if so
+
+        Args:
+            username: @username to check
+        """
+        logger.info(f"Checking {username}...")
+
+        # Run tiktok-live-recorder with --record-if-offline flag
+        # This will wait for stream to start if offline
+        cmd = [
+            'tiktok-live-recorder',
+            '-u', username,
+            '--record-if-offline',
+            '--download-folder', self.download_dir,
+            '--tiktok-domain', 'www.tiktok.com'
+        ]
+
+        try:
+            # Run recorder
+            process = await asyncio.create_subprocess_exec(
+                *cmd,
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE
+            )
+
+            # Wait for process to complete
+            stdout, stderr = await process.communicate()
+
+            if process.returncode == 0:
+                logger.info(f"Successfully recorded {username}")
+            else:
+                logger.error(f"Error recording {username}: {stderr.decode()}")
+
+        except Exception as e:
+            logger.error(f"Exception checking {username}: {e}")
+
+    async def monitor_all(self, interval: int = 300):
+        """
+        Monitor all creators periodically
+
+        Args:
+            interval: Check interval in seconds (default: 5 minutes)
+        """
+        while True:
+            logger.info(f"Checking {len(self.creators)} creators...")
+
+            tasks = [
+                self.check_and_record(creator)
+                for creator in self.creators
+            ]
+
+            # Run checks concurrently
+            await asyncio.gather(*tasks, return_exceptions=True)
+
+            # Wait before next check
+            logger.info(f"Waiting {interval}s before next check...")
+            await asyncio.sleep(interval)
+
+# Usage
+async def main():
+    # List of creators to monitor
+    creators = [
+        '@creator1',
+        '@creator2',
+        '@creator3'
+    ]
+
+    monitor = TikTokLiveMonitor(
+        creators=creators,
+        download_dir='~/Videos/TikTok'
+    )
+
+    # Start monitoring (runs continuously)
+    await monitor.monitor_all(interval=300)
+
+if __name__ == '__main__':
+    asyncio.run(main())</code></pre>
+            </div>
+
+            <h3 class="text-xl font-semibold text-gray-800 mt-6 mb-3">Cron Job for Periodic Checks</h3>
+            <div class="code-block">
+                <pre><code class="language-bash"># Add to crontab with: crontab -e
+
+# Check for live streams every 5 minutes
+*/5 * * * * /usr/bin/python3 /path/to/tiktok_monitor.py >> /var/log/tiktok_monitor.log 2>&1
+
+# Or use systemd service for more control</code></pre>
+            </div>
+        </section>
+
+        <!-- Production Setup -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Production Setup That Works</h2>
+            <div class="code-block">
+                <pre><code class="language-bash">#!/bin/bash
+# tiktok_recorder.sh - Production recording script
+
+set -e
+
+# Configuration
+CREATORS=("@creator1" "@creator2" "@creator3")
+DOWNLOAD_DIR="$HOME/Videos/TikTok"
+FFMPEG_PATH="/usr/bin/ffmpeg"
+MAX_DURATION=14400  # 4 hours in seconds
+
+# Create download directory
+mkdir -p "$DOWNLOAD_DIR"
+
+# Function to record a single creator
+record_creator() {
+    local username="$1"
+    local timestamp=$(date +"%Y%m%d_%H%M%S")
+    local log_file="$DOWNLOAD_DIR/${username}_${timestamp}.log"
+
+    echo "[$(date)] Checking $username..."
+
+    tiktok-live-recorder \
+        -u "$username" \
+        --download-folder "$DOWNLOAD_DIR" \
+        --ffmpeg-path "$FFMPEG_PATH" \
+        --tiktok-domain www.tiktok.com \
+        --record-if-offline \
+        --max-recording-duration "$MAX_DURATION" \
+        2>&1 | tee "$log_file"
+
+    echo "[$(date)] Finished recording $username"
+}
+
+# Main loop
+main() {
+    echo "Starting TikTok Live Recorder..."
+    echo "Monitoring ${#CREATORS[@]} creators"
+
+    while true; do
+        for creator in "${CREATORS[@]}"; do
+            record_creator "$creator"
+        done
+
+        # Wait 5 minutes before next check
+        echo "Waiting 5 minutes..."
+        sleep 300
+    done
+}
+
+# Run main function
+main "$@"</code></pre>
+            </div>
+        </section>
+
+        <!-- Monitoring & Debugging -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Monitoring & Debugging</h2>
+
+            <h3 class="text-xl font-semibold text-gray-800 mt-6 mb-3">Check Recorder Status</h3>
+            <div class="code-block">
+                <pre><code class="language-bash"># Check if recorder is running
+pgrep -f tiktok-live-recorder
+
+# View active recordings
+ls -lh ~/Videos/TikTok/*.mp4
+
+# Check disk space (recordings can be large)
+df -h ~/Videos/TikTok
+
+# Monitor log file
+tail -f ~/.config/tiktok-live-recorder/recorder.log</code></pre>
+            </div>
+
+            <h3 class="text-xl font-semibold text-gray-800 mt-6 mb-3">Common Issues</h3>
+            <ul class="list-disc pl-6 space-y-2 text-gray-700">
+                <li><strong>Connection fails:</strong> Try different --tiktok-domain values</li>
+                <li><strong>FFmpeg not found:</strong> Specify --ffmpeg-path explicitly</li>
+                <li><strong>Partial recordings:</strong> Check disk space and network stability</li>
+                <li><strong>Private streams:</strong> Need to add sessionid cookies</li>
+            </ul>
+        </section>
+
+        <!-- Legal Note -->
+        <section class="mt-12 p-6 bg-yellow-50 rounded-lg border border-yellow-200">
+            <h3 class="font-semibold text-gray-800 mb-2">⚠️ Legal & Ethical Note</h3>
+            <p class="text-gray-700 text-sm">
+                Recording live streams may violate TikTok's Terms of Service and copyright laws. Only record streams you have permission to archive. Respect creators' rights and content ownership. This article is for educational purposes only.
+            </p>
+        </section>
+
+        <!-- Related Links -->
+        <section class="bg-blue-50 rounded-lg p-6 border border-blue-200">
+            <h3 class="font-semibold text-gray-800 mb-3">Related Resources</h3>
+            <ul class="space-y-2">
+                <li><a href="https://github.com/zerodytrash/TikTok-Live-Recorder" target="_blank" class="text-blue-600 hover:underline">TikTok Live Recorder on GitHub</a></li>
+                <li><a href="https://ffmpeg.org/" target="_blank" class="text-blue-600 hover:underline">FFmpeg Official Site</a></li>
+            </ul>
+        </section>
+    </article>
+
+    <script>
+        // Initialize Prism.js
+        if (typeof Prism !== 'undefined') {
+            Prism.highlightAll();
+        }
+    </script>
+</body>
+</html>

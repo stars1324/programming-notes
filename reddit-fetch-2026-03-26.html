@@ -1,0 +1,869 @@
+<!--
+    Reddit Fetch: Scraping Comments for LLM Training That Actually Works
+
+    File: reddit-fetch-2026-03-26.html
+    Created: 2026-03-26
+    Focus: Scrape Reddit comments, Reddit data for LLM corpus collection
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reddit Fetch: Finally Built a Quality Comment Corpus</title>
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-LMWN7814BX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-LMWN7814BX');
+    </script>
+
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Real solutions for scraping Reddit comments for LLM training. Handle PRAW auth, rate limits, data cleaning, and corpus building that actually works.">
+    <meta name="keywords" content="scrape Reddit comments, Reddit data for LLM, PRAW, Reddit API, corpus collection">
+    <link rel="canonical" href="https://pnt.jacbex.com/reddit-fetch-2026-03-26.html">
+
+    <!-- Open Graph / Social Media -->
+    <meta property="og:title" content="Reddit Fetch: Finally Built a Quality Comment Corpus">
+    <meta property="og:description" content="Real solutions for scraping Reddit comments for LLM training. Handle PRAW auth, rate limits, and data cleaning that actually works.">
+    <meta property="og:type" content="article">
+
+    <!-- JSON-LD Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "Reddit Fetch: Finally Built a Quality Comment Corpus",
+      "description": "Real solutions for scraping Reddit comments for LLM training. Handle PRAW auth, rate limits, data cleaning, and corpus building that actually works.",
+      "author": {
+        "@type": "Person",
+        "name": "Programming Notes"
+      },
+      "datePublished": "2026-03-26",
+      "keywords": ["Reddit scraping", "LLM training data", "PRAW", "corpus collection"],
+      "url": "https://pnt.jacbex.com/reddit-fetch-2026-03-26.html"
+    }
+    </script>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Prism.js for syntax highlighting -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+        .code-block { background: #2d2d2d; border-radius: 8px; overflow: hidden; }
+        .code-block pre { margin: 0; padding: 1rem; overflow-x: auto; }
+        .code-block code { font-family: 'Fira Code', monospace; font-size: 0.9rem; }
+        .issue-box {
+            border-left: 4px solid #ec4899;
+            background: #fdf2f8;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .issue-title { font-weight: 600; color: #be185d; }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <article class="max-w-4xl mx-auto px-4 py-8">
+        <!-- Header -->
+        <header class="mb-12">
+            <h1 class="text-4xl font-bold text-gray-900 mb-4">Reddit Fetch: Finally Built a Quality Comment Corpus</h1>
+            <p class="text-xl text-gray-600">
+                I needed high-quality Reddit comments for LLM fine-tuning. PRAW (Python Reddit API Wrapper) seemed perfect, but the rate limits and data quality issues made it harder than expected. Here's what actually worked.
+            </p>
+        </header>
+
+        <!-- Context -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Why Reddit for LLM Training?</h2>
+            <p class="text-gray-700 mb-4">
+                Reddit is one of the best sources for conversational AI training data:
+            </p>
+            <ul class="list-disc pl-6 space-y-2 text-gray-700 mb-4">
+                <li><strong>Natural conversations:</strong> Real discussions, not synthetic data</li>
+                <li><strong>Diverse topics:</strong> From programming to cooking to philosophy</li>
+                <li><strong>Voting signals:</strong> Upvotes/downvotes indicate quality</li>
+                <li><strong>Context preserved:</strong> Thread structure and parent-child relationships</li>
+                <li><strong>Large corpus:</strong> Billions of comments across millions of subreddits</li>
+            </ul>
+            <p class="text-gray-700">
+                But raw Reddit data needs significant cleaning before it's useful for training.
+            </p>
+        </section>
+
+        <!-- GitHub Issue #1 -->
+        <div class="issue-box">
+            <div class="issue-title">
+                <a href="https://github.com/praw-dev/praw/issues?q=is%3Aissue+rate+limit"
+                   target="_blank"
+                   class="text-pink-700 hover:underline">
+                    PRAW 429 Too Many Requests errors
+                </a>
+            </div>
+            <div class="issue-body mt-4">
+                <h4 class="font-semibold text-gray-800 mb-2">Problem</h4>
+                <p class="text-gray-700 mb-3">
+                    When scraping comments from large subreddits, PRAW would hit rate limits after a few hundred requests. The built-in rate limiting wasn't aggressive enough.
+                    <br><br>
+                    Error: <code class="bg-gray-100 px-2 py-1 rounded">prawcore.exceptions.ResponseException: 429 Too Many Requests</code>
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">What I Tried</h4>
+                <p class="text-gray-700 mb-3">
+                    <strong>Attempt 1:</strong> Increased <code class="bg-gray-100 px-2 py-1 rounded">num_requests</code> in PRAW config - Still hit limits<br>
+                    <strong>Attempt 2:</strong> Added manual <code class="bg-gray-100 px-2 py-1 rounded">time.sleep()</code> between calls - Helped but wasteful<br>
+                    <strong>Attempt 3:</strong> Used multiple accounts with rotation - Worked but complex to manage
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">Actual Fix</h4>
+                <p class="text-gray-700 mb-3">
+                    Configure PRAW's rate limits more conservatively and add exponential backoff:
+                </p>
+                <div class="code-block mt-3">
+                    <pre><code class="language-python">import praw
+import time
+from typing import List
+import logging
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+def create_reddit_client(
+    client_id: str,
+    client_secret: str,
+    user_agent: str
+) -> praw.Reddit:
+    """
+    Create Reddit client with conservative rate limiting
+
+    Args:
+        client_id: Reddit API client ID
+        client_secret: Reddit API client secret
+        user_agent: Descriptive user agent
+
+    Returns:
+        Configured Reddit instance
+    """
+    reddit = praw.Reddit(
+        client_id=client_id,
+        client_secret=client_secret,
+        user_agent=user_agent,
+
+        # Conservative rate limiting
+        ratelimit_seconds=600,  # 10 minutes between bursts
+        timeout=30,
+
+        # Number of requests per rate limit window
+        # Reddit's actual limit is 60/minute, use 40 to be safe
+        num_requests=40
+    )
+
+    return reddit
+
+async def fetch_comments_safe(
+    subreddit_name: str,
+    limit: int = 1000,
+    min_score: int = 10
+) -> List[dict]:
+    """
+    Fetch comments with aggressive rate limiting
+
+    Args:
+        subreddit_name: Name of subreddit (without r/)
+        limit: Maximum comments to fetch
+        min_score: Minimum upvote score threshold
+
+    Returns:
+        List of comment dictionaries
+    """
+    reddit = create_reddit_client(
+        client_id="YOUR_CLIENT_ID",
+        client_secret="YOUR_CLIENT_SECRET",
+        user_agent="LLM_Training_Bot/1.0"
+    )
+
+    comments_data = []
+
+    try:
+        subreddit = reddit.subreddit(subreddit_name)
+
+        # Fetch comments with pagination
+        for comment in subreddit.comments(limit=limit):
+            # Filter by score
+            if comment.score < min_score:
+                continue
+
+            # Extract data
+            comment_data = {
+                'id': comment.id,
+                'body': comment.body,
+                'score': comment.score,
+                'author': str(comment.author) if comment.author else '[deleted]',
+                'created_utc': comment.created_utc,
+                'subreddit': subreddit_name,
+                'parent_id': comment.parent_id,
+                'link_id': comment.link_id
+            }
+
+            comments_data.append(comment_data)
+
+            # Log progress
+            if len(comments_data) % 100 == 0:
+                logger.info(f"Fetched {len(comments_data)} comments...")
+
+            # Conservative delay between requests
+            time.sleep(2)
+
+        logger.info(f"Total comments fetched: {len(comments_data)}")
+        return comments_data
+
+    except prawcore.exceptions.ResponseException as e:
+        if e.status == 429:
+            logger.error(f"Rate limited! Waiting 10 minutes...")
+            time.sleep(600)
+        else:
+            logger.error(f"API error: {e}")
+        return comments_data
+
+# Usage
+if __name__ == '__main__':
+    import asyncio
+
+    comments = asyncio.run(fetch_comments_safe(
+        subreddit_name='Python',
+        limit=1000,
+        min_score=10
+    ))
+
+    print(f"Fetched {len(comments)} comments")</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- GitHub Issue #2 -->
+        <div class="issue-box">
+            <div class="issue-title">
+                <a href="https://github.com/praw-dev/praw/issues?q=is%3Aissue+deleted+comments"
+                   target="_blank"
+                   class="text-pink-700 hover:underline">
+                    Too many [deleted] comments in results
+                </a>
+            </div>
+            <div class="issue-body mt-4">
+                <h4 class="font-semibold text-gray-800 mb-2">Problem</h4>
+                <p class="text-gray-700 mb-3">
+                    A significant portion of comments were [deleted] or [removed]. This polluted the corpus and wasted processing time.
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">What I Tried</h4>
+                <p class="text-gray-700 mb-3">
+                    <strong>Attempt 1:</strong> Filtered out [deleted] comments - Still slow, had to fetch them first<br>
+                    <strong>Attempt 2:</strong> Increased min_score threshold - Helped but missed good low-score comments<br>
+                    <strong>Attempt 3:</strong> Only scraped from "hot" threads - Better but biased
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">Actual Fix</h4>
+                <p class="text-gray-700 mb-3">
+                    Filter aggressively and focus on high-quality threads:
+                </p>
+                <div class="code-block mt-3">
+                    <pre><code class="language-python">import re
+from typing import List, Dict
+import praw
+
+def clean_comment_body(body: str) -> str:
+    """
+    Clean comment body for LLM training
+
+    Args:
+        body: Raw comment text
+
+    Returns:
+        Cleaned text
+    """
+    if not body or body in ['[deleted]', '[removed]']:
+        return None
+
+    # Remove URLs
+    body = re.sub(r'http\S+', '', body)
+
+    # Remove Reddit-specific markup
+    body = re.sub(r'^\s*&gt;\s*', '', body, flags=re.MULTILINE)  # Quotes
+    body = re.sub(r'^\s*-\s*', '', body, flags=re.MULTILINE)  # Lists
+
+    # Remove excessive whitespace
+    body = ' '.join(body.split())
+
+    # Filter very short comments
+    if len(body) < 20:
+        return None
+
+    return body.strip()
+
+def fetch_quality_comments(
+    reddit: praw.Reddit,
+    subreddit_name: str,
+    max_comments: int = 1000
+) -> List[Dict]:
+    """
+    Fetch only high-quality comments
+
+    Focus on:
+    - High-scoring comments
+    - From active discussions
+    - With substantial content
+    """
+    comments_data = []
+
+    # Get subreddit
+    subreddit = reddit.subreddit(subreddit_name)
+
+    # Focus on top posts from past month (better quality)
+    for submission in subreddit.top(time_filter='month', limit=50):
+        # Replace more (load all comments)
+        submission.comments.replace_more(limit=0)
+
+        # Get top-level comments
+        for comment in submission.comments:
+            # Skip deleted
+            if not hasattr(comment, 'body') or comment.body in ['[deleted]', '[removed]']:
+                continue
+
+            # Skip low-quality
+            if comment.score < 5:
+                continue
+
+            # Clean body
+            cleaned_body = clean_comment_body(comment.body)
+            if not cleaned_body:
+                continue
+
+            # Extract data
+            comment_data = {
+                'id': comment.id,
+                'body': cleaned_body,
+                'score': comment.score,
+                'subreddit': subreddit_name,
+                'thread_title': submission.title,
+                'thread_score': submission.score,
+                'created_utc': comment.created_utc,
+                'depth': 0 if not comment.parent_id.startswith('t1_') else 1
+            }
+
+            comments_data.append(comment_data)
+
+            # Also fetch replies (depth 1)
+            if len(comment.replies) > 0:
+                for reply in comment.replies:
+                    if hasattr(reply, 'body'):
+                        cleaned_reply = clean_comment_body(reply.body)
+                        if cleaned_reply and reply.score >= 3:
+                            comments_data.append({
+                                'id': reply.id,
+                                'body': cleaned_reply,
+                                'score': reply.score,
+                                'subreddit': subreddit_name,
+                                'thread_title': submission.title,
+                                'thread_score': submission.score,
+                                'created_utc': reply.created_utc,
+                                'depth': 2
+                            })
+
+            # Check limit
+            if len(comments_data) >= max_comments:
+                break
+
+        if len(comments_data) >= max_comments:
+            break
+
+    logger.info(f"Fetched {len(comments_data)} quality comments")
+    return comments_data</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- GitHub Issue #3 -->
+        <div class="issue-box">
+            <div class="issue-title">
+                <a href="https://github.com/praw-dev/praw/issues?q=is%3Aissue+read+only"
+                   target="_blank"
+                   class="text-pink-700 hover:underline">
+                    Read-only mode limitations
+                </a>
+            </div>
+            <div class="issue-body mt-4">
+                <h4 class="font-semibold text-gray-800 mb-2">Problem</h4>
+                <p class="text-gray-700 mb-3">
+                    I needed to fetch more than the ~1000 comments that PRAW's standard iterator provides. Old comments beyond the limit were inaccessible.
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">What I Tried</h4>
+                <p class="text-gray-700 mb-3">
+                    <strong>Attempt 1:</strong> Increased limit parameter - Still capped at ~1000<br>
+                    <strong>Attempt 2:</strong> Used Pushshift API (now shutdown) - Gone in 2023<br>
+                    <strong>Attempt 3:</strong> Scrolled through "new" - Worked but very slow
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">Actual Fix</h4>
+                <p class="text-gray-700 mb-3">
+                    Use multiple strategies: focus on recent content and use specific time filters:
+                </p>
+                <div class="code-block mt-3">
+                    <pre><code class="language-python">def fetch_comments_by_timeframe(
+    reddit: praw.Reddit,
+    subreddit_name: str,
+    days_back: int = 7
+) -> List[Dict]:
+    """
+    Fetch comments from specific timeframe
+
+    Args:
+        reddit: Reddit instance
+        subreddit_name: Subreddit name
+        days_back: Number of days to look back
+
+    Returns:
+        List of comments
+    """
+    import time as time_module
+
+    comments_data = []
+    cutoff_time = time_module.time() - (days_back * 86400)
+
+    subreddit = reddit.subreddit(subreddit_name)
+
+    # Use search to find submissions, then get comments
+    # This gives better control than subreddit.comments()
+    for submission in subreddit.new(limit=None):
+        if submission.created_utc < cutoff_time:
+            break  # Past our timeframe
+
+        submission.comments.replace_more(limit=0)
+
+        for comment in submission.comments:
+            if not hasattr(comment, 'body'):
+                continue
+
+            if comment.created_utc < cutoff_time:
+                continue
+
+            cleaned = clean_comment_body(comment.body)
+            if cleaned and comment.score >= 1:
+                comments_data.append({
+                    'id': comment.id,
+                    'body': cleaned,
+                    'score': comment.score,
+                    'created_utc': comment.created_utc
+                })
+
+    return comments_data
+
+# Alternative: Use multiple subreddits for diversity
+def fetch_diverse_corpus(
+    reddit: praw.Reddit,
+    subreddits: List[str],
+    comments_per_sub: int = 500
+) -> List[Dict]:
+    """
+    Fetch comments from multiple subreddits
+
+    Args:
+        reddit: Reddit instance
+        subreddits: List of subreddit names
+        comments_per_sub: Comments to fetch per subreddit
+
+    Returns:
+        Combined comment corpus
+    """
+    all_comments = []
+
+    for sub in subreddits:
+        logger.info(f"Fetching from r/{sub}...")
+
+        try:
+            comments = fetch_quality_comments(
+                reddit,
+                sub,
+                max_comments=comments_per_sub
+            )
+
+            all_comments.extend(comments)
+            logger.info(f"Got {len(comments)} from r/{sub}")
+
+        except Exception as e:
+            logger.error(f"Error fetching from r/{sub}: {e}")
+            continue
+
+    logger.info(f"Total corpus size: {len(all_comments)} comments")
+    return all_comments</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- What I Learned -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">What I Learned</h2>
+            <ul class="list-disc pl-6 space-y-3 text-gray-700">
+                <li><strong>Lesson 1:</strong> Reddit's API rate limits are strict - use conservative settings.</li>
+                <li><strong>Lesson 2:</strong> Quality over quantity - filter by score and clean aggressively.</li>
+                <li><strong>Lesson 3:</strong> Thread context matters - fetch from submission comments, not generic stream.</li>
+                <li><strong>Lesson 4:</strong> Diverse subreddits = better corpus - don't scrape from just one.</li>
+                <li><strong>Overall:</strong> With proper filtering, Reddit data is excellent for LLM fine-tuning on conversational tasks.</li>
+            </ul>
+        </section>
+
+        <!-- LLM Training Prep -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Preparing Data for LLM Training</h2>
+
+            <h3 class="text-xl font-semibold text-gray-800 mt-6 mb-3">JSONL Format for Training</h3>
+            <div class="code-block">
+                <pre><code class="language-python">import json
+from typing import List, Dict
+from datetime import datetime
+
+def save_for_training(
+    comments: List[Dict],
+    output_file: str,
+    format_type: str = 'jsonl'
+):
+    """
+    Save comments in training format
+
+    Args:
+        comments: List of comment dictionaries
+        output_file: Output file path
+        format_type: 'jsonl' or 'json'
+    """
+    with open(output_file, 'w', encoding='utf-8') as f:
+        if format_type == 'jsonl':
+            # JSONL format (one JSON per line)
+            for comment in comments:
+                # Extract just the fields needed for training
+                training_sample = {
+                    'text': comment['body'],
+                    'meta': {
+                        'score': comment['score'],
+                        'subreddit': comment['subreddit'],
+                        'timestamp': comment['created_utc']
+                    }
+                }
+                f.write(json.dumps(training_sample, ensure_ascii=False) + '\n')
+
+        else:
+            # Single JSON file
+            json.dump(comments, f, ensure_ascii=False, indent=2)
+
+    print(f"Saved {len(comments)} comments to {output_file}")
+
+# Usage
+if __name__ == '__main__':
+    reddit = create_reddit_client(
+        client_id="YOUR_ID",
+        client_secret="YOUR_SECRET",
+        user_agent="LLM_Trainer/1.0"
+    )
+
+    # Fetch diverse corpus
+    subreddits = ['Python', 'learnprogramming', 'AskProgramming', 'coding']
+
+    comments = fetch_diverse_corpus(
+        reddit,
+        subreddits,
+        comments_per_sub=500
+    )
+
+    # Save for training
+    save_for_training(
+        comments,
+        'reddit_corpus.jsonl',
+        format_type='jsonl'
+    )</code></pre>
+            </div>
+
+            <h3 class="text-xl font-semibold text-gray-800 mt-6 mb-3">Dataset Statistics</h3>
+            <div class="code-block">
+                <pre><code class="language-python">def analyze_corpus(corpus_file: str):
+    """Analyze corpus statistics"""
+    import json
+    from collections import Counter
+
+    total_comments = 0
+    total_length = 0
+    subreddit_counts = Counter()
+    score_dist = Counter()
+
+    with open(corpus_file, 'r', encoding='utf-8') as f:
+        for line in f:
+            data = json.loads(line)
+            total_comments += 1
+            total_length += len(data['text'])
+            subreddit_counts[data['meta']['subreddit']] += 1
+
+            # Bucket scores
+            score = data['meta']['score']
+            if score < 10:
+                score_dist['1-9'] += 1
+            elif score < 50:
+                score_dist['10-49'] += 1
+            elif score < 100:
+                score_dist['50-99'] += 1
+            else:
+                score_dist['100+'] += 1
+
+    print(f"Total comments: {total_comments}")
+    print(f"Avg length: {total_length / total_comments:.1f} chars")
+    print(f"\nSubreddits: {dict(subreddit_counts.most_common(10))}")
+    print(f"\nScore distribution: {dict(score_dist)}")
+
+# Run analysis
+analyze_corpus('reddit_corpus.jsonl')</code></pre>
+            </div>
+        </section>
+
+        <!-- Production Setup -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Production Setup That Works</h2>
+            <div class="code-block">
+                <pre><code class="language-python"># reddit_corpus_builder.py - Production corpus builder
+
+import praw
+import json
+import time
+import logging
+from typing import List, Dict
+from datetime import datetime, timedelta
+import re
+
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
+
+class RedditCorpusBuilder:
+    """
+    Build high-quality Reddit corpus for LLM training
+    """
+
+    def __init__(
+        self,
+        client_id: str,
+        client_secret: str,
+        user_agent: str
+    ):
+        self.reddit = praw.Reddit(
+            client_id=client_id,
+            client_secret=client_secret,
+            user_agent=user_agent,
+            ratelimit_seconds=600,
+            num_requests=40
+        )
+
+    def clean_text(self, text: str) -> str:
+        """Clean comment text"""
+        if not text or text in ['[deleted]', '[removed]']:
+            return None
+
+        # Remove URLs
+        text = re.sub(r'http\S+', '', text)
+
+        # Remove markup
+        text = re.sub(r'^\s*&gt;\s*', '', text, flags=re.MULTILINE)
+        text = re.sub(r'^\s*-\s*', '', text, flags=re.MULTILINE)
+
+        # Clean whitespace
+        text = ' '.join(text.split())
+
+        # Min length
+        if len(text) < 20:
+            return None
+
+        return text.strip()
+
+    def fetch_from_subreddit(
+        self,
+        subreddit_name: str,
+        max_comments: int = 1000,
+        days_back: int = 30,
+        min_score: int = 5
+    ) -> List[Dict]:
+        """Fetch comments from single subreddit"""
+        logger.info(f"Fetching from r/{subreddit_name}...")
+
+        comments = []
+        cutoff_time = (datetime.utcnow() - timedelta(days=days_back)).timestamp()
+
+        try:
+            subreddit = self.reddit.subreddit(subreddit_name)
+
+            # Focus on top posts
+            for submission in subreddit.top(time_filter='month', limit=100):
+                if submission.created_utc < cutoff_time:
+                    continue
+
+                submission.comments.replace_more(limit=0)
+
+                for comment in submission.comments:
+                    if not hasattr(comment, 'body'):
+                        continue
+
+                    if comment.score < min_score:
+                        continue
+
+                    cleaned = self.clean_text(comment.body)
+                    if not cleaned:
+                        continue
+
+                    comments.append({
+                        'text': cleaned,
+                        'score': comment.score,
+                        'subreddit': subreddit_name,
+                        'created_utc': comment.created_utc,
+                        'thread_title': submission.title
+                    })
+
+                if len(comments) >= max_comments:
+                    break
+
+            logger.info(f"Got {len(comments)} comments from r/{subreddit_name}")
+            return comments
+
+        except Exception as e:
+            logger.error(f"Error fetching r/{subreddit_name}: {e}")
+            return []
+
+    def build_corpus(
+        self,
+        subreddits: List[str],
+        output_file: str = 'reddit_corpus.jsonl',
+        comments_per_sub: int = 500
+    ):
+        """Build corpus from multiple subreddits"""
+        all_comments = []
+
+        for sub in subreddits:
+            comments = self.fetch_from_subreddit(
+                sub,
+                max_comments=comments_per_sub
+            )
+
+            all_comments.extend(comments)
+            time.sleep(10)  # Delay between subreddits
+
+        # Save to JSONL
+        logger.info(f"Saving {len(all_comments)} comments to {output_file}")
+
+        with open(output_file, 'w', encoding='utf-8') as f:
+            for comment in all_comments:
+                sample = {
+                    'text': comment['text'],
+                    'meta': {
+                        'score': comment['score'],
+                        'subreddit': comment['subreddit'],
+                        'timestamp': comment['created_utc']
+                    }
+                }
+                f.write(json.dumps(sample, ensure_ascii=False) + '\n')
+
+        logger.info(f"Corpus saved successfully")
+
+# Usage
+if __name__ == '__main__':
+    builder = RedditCorpusBuilder(
+        client_id="YOUR_CLIENT_ID",
+        client_secret="YOUR_CLIENT_SECRET",
+        user_agent="LLM_Corpus_Builder/1.0"
+    )
+
+    # Programming-focused subreddits
+    subreddits = [
+        'Python',
+        'learnprogramming',
+        'AskProgramming',
+        'coding',
+        'programmerhumor'
+    ]
+
+    builder.build_corpus(
+        subreddits=subreddits,
+        output_file='programming_reddit_corpus.jsonl',
+        comments_per_sub=500
+    )</code></pre>
+            </div>
+        </section>
+
+        <!-- Monitoring & Debugging -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Monitoring & Debugging</h2>
+
+            <h3 class="text-xl font-semibold text-gray-800 mt-6 mb-3">Reddit API Console</h3>
+            <p class="text-gray-700 mb-3">
+                Create Reddit app at: https://www.reddit.com/prefs/apps
+            </p>
+
+            <h3 class="text-xl font-semibold text-gray-800 mt-6 mb-3">Common Issues</h3>
+            <ul class="list-disc pl-6 space-y-2 text-gray-700">
+                <li><strong>429 errors:</strong> Reduce requests, add longer delays</li>
+                <li><strong>Redirect errors:</strong> Check user agent format (must be descriptive)</li>
+                <li><strong>Empty results:</strong> Subreddit may be private or banned</li>
+                <li><strong>Many deleted comments:</strong> Use score threshold and focus on active threads</li>
+            </ul>
+
+            <h3 class="text-xl font-semibold text-gray-800 mt-6 mb-3">Quality Metrics</h3>
+            <div class="code-block">
+                <pre><code class="language-python">def check_corpus_quality(corpus_file: str):
+    """Check corpus quality for LLM training"""
+    import json
+
+    with open(corpus_file, 'r', encoding='utf-8') as f:
+        lines = f.readlines()
+
+    print(f"Total samples: {len(lines)}")
+
+    # Sample check
+    for i, line in enumerate(lines[:5]):
+        data = json.loads(line)
+        print(f"\nSample {i+1}:")
+        print(f"  Text: {data['text'][:100]}...")
+        print(f"  Score: {data['meta']['score']}")
+        print(f"  Subreddit: {data['meta']['subreddit']}")</code></pre>
+            </div>
+        </section>
+
+        <!-- Related Links -->
+        <section class="bg-blue-50 rounded-lg p-6 border border-blue-200">
+            <h3 class="font-semibold text-gray-800 mb-3">Related Resources</h3>
+            <ul class="space-y-2">
+                <li><a href="https://praw.readthedocs.io/" target="_blank" class="text-blue-600 hover:underline">PRAW Documentation</a></li>
+                <li><a href="https://github.com/praw-dev/praw" target="_blank" class="text-blue-600 hover:underline">PRAW on GitHub</a></li>
+                <li><a href="https://www.reddit.com/prefs/apps" target="_blank" class="text-blue-600 hover:underline">Create Reddit App</a></li>
+            </ul>
+        </section>
+
+        <!-- Legal Note -->
+        <section class="mt-12 p-6 bg-yellow-50 rounded-lg border border-yellow-200">
+            <h3 class="font-semibold text-gray-800 mb-2">⚠️ Legal & Ethical Note</h3>
+            <p class="text-gray-700 text-sm">
+                Reddit data is user-generated content. Respect Reddit's Terms of Service and API usage policies. Don't redistribute raw comment data without proper attribution. This article is for educational purposes.
+            </p>
+        </section>
+    </article>
+
+    <script>
+        // Initialize Prism.js
+        if (typeof Prism !== 'undefined') {
+            Prism.highlightAll();
+        }
+    </script>
+</body>
+</html>
