@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coolify: Self-Hosted Heroku Alternative That Actually Works</title>
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-LMWN7814BX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-LMWN7814BX');
+    </script>
+
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Deploy apps on your VPS with Coolify, a self-hosted Heroku alternative. Real production setup with Docker, automatic SSL, and GitHub integration.">
+    <meta name="keywords" content="Coolify, self-hosted Heroku, deploy apps on VPS, Docker deployment, PaaS alternative, VPS hosting">
+    <link rel="canonical" href="https://pnt.jacbex.com/coolify-2026-03-31.html">
+
+    <!-- Open Graph / Social Media -->
+    <meta property="og:title" content="Coolify: Self-Hosted Heroku Alternative That Actually Works">
+    <meta property="og:description" content="Deploy apps on your VPS with Coolify. Real production setup with Docker, SSL, and GitHub integration.">
+    <meta property="og:type" content="article">
+
+    <!-- JSON-LD Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "Coolify: Self-Hosted Heroku Alternative That Actually Works",
+      "description": "Deploy apps on your VPS with Coolify, a self-hosted Heroku alternative with real production setup",
+      "author": {
+        "@type": "Person",
+        "name": "Programming Notes"
+      },
+      "datePublished": "2026-03-31",
+      "keywords": ["Coolify", "self-hosted Heroku", "Docker deployment", "VPS hosting", "PaaS"],
+      "url": "https://pnt.jacbex.com/coolify-2026-03-31.html"
+    }
+    </script>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Prism.js for syntax highlighting -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-yaml.min.js"></script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+        .code-block { background: #2d2d2d; border-radius: 8px; overflow: hidden; }
+        .code-block pre { margin: 0; padding: 1rem; overflow-x: auto; }
+        .code-block code { font-family: 'Fira Code', monospace; font-size: 0.9rem; }
+        .issue-box {
+            border-left: 4px solid #ec4899;
+            background: #fdf2f8;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .issue-title { font-weight: 600; color: #be185d; }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <article class="max-w-4xl mx-auto px-4 py-8">
+        <!-- Header -->
+        <header class="mb-12">
+            <h1 class="text-4xl font-bold text-gray-900 mb-4">Coolify: Self-Hosted Heroku Alternative That Actually Works</h1>
+            <p class="text-xl text-gray-600">
+                After months of paying Heroku's inflated prices, I finally moved all my side projects to Coolify on a $5/month VPS.
+                The transition wasn't smooth sailing, but I now have a fully functional PaaS that costs pennies to run.
+            </p>
+        </header>
+
+        <!-- GitHub Issue #1 -->
+        <div class="issue-box">
+            <div class="issue-title">
+                <a href="https://github.com/coollabsio/coolify/issues?q=is%3Aissue+SSL+certificate+failed"
+                   target="_blank"
+                   class="text-pink-700 hover:underline">
+                    SSL Certificate Not Auto-Renewing for Custom Domains
+                </a>
+            </div>
+            <div class="issue-body mt-4">
+                <h4 class="font-semibold text-gray-800 mb-2">Problem</h4>
+                <p class="text-gray-700 mb-3">
+                    I had Coolify running on a DigitalOcean droplet, connected my custom domain, and the SSL cert generated fine.
+                    Two months later, visitors started seeing security warnings. The certificate had expired and wasn't renewing.
+                    <br><br>
+                    Error: <code class="bg-gray-100 px-2 py-1 rounded">SSL certificate expired. Failed to renew: ACME challenge timed out</code>
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">What I Tried</h4>
+                <p class="text-gray-700 mb-3">
+                    <strong>Attempt 1:</strong> Clicked "Force Renew" in the Coolify dashboard - got the same timeout error.<br>
+                    <strong>Attempt 2:</strong> Checked if port 80 was blocked - it wasn't, Nginx was listening fine.<br>
+                    <strong>Attempt 3:</strong> Tried switching from Let's Encrypt to ZeroSSL - still failed.
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">Actual Fix</h4>
+                <p class="text-gray-700 mb-3">
+                    The issue was that my DNS provider (Cloudflare) was proxying traffic through their own SSL,
+                    which broke the ACME challenge. I needed to either use Cloudflare's Origin certificates
+                    or set DNS-only mode during the initial cert generation.
+                </p>
+                <div class="code-block mt-3">
+                    <pre><code class="language-bash"># In Cloudflare DNS settings:
+# 1. Click the orange cloud icon to turn it grey (DNS-only)
+# 2. Wait 5 minutes for DNS propagation
+# 3. Go to Coolify dashboard → Application → Domains
+# 4. Click "Force Renew SSL Certificate"
+
+# Or use Cloudflare Origin Certificate:
+# 1. Get cert from Cloudflare SSL/TLS → Origin Server → Create
+# 2. In Coolify, add custom certificate instead of Let's Encrypt
+# 3. Keep Cloudflare proxy enabled (orange cloud)</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- GitHub Issue #2 -->
+        <div class="issue-box">
+            <div class="issue-title">
+                <a href="https://github.com/coollabsio/coolify/issues?q=is%3Aissue+out+of+memory"
+                   target="_blank"
+                   class="text-pink-700 hover:underline">
+                    Coolify Keeps Crashing Due to Out of Memory
+                </a>
+            </div>
+            <div class="issue-body mt-4">
+                <h4 class="font-semibold text-gray-800 mb-2">Problem</h4>
+                <p class="text-gray-700 mb-3">
+                    Running Coolify on a 1GB RAM VPS with 3 small Node.js apps. The Coolify container kept getting OOM killed
+                    every few days, taking down all my apps with it.
+                    <br><br>
+                    <code class="bg-gray-100 px-2 py-1 rounded">docker ps</code> showed Coolify constantly restarting.
+                    <code class="bg-gray-100 px-2 py-1 rounded">docker logs coolify</code> revealed JavaScript heap out of memory errors.
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">What I Tried</h4>
+                <p class="text-gray-700 mb-3">
+                    <strong>Attempt 1:</strong> Added swap space - helped for a week, then crashes resumed.<br>
+                    <strong>Attempt 2:</strong> Tried limiting individual app memory - didn't reduce Coolify's usage.<br>
+                    <strong>Attempt 3:</strong> Removed unused Docker images and volumes - freed disk space but not RAM.
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">Actual Fix</h4>
+                <p class="text-gray-700 mb-3">
+                    Coolify itself runs on a resource-heavy stack (Nuxt.js + SQLite). The solution is to:
+                    1) Add a properly sized swap file, and 2) Limit the number of concurrent build operations.
+                    Also, monitoring showed that builds were the RAM spike trigger - not the runtime.
+                </p>
+                <div class="code-block mt-3">
+                    <pre><code class="language-bash"># Create 4GB swap file (do this, not 1GB like I first tried)
+sudo fallocate -l 4G /swapfile
+sudo chmod 600 /swapfile
+sudo mkswap /swapfile
+sudo swapon /swapfile
+echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
+
+# Reduce swapiness to prefer RAM over swap
+sudo sysctl vm.swappiness=10
+echo 'vm.swappiness=10' | sudo tee -a /etc/sysctl.conf
+
+# In Coolify: Settings → General → Concurrent builds
+# Set to 1 instead of default 3
+
+# Restart Coolify
+cd /opt/coolify
+docker-compose down && docker-compose up -d</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- GitHub Issue #3 -->
+        <div class="issue-box">
+            <div class="issue-title">
+                <a href="https://github.com/coollabsio/coolify/issues?q=is%3Aissue+GitHub+webhook+not+triggering"
+                   target="_blank"
+                   class="text-pink-700 hover:underline">
+                    GitHub Webhooks Not Triggering Deployments
+                </a>
+            </div>
+            <div class="issue-body mt-4">
+                <h4 class="font-semibold text-gray-800 mb-2">Problem</h4>
+                <p class="text-gray-700 mb-3">
+                    Connected my GitHub repo to Coolify, set up the webhook URL in GitHub repo settings.
+                    Pushing to main branch did nothing - no deployment, no logs, no error.
+                    GitHub webhook delivery showed "200 OK" but Coolify wasn't doing anything.
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">What I Tried</h4>
+                <p class="text-gray-700 mb-3">
+                    <strong>Attempt 1:</strong> Re-created the webhook in GitHub multiple times - same result.<br>
+                    <strong>Attempt 2:</strong> Checked Coolify logs - showed webhook received but "branch not configured".<br>
+                    <strong>Attempt 3:</strong> Set branch to "*" thinking wildcard would work - it didn't.
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">Actual Fix</h4>
+                <p class="text-gray-700 mb-3">
+                    In Coolify v3+, you need to explicitly configure the webhook branch in the application settings.
+                    The UI has a "Webhook" tab where you must set the exact branch name (case-sensitive).
+                    Also, the GitHub App integration is more reliable than manual webhook URLs.
+                </p>
+                <div class="code-block mt-3">
+                    <pre><code class="language-bash"># Recommended: Use GitHub App Integration instead of webhooks
+# 1. In Coolify: Settings → Source → GitHub → Install GitHub App
+# 2. Select your repos when prompted
+# 3. In application: Source → Connect via GitHub App
+# 4. Choose branch: "main" (exact match, not "Main")
+
+# If using manual webhooks, check the preview URL format:
+# https://your-coolify-domain.com/api/v1/webhooks/preview/{source-id}
+# The source-id must match your application ID</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- What I Learned Section -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">What I Learned</h2>
+            <ul class="list-disc pl-6 space-y-3 text-gray-700">
+                <li><strong>Lesson 1:</strong> Cloudflare proxy and Let's Encrypt don't mix - use DNS-only mode during cert generation or Cloudflare Origin certs.</li>
+                <li><strong>Lesson 2:</strong> Coolify needs at minimum 2GB RAM or 1GB RAM + 4GB swap for production use with multiple apps.</li>
+                <li><strong>Lesson 3:</strong> The GitHub App integration is way more reliable than manual webhooks - use it if possible.</li>
+                <li><strong>Overall:</strong> Coolify is powerful but resource-hungry. For a single VPS with multiple apps,
+                    monitor RAM usage closely and consider using external databases instead of running everything on one box.</li>
+            </ul>
+        </section>
+
+        <!-- Production Setup -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Production Setup</h2>
+            <p class="text-gray-700 mb-4">
+                Here's the complete setup that's been working for me on a $5/month DigitalOcean droplet
+                (1GB RAM, 25GB SSD, 1TB transfer). Running 3 Node.js apps and a PostgreSQL database.
+            </p>
+
+            <div class="code-block">
+                <pre><code class="language-bash"># 1. Initial server setup (Ubuntu 22.04)
+curl -fsSL https://get.docker.com | sh
+usermod -aG docker $USER
+
+# 2. Create swap before installing Coolify
+sudo fallocate -l 4G /swapfile
+sudo chmod 600 /swapfile
+sudo mkswap /swapfile
+sudo swapon /swapfile
+echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
+sudo sysctl vm.swappiness=10
+
+# 3. Install Coolify via their script
+curl -fsSL https://cdn.coollabs.io/coolify/install.sh | bash
+
+# 4. Configure DNS (example for Cloudflare)
+# - A record: coolify.yourdomain.com → your VPS IP
+# - A record: *.apps.yourdomain.com → your VPS IP
+# - Set proxy to DNS-only (grey cloud) for initial SSL
+
+# 5. First-time setup
+# - Access https://coolify.yourdomain.com
+# - Create admin account
+# - Configure domains and email
+
+# 6. Configure resources in Coolify
+# - Settings → General → Concurrent builds: 1
+# - Each app: Add resource limits (512MB RAM per app)
+
+# 7. Connect GitHub via GitHub App (most reliable)
+# Settings → Source → GitHub → Install GitHub App
+
+# 8. Deploy your first app
+# - New Resource → Application → From GitHub
+# - Select repo and branch
+# - Set build command: npm run build
+# - Set start command: npm start
+# - Set port: 3000 (or your app's port)
+# - Click Deploy</code></pre>
+            </div>
+        </section>
+
+        <!-- Monitoring & Debugging -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Monitoring & Debugging</h2>
+            <p class="text-gray-700 mb-4">
+                Keep an eye on these metrics to avoid the issues I ran into:
+            </p>
+
+            <h3 class="text-xl font-semibold text-gray-800 mt-6 mb-3">Essential Commands</h3>
+            <div class="code-block mb-4">
+                <pre><code class="language-bash"># Check Coolify logs
+docker logs -f coolify --tail 100
+
+# Check all container resource usage
+docker stats
+
+# Check if swap is being used (swpd > 0 means RAM pressure)
+free -h
+
+# Check disk space (Docker images can accumulate)
+df -h
+
+# Restart Coolify if it becomes unresponsive
+cd /opt/coolify && docker-compose restart</code></pre>
+            </div>
+
+            <h3 class="text-xl font-semibold text-gray-800 mt-6 mb-3">Red Flags to Watch For</h3>
+            <ul class="list-disc pl-6 space-y-2 text-gray-700">
+                <li>Swap usage consistently above 50% - need more RAM or fewer apps</li>
+                <li>Coolify container restarting more than once per day - memory leak or OOM</li>
+                <li>Build failures with "write: no space left on device" - cleanup Docker images</li>
+                <li>Webhook timeouts during GitHub pushes - check network connectivity</li>
+            </ul>
+        </section>
+
+        <!-- Related Links -->
+        <section class="bg-blue-50 rounded-lg p-6 border border-blue-200">
+            <h3 class="font-semibold text-gray-800 mb-3">Related Resources</h3>
+            <ul class="space-y-2">
+                <li><a href="nginx-proxy-manager.html" class="text-blue-600 hover:underline">Nginx Proxy Manager: Alternative for Reverse Proxy</a></li>
+                <li><a href="portainer.html" class="text-blue-600 hover:underline">Portainer: Docker Container Management UI</a></li>
+                <li><a href="https://github.com/coollabsio/coolify" target="_blank" class="text-blue-600 hover:underline">Coolify Official GitHub Repository</a></li>
+                <li><a href="https://coolify.io/docs" target="_blank" class="text-blue-600 hover:underline">Official Documentation</a></li>
+            </ul>
+        </section>
+    </article>
+
+    <script>
+        // Initialize Prism.js
+        if (typeof Prism !== 'undefined') {
+            Prism.highlightAll();
+        }
+    </script>
+</body>
+</html>

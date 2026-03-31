@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nginx Proxy Manager: SSL Certificates That Finally Auto-Renew</title>
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-LMWN7814BX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-LMWN7814BX');
+    </script>
+
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Set up Nginx Proxy Manager (NPM) for your home lab with automatic SSL certificates. Real reverse proxy guide with Let's Encrypt and Cloudflare.">
+    <meta name="keywords" content="Nginx Proxy Manager, NPM reverse proxy guide, SSL certificates home lab, reverse proxy Docker, Let's Encrypt automation">
+    <link rel="canonical" href="https://pnt.jacbex.com/nginx-proxy-manager-2026-03-31.html">
+
+    <!-- Open Graph / Social Media -->
+    <meta property="og:title" content="Nginx Proxy Manager: SSL Certificates That Finally Auto-Renew">
+    <meta property="og:description" content="Set up Nginx Proxy Manager for your home lab with automatic SSL. Real reverse proxy guide.">
+    <meta property="og:type" content="article">
+
+    <!-- JSON-LD Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "Nginx Proxy Manager: SSL Certificates That Finally Auto-Renew",
+      "description": "Set up Nginx Proxy Manager for your home lab with automatic SSL certificates",
+      "author": {
+        "@type": "Person",
+        "name": "Programming Notes"
+      },
+      "datePublished": "2026-03-31",
+      "keywords": ["Nginx Proxy Manager", "reverse proxy", "SSL certificates", "home lab", "Docker proxy"],
+      "url": "https://pnt.jacbex.com/nginx-proxy-manager-2026-03-31.html"
+    }
+    </script>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Prism.js for syntax highlighting -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-yaml.min.js"></script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+        .code-block { background: #2d2d2d; border-radius: 8px; overflow: hidden; }
+        .code-block pre { margin: 0; padding: 1rem; overflow-x: auto; }
+        .code-block code { font-family: 'Fira Code', monospace; font-size: 0.9rem; }
+        .issue-box {
+            border-left: 4px solid #ec4899;
+            background: #fdf2f8;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .issue-title { font-weight: 600; color: #be185d; }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <article class="max-w-4xl mx-auto px-4 py-8">
+        <!-- Header -->
+        <header class="mb-12">
+            <h1 class="text-4xl font-bold text-gray-900 mb-4">Nginx Proxy Manager: SSL Certificates That Finally Auto-Renew</h1>
+            <p class="text-xl text-gray-600">
+                I spent way too much time manually renewing Let's Encrypt certs and editing Nginx config files.
+                Nginx Proxy Manager (NPM) solved all of that with a clean web UI. Here's my production setup
+                that's been handling 20+ services on my home lab for the past year.
+            </p>
+        </header>
+
+        <!-- GitHub Issue #1 -->
+        <div class="issue-box">
+            <div class="issue-title">
+                <a href="https://github.com/NginxProxyManager/nginx-proxy-manager/issues?q=is%3Aissue+Let%27s+Encrypt+rate+limit"
+                   target="_blank"
+                   class="text-pink-700 hover:underline">
+                    Let's Encrypt Rate Limiting Blocking Cert Generation
+                </a>
+            </div>
+            <div class="issue-body mt-4">
+                <h4 class="font-semibold text-gray-800 mb-2">Problem</h4>
+                <p class="text-gray-700 mb-3">
+                    Setting up multiple subdomains for testing. NPM kept failing with "Too many certificates already issued"
+                    after creating just 5 certificates. I was stuck in development mode, couldn't test properly.
+                    <br><br>
+                    Error: <code class="bg-gray-100 px-2 py-1 rounded">Error creating certificate. Too many certificates already issued for: example.com</code>
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">What I Tried</h4>
+                <p class="text-gray-700 mb-3">
+                    <strong>Attempt 1:</strong> Waited an hour - still hitting the limit.<br>
+                    <strong>Attempt 2:</strong> Deleted and recreated certs - count didn't reset.<br>
+                    <strong>Attempt 3:</strong> Tried using different domains - not practical for long-term.
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">Actual Fix</h4>
+                <p class="text-gray-700 mb-3">
+                    Use Let's Encrypt staging server for testing (unlimited rate limit), and DNS challenge instead of HTTP.
+                    DNS challenge bypasses many rate limits and works better behind Cloudflare proxy.
+                </p>
+                <div class="code-block mt-3">
+                    <pre><code class="language-bash"># In NPM UI: SSL Certificates → Add Certificate
+# For testing, use Staging Let's Encrypt:
+# - Domain: *.yourdomain.com
+# - Email: your@email.com
+# - Let's Encrypt: Staging (not Production)
+
+# For production, use DNS Challenge with Cloudflare:
+# 1. Get Cloudflare API Token:
+#    - Cloudflare Dashboard → My Profile → API Tokens
+#    - Create token with Zone:DNS:Edit permission
+#
+# 2. In NPM: Settings → SSL → DNS Challenge
+#    - Provider: Cloudflare
+#    - Credentials:
+#      - Cloudflare Email: your@email.com
+#      - Cloudflare API Key: your_api_token_here
+
+# 3. Create certificate with DNS challenge
+# This bypasses HTTP validation and many rate limits</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- GitHub Issue #2 -->
+        <div class="issue-box">
+            <div class="issue-title">
+                <a href="https://github.com/NginxProxyManager/nginx-proxy-manager/issues?q=is%3Aissue+502+Bad+Gateway"
+                   target="_blank"
+                   class="text-pink-700 hover:underline">
+                    502 Bad Gateway for Docker Containers
+                </a>
+            </div>
+            <div class="issue-body mt-4">
+                <h4 class="font-semibold text-gray-800 mb-2">Problem</h4>
+                <p class="text-gray-700 mb-3">
+                    NPM running in Docker, trying to proxy to other Docker containers on the same host.
+                    Kept getting 502 Bad Gateway. The backend containers were running fine, accessible via curl on the host,
+                    but NPM couldn't reach them.
+                    <br><br>
+                    <code class="bg-gray-100 px-2 py-1 rounded">curl http://localhost:3000</code> worked, but proxy didn't.
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">What I Tried</h4>
+                <p class="text-gray-700 mb-3">
+                    <strong>Attempt 1:</strong> Used <code class="bg-gray-100 px-2 py-1 rounded">localhost:3000</code> as upstream - didn't work (Docker networking issue).<br>
+                    <strong>Attempt 2:</strong> Used <code class="bg-gray-100 px-2 py-1 rounded">127.0.0.1:3000</code> - same 502 error.<br>
+                    <strong>Attempt 3:</strong> Exposed all ports on the backend containers - security risk, still had issues.
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">Actual Fix</h4>
+                <p class="text-gray-700 mb-3">
+                    The issue is Docker networking - containers need to be on the same network to communicate.
+                    Created a shared Docker network, attached all containers (NPM + backends) to it.
+                    Then use container names as hostnames, not localhost.
+                </p>
+                <div class="code-block mt-3">
+                    <pre><code class="language-bash"># 1. Create shared network
+docker network create proxy-network
+
+# 2. Run NPM on the shared network
+docker run -d \
+  --name nginx-proxy-manager \
+  --network proxy-network \
+  -p 80:80 \
+  -p 443:443 \
+  -p 81:81 \
+  -v /path/to/npm/data:/data \
+  'jc21/nginx-proxy-manager:latest'
+
+# 3. Run your backend app on same network
+docker run -d \
+  --name my-app \
+  --network proxy-network \
+  -v /path/to/app:/app \
+  my-nodejs-app
+
+# 4. In NPM UI, use container name as upstream host:
+# - Scheme: http
+# - Forward Hostname/IP: my-app (not localhost!)
+# - Forward Port: 3000</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- GitHub Issue #3 -->
+        <div class="issue-box">
+            <div class="issue-title">
+                <a href="https://github.com/NginxProxyManager/nginx-proxy-manager/issues?q=is%3Aissue+websocket+connection"
+                   target="_blank"
+                   class="text-pink-700 hover:underline">
+                    WebSocket Connections Dropping Intermittently
+                </a>
+            </div>
+            <div class="issue-body mt-4">
+                <h4 class="font-semibold text-gray-800 mb-2">Problem</h4>
+                <p class="text-gray-700 mb-3">
+                    Running a Node.js app with Socket.io through NPM. WebSocket connections would connect initially
+                    but drop after 30-60 seconds with "Connection closed" errors. Direct connection to the backend worked fine.
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">What I Tried</h4>
+                <p class="text-gray-700 mb-3">
+                    <strong>Attempt 1:</strong> Increased timeout values in Nginx advanced settings - didn't help.<br>
+                    <strong>Attempt 2:</strong> Tried HTTP/1.1 instead of HTTP/2 - websockets still dropped.<br>
+                    <strong>Attempt 3:</strong> Disabled Cloudflare proxy (orange cloud → grey) - worked but defeats the purpose.
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">Actual Fix</h4>
+                <p class="text-gray-700 mb-3">
+                    Need to add specific Nginx configuration for WebSocket upgrade headers and timeouts.
+                    NPM has an "Advanced" tab where you can add custom Nginx location blocks.
+                </p>
+                <div class="code-block mt-3">
+                    <pre><code class="language-yaml"># In NPM UI: Proxy Host → Advanced → Custom Nginx Configuration
+
+# Add these location blocks for WebSocket support
+location / {
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection "upgrade";
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+
+    # WebSocket timeout settings
+    proxy_connect_timeout 7d;
+    proxy_send_timeout 7d;
+    proxy_read_timeout 7d;
+
+    # Pass all requests to backend
+    proxy_pass http://backend-container-name;
+}
+
+# For Socket.io specifically, also add:
+location /socket.io/ {
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection "upgrade";
+    proxy_http_version 1.1;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_pass http://backend-container-name;
+}</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- What I Learned Section -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">What I Learned</h2>
+            <ul class="list-disc pl-6 space-y-3 text-gray-700">
+                <li><strong>Lesson 1:</strong> Use DNS challenge for SSL certs when behind Cloudflare - HTTP challenge fails with proxy enabled.</li>
+                <li><strong>Lesson 2:</strong> All Docker containers must be on the same network - using localhost won't work.</li>
+                <li><strong>Lesson 3:</strong> WebSocket support requires specific Nginx config - don't assume defaults work for real-time apps.</li>
+                <li><strong>Overall:</strong> NPM's UI hides the complexity of Nginx, but understanding Nginx fundamentals
+                    (proxy headers, timeouts, networking) is still essential for troubleshooting.</li>
+            </ul>
+        </section>
+
+        <!-- Production Setup -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Production Setup</h2>
+            <p class="text-gray-700 mb-4">
+                Complete Docker Compose setup for NPM with multiple services on a home lab server.
+            </p>
+
+            <div class="code-block">
+                <pre><code class="language-yaml"># docker-compose.yml for NPM stack
+version: "3"
+
+services:
+  nginx-proxy-manager:
+    image: 'jc21/nginx-proxy-manager:latest'
+    container_name: nginx-proxy-manager
+    restart: unless-stopped
+    ports:
+      - '80:80'    # HTTP
+      - '443:443'  # HTTPS
+      - '81:81'    # Management UI
+    volumes:
+      - ./npm/data:/data
+      - ./npm/letsencrypt:/etc/letsencrypt
+    networks:
+      - proxy-network
+
+  # Example backend service
+  my-app:
+    image: my-nodejs-app:latest
+    container_name: my-app
+    restart: unless-stopped
+    networks:
+      - proxy-network
+    # No port exposure needed - internal network only
+
+  # Another service
+  my-service:
+    image: my-service:latest
+    container_name: my-service
+    restart: unless-stopped
+    networks:
+      - proxy-network
+
+networks:
+  proxy-network:
+    external: true
+
+# Run this first to create the network:
+# docker network create proxy-network</code></pre>
+            </div>
+
+            <div class="code-block mt-4">
+                <pre><code class="language-bash"># Initial setup commands
+mkdir -p npm/{data,letsencrypt}
+docker network create proxy-network
+
+# Start NPM
+docker-compose up -d
+
+# Access NPM UI
+# Default credentials:
+# Email: admin@example.com
+# Password: changeme
+# Change immediately after first login
+
+# Configure DNS (Cloudflare example)
+# A record: npm.yourdomain.com → your server IP
+# A record: *.yourdomain.com → your server IP
+
+# For Cloudflare SSL with NPM:
+# SSL/TLS → Full (strict)
+# Edge Certificates → Always Use HTTPS: ON
+# Edge Certificates → Automatic HTTPS Rewrites: ON</code></pre>
+            </div>
+        </section>
+
+        <!-- Monitoring & Debugging -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Monitoring & Debugging</h2>
+            <p class="text-gray-700 mb-4">
+                Essential commands and red flags for NPM maintenance:
+            </p>
+
+            <h3 class="text-xl font-semibold text-gray-800 mt-6 mb-3">Essential Commands</h3>
+            <div class="code-block mb-4">
+                <pre><code class="language-bash"># View NPM logs
+docker logs nginx-proxy-manager -f
+
+# Check Nginx config (generated by NPM)
+docker exec nginx-proxy-manager cat /etc/nginx/conf.d/default.conf
+
+# Test Nginx configuration
+docker exec nginx-proxy-manager nginx -t
+
+# Reload Nginx without restart
+docker exec nginx-proxy-manager nginx -s reload
+
+# Renew all SSL certificates manually
+# (NPM auto-renews, but this forces immediate renewal)
+docker exec nginx-proxy-manager /app/certbot-helper.py renew-all</code></pre>
+            </div>
+
+            <h3 class="text-xl font-semibold text-gray-800 mt-6 mb-3">Red Flags to Watch For</h3>
+            <ul class="list-disc pl-6 space-y-2 text-gray-700">
+                <li>Certs expiring in < 7 days - check if auto-renew is working</li>
+                <li>Container restarting more than once per day - memory or config issue</li>
+                <li>502 errors on all proxies - check backend container health and network connectivity</li>
+                <li>High CPU usage from NPM - possible DDoS or misconfigured proxy</li>
+            </ul>
+        </section>
+
+        <!-- Related Links -->
+        <section class="bg-blue-50 rounded-lg p-6 border border-blue-200">
+            <h3 class="font-semibold text-gray-800 mb-3">Related Resources</h3>
+            <ul class="space-y-2">
+                <li><a href="portainer.html" class="text-blue-600 hover:underline">Portainer: Docker Container Management UI</a></li>
+                <li><a href="coolify-2026-03-31.html" class="text-blue-600 hover:underline">Coolify: Self-Hosted PaaS Alternative</a></li>
+                <li><a href="https://github.com/NginxProxyManager/nginx-proxy-manager" target="_blank" class="text-blue-600 hover:underline">NPM Official GitHub Repository</a></li>
+                <li><a href="https://nginxproxymanager.com/" target="_blank" class="text-blue-600 hover:underline">Official Documentation</a></li>
+            </ul>
+        </section>
+    </article>
+
+    <script>
+        // Initialize Prism.js
+        if (typeof Prism !== 'undefined') {
+            Prism.highlightAll();
+        }
+    </script>
+</body>
+</html>

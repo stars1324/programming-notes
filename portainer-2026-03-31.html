@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portainer: Docker Container Management That Actually Works</title>
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-LMWN7814BX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-LMWN7814BX');
+    </script>
+
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Manage Docker containers with Portainer UI. Setup guide for Portainer agent, multi-node clusters, and edge deployments.">
+    <meta name="keywords" content="Portainer, manage Docker containers UI, Portainer agent setup, Docker management tool, container orchestration">
+    <link rel="canonical" href="https://pnt.jacbex.com/portainer-2026-03-31.html">
+
+    <!-- Open Graph / Social Media -->
+    <meta property="og:title" content="Portainer: Docker Container Management That Actually Works">
+    <meta property="og:description" content="Manage Docker containers with Portainer UI. Setup guide for agents and clusters.">
+    <meta property="og:type" content="article">
+
+    <!-- JSON-LD Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "Portainer: Docker Container Management That Actually Works",
+      "description": "Manage Docker containers with Portainer UI, including agent setup and multi-node clusters",
+      "author": {
+        "@type": "Person",
+        "name": "Programming Notes"
+      },
+      "datePublished": "2026-03-31",
+      "keywords": ["Portainer", "Docker management", "container UI", "Docker agent", "container orchestration"],
+      "url": "https://pnt.jacbex.com/portainer-2026-03-31.html"
+    }
+    </script>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Prism.js for syntax highlighting -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-yaml.min.js"></script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+        .code-block { background: #2d2d2d; border-radius: 8px; overflow: hidden; }
+        .code-block pre { margin: 0; padding: 1rem; overflow-x: auto; }
+        .code-block code { font-family: 'Fira Code', monospace; font-size: 0.9rem; }
+        .issue-box {
+            border-left: 4px solid #ec4899;
+            background: #fdf2f8;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .issue-title { font-weight: 600; color: #be185d; }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <article class="max-w-4xl mx-auto px-4 py-8">
+        <!-- Header -->
+        <header class="mb-12">
+            <h1 class="text-4xl font-bold text-gray-900 mb-4">Portainer: Docker Container Management That Actually Works</h1>
+            <p class="text-xl text-gray-600">
+                I was managing Docker exclusively through CLI for years. Log inspection meant scrolling through
+                thousands of lines, and checking stats across 5 servers was SSH hell. Portainer changed all that.
+                Here's my setup managing containers across a home lab and a VPS.
+            </p>
+        </header>
+
+        <!-- GitHub Issue #1 -->
+        <div class="issue-box">
+            <div class="issue-title">
+                <a href="https://github.com/portainer/portainer/issues?q=is%3Aissue+agent+connection+refused"
+                   target="_blank"
+                   class="text-pink-700 hover:underline">
+                    Portainer Agent Connection Refused on Remote Host
+                </a>
+            </div>
+            <div class="issue-body mt-4">
+                <h4 class="font-semibold text-gray-800 mb-2">Problem</h4>
+                <p class="text-gray-700 mb-3">
+                    Had Portainer running on my main server, wanted to add a second VPS to the same dashboard.
+                    Deployed the Portainer Agent on the VPS, but Portainer couldn't connect - "Connection refused".
+                    The agent was running (verified with <code class="bg-gray-100 px-2 py-1 rounded">docker ps</code>), but no go.
+                    <br><br>
+                    Error: <code class="bg-gray-100 px-2 py-1 rounded">Failed to add environment: Connection refused</code>
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">What I Tried</h4>
+                <p class="text-gray-700 mb-3">
+                    <strong>Attempt 1:</strong> Used the server's private IP - failed (servers on different networks).<br>
+                    <strong>Attempt 2:</strong> Used public IP with port 9001 - timed out (firewall blocking).<br>
+                    <strong>Attempt 3:</strong> Exposed port 9001 in Docker compose - still blocked by ufw.
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">Actual Fix</h4>
+                <p class="text-gray-700 mb-3">
+                    The agent needs port 9001/tcp exposed AND the firewall must allow it. Also, for security,
+                    I set up an SSH tunnel to the agent instead of exposing it publicly. Portainer supports SSH connections.
+                </p>
+                <div class="code-block mt-3">
+                    <pre><code class="language-bash"># Option 1: Direct connection (expose port 9001)
+# On remote server, run agent with exposed port:
+docker run -d \
+  -p 9001:9001 \
+  --name portainer-agent \
+  --restart=always \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  -v /var/lib/docker/volumes:/var/lib/docker/volumes \
+  portainer/agent:latest
+
+# Allow through firewall (UFW example)
+sudo ufw allow 9001/tcp
+
+# Option 2: SSH tunnel (more secure, no port exposure)
+# In Portainer UI: Add Environment
+# - Environment type: Agent
+# - Environment URL: ssh://user@remote-server-ip
+# - Port: 9001 (agent's internal port)
+# - SSH key: Upload your private key or password
+
+# No firewall changes needed - uses SSH port 22</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- GitHub Issue #2 -->
+        <div class="issue-box">
+            <div class="issue-title">
+                <a href="https://github.com/portainer/portainer/issues?q=is%3Aissue+templates+not+loading"
+                   target="_blank"
+                   class="text-pink-700 hover:underline">
+                    Container Templates Not Loading
+                </a>
+            </div>
+            <div class="issue-body mt-4">
+                <h4 class="font-semibold text-gray-800 mb-2">Problem</h4>
+                <p class="text-gray-700 mb-3">
+                    Clicked on "Templates" in Portainer, the list never loaded. Just spun forever with a loading spinner.
+                    Could deploy containers manually, but the template feature (my main use case) was broken.
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">What I Tried</h4>
+                <p class="text-gray-700 mb-3">
+                    <strong>Attempt 1:</strong> Refreshed the page multiple times - no change.<br>
+                    <strong>Attempt 2:</strong> Restarted the Portainer container - still failed.<br>
+                    <strong>Attempt 3:</strong> Checked Portainer logs - showed "fetching templates..." but no errors.
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">Actual Fix</h4>
+                <p class="text-gray-700 mb-3">
+                    The default template URL (portainer.io templates) was timing out. Portainer allows custom template definitions.
+                    I either needed to: 1) Use a local template file, or 2) Host my own template repository, or 3) Define templates manually in Portainer's App Templates settings.
+                </p>
+                <div class="code-block mt-3">
+                    <pre><code class="language-json"># Create custom template file (templates.json)
+{
+  "version": "2",
+  "templates": [
+    {
+      "title": "Nginx",
+      "description": "High performance web server",
+      "logo": "https://example.com/nginx.png",
+      "image": "nginx:latest",
+      "ports": ["80:80", "443:443"],
+      "volumes": ["/etc/nginx/conf.d", "/var/www/html"]
+    },
+    {
+      "title": "PostgreSQL",
+      "description": "Object-relational database",
+      "logo": "https://example.com/postgres.png",
+      "image": "postgres:15",
+      "env": [
+        {
+          "name": "POSTGRES_PASSWORD",
+          "label": "Postgres Password",
+          "default": "changeme"
+        }
+      ]
+    }
+  ]
+}
+
+# In Portainer: Settings → App Templates
+# Use custom URL: file:///templates/templates.json
+# Or host the file and use: https://your-domain.com/templates.json</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- GitHub Issue #3 -->
+        <div class="issue-box">
+            <div class="issue-title">
+                <a href="https://github.com/portainer/portainer/issues?q=is%3Aissue+stack+deploy+failed"
+                   target="_blank"
+                   class="text-pink-700 hover:underline">
+                    Docker Compose Stack Deployment Failed with "Invalid Reference Format"
+                </a>
+            </div>
+            <div class="issue-body mt-4">
+                <h4 class="font-semibold text-gray-800 mb-2">Problem</h4>
+                <p class="text-gray-700 mb-3">
+                    Uploading a docker-compose.yml file through Portainer's web editor. Clicked "Deploy the stack",
+                    got "Failed to deploy stack: invalid reference format".
+                    The same docker-compose.yml worked perfectly when deployed from CLI with <code class="bg-gray-100 px-2 py-1 rounded">docker-compose up</code>.
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">What I Tried</h4>
+                <p class="text-gray-700 mb-3">
+                    <strong>Attempt 1:</strong> Removed comments from docker-compose.yml - didn't help.<br>
+                    <strong>Attempt 2:</strong> Simplified the compose file to basic service - still failed.<br>
+                    <strong>Attempt 3:</strong> Tried pasting the content instead of uploading - same error.
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">Actual Fix</h4>
+                <p class="text-gray-700 mb-3">
+                    The issue was hidden characters in the web editor - specifically, smart quotes and em-dashes
+                    from copying documentation. Portainer's parser is stricter than docker-compose CLI.
+                    Fixed by: 1) Using a text editor to ensure plain ASCII, or 2) Uploading the file instead of pasting,
+                    or 3) Using Portainer's stack upload from git repository.
+                </p>
+                <div class="code-block mt-3">
+                    <pre><code class="language-bash"># Instead of pasting into web editor:
+
+# Option 1: Upload file directly
+# In Portainer: Stacks → Add stack → Upload from file
+# Select your docker-compose.yml
+
+# Option 2: Use Git repository
+# In Portainer: Stacks → Add stack → Git repository
+# Repository URL: https://github.com/username/repo
+# Compose path: docker-compose.yml (in repo)
+
+# Option 3: Fix the text editor issue
+# Use VS Code or similar to ensure no smart quotes
+# Find: "" Replace: "  (straight quotes)
+# Find: — Replace: --  (em dash to hyphens)</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- What I Learned Section -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">What I Learned</h2>
+            <ul class="list-disc pl-6 space-y-3 text-gray-700">
+                <li><strong>Lesson 1:</strong> SSH tunneling to agents is more secure than exposing port 9001 publicly - use it for remote servers.</li>
+                <li><strong>Lesson 2:</strong> The default template repository can be slow/unreliable - host your own templates for production use.</li>
+                <li><strong>Lesson 3:</strong> Portainer's YAML parser is stricter than docker-compose CLI - hidden characters cause silent failures.</li>
+                <li><strong>Overall:</strong> Portainer is excellent for visual management but don't abandon CLI entirely.
+                    Some operations (complex debugging, emergency recovery) are still faster via command line.</li>
+            </ul>
+        </section>
+
+        <!-- Production Setup -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Production Setup</h2>
+            <p class="text-gray-700 mb-4">
+                Complete setup for Portainer with agents across multiple servers.
+            </p>
+
+            <div class="code-block">
+                <pre><code class="language-bash"># 1. Main Portainer Server
+docker run -d \
+  -p 9443:9443 \
+  --name portainer \
+  --restart=always \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  -v portainer_data:/data \
+  cr.portainer.io/portainer/portainer-ce:latest
+
+# Access at: https://your-server-ip:9443
+# Default admin account required on first login
+
+# 2. Portainer Agent (on remote Docker hosts)
+docker run -d \
+  -p 9001:9001 \
+  --name portainer-agent \
+  --restart=always \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  -v /var/lib/docker/volumes:/var/lib/docker/volumes \
+  portainer/agent:latest
+
+# 3. Add Agent to Portainer
+# In Portainer UI: Environments → Add environment
+# Select: Agent
+# Environment URL: agent-server-ip:9001
+# Or use SSH: ssh://user@agent-server-ip
+
+# 4. Edge Agent (for IoT/remote devices with unstable connectivity)
+# On edge device:
+docker run -d \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  -v /var/lib/docker/volumes:/var/lib/docker/volumes \
+  --name portainer-edge-agent \
+  --restart=always \
+  portainer/agent:latest
+
+# In Portainer UI: Environments → Add edge environment
+# The agent will poll Portainer periodically (no inbound connection needed)</code></pre>
+            </div>
+
+            <div class="code-block mt-4">
+                <pre><code class="language-yaml"># Docker Compose for Portainer stack
+version: '3.8'
+
+services:
+  portainer:
+    image: portainer/portainer-ce:latest
+    container_name: portainer
+    restart: unless-stopped
+    ports:
+      - "9443:9443"
+      - "9000:9000"
+      - "8000:8000"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_data:/data
+    networks:
+      - proxy-network
+
+  agent:
+    image: portainer/agent:latest
+    container_name: portainer-agent
+    restart: unless-stopped
+    ports:
+      - "9001:9001"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /var/lib/docker/volumes:/var/lib/docker/volumes
+    networks:
+      - proxy-network
+
+volumes:
+  portainer_data:
+
+networks:
+  proxy-network:
+    external: true</code></pre>
+            </div>
+        </section>
+
+        <!-- Monitoring & Debugging -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Monitoring & Debugging</h2>
+            <p class="text-gray-700 mb-4">
+                Key commands and monitoring tips for Portainer:
+            </p>
+
+            <h3 class="text-xl font-semibold text-gray-800 mt-6 mb-3">Essential Commands</h3>
+            <div class="code-block mb-4">
+                <pre><code class="language-bash"># View Portainer logs
+docker logs portainer -f
+
+# Restart Portainer (preserves data)
+docker restart portainer
+
+# Backup Portainer data
+docker run --rm \
+  -v portainer_data:/data \
+  -v $(pwd):/backup \
+  alpine tar czf /backup/portainer-backup.tar.gz /data
+
+# Restore from backup
+docker run --rm \
+  -v portainer_data:/data \
+  -v $(pwd):/backup \
+  alpine tar xzf /backup/portainer-backup.tar.gz
+
+# Check agent connectivity
+# In Portainer UI: Environments → Select environment → Status</code></pre>
+            </div>
+
+            <h3 class="text-xl font-semibold text-gray-800 mt-6 mb-3">Red Flags to Watch For</h3>
+            <ul class="list-disc pl-6 space-y-2 text-gray-700">
+                <li>Agents showing "Disconnected" status - check network connectivity and firewall rules</li>
+                <li>Template loading takes >30 seconds - consider using custom template repository</li>
+                <li>Portainer container restarting - check disk space and Docker daemon health</li>
+                <li>Stack deployment fails silently - use CLI to validate compose files first</li>
+            </ul>
+        </section>
+
+        <!-- Related Links -->
+        <section class="bg-blue-50 rounded-lg p-6 border border-blue-200">
+            <h3 class="font-semibold text-gray-800 mb-3">Related Resources</h3>
+            <ul class="space-y-2">
+                <li><a href="nginx-proxy-manager-2026-03-31.html" class="text-blue-600 hover:underline">Nginx Proxy Manager: Reverse Proxy Setup</a></li>
+                <li><a href="coolify-2026-03-31.html" class="text-blue-600 hover:underline">Coolify: Self-Hosted PaaS</a></li>
+                <li><a href="https://github.com/portainer/portainer" target="_blank" class="text-blue-600 hover:underline">Portainer Official GitHub Repository</a></li>
+                <li><a href="https://docs.portainer.io/" target="_blank" class="text-blue-600 hover:underline">Official Documentation</a></li>
+            </ul>
+        </section>
+    </article>
+
+    <script>
+        // Initialize Prism.js
+        if (typeof Prism !== 'undefined') {
+            Prism.highlightAll();
+        }
+    </script>
+</body>
+</html>

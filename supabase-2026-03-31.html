@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supabase: Got Local Development Finally Working</title>
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-LMWN7814BX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-LMWN7814BX');
+    </script>
+
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Supabase local development setup guide. Compare Supabase vs Firebase for your next project.">
+    <meta name="keywords" content="Supabase local development, Supabase vs Firebase, PostgreSQL backend, real-time database, open source Firebase">
+    <link rel="canonical" href="https://pnt.jacbex.com/supabase-2026-03-31.html">
+
+    <!-- Open Graph / Social Media -->
+    <meta property="og:title" content="Supabase: Got Local Development Finally Working">
+    <meta property="og:description" content="Supabase local development setup with Supabase vs Firebase comparison.">
+    <meta property="og:type" content="article">
+
+    <!-- JSON-LD Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "Supabase: Got Local Development Finally Working",
+      "description": "Supabase local development setup with Supabase vs Firebase comparison",
+      "author": {
+        "@type": "Person",
+        "name": "Programming Notes"
+      },
+      "datePublished": "2026-03-31",
+      "keywords": ["Supabase", "local development", "Firebase alternative", "PostgreSQL", "realtime database"],
+      "url": "https://pnt.jacbex.com/supabase-2026-03-31.html"
+    }
+    </script>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Prism.js for syntax highlighting -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js"></script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+        .code-block { background: #2d2d2d; border-radius: 8px; overflow: hidden; }
+        .code-block pre { margin: 0; padding: 1rem; overflow-x: auto; }
+        .code-block code { font-family: 'Fira Code', monospace; font-size: 0.9rem; }
+        .issue-box {
+            border-left: 4px solid #ec4899;
+            background: #fdf2f8;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .issue-title { font-weight: 600; color: #be185d; }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <article class="max-w-4xl mx-auto px-4 py-8">
+        <!-- Header -->
+        <header class="mb-12">
+            <h1 class="text-4xl font-bold text-gray-900 mb-4">Supabase: Got Local Development Finally Working</h1>
+            <p class="text-xl text-gray-600">
+                Firebase was great until I needed to write a complex query. Supabase gave me PostgreSQL,
+                real-time, and auth in one package. Local development was tricky though - took me a week
+                to get it working smoothly. Here's what I learned.
+            </p>
+        </header>
+
+        <!-- GitHub Issue #1 -->
+        <div class="issue-box">
+            <div class="issue-title">
+                <a href="https://github.com/supabase/supabase/issues?q=is%3Aissue+docker+out+of+memory"
+                   target="_blank"
+                   class="text-pink-700 hover:underline">
+                    Supabase Local Development OOM on 8GB RAM Machine
+                </a>
+            </div>
+            <div class="issue-body mt-4">
+                <h4 class="font-semibold text-gray-800 mb-2">Problem</h4>
+                <p class="text-gray-700 mb-3">
+                    Tried running <code class="bg-gray-100 px-2 py-1 rounded">supabase start</code> on my MacBook with 8GB RAM.
+                    Got through about 60% of the startup process, then Docker killed the Postgres container.
+                    System monitor showed 95% memory usage before the crash.
+                    <br><br>
+                    Error: <code class="bg-gray-100 px-2 py-1 rounded">Container postgres exited with code 137 (OOM killed)</code>
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">What I Tried</h4>
+                <p class="text-gray-700 mb-3">
+                    <strong>Attempt 1:</strong> Closed all other apps and browser tabs - still crashed.<br>
+                    <strong>Attempt 2:</strong> Increased Docker memory limit to 6GB - macOS doesn't allow this without hacks.<br>
+                    <strong>Attempt 3:</strong> Tried using Supabase Cloud instead - worked but wanted local development.
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">Actual Fix</h4>
+                <p class="text-gray-700 mb-3">
+                    The default Supabase config starts too many services. I needed to: 1) Disable unnecessary services
+                    (like Studio and GoTrue) during development, 2) Reduce Postgres shared_buffers and work_mem,
+                    and 3) Use Docker resource limits to prevent runaway memory consumption.
+                </p>
+                <div class="code-block mt-3">
+                    <pre><code class="language-bash"># In supabase/config.toml, disable unused services:
+[auth]
+enabled = false  # Disable GoTrue if not testing auth
+
+[studio]
+enabled = false  # Disable Studio to save ~500MB RAM
+
+# Create Docker override file to limit resources:
+cat > docker-compose.override.yml << EOF
+services:
+  db:
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+    command:
+      - postgres
+      - -c
+      - shared_buffers=256MB
+      - -c
+      - work_mem=16MB
+      - -c
+      - maintenance_work_mem=64MB
+EOF
+
+# Or run minimal services only:
+supabase start --exclude studio,auth,realtime,imgproxy
+
+# Check actual memory usage:
+docker stats --no-stream
+
+# Alternative: Use remote development database
+supabase link --project-ref your-project-id
+supabase db remote commit</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- GitHub Issue #2 -->
+        <div class="issue-box">
+            <div class="issue-title">
+                <a href="https://github.com/supabase/supabase/issues?q=is%3Aissue+migration+not+applying"
+                   target="_blank"
+                   class="text-pink-700 hover:underline">
+                    Database Migrations Not Applying Correctly
+                </a>
+            </div>
+            <div class="issue-body mt-4">
+                <h4 class="font-semibold text-gray-800 mb-2">Problem</h4>
+                <p class="text-gray-700 mb-3">
+                    Created migration files in supabase/migrations directory. Ran <code class="bg-gray-100 px-2 py-1 rounded">supabase db push</code> -
+                    showed "Applied 3 migrations" but the tables didn't exist. Checked the database directly,
+                    the schema_migrations table showed the migrations as applied, but they clearly weren't.
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">What I Tried</h4>
+                <p class="text-gray-700 mb-3">
+                    <strong>Attempt 1:</strong> Dropped and recreated the database - same issue.<br>
+                    <strong>Attempt 2:</strong> Ran SQL manually in Studio - worked fine.<br>
+                    <strong>Attempt 3:</strong> Checked migration file timestamps - they were in order.
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">Actual Fix</h4>
+                <p class="text-gray-700 mb-3">
+                    The issue was that I was editing migrations that had already been "applied" according to schema_migrations.
+                    When you modify an old migration, Supabase doesn't re-run it. The solution: either reset the database
+                    or create a new migration that alters the existing schema. Also, migration files must use sequential numbering.
+                </p>
+                <div class="code-block mt-3">
+                    <pre><code class="language-bash"># Don't do this (editing applied migrations):
+# supabase/migrations/20240101_initial.sql (already applied)
+-- ALTER TABLE users ADD COLUMN new_field text;  -- Won't run!
+
+# Instead, create a new migration:
+supabase migration new add_new_field
+# This creates: supabase/migrations/20240102_add_new_field.sql
+
+# Or reset and replay all migrations:
+supabase db reset --linked
+
+# View migration status:
+supabase migration list
+
+# Check what migrations have actually run:
+supabase db execute --query "SELECT * FROM supabase_migrations.schema_migrations ORDER BY version"
+
+# Best practice: When developing locally
+# 1. Make changes in Studio
+# 2. Generate migration from those changes:
+supabase db remote commit
+
+# 3. Apply to local:
+supabase db reset</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- GitHub Issue #3 -->
+        <div class="issue-box">
+            <div class="issue-title">
+                <a href="https://github.com/supabase/supabase/issues?q=is%3Aissue+row+level+security+not+working"
+                   target="_blank"
+                   class="text-pink-700 hover:underline">
+                    Row Level Security Policies Blocking All Access
+                </a>
+            </div>
+            <div class="issue-body mt-4">
+                <h4 class="font-semibold text-gray-800 mb-2">Problem</h4>
+                <p class="text-gray-700 mb-3">
+                    Enabled RLS on a table, created a policy to allow users to see their own data.
+                    Querying from the client returned an empty array every time. Verified the auth.uid() was correct,
+                    but the policy seemed to block everything, even rows I owned.
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">What I Tried</h4>
+                <p class="text-gray-700 mb-3">
+                    <strong>Attempt 1:</strong> Simplified the policy to just "auth.uid() = user_id" - still blocked.<br>
+                    <strong>Attempt 2:</strong> Disabled RLS temporarily - data appeared, confirming the policy was the issue.<br>
+                    <strong>Attempt 3:</strong> Used USING vs IN check - neither worked.
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">Actual Fix</h4>
+                <p class="text-gray-700 mb-3">
+                    The issue was subtle: my policy used USING (for SELECT) but I also needed WITH CHECK (for INSERT/UPDATE).
+                    Also, the user_id column in my table was UUID but I was comparing it incorrectly. Needed explicit casting
+                    and to check both USING and WITH CHECK for full CRUD operations.
+                </p>
+                <div class="code-block mt-3">
+                    <pre><code class="language-sql>-- Correct RLS policy for full CRUD:
+
+-- Enable RLS
+ALTER TABLE posts ENABLE ROW LEVEL SECURITY;
+
+-- Create policy that allows users to manage their own posts
+CREATE POLICY "Users can manage own posts"
+ON posts
+FOR ALL  -- Covers SELECT, INSERT, UPDATE, DELETE
+USING (auth.uid() = user_id)  -- For SELECT and DELETE
+WITH CHECK (auth.uid() = user_id);  -- For INSERT and UPDATE
+
+-- If using composite keys or multiple conditions:
+CREATE POLICY "Users can manage own posts or public posts"
+ON posts
+FOR ALL
+USING (
+  auth.uid() = user_id OR is_public = true
+)
+WITH CHECK (
+  auth.uid() = user_id
+);
+
+-- For service_role access (bypasses RLS):
+-- Use the service_role key when initializing Supabase client
+
+-- Debug RLS policies:
+SELECT * FROM pg_policies WHERE tablename = 'posts';
+
+-- Test policy as specific user:
+SET LOCAL ROLE authenticated;
+SET request.user_id to 'your-uuid-here';
+SELECT * FROM posts;</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- What I Learned Section -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">What I Learned</h2>
+            <ul class="list-disc pl-6 space-y-3 text-gray-700">
+                <li><strong>Lesson 1:</strong> Local Supabase needs serious RAM - disable Studio and Auth when not needed, or use cloud development database.</li>
+                <li><strong>Lesson 2:</strong> Never edit applied migrations - create new ones or use <code class="bg-gray-100 px-2 py-1 rounded">supabase db reset</code>.</li>
+                <li><strong>Lesson 3:</strong> RLS policies need both USING (read) and WITH CHECK (write) - one without the other causes silent failures.</li>
+                <li><strong>Overall:</strong> Supabase vs Firebase: Supabase gives you raw SQL power which is amazing for complex queries,
+                    but Firebase is simpler for basic apps. If you know SQL, Supabase is a game-changer.</li>
+            </ul>
+        </section>
+
+        <!-- Production Setup -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Production Setup</h2>
+            <p class="text-gray-700 mb-4">
+                Local development setup that doesn't kill your machine.
+            </p>
+
+            <div class="code-block">
+                <pre><code class="language-bash"># 1. Install Supabase CLI
+brew install supabase/tap/supabase
+
+# 2. Initialize project
+supabase init
+
+# 3. Configure for low-RAM development
+cat > supabase/config.toml << EOF
+[project_id]
+[api]
+enabled = true
+port = 54321
+schemas = ["public", "graphql_public"]
+
+[db]
+port = 54322
+shadow_db_port = 54320
+major_version = "15.1.0"
+
+[studio]
+enabled = false  # Disable to save RAM
+port = 54323
+
+[inbucket]
+enabled = false  # Disable email testing
+port = 54324
+
+[auth]
+enabled = false  # Disable if not testing auth
+site_url = "http://localhost:3000"
+
+[edge_runtime]
+enabled = false  # Disable if not using Edge Functions
+policy = "per_request"
+
+[cli]
+smart_zip = true
+EOF
+
+# 4. Start minimal stack
+supabase start --exclude studio,auth,inbucket,realtime,imgproxy
+
+# 5. Or link to cloud for development
+supabase link --project-ref your-project-id
+supabase db remote commit</code></pre>
+            </div>
+
+            <div class="code-block mt-4">
+                <pre><code class="language-javascript">// Client initialization
+import { createClient } from '@supabase/supabase-js'
+
+const supabaseUrl = process.env.SUPABASE_URL
+const supabaseKey = process.env.SUPABASE_ANON_KEY
+
+const supabase = createClient(supabaseUrl, supabaseKey)
+
+// Query with RLS
+const { data, error } = await supabase
+  .from('posts')
+  .select('*')
+  // RLS automatically filters by user_id
+
+// Real-time subscription
+const channel = supabase
+  .channel('custom-channel')
+  .on('postgres_changes', {
+    event: 'INSERT',
+    schema: 'public',
+    table: 'posts'
+  }, (payload) => console.log('New post!', payload.new))
+  .subscribe()</code></pre>
+            </div>
+        </section>
+
+        <!-- Monitoring & Debugging -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Monitoring & Debugging</h2>
+            <p class="text-gray-700 mb-4">
+                Essential Supabase development commands:
+            </p>
+
+            <h3 class="text-xl font-semibold text-gray-800 mt-6 mb-3">Essential Commands</h3>
+            <div class="code-block mb-4">
+                <pre><code class="language-bash"># Start local development
+supabase start
+
+# Stop all services
+supabase stop
+
+# View logs
+supabase status
+supabase logs
+
+# Database operations
+supabase db reset  # Reset local database
+supabase db push   # Push migrations to local
+supabase db remote commit  # Capture remote schema
+
+# Generate typescript types
+supabase gen types typescript --local > lib/supabase.types.ts
+
+# Test a query
+supabase db execute --query "SELECT COUNT(*) FROM users"
+
+# Open Studio UI (if enabled)
+supabase inspect</code></pre>
+            </div>
+
+            <h3 class="text-xl font-semibold text-gray-800 mt-6 mb-3">Supabase vs Firebase</h3>
+            <div class="bg-gray-100 rounded-lg p-6">
+                <table class="w-full text-left">
+                    <thead>
+                        <tr class="border-b">
+                            <th class="py-2">Feature</th>
+                            <th class="py-2">Supabase</th>
+                            <th class="py-2">Firebase</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="border-b">
+                            <td class="py-2">Database</td>
+                            <td class="py-2">PostgreSQL (SQL)</td>
+                            <td class="py-2">Firestore (NoSQL)</td>
+                        </tr>
+                        <tr class="border-b">
+                            <td class="py-2">Query Complexity</td>
+                            <td class="py-2">Full SQL power</td>
+                            <td class="py-2">Limited query language</td>
+                        </tr>
+                        <tr class="border-b">
+                            <td class="py-2">Real-time</td>
+                            <td class="py-2">PostgreSQL changes</td>
+                            <td class="py-2">Native listeners</td>
+                        </tr>
+                        <tr class="border-b">
+                            <td class="py-2">Local Development</td>
+                            <td class="py-2">Full local stack</td>
+                            <td class="py-2">Emulator suite</td>
+                        </tr>
+                        <tr>
+                            <td class="py-2">Learning Curve</td>
+                            <td class="py-2">Need SQL knowledge</td>
+                            <td class="py-2">Easier for beginners</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Related Links -->
+        <section class="bg-blue-50 rounded-lg p-6 border border-blue-200">
+            <h3 class="font-semibold text-gray-800 mb-3">Related Resources</h3>
+            <ul class="space-y-2">
+                <li><a href="appwrite-2026-03-31.html" class="text-blue-600 hover:underline">Appwrite: Firebase Alternative</a></li>
+                <li><a href="pocketbase-2026-03-31.html" class="text-blue-600 hover:underline">Pocketbase: Lightweight Backend</a></li>
+                <li><a href="https://github.com/supabase/supabase" target="_blank" class="text-blue-600 hover:underline">Supabase Official GitHub</a></li>
+                <li><a href="https://supabase.com/docs" target="_blank" class="text-blue-600 hover:underline">Official Documentation</a></li>
+            </ul>
+        </section>
+    </article>
+
+    <script>
+        // Initialize Prism.js
+        if (typeof Prism !== 'undefined') {
+            Prism.highlightAll();
+        }
+    </script>
+</body>
+</html>

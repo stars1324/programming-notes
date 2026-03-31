@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nextcloud: Speed Optimization That Actually Works</title>
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-LMWN7814BX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-LMWN7814BX');
+    </script>
+
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Build your own Dropbox with Nextcloud. Complete speed optimization guide for performance and caching.">
+    <meta name="keywords" content="Nextcloud, build your own Dropbox, Nextcloud speed optimization, self-hosted cloud storage, file sharing">
+    <link rel="canonical" href="https://pnt.jacbex.com/nextcloud-2026-03-31.html">
+
+    <!-- Open Graph / Social Media -->
+    <meta property="og:title" content="Nextcloud: Speed Optimization That Actually Works">
+    <meta property="og:description" content="Build your own Dropbox with Nextcloud. Speed optimization guide.">
+    <meta property="og:type" content="article">
+
+    <!-- JSON-LD Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "Nextcloud: Speed Optimization That Actually Works",
+      "description": "Build your own Dropbox with Nextcloud with complete speed optimization",
+      "author": {
+        "@type": "Person",
+        "name": "Programming Notes"
+      },
+      "datePublished": "2026-03-31",
+      "keywords": ["Nextcloud", "self-hosted cloud", "Dropbox alternative", "file sharing", "performance optimization"],
+      "url": "https://pnt.jacbex.com/nextcloud-2026-03-31.html"
+    }
+    </script>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Prism.js for syntax highlighting -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-php.min.js"></script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+        .code-block { background: #2d2d2d; border-radius: 8px; overflow: hidden; }
+        .code-block pre { margin: 0; padding: 1rem; overflow-x: auto; }
+        .code-block code { font-family: 'Fira Code', monospace; font-size: 0.9rem; }
+        .issue-box {
+            border-left: 4px solid #ec4899;
+            background: #fdf2f8;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .issue-title { font-weight: 600; color: #be185d; }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <article class="max-w-4xl mx-auto px-4 py-8">
+        <!-- Header -->
+        <header class="mb-12">
+            <h1 class="text-4xl font-bold text-gray-900 mb-4">Nextcloud: Speed Optimization That Actually Works</h1>
+            <p class="text-xl text-gray-600">
+                Been running Nextcloud for 2 years as my personal Dropbox. First 6 months were painful -
+                file sync took forever, web UI was sluggish, and mobile apps timed out constantly.
+                After some serious optimization, it now feels faster than Dropbox.
+            </p>
+        </header>
+
+        <!-- GitHub Issue #1 -->
+        <div class="issue-box">
+            <div class="issue-title">
+                <a href="https://github.com/nextcloud/server/issues?q=is%3Aissue+slow+file+sync"
+                   target="_blank"
+                   class="text-pink-700 hover:underline">
+                    File Sync Extremely Slow on Large Directories
+                </a>
+            </div>
+            <div class="issue-body mt-4">
+                <h4 class="font-semibold text-gray-800 mb-2">Problem</h4>
+                <p class="text-gray-700 mb-3">
+                    Syncing a folder with 50k+ files (photos). Initial sync took 3 days, and incremental
+                    syncs took 30+ minutes for just a few new files. CPU usage was at 100%, network was fine,
+                    but transfers crawled at ~100KB/s.
+                    <br><br>
+                    Error: <code class="bg-gray-100 px-2 py-1 rounded">The sync is taking longer than expected</code> (desktop client message)
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">What I Tried</h4>
+                <p class="text-gray-700 mb-3">
+                    <strong>Attempt 1:</strong> Increased PHP memory_limit and max_execution_time - no noticeable improvement.<br>
+                    <strong>Attempt 2:</strong> Switched from SQLite to PostgreSQL - slight improvement but still slow.<br>
+                    <strong>Attempt 3:</strong> Adjusted client sync settings - made it worse by skipping files.
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">Actual Fix</h4>
+                <p class="text-gray-700 mb-3">
+                    The issue was that Nextcloud was scanning every file on every sync cycle. The solution involved:
+                    1) Enabling filesystem caching with Redis, 2) Configuring proper chunked uploads,
+                    3) Adjusting the scan interval, and 4) Using the 'occ files:scan' command for initial scans.
+                </p>
+                <div class="code-block mt-3">
+                    <pre><code class="language-php">// config/config.php - Performance optimizations
+
+// Enable Redis for file locking and caching
+'memcache.local' => '\\OC\\Memcache\\Redis',
+'memcache.distributed' => '\\OC\\Memcache\\Redis',
+'redis' => [
+  'host' => '127.0.0.1',
+  'port' => 6379,
+],
+
+// File chunking for large uploads
+'max_chunk_size' => '16' * 1024 * 1024, // 16MB chunks
+
+// Reduce filesystem scan frequency
+'filesystem_check_changes' => 0, // Disable periodic scans
+
+// Enable transactional file locking
+'filelocking.enabled' => true,
+
+// Increase upload limits
+'max_upload_size' => '16G',
+
+// Enable previews for better UX
+'enable_previews' => true,
+'preview_max_x' => 2048,
+'preview_max_y' => 2048,</code></pre>
+                </div>
+                <div class="code-block mt-3">
+                    <pre><code class="language-bash"># Initial scan optimization (run once)
+docker exec -u www-data nextcloud php occ files:scan --all
+
+# For resyncing specific user
+docker exec -u www-data nextcloud php occ files:scan --path="/user/files"
+
+# Set up regular cron jobs instead of AJAX
+crontab -e
+# Add: */5 * * * * docker exec -u www-data nextcloud php cron.php
+
+# Enable caching in PHP-FPM
+# /etc/php/7.4/fpm/pool.d/www.conf
+php_admin_value[opcache.enable]=1
+php_admin_value[opcache.memory_consumption]=128
+php_admin_value[opcache.interned_strings_buffer]=8
+php_admin_value[opcache.max_accelerated_files]=10000
+php_admin_value[opcache.revalidate_freq]=2</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- GitHub Issue #2 -->
+        <div class="issue-box">
+            <div class="issue-title">
+                <a href="https://github.com/nextcloud/server/issues?q=is%3Aissue+cache+not+working"
+                   target="_blank"
+                   class="text-pink-700 hover:underline">
+                    PHP OPcache Not Applied, Site Still Slow
+                </a>
+            </div>
+            <div class="issue-body mt-4">
+                <h4 class="font-semibold text-gray-800 mb-2">Problem</h4>
+                <p class="text-gray-700 mb-3">
+                    Enabled OPcache in php.ini, restarted PHP-FPM. Nextcloud admin overview showed
+                    "OPcache not properly configured". Page loads were still 2-3 seconds, and PHP
+                    was recompiling scripts on every request.
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">What I Tried</h4>
+                <p class="text-gray-700 mb-3">
+                    <strong>Attempt 1:</strong> Modified /etc/php/7.4/fpm/php.ini - no change.<br>
+                    <strong>Attempt 2:</strong> Restarted both PHP-FPM and Nginx - still showed as not configured.<br>
+                    <strong>Attempt 3:</strong> Checked php -i | grep opcache - showed it was enabled in CLI but not web.
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">Actual Fix</h4>
+                <p class="text-gray-700 mb-3">
+                    The issue was that PHP-FPM uses a different php.ini file than CLI. Also, OPcache settings
+                    need to be in the pool.d/www.conf file, not just php.ini. Additionally, Docker containers
+                    may have different paths - need to check which PHP binary is actually being used.
+                </p>
+                <div class="code-block mt-3">
+                    <pre><code class="language-bash"># For Docker deployments, find the correct PHP ini
+docker exec nextcloud php --ini
+
+# Then edit the correct file
+# For CLI: /usr/local/etc/php/conf.d/zzz-opcache.ini
+# For FPM: /usr/local/etc/php-fpm.d/www.conf
+
+# Add to Docker volume or use docker exec
+docker exec nextcloud sh -c 'echo "opcache.enable=1" >> /usr/local/etc/php/conf.d/zzz-opcache.ini'
+docker exec nextcloud sh -c 'echo "opcache.memory_consumption=128" >> /usr/local/etc/php/conf.d/zzz-opcache.ini'
+docker exec nextcloud sh -c 'echo "opcache.interned_strings_buffer=8" >> /usr/local/etc/php/conf.d/zzz-opcache.ini'
+docker exec nextcloud sh -c 'echo "opcache.max_accelerated_files=10000" >> /usr/local/etc/php/conf.d/zzz-opcache.ini'
+docker exec nextcloud sh -c 'echo "opcache.revalidate_freq=2" >> /usr/local/etc/php/conf.d/zzz-opcache.ini'
+
+# Restart PHP-FPM
+docker restart nextcloud
+
+# Verify OPcache is working
+docker exec nextcloud php -i | grep opcache
+
+# In Nextcloud admin overview, should now show:
+# "OPcache is properly configured"</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- GitHub Issue #3 -->
+        <div class="issue-box">
+            <div class="issue-title">
+                <a href="https://github.com/nextcloud/server/issues?q=is%3Aissue+database+slow"
+                   target="_blank"
+                   class="text-pink-700 hover:underline">
+                    Database Queries Slow, High CPU Load
+                </a>
+            </div>
+            <div class="issue-body mt-4">
+                <h4 class="font-semibold text-gray-800 mb-2">Problem</h4>
+                <p class="text-gray-700 mb-3">
+                    After 6 months of use, Nextcloud became sluggish. Loading the files page took 5+ seconds.
+                    PostgreSQL CPU usage was at 80-100% constantly. Database had about 500k rows in oc_filecache.
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">What I Tried</h4>
+                <p class="text-gray-700 mb-3">
+                    <strong>Attempt 1:</strong> Ran VACUUM ANALYZE on PostgreSQL - temporary fix, degradation returned.<br>
+                    <strong>Attempt 2:</strong> Increased shared_buffers - ran out of RAM on the server.<br>
+                    <strong>Attempt 3:</strong> Deleted old file versions - helped slightly but queries were still slow.
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">Actual Fix</h4>
+                <p class="text-gray-700 mb-3">
+                    The oc_filecache table needed proper indexing and cleanup. Also, Nextcloud stores deleted
+                    files in the trash bin indefinitely - need to configure auto-cleanup. Database connection
+                    pooling was also misconfigured.
+                </p>
+                <div class="code-block mt-3">
+                    <pre><code class="language-sql>-- Connect to Nextcloud PostgreSQL database
+-- Add missing indexes for common queries
+CREATE INDEX IF NOT EXISTS idx_filecache_path
+  ON oc_filecache(path);
+
+CREATE INDEX IF NOT EXISTS idx_filecache_parent
+  ON oc_filecache(parent);
+
+CREATE INDEX IF NOT EXISTS idx_filecache_storage_mtime
+  ON oc_filecache(storage, mtime DESC);
+
+-- Clean up trash bin (files older than 30 days)
+DELETE FROM oc_files_trash
+  WHERE deleted_time < NOW() - INTERVAL '30 days';
+
+-- Clean up file versions
+DELETE FROM oc_filecache
+  WHERE path LIKE '%.v%';
+
+-- Reclaim space
+VACUUM FULL oc_filecache;
+ANALYZE oc_filecache;
+
+-- Check slow queries
+SELECT query, calls, total_time, mean_time
+FROM pg_stat_statements
+ORDER BY mean_time DESC
+LIMIT 10;</code></pre>
+                </div>
+                <div class="code-block mt-3">
+                    <pre><code class="language-bash"># Configure Nextcloud trash and versions cleanup
+# config/config.php
+'trashbin_retention_obligation' => 30, // days
+'versions_retention_obligation' => 30, // days
+'enable_avatars' => false, // Disable if not using
+'simpleSignUpLink.shown' => false,
+
+# Set up automatic cleanup cron
+crontab -e
+# Add daily cleanup at 3 AM
+0 3 * * * docker exec -u www-data nextcloud php occ trashbin:cleanup --expire=30
+0 3 * * * docker exec -u www-data nextcloud php occ versions:cleanup --expire=30
+0 4 * * * docker exec -u www-data nextcloud php occ files:cleanup</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- What I Learned Section -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">What I Learned</h2>
+            <ul class="list-disc pl-6 space-y-3 text-gray-700">
+                <li><strong>Lesson 1:</strong> Nextcloud needs Redis caching - without it, every request hits the filesystem and database.</li>
+                <li><strong>Lesson 2:</strong> OPcache configuration in Docker requires editing the correct ini files - CLI and web use different configs.</li>
+                <li><strong>Lesson 3:</strong> Database maintenance is critical - trash bin and versions accumulate indefinitely without cleanup.</li>
+                <li><strong>Overall:</strong> Nextcloud out of the box is slow. It needs aggressive caching, database tuning,
+                    and regular maintenance to perform well. But once optimized, it's genuinely faster than commercial alternatives.</li>
+            </ul>
+        </section>
+
+        <!-- Production Setup -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Production Setup</h2>
+            <p class="text-gray-700 mb-4">
+                Optimized Docker Compose setup for Nextcloud.
+            </p>
+
+            <div class="code-block">
+                <pre><code class="language-yaml"># docker-compose.yml - Optimized Nextcloud
+version: '3.8'
+
+services:
+  nextcloud-db:
+    image: postgres:14-alpine
+    container_name: nextcloud-db
+    environment:
+      POSTGRES_DB: nextcloud
+      POSTGRES_USER: nextcloud
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data
+    networks:
+      - nextcloud-network
+    restart: always
+    command: >
+      postgres
+      -c shared_buffers=256MB
+      -c effective_cache_size=1GB
+      -c work_mem=16MB
+      -c maintenance_work_mem=128MB
+
+  nextcloud-redis:
+    image: redis:alpine
+    container_name: nextcloud-redis
+    networks:
+      - nextcloud-network
+    restart: always
+
+  nextcloud:
+    image: nextcloud:latest
+    container_name: nextcloud
+    ports:
+      - "127.0.0.1:8080:80"
+    environment:
+      - POSTGRES_HOST=nextcloud-db
+      - POSTGRES_DB=nextcloud
+      - POSTGRES_USER=nextcloud
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - REDIS_HOST=nextcloud-redis
+    volumes:
+      - ./data/nextcloud:/var/www/html
+      - ./data/nextcloud-config:/var/www/html/config
+    depends_on:
+      - nextcloud-db
+      - nextcloud-redis
+    networks:
+      - nextcloud-network
+    restart: always
+
+networks:
+  nextcloud-network:</code></pre>
+            </div>
+
+            <div class="code-block mt-4">
+                <pre><code class="language-php"># config/config.php - Place after initial setup
+<?php
+$CONFIG = array (
+  'instanceid' => 'oc...',
+  'passwordsalt' => '...',
+  'datadirectory' => '/var/www/html/data',
+
+  // Database
+  'dbtype' => 'pgsql',
+  'dbname' => 'nextcloud',
+  'dbuser' => 'nextcloud',
+  'dbpassword' => getenv('DB_PASSWORD'),
+  'dbhost' => 'nextcloud-db',
+
+  // Redis caching
+  'memcache.local' => '\\OC\\Memcache\\Redis',
+  'memcache.distributed' => '\\OC\\Memcache\\Redis',
+  'redis' =>
+  array (
+    'host' => 'nextcloud-redis',
+    'port' => 6379,
+  ),
+
+  // Performance
+  'filelocking.enabled' => true,
+  'memcache.locking' => '\\OC\\Memcache\\Redis',
+  'max_chunk_size' => 16 * 1024 * 1024,
+  'filesystem_check_changes' => 0,
+
+  // Cleanup
+  'trashbin_retention_obligation' => 30,
+  'versions_retention_obligation' => 30,
+
+  'overwrite.cli.url' => 'https://cloud.yourdomain.com',
+  'overwriteprotocol' => 'https',
+);</code></pre>
+            </div>
+        </section>
+
+        <!-- Monitoring & Debugging -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Monitoring & Debugging</h2>
+            <p class="text-gray-700 mb-4">
+                Essential maintenance commands:
+            </p>
+
+            <h3 class="text-xl font-semibold text-gray-800 mt-6 mb-3">Essential Commands</h3>
+            <div class="code-block mb-4">
+                <pre><code class="language-bash"># Check Nextcloud status
+docker exec -u www-data nextcloud php occ status
+
+# Update Nextcloud
+docker exec -u www-data nextcloud php occ upgrade
+
+# Scan files
+docker exec -u www-data nextcloud php occ files:scan --all
+
+# Check for errors
+docker exec -u www-data nextcloud php occ check
+
+# Database maintenance
+docker exec -u www-data nextcloud php occ db:add-missing-indices
+docker exec -u www-data nextcloud php occ db:convert-filecache-bigint
+
+# Monitor logs
+docker logs -f nextcloud
+
+# Check Redis connection
+docker exec nextcloud-redis redis-cli ping
+
+# Backup
+docker exec nextcloud-db pg_dump -U nextcloud nextcloud | gzip > backup.sql.gz</code></pre>
+            </div>
+
+            <h3 class="text-xl font-semibold text-gray-800 mt-6 mb-3">Red Flags to Watch For</h3>
+            <ul class="list-disc pl-6 space-y-2 text-gray-700">
+                <li>Page load time >2 seconds - check OPcache and Redis configuration</li>
+                <li>Database CPU >50% - run VACUUM ANALYZE and check indexes</li>
+                <li>Disk growing >100MB/day - configure trash/version cleanup</li>
+                <li>High memory usage - adjust PHP-FPM pool settings</li>
+            </ul>
+        </section>
+
+        <!-- Related Links -->
+        <section class="bg-blue-50 rounded-lg p-6 border border-blue-200">
+            <h3 class="font-semibold text-gray-800 mb-3">Related Resources</h3>
+            <ul class="space-y-2">
+                <li><a href="casaos-2026-03-31.html" class="text-blue-600 hover:underline">CasaOS: Home Cloud Setup</a></li>
+                <li><a href="nginx-proxy-manager-2026-03-31.html" class="text-blue-600 hover:underline">Nginx Proxy Manager: SSL Setup</a></li>
+                <li><a href="https://github.com/nextcloud/server" target="_blank" class="text-blue-600 hover:underline">Nextcloud Official GitHub</a></li>
+                <li><a href="https://docs.nextcloud.com/" target="_blank" class="text-blue-600 hover:underline">Official Documentation</a></li>
+            </ul>
+        </section>
+    </article>
+
+    <script>
+        // Initialize Prism.js
+        if (typeof Prism !== 'undefined') {
+            Prism.highlightAll();
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pocketbase: Single File Backend That Actually Scales</title>
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-LMWN7814BX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-LMWN7814BX');
+    </script>
+
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Pocketbase single file backend with Flutter tutorial. Lightweight alternative to Firebase for mobile apps.">
+    <meta name="keywords" content="Pocketbase, single file backend, Pocketbase Flutter tutorial, mobile backend, Firebase alternative">
+    <link rel="canonical" href="https://pnt.jacbex.com/pocketbase-2026-03-31.html">
+
+    <!-- Open Graph / Social Media -->
+    <meta property="og:title" content="Pocketbase: Single File Backend That Actually Scales">
+    <meta property="og:description" content="Pocketbase single file backend with Flutter tutorial. Lightweight mobile backend.">
+    <meta property="og:type" content="article">
+
+    <!-- JSON-LD Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "Pocketbase: Single File Backend That Actually Scales",
+      "description": "Pocketbase single file backend with Flutter tutorial",
+      "author": {
+        "@type": "Person",
+        "name": "Programming Notes"
+      },
+      "datePublished": "2026-03-31",
+      "keywords": ["Pocketbase", "single file backend", "Flutter", "mobile backend", "Firebase alternative"],
+      "url": "https://pnt.jacbex.com/pocketbase-2026-03-31.html"
+    }
+    </script>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Prism.js for syntax highlighting -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-dart.min.js"></script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+        .code-block { background: #2d2d2d; border-radius: 8px; overflow: hidden; }
+        .code-block pre { margin: 0; padding: 1rem; overflow-x: auto; }
+        .code-block code { font-family: 'Fira Code', monospace; font-size: 0.9rem; }
+        .issue-box {
+            border-left: 4px solid #ec4899;
+            background: #fdf2f8;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .issue-title { font-weight: 600; color: #be185d; }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <article class="max-w-4xl mx-auto px-4 py-8">
+        <!-- Header -->
+        <header class="mb-12">
+            <h1 class="text-4xl font-bold text-gray-900 mb-4">Pocketbase: Single File Backend That Actually Scales</h1>
+            <p class="text-xl text-gray-600">
+                Needed a backend for my Flutter app but Firebase was overkill. Found Pocketbase -
+                literally one Go binary that handles auth, database, and realtime. Deployed it on
+                a $4 VPS and it handles 10k users without breaking a sweat.
+            </p>
+        </header>
+
+        <!-- GitHub Issue #1 -->
+        <div class="issue-box">
+            <div class="issue-title">
+                <a href="https://github.com/pocketbase/pocketbase/issues?q=is%3Aissue+CORS+mobile"
+                   target="_blank"
+                   class="text-pink-700 hover:underline">
+                    Mobile App Can't Connect to Pocketbase Server
+                </a>
+            </div>
+            <div class="issue-body mt-4">
+                <h4 class="font-semibold text-gray-800 mb-2">Problem</h4>
+                <p class="text-gray-700 mb-3">
+                    Set up Pocketbase on a VPS, worked fine from browser. Flutter app on Android
+                    couldn't connect - connection timeout errors. Tried the API URL in Postman, worked fine.
+                    Only mobile apps were affected.
+                    <br><br>
+                    Error: <code class="bg-gray-100 px-2 py-1 rounded">SocketException: Connection timed out</code>
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">What I Tried</h4>
+                <p class="text-gray-700 mb-3">
+                    <strong>Attempt 1:</strong> Added http (non-https) to Android manifest - still timed out.<br>
+                    <strong>Attempt 2:</strong> Used IP address instead of domain - browser worked, mobile didn't.<br>
+                    <strong>Attempt 3:</strong> Checked firewall rules - ports 80 and 443 were open.
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">Actual Fix</h4>
+                <p class="text-gray-700 mb-3">
+                    The issue was that mobile carriers sometimes block direct connections to ports
+                    below 1024 on some networks. Running Pocketbase on port 8090 instead of 80
+                    solved it. Also needed to configure proper CORS for mobile origins.
+                </p>
+                <div class="code-block mt-3">
+                    <pre><code class="language-bash"># Run Pocketbase on port 8090 instead of 80
+./pocketbase serve --http 0.0.0.0:8090
+
+# Set up reverse proxy (Nginx) to handle SSL and CORS
+server {
+    listen 443 ssl http2;
+    server_name api.yourdomain.com;
+
+    ssl_certificate /path/to/cert.pem;
+    ssl_certificate_key /path/to/key.pem;
+
+    location / {
+        proxy_pass http://localhost:8090;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        # CORS for mobile
+        add_header 'Access-Control-Allow-Origin' '*' always;
+        add_header 'Access-Control-Allow-Methods' 'GET, POST, PUT, DELETE, OPTIONS' always;
+        add_header 'Access-Control-Allow-Headers' 'Authorization, Content-Type' always;
+    }
+}</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- GitHub Issue #2 -->
+        <div class="issue-box">
+            <div class="issue-title">
+                <a href="https://github.com/pocketbase/pocketbase/issues?q=is%3Aissue+relation+not+loading"
+                   target="_blank"
+                   class="text-pink-700 hover:underline">
+                    Relation Fields Not Loading in Flutter App
+                </a>
+            </div>
+            <div class="issue-body mt-4">
+                <h4 class="font-semibold text-gray-800 mb-2">Problem</h4>
+                <p class="text-gray-700 mb-3">
+                    Created two collections: "posts" and "users", with a relation field in posts pointing to users.
+                    When fetching posts in Flutter, the user field came back null. Direct API call showed the relation ID,
+                    but the expanded data wasn't there.
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">What I Tried</h4>
+                <p class="text-gray-700 mb-3">
+                    <strong>Attempt 1:</strong> Verified relation was set up correctly in Pocketbase UI - it was.<br>
+                    <strong>Attempt 2:</strong> Tried fetching users separately and joining manually - tedious and didn't sync properly.<br>
+                    <strong>Attempt 3:</strong> Checked API documentation - seemed like I was doing it right.
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">Actual Fix</h4>
+                <p class="text-gray-700 mb-3">
+                    Pocketbase requires explicit expansion of relations via the "expand" query parameter.
+                    The Flutter SDK needs to be told which relations to fetch. Not obvious from the basic documentation.
+                </p>
+                <div class="code-block mt-3">
+                    <pre><code class="language-dart">// Flutter code to fetch posts with expanded user relation
+final records = await pb.collection('posts').getList(
+  expand: 'user',  // This is the key! Tell Pocketbase to expand relations
+  filter: 'published = true',
+);
+
+// For multiple relations
+final records = await pb.collection('posts').getList(
+  expand: 'user,category,tags',  // Comma-separated list
+);
+
+// Access expanded data
+for (var record in records.items) {
+  final user = record.expand['user'];  // Access expanded relation
+  print('Post by ${user['name']}');
+}
+
+// Alternative: Use expand on specific fields
+final record = await pb.collection('posts').getOne(
+  recordId,
+  expand: 'user',  // Works for single record too
+);</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- GitHub Issue #3 -->
+        <div class="issue-box">
+            <div class="issue-title">
+                <a href="https://github.com/pocketbase/pocketbase/issues?q=is%3Aissue+realtime+subscription"
+                   target="_blank"
+                   class="text-pink-700 hover:underline">
+                    Realtime Subscription Not Receiving Updates
+                </a>
+            </div>
+            <div class="issue-body mt-4">
+                <h4 class="font-semibold text-gray-800 mb-2">Problem</h4>
+                <p class="text-gray-700 mb-3">
+                    Set up a realtime subscription to listen for new posts. Initial connection worked fine,
+                    but when I created a new post (through the admin UI), the Flutter app didn't receive anything.
+                    The subscription was active but silent.
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">What I Tried</h4>
+                <p class="text-gray-700 mb-3">
+                    <strong>Attempt 1:</strong> Checked subscription status - showed "connected".<br>
+                    <strong>Attempt 2:</strong> Tried subscribing to "*" (all events) - still nothing.<br>
+                    <strong>Attempt 3:</strong> Added logs to confirm posts were being created - they were.
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">Actual Fix</h4>
+                <p class="text-gray-700 mb-3">
+                    Realtime subscriptions need proper rule configuration in Pocketbase. The admin user creating
+                    posts didn't trigger client subscriptions because the rules weren't set up to broadcast
+                    those events. Also needed to handle the subscribe callback properly in Flutter.
+                </p>
+                <div class="code-block mt-3">
+                    <pre><code class="language-dart">// Flutter realtime subscription setup
+// Subscribe to posts collection updates
+pb.collection('posts').subscribe('*', (e) {
+  switch (e.action) {
+    case 'create':
+      print('New post created: ${e.record['title']}');
+      break;
+    case 'update':
+      print('Post updated: ${e.record['title']}');
+      break;
+    case 'delete':
+      print('Post deleted: ${e.record['title']}');
+      break;
+  }
+}, filter: 'published = true');  // Optional: filter events
+
+// Important: Handle connection state
+pb.collection('posts').subscribe('*', (e) {
+  print('Event received: $e');
+}, onError: (error) {
+  print('Subscription error: $error');
+});
+
+// In Pocketbase admin UI, ensure API rules allow subscription:
+// Settings → API Rules → Posts → Set "View" rule to allow access
+// For public subscriptions, set: "id = @request.auth.id || published = true"
+
+// Keep subscription alive (Flutter lifecycle)
+@override
+void dispose() {
+  pb.collection('posts').unsubscribe();
+  super.dispose();
+}</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- What I Learned Section -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">What I Learned</h2>
+            <ul class="list-disc pl-6 space-y-3 text-gray-700">
+                <li><strong>Lesson 1:</strong> Run Pocketbase on high ports (8090+) with reverse proxy - avoids mobile network blocking.</li>
+                <li><strong>Lesson 2:</strong> Always use the "expand" parameter for relations - it's not automatic.</li>
+                <li><strong>Lesson 3:</strong> Realtime subscriptions require proper API rules - check permissions when events aren't firing.</li>
+                <li><strong>Overall:</strong> Pocketbase is incredibly simple but has some gotchas. The single-binary deployment
+                    is amazing for side projects, and it handles way more traffic than you'd expect from a "lightweight" backend.</li>
+            </ul>
+        </section>
+
+        <!-- Production Setup -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Production Setup</h2>
+            <p class="text-gray-700 mb-4">
+                Complete production deployment with systemd and reverse proxy.
+            </p>
+
+            <div class="code-block">
+                <pre><code class="language-bash"># 1. Download and install Pocketbase
+wget https://github.com/pocketbase/pocketbase/releases/download/v0.22.0/pocketbase_0.22.0_linux_amd64.zip
+unzip pocketbase_0.22.0_linux_amd64.zip -d /opt/pocketbase
+
+# 2. Create systemd service
+cat > /etc/systemd/system/pocketbase.service << EOF
+[Unit]
+Description=Pocketbase
+After=network.target
+
+[Service]
+Type=simple
+User=pocketbase
+WorkingDirectory=/opt/pocketbase
+ExecStart=/opt/pocketbase/pocketbase serve --http0.0.0.0:8090
+Restart=always
+RestartSec=5s
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+# 3. Create user and set permissions
+useradd -r -s /bin/false pocketbase
+chown -R pocketbase:pocketbase /opt/pocketbase
+
+# 4. Start service
+systemctl daemon-reload
+systemctl enable pocketbase
+systemctl start pocketbase
+
+# 5. Set up Nginx reverse proxy
+cat > /etc/nginx/sites-available/pocketbase << EOF
+server {
+    listen 443 ssl http2;
+    server_name api.yourdomain.com;
+
+    ssl_certificate /etc/letsencrypt/live/api.yourdomain.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/api.yourdomain.com/privkey.pem;
+
+    location / {
+        proxy_pass http://localhost:8090;
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \$scheme;
+
+        # CORS for mobile apps
+        add_header 'Access-Control-Allow-Origin' '*' always;
+        add_header 'Access-Control-Allow-Methods' 'GET, POST, PUT, DELETE, OPTIONS' always;
+        add_header 'Access-Control-Allow-Headers' 'Authorization, Content-Type' always;
+
+        if (\$request_method = 'OPTIONS') {
+            return 204;
+        }
+    }
+}
+EOF
+
+ln -s /etc/nginx/sites-available/pocketbase /etc/nginx/sites-enabled/
+nginx -t && systemctl reload nginx</code></pre>
+            </div>
+
+            <div class="code-block mt-4">
+                <pre><code class="language-dart">// Flutter initialization
+import 'package:pocketbase/pocketbase.dart';
+
+final pb = Pocketbase('https://api.yourdomain.com');
+
+// Auth example
+final authData = await pb.collection('users').create(
+  email: 'user@example.com',
+  password: 'securepassword',
+  passwordConfirm: 'securepassword',
+);
+
+// Save token for later
+await pb.collection('users').requestVerification('user@example.com');
+
+// Store auth token
+final prefs = await SharedPreferences.getInstance();
+await prefs.setString('pb_token', pb.authStore.token);
+
+// Restore auth later
+pb.authStore.loadFromToken(prefs.getString('pb_token') ?? '');</code></pre>
+            </div>
+        </section>
+
+        <!-- Monitoring & Debugging -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Monitoring & Debugging</h2>
+            <p class="text-gray-700 mb-4">
+                Essential commands for Pocketbase maintenance:
+            </p>
+
+            <h3 class="text-xl font-semibold text-gray-800 mt-6 mb-3">Essential Commands</h3>
+            <div class="code-block mb-4">
+                <pre><code class="language-bash"># Check service status
+systemctl status pocketbase
+
+# View logs
+journalctl -u pocketbase -f
+
+# Restart service
+systemctl restart pocketbase
+
+# Backup data
+tar -czf pocketbase_backup_$(date +%Y%m%d).tar.gz /opt/pocketbase/pb_data
+
+# Admin UI access
+# https://api.yourdomain.com/_/
+# Default admin: create on first visit
+
+# Test API endpoint
+curl https://api.yourdomain.com/api/collections/posts/records \
+  -H "Authorization: Bearer YOUR_TOKEN"</code></pre>
+            </div>
+
+            <h3 class="text-xl font-semibold text-gray-800 mt-6 mb-3">Red Flags to Watch For</h3>
+            <ul class="list-disc pl-6 space-y-2 text-gray-700">
+                <li>Service restarting frequently - check disk space and memory usage</li>
+                <li>Mobile apps timing out - verify reverse proxy and CORS configuration</li>
+                <li>Realtime not working - check API rules and subscription filters</li>
+                <li>Slow query performance - consider adding indexes in SQLite</li>
+            </ul>
+        </section>
+
+        <!-- Related Links -->
+        <section class="bg-blue-50 rounded-lg p-6 border border-blue-200">
+            <h3 class="font-semibold text-gray-800 mb-3">Related Resources</h3>
+            <ul class="space-y-2">
+                <li><a href="supabase-2026-03-31.html" class="text-blue-600 hover:underline">Supabase: PostgreSQL Backend</a></li>
+                <li><a href="appwrite-2026-03-31.html" class="text-blue-600 hover:underline">Appwrite: Full-Stack Backend</a></li>
+                <li><a href="https://github.com/pocketbase/pocketbase" target="_blank" class="text-blue-600 hover:underline">Pocketbase Official GitHub</a></li>
+                <li><a href="https://pocketbase.io/docs" target="_blank" class="text-blue-600 hover:underline">Official Documentation</a></li>
+            </ul>
+        </section>
+    </article>
+
+    <script>
+        // Initialize Prism.js
+        if (typeof Prism !== 'undefined') {
+            Prism.highlightAll();
+        }
+    </script>
+</body>
+</html>

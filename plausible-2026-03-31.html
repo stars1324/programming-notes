@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plausible: Privacy Analytics That Don't Suck</title>
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-LMWN7814BX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-LMWN7814BX');
+    </script>
+
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Install Plausible Docker self-hosted analytics. Privacy-friendly alternative to Google Analytics with easy setup.">
+    <meta name="keywords" content="Plausible, privacy friendly analytics, install Plausible Docker, Google Analytics alternative, GDPR compliant">
+    <link rel="canonical" href="https://pnt.jacbex.com/plausible-2026-03-31.html">
+
+    <!-- Open Graph / Social Media -->
+    <meta property="og:title" content="Plausible: Privacy Analytics That Don't Suck">
+    <meta property="og:description" content="Install Plausible Docker self-hosted analytics. Privacy-friendly GA alternative.">
+    <meta property="og:type" content="article">
+
+    <!-- JSON-LD Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "Plausible: Privacy Analytics That Don't Suck",
+      "description": "Install Plausible Docker self-hosted analytics, a privacy-friendly Google Analytics alternative",
+      "author": {
+        "@type": "Person",
+        "name": "Programming Notes"
+      },
+      "datePublished": "2026-03-31",
+      "keywords": ["Plausible", "privacy analytics", "self-hosted analytics", "Docker analytics", "GDPR"],
+      "url": "https://pnt.jacbex.com/plausible-2026-03-31.html"
+    }
+    </script>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Prism.js for syntax highlighting -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-yaml.min.js"></script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+        .code-block { background: #2d2d2d; border-radius: 8px; overflow: hidden; }
+        .code-block pre { margin: 0; padding: 1rem; overflow-x: auto; }
+        .code-block code { font-family: 'Fira Code', monospace; font-size: 0.9rem; }
+        .issue-box {
+            border-left: 4px solid #ec4899;
+            background: #fdf2f8;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .issue-title { font-weight: 600; color: #be185d; }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <article class="max-w-4xl mx-auto px-4 py-8">
+        <!-- Header -->
+        <header class="mb-12">
+            <h1 class="text-4xl font-bold text-gray-900 mb-4">Plausible: Privacy Analytics That Don't Suck</h1>
+            <p class="text-xl text-gray-600">
+                Tried Umami first - too basic. Looked at Matomo - too heavy. Plausible hit the sweet spot:
+                clean UI, actually useful insights, and my users' data stays on my server.
+                Cost me $6/month to host vs Google's "free" product that sells your data.
+            </p>
+        </header>
+
+        <!-- GitHub Issue #1 -->
+        <div class="issue-box">
+            <div class="issue-title">
+                <a href="https://github.com/plausible/hosting/issues?q=is%3Aissue+SMTP+configuration"
+                   target="_blank"
+                   class="text-pink-700 hover:underline">
+                    Password Reset Emails Not Sending
+                </a>
+            </div>
+            <div class="issue-body mt-4">
+                <h4 class="font-semibold text-gray-800 mb-2">Problem</h4>
+                <p class="text-gray-700 mb-3">
+                    Got Plausible running fine, but the "forgot password" feature did nothing.
+                    Users (including me) couldn't reset passwords. Checked the logs - no error messages,
+                    just silence when trying to send emails.
+                    <br><br>
+                    Error: <code class="bg-gray-100 px-2 py-1 rounded">{:error, :send_failed}</code> in Plausible logs.
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">What I Tried</h4>
+                <p class="text-gray-700 mb-3">
+                    <strong>Attempt 1:</strong> Verified SMTP credentials worked with telnet - they did.<br>
+                    <strong>Attempt 2:</strong> Changed SMTP ports (587, 465, 25) - none worked.<br>
+                    <strong>Attempt 3:</strong> Tried Gmail SMTP - also failed (less secure app issue).
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">Actual Fix</h4>
+                <p class="text-gray-700 mb-3">
+                    Plausible requires specific SMTP environment variables, and the mailer adapter
+                    wasn't configured. Needed to set SMTP_HOST_ADDR, SMTP_HOST_PORT, and use a proper mailer service.
+                    Also, some providers (like Mailgun) require TLS which needs explicit configuration.
+                </p>
+                <div class="code-block mt-3">
+                    <pre><code class="language-bash"># In docker-compose.yml, add to plausible service:
+environment:
+  # SMTP Configuration
+  MAILER_EMAIL: noreply@yourdomain.com
+  SMTP_HOST_ADDR: smtp.mailgun.org
+  SMTP_HOST_PORT: 587
+  SMTP_USER_NAME: postmaster@yourdomain.com
+  SMTP_USER_PASSWORD: ${SMTP_PASSWORD}
+  SMTP_RETRIES: 2
+  SMTP_TLS: "true"  # Critical for Mailgun and similar
+
+# Or for Gmail (requires App Password now):
+environment:
+  MAILER_EMAIL: your-email@gmail.com
+  SMTP_HOST_ADDR: smtp.gmail.com
+  SMTP_HOST_PORT: 587
+  SMTP_USER_NAME: your-email@gmail.com
+  SMTP_USER_PASSWORD: ${GMAIL_APP_PASSWORD}  # Generate in Google Account settings
+  SMTP_TLS: "true"
+
+# Test email sending from within container:
+docker exec plausible bash
+/app/plausible/bin/plausible exec release_tasks
+# Then trigger a password reset to test</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- GitHub Issue #2 -->
+        <div class="issue-box">
+            <div class="issue-title">
+                <a href="https://github.com/plausible/hosting/issues?q=is%3Aissue+Clickhouse+out+of+memory"
+                   target="_blank"
+                   class="text-pink-700 hover:underline">
+                    ClickHouse Running Out of Memory
+                </a>
+            </div>
+            <div class="issue-body mt-4">
+                <h4 class="font-semibold text-gray-800 mb-2">Problem</h4>
+                <p class="text-gray-700 mb-3">
+                    After running Plausible for 2 weeks with moderate traffic (~5k daily pageviews),
+                    the server started swapping. Checking htop, ClickHouse was consuming 2.5GB RAM
+                    on a 2GB VPS. The container got OOM killed and took analytics down.
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">What I Tried</h4>
+                <p class="text-gray-700 mb-3">
+                    <strong>Attempt 1:</strong> Added 4GB swap - kept swapping, performance degraded.<br>
+                    <strong>Attempt 2:</strong> Reduced ClickHouse memory limit in docker-compose - database queries started failing.<br>
+                    <strong>Attempt 3:</strong> Restarted ClickHouse - memory usage slowly climbed back up.
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">Actual Fix</h4>
+                <p class="text-gray-700 mb-3">
+                    ClickHouse is designed to use lots of RAM for performance. The solution: 1) Enable ClickHouse's
+                    memory profiler to understand what's consuming memory, 2) Configure appropriate memory limits
+                    that leave room for the OS and other containers, and 3) Set up log cleanup to prevent unbounded growth.
+                </p>
+                <div class="code-block mt-3">
+                    <pre><code class="language-yaml"># Add ClickHouse configuration with memory limits
+services:
+  clickhouse:
+    image: clickhouse/clickhouse-server:23
+    container_name: plausible_clickhouse
+    networks:
+      - plausible-network
+    volumes:
+      - ./data/clickhouse:/var/lib/clickhouse
+      - ./clickhouse/config.xml:/etc/clickhouse-server/config.d/custom.xml:ro
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
+
+# Create clickhouse/config.xml:
+# <clickhouse>
+#   <max_memory_usage>1500000000</max_memory_usage>  <!-- 1.5GB -->
+#   <max_bytes_before_external_sort>1000000000</max_bytes_before_external_sort>
+#   <max_bytes_before_external_group_by>1000000000</max_bytes_before_external_group_by>
+#   <log_level>warning</log_level>
+#   <logger>
+#     <level>warning</level>
+#     <size>100M</size>  <!-- Limit log size -->
+#     <count>3</count>   <!-- Keep 3 rotations -->
+#   </logger>
+# </clickhouse>
+
+# For low-traffic sites, you can also disable some ClickHouse features:
+# ClickHouse config → disable unnecessary table functions</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- GitHub Issue #3 -->
+        <div class="issue-box">
+            <div class="issue-title">
+                <a href="https://github.com/plausible/hosting/issues?q=is%3Aissue+CORS+error"
+                   target="_blank"
+                   class="text-pink-700 hover:underline">
+                    Tracking Script CORS Error on Multi-Site Setup
+                </a>
+            </div>
+            <div class="issue-body mt-4">
+                <h4 class="font-semibold text-gray-800 mb-2">Problem</h4>
+                <p class="text-gray-700 mb-3">
+                    Added Plausible tracking to multiple domains on different servers.
+                    Worked fine on the main domain, but other sites showed CORS errors in console:
+                    "Cross-origin request blocked: same-origin policy".
+                    Tracking events weren't being recorded from those sites.
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">What I Tried</h4>
+                <p class="text-gray-700 mb-3">
+                    <strong>Attempt 1:</strong> Added CORS headers in my site's Nginx config - didn't help (wrong place).<br>
+                    <strong>Attempt 2:</strong> Used the same tracking script on all sites - CORS errors persisted.<br>
+                    <strong>Attempt 3:</strong> Tried accessing Plausible via IP instead of domain - browser blocked mixed content.
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">Actual Fix</h4>
+                <p class="text-gray-700 mb-3">
+                    The CORS configuration needs to be on the Plausible server itself, not the sites being tracked.
+                    Plausible has a BASE_URL configuration that needs to match your domain. Also needed to configure
+                    the reverse proxy to send proper CORS headers for the /api/event endpoint.
+                </p>
+                <div class="code-block mt-3">
+                    <pre><code class="language-nginx"># Nginx reverse proxy config for Plausible
+server {
+    listen 443 ssl http2;
+    server_name analytics.yourdomain.com;
+
+    # Basic proxy setup
+    location / {
+        proxy_pass http://localhost:8000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    # Specific CORS handling for event tracking
+    location /api/event {
+        proxy_pass http://localhost:8000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+
+        # CORS headers for cross-site tracking
+        add_header 'Access-Control-Allow-Origin' '*' always;
+        add_header 'Access-Control-Allow-Methods' 'POST, OPTIONS' always;
+        add_header 'Access-Control-Allow-Headers' 'Content-Type' always;
+
+        if ($request_method = 'OPTIONS') {
+            return 204;
+        }
+    }
+}
+
+# In Plausible docker-compose.yml:
+environment:
+  BASE_URL: https://analytics.yourdomain.com
+  # Important: must match the domain accessing it</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- What I Learned Section -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">What I Learned</h2>
+            <ul class="list-disc pl-6 space-y-3 text-gray-700">
+                <li><strong>Lesson 1:</strong> SMTP configuration is tricky - use Mailgun or similar service for reliable email delivery.</li>
+                <li><strong>Lesson 2:</strong> ClickHouse needs significant RAM - budget at least 2GB RAM for small deployments, 4GB+ for production.</li>
+                <li><strong>Lesson 3:</strong> CORS issues happen when tracking across domains - configure headers on the Plausible server, not client sites.</li>
+                <li><strong>Overall:</strong> Plausible is more resource-intensive than Umami but provides better analytics.
+                    The trade-off is worth it if you need detailed insights, but not if you just want basic pageview counts.</li>
+            </ul>
+        </section>
+
+        <!-- Production Setup -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Production Setup</h2>
+            <p class="text-gray-700 mb-4">
+                Complete production setup with all services properly configured.
+            </p>
+
+            <div class="code-block">
+                <pre><code class="language-yaml"># docker-compose.yml for Plausible Hosting
+version: "3.8"
+
+services:
+  plausible_db:
+    image: postgres:15-alpine
+    container_name: plausible_db
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=plausible
+      - POSTGRES_USER=plausible
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+    networks:
+      - plausible-network
+    restart: always
+
+  plausible_events_db:
+    image: clickhouse/clickhouse-server:23
+    container_name: plausible_events_db
+    volumes:
+      - ./data/clickhouse:/var/lib/clickhouse
+      - ./clickhouse/config.xml:/etc/clickhouse-server/config.d/custom.xml:ro
+    networks:
+      - plausible-network
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
+    restart: always
+
+  plausible:
+    image: plausible/analytics:latest
+    container_name: plausible
+    command: sh -c "sleep 10 && /entrypoint.sh db createdb && /entrypoint.sh db migrate && /entrypoint.sh db init-admin && /entrypoint.sh run"
+    depends_on:
+      - plausible_db
+      - plausible_events_db
+    ports:
+      - 127.0.0.1:8000:8000
+    environment:
+      - BASE_URL=https://analytics.yourdomain.com
+      - SECRET_KEY_BASE=${SECRET_KEY_BASE}
+      - DATABASE_URL=postgresql://plausible:${DB_PASSWORD}@plausible_db:5432/plausible
+      - CLICKHOUSE_DATABASE_URL=clickhouse://plausible_events_db:8123/plausible_events_db
+      - SERVER_PORT=8000
+      - DISABLE_REGISTRATION=true
+      - ADMIN_USER_EMAIL=${ADMIN_EMAIL}
+      - ADMIN_USER_NAME=admin
+      - ADMIN_USER_PWD=${ADMIN_PASSWORD}
+    networks:
+      - plausible-network
+    restart: always
+
+networks:
+  plausible-network:</code></pre>
+            </div>
+
+            <div class="code-block mt-4">
+                <pre><code class="language-bash"># Generate secrets in .env file
+cat > .env << EOF
+# Generate with: openssl rand -base64 64 | tr -d '\n'
+SECRET_KEY_BASE=your_generated_secret_key_here
+
+# Generate with: openssl rand -base64 32
+DB_PASSWORD=your_generated_db_password_here
+
+ADMIN_EMAIL=your@email.com
+ADMIN_PASSWORD=your_secure_admin_password
+EOF
+
+# ClickHouse config file (clickhouse/config.xml)
+cat > clickhouse/config.xml << EOF
+<clickhouse>
+  <max_memory_usage>1500000000</max_memory_usage>
+  <logger>
+    <level>warning</level>
+    <size>100M</size>
+    <count>3</count>
+  </logger>
+</clickhouse>
+EOF
+
+# Start everything
+docker-compose up -d
+
+# Wait for initialization, then access:
+# https://analytics.yourdomain.com</code></pre>
+            </div>
+        </section>
+
+        <!-- Monitoring & Debugging -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Monitoring & Debugging</h2>
+            <p class="text-gray-700 mb-4">
+                Essential commands for maintaining Plausible:
+            </p>
+
+            <h3 class="text-xl font-semibold text-gray-800 mt-6 mb-3">Essential Commands</h3>
+            <div class="code-block mb-4">
+                <pre><code class="language-bash"># View logs
+docker-compose logs -f plausible
+
+# Check database sizes
+docker exec plausible_events_db clickhouse-client --query "SELECT formatReadableSize(sum(bytes)) FROM system.parts WHERE active"
+
+# Count events in database
+docker exec plausible_events_db clickhouse-client --query "SELECT COUNT(*) FROM plausible_events_db.events"
+
+# Backup PostgreSQL database
+docker exec plausible_db pg_dump -U plausible plausible | gzip > backup_$(date +%Y%m%d).sql.gz
+
+# Restart services
+docker-compose restart plausible
+
+# Update to latest version
+docker-compose pull
+docker-compose up -d</code></pre>
+            </div>
+
+            <h3 class="text-xl font-semibold text-gray-800 mt-6 mb-3">Red Flags to Watch For</h3>
+            <ul class="list-disc pl-6 space-y-2 text-gray-700">
+                <li>ClickHouse using >2GB RAM - consider upgrading server or tuning memory limits</li>
+                <li>Events not appearing within 5 minutes - check database connectivity</li>
+                <li>SMTP failures in logs - verify email credentials and TLS settings</li>
+                <li>Disk growing >100MB/day - configure log rotation and data retention</li>
+            </ul>
+        </section>
+
+        <!-- Related Links -->
+        <section class="bg-blue-50 rounded-lg p-6 border border-blue-200">
+            <h3 class="font-semibold text-gray-800 mb-3">Related Resources</h3>
+            <ul class="space-y-2">
+                <li><a href="umami-2026-03-31.html" class="text-blue-600 hover:underline">Umami: Lightweight Alternative</a></li>
+                <li><a href="nginx-proxy-manager-2026-03-31.html" class="text-blue-600 hover:underline">Nginx Proxy Manager: Reverse Proxy</a></li>
+                <li><a href="https://github.com/plausible/hosting" target="_blank" class="text-blue-600 hover:underline">Plausible Hosting GitHub</a></li>
+                <li><a href="https://plausible.io/docs" target="_blank" class="text-blue-600 hover:underline">Official Documentation</a></li>
+            </ul>
+        </section>
+    </article>
+
+    <script>
+        // Initialize Prism.js
+        if (typeof Prism !== 'undefined') {
+            Prism.highlightAll();
+        }
+    </script>
+</body>
+</html>
