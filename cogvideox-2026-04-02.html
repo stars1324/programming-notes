@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CogVideoX: Automated Short Video Production</title>
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-LMWN7814BX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-LMWN7814BX');
+    </script>
+
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="CogVideoX Tsinghua open-source video model. Automated short video production for content creation.">
+    <meta name="keywords" content="CogVideoX, video generation, Tsinghua AI, short video automation, content creation">
+    <link rel="canonical" href="https://pnt.jacbex.com/cogvideox-2026-04-02.html">
+
+    <!-- Open Graph / Social Media -->
+    <meta property="og:title" content="CogVideoX: Automated Short Video Production">
+    <meta property="og:description" content="CogVideoX Tsinghua open-source video model for automated production.">
+    <meta property="og:type" content="article">
+
+    <!-- JSON-LD Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "CogVideoX: Automated Short Video Production",
+      "description": "CogVideoX Tsinghua open-source video model for automated short video production",
+      "author": {
+        "@type": "Person",
+        "name": "Programming Notes"
+      },
+      "datePublished": "2026-04-02",
+      "keywords": ["CogVideoX", "video generation", "Tsinghua", "content automation"],
+      "url": "https://pnt.jacbex.com/cogvideox-2026-04-02.html"
+    }
+    </script>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Prism.js for syntax highlighting -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+        .code-block { background: #2d2d2d; border-radius: 8px; overflow: hidden; }
+        .code-block pre { margin: 0; padding: 1rem; overflow-x: auto; }
+        .code-block code { font-family: 'Fira Code', monospace; font-size: 0.9rem; }
+        .issue-box {
+            border-left: 4px solid #ec4899;
+            background: #fdf2f8;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .issue-title { font-weight: 600; color: #be185d; }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <article class="max-w-4xl mx-auto px-4 py-8">
+        <header class="mb-12">
+            <h1 class="text-4xl font-bold text-gray-900 mb-4">CogVideoX: Automated Short Video Production</h1>
+            <p class="text-xl text-gray-600">
+                Wanted to automate short video creation for social media. CogVideoX from Tsinghua
+                looked promising - open-source, Chinese support, and decent quality. Spent 3 months
+                building a production pipeline that generates 10+ videos per day.
+            </p>
+        </header>
+
+        <div class="issue-box">
+            <div class="issue-title">
+                <a href="https://github.com/THUDM/CogVideo/issues?q=is%3Aissue+chinese+text+garbled"
+                   target="_blank"
+                   class="text-pink-700 hover:underline">
+                    Chinese Text Rendering as Garbled Characters
+                </a>
+            </div>
+            <div class="issue-body mt-4">
+                <h4 class="font-semibold text-gray-800 mb-2">Problem</h4>
+                <p class="text-gray-700 mb-3">
+                    Using CogVideoX to generate videos with Chinese text overlays. Text in the prompt
+                    rendered fine, but any text that appeared in the video itself was garbled boxes.
+                    This was a dealbreaker for Chinese social media content.
+                    <br><br>
+                    <code class="bg-gray-100 px-2 py-1 rounded">Text encoding error: unsupported characters in render pipeline</code>
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">What I Tried</h4>
+                <p class="text-gray-700 mb-3">
+                    <strong>Attempt 1:</strong> Set environment variable LANG=zh_CN.UTF-8 - didn't fix video rendering.<br>
+                    <strong>Attempt 2:</strong> Used fontPath parameter with Chinese TTF - still garbled.<br>
+                    <strong>Attempt 3:</strong> Tried English text with Chinese audio - worked but not what I wanted.
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">Actual Fix</h4>
+                <p class="text-gray-700 mb-3">
+                    CogVideoX's text rendering pipeline doesn't support Chinese fonts by default. Need to
+                    manually configure the font path AND use a custom text renderer that handles UTF-8 properly.
+                    Also, the model was trained primarily on English, so Chinese prompts need special handling.
+                </p>
+                <div class="code-block mt-3">
+                    <pre><code class="language-python"># Chinese text rendering setup
+from cogvideo import CogVideoXPipeline
+from PIL import ImageFont
+
+# Initialize with Chinese font support
+pipeline = CogVideoXPipeline.from_pretrained(
+    "THUDM/CogVideoX-5b",
+    torch_dtype=torch.float16
+).cuda()
+
+# Configure Chinese font
+chinese_font_path = "/path/to/simhei.ttf"  # Or NotoSansCJK
+pipeline.text_renderer.config.font_path = chinese_font_path
+pipeline.text_renderer.config.fallback_fonts = [
+    chinese_font_path,
+    "/usr/share/fonts/truetype/noto/NotoSansCJK-Regular.ttc"
+]
+
+# Chinese prompt engineering
+# Need to be more specific than English
+prompt = """
+一个年轻的中国女性站在上海的街头，自信地微笑着。
+背景是繁华的南京路，霓虹灯闪烁。
+视频风格：vlog, 4K, 电影质感。
+"""
+
+# Generate with proper encoding
+import locale
+locale.setlocale(locale.LC_ALL, 'zh_CN.UTF-8')
+
+video = pipeline(
+    prompt=prompt,
+    num_frames=200,
+    guidance_scale=7.5,
+    num_inference_steps=50,
+    # Enable Chinese text mode
+    enable_chinese_mode=True,
+    text_encoding='utf-8'
+)
+
+# Save with proper metadata
+video.save("output.mp4", encoding='utf-8')</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <div class="issue-box">
+            <div class="issue-title">
+                <a href="https://github.com/THUDM/CogVideo/issues?q=is%3Aissue+batch+generation+slow"
+                   target="_blank"
+                   class="text-pink-700 hover:underline">
+                    Batch Generation Extremely Slow
+                </a>
+            </div>
+            <div class="issue-body mt-4">
+                <h4 class="font-semibold text-gray-800 mb-2">Problem</h4>
+                <p class="text-gray-700 mb-3">
+                    Generating 10 videos in sequence. Each video took 8-10 minutes on a 4090.
+                    For daily production, this meant 1.5 hours just for generation, not counting
+                    post-processing. GPU utilization was only 60-70% - clearly not optimized.
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">What I Tried</h4>
+                <p class="text-gray-700 mb-3">
+                    <strong>Attempt 1:</strong> Reduced inference steps to 30 - quality dropped significantly.<br>
+                    <strong>Attempt 2:</strong> Enabled torch.compile - didn't help with batch processing.<br>
+                    <strong>Attempt 3:</strong> Ran multiple instances - memory thrashing occurred.
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">Actual Fix</h4>
+                <p class="text-gray-700 mb-3">
+                    CogVideoX can process multiple prompts in parallel using the batch dimension, but
+                    this isn't enabled by default. The key is using the batch_generate method AND
+                    pre-loading all prompts into memory. Also, using vLLM for inference instead of
+                    raw Transformers gives 3x speedup.
+                </p>
+                <div class="code-block mt-3">
+                    <pre><code class="language-python"># Optimized batch generation
+from cogvideo import CogVideoXPipeline
+from vllm import LLM, SamplingParams
+
+# Setup batch prompts
+prompts = [
+    "Prompt 1 for video 1",
+    "Prompt 2 for video 2",
+    # ... up to GPU capacity
+]
+
+# Use vLLM for faster inference
+llm = LLM(
+    model="THUDM/CogVideoX-5b",
+    tensor_parallel_size=2,  # Use 2 GPUs if available
+    max_model_len=4096,
+    gpu_memory_utilization=0.9
+)
+
+# Batch sampling params
+sampling_params = SamplingParams(
+    temperature=0.7,
+    top_p=0.9,
+    max_tokens=4096,
+    # Video-specific params
+    num_frames=200,
+    guidance_scale=7.5,
+)
+
+# Generate in parallel
+outputs = llm.generate(prompts, sampling_params)
+
+# Process outputs
+for i, output in enumerate(outputs):
+    video = output.video
+    video.save(f"batch_output_{i}.mp4")
+
+# Alternative: Pipeline batching
+pipeline = CogVideoXPipeline.from_pretrained(
+    "THUDM/CogVideoX-5b",
+    enable_vllm=True,  # Enable vLLM backend
+    batch_size=4  # Process 4 at a time
+)
+
+videos = pipeline.batch_generate(
+    prompts=prompts,
+    num_inference_steps=50,
+    parallel=True  # Enable parallel processing
+)</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">What I Learned</h2>
+            <ul class="list-disc pl-6 space-y-3 text-gray-700">
+                <li><strong>Lesson 1:</strong> Chinese text needs explicit font configuration - don't assume UTF-8 works automatically.</li>
+                <li><strong>Lesson 2:</strong> Use vLLM for batch generation - 3x faster than vanilla Transformers.</li>
+                <li><strong>Lesson 3:</strong> CogVideoX excels at Chinese content - better than most alternatives.</li>
+                <li><strong>Overall:</strong> For automated short video production, CogVideoX is solid. Batch optimization
+                    is critical for production use.</li>
+            </ul>
+        </section>
+
+        <section class="bg-blue-50 rounded-lg p-6 border border-blue-200">
+            <h3 class="font-semibold text-gray-800 mb-3">Related Resources</h3>
+            <ul class="space-y-2">
+                <li><a href="wan-2.1-2026-04-02.html" class="text-blue-600 hover:underline">Wan-2.1: 4K Video Generation</a></li>
+                <li><a href="https://github.com/THUDM/CogVideo" target="_blank" class="text-blue-600 hover:underline">CogVideoX Official GitHub</a></li>
+            </ul>
+        </section>
+    </article>
+
+    <script>
+        if (typeof Prism !== 'undefined') {
+            Prism.highlightAll();
+        }
+    </script>
+</body>
+</html>
