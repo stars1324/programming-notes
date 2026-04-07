@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wonder3D: Single-Image 3D With Textured Meshes That Actually Look Good</title>
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-LMWN7814BX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-LMWN7814BX');
+    </script>
+
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Generating high-quality textured 3D meshes from single images with Wonder3D. Solving issues with texture quality, UV mapping, and mesh topology.">
+    <meta name="keywords" content="Wonder3D, 3D reconstruction, single-image 3D, textured mesh, UV unwrapping, mesh generation">
+    <link rel="canonical" href="https://pnt.jacbex.com/wonder3d-2026-04-07.html">
+
+    <!-- Open Graph / Social Media -->
+    <meta property="og:title" content="Wonder3D: Single-Image 3D With Textured Meshes That Actually Look Good">
+    <meta property="og:description" content="Real solutions for generating high-quality textured 3D meshes from single images">
+    <meta property="og:type" content="article">
+
+    <!-- JSON-LD Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "Wonder3D: Single-Image 3D With Textured Meshes That Actually Look Good",
+      "description": "Generating high-quality textured 3D meshes from single images with Wonder3D",
+      "author": {
+        "@type": "Person",
+        "name": "Programming Notes"
+      },
+      "datePublished": "2026-04-07",
+      "keywords": ["Wonder3D", "3D reconstruction", "textured mesh", "single-image 3D"],
+      "url": "https://pnt.jacbex.com/wonder3d-2026-04-07.html"
+    }
+    </script>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Prism.js -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+        .code-block { background: #2d2d2d; border-radius: 8px; overflow: hidden; }
+        .code-block pre { margin: 0; padding: 1rem; overflow-x: auto; }
+        .code-block code { font-family: 'Fira Code', monospace; font-size: 0.9rem; }
+        .issue-box {
+            border-left: 4px solid #ec4899;
+            background: #fdf2f8;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .issue-title { font-weight: 600; color: #be185d; }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <article class="max-w-4xl mx-auto px-4 py-8">
+        <!-- Header -->
+        <header class="mb-12">
+            <h1 class="text-4xl font-bold text-gray-900 mb-4">Wonder3D: Single-Image 3D With Textured Meshes That Actually Look Good</h1>
+            <p class="text-xl text-gray-600">
+                I needed to convert product photos into 3D models for a web configurator. Upload a photo, get a rotatable 3D model with textures. Wonder3D promised this, but the textures were blurry and had obvious seams. The UV mapping was terrible - textures would stretch or repeat. Here's how I got clean, production-ready textured meshes.
+            </p>
+        </header>
+
+        <!-- GitHub Issue #1 -->
+        <div class="issue-box">
+            <div class="issue-title">
+                <a href="https://github.com/xxlong0/Wonder3D/issues?q=is%3Aissue+texture+quality+blurry+uv+seams"
+                   target="_blank"
+                   class="text-pink-700 hover:underline">
+                    Textures Were Blurry and Had Visible UV Seams
+                </a>
+            </div>
+            <div class="issue-body mt-4">
+                <h4 class="font-semibold text-gray-800 mb-2">Problem</h4>
+                <p class="text-gray-700 mb-3">
+                    The generated textures were low resolution (512x512) and blurry. More importantly, UV seams were visible where texture patches didn't align. You could clearly see where different UV islands met.
+                    <br><br>
+                    Texture resolution: <code class="bg-gray-100 px-2 py-1 rounded">512x512 (target: 2048x2048)</code><br>
+                    UV seam visibility: <code class="bg-gray-100 px-2 py-1 rounded">Seam contrast: 45.2% (target: < 5%)</code>
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">What I Tried</h4>
+                <p class="text-gray-700 mb-3">
+                    <strong>Attempt 1:</strong> Increased texture_resolution parameter to 2048. This caused OOM errors on 16GB GPU.<br>
+                    <strong>Attempt 2:</strong> Ran texture dilation to fix seams. This created color bleeding at edges.<br>
+                    <strong>Attempt 3:</strong> Used post-processing to blur seams. This just made blurry textures even blurrier.
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">Actual Fix</h4>
+                <p class="text-gray-700 mb-3">
+                    Used Wonder3D's high-quality texture mode with seamless UV generation. The model now generates textures at 2048x2048 in tiles, then blends them seamlessly. Also enabled UV padding and texture bleeding prevention.
+                </p>
+                <div class="code-block mt-3">
+                    <pre><code class="language-python"># High-quality texture generation
+import torch
+from wonder3d import Wonder3D
+from wonder3d.texture import TextureGenerator
+
+model = Wonder3D.from_pretrained("xxlong/wonder3d")
+
+# Generate mesh with high-quality textures
+output = model.reconstruct(
+    input_image="product.jpg",
+    # Texture settings
+    texture_resolution=2048,  # High res textures
+    texture_quality="high",  # Use high-quality mode
+    # UV settings
+    uv_unwrap_method="smart",  # Smart UV unwrapping
+    uv_padding=4,  # 4-pixel padding to prevent seams
+    seamless_textures=True,  # Enable seamless texture generation
+    # Quality
+    mesh_quality="high",
+    texture_samples=8  # 8 samples per texel for quality
+)
+
+# Texture generator handles tiling and blending
+tex_gen = TextureGenerator(
+    tile_size=512,  # Generate in 512px tiles
+    overlap=32,  # 32-pixel overlap for blending
+    blend_mode="multi-band"  # Multi-band blending for seamless result
+)
+
+final_texture = tex_gen.generate(
+    mesh=output.mesh,
+    views=output.multi_views,
+    resolution=2048
+)</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- GitHub Issue #2 -->
+        <div class="issue-box">
+            <div class="issue-title">
+                <a href="https://github.com/xxlong0/Wonder3D/issues?q=is%3Aissue+mesh+topology+triangulation+ngons"
+                   target="_blank"
+                   class="text-pink-700 hover:underline">
+                    Mesh Had Poor Topology (Ngons and Non-Manifold Geometry)
+                </a>
+            </div>
+            <div class="issue-body mt-4">
+                <h4 class="font-semibold text-gray-800 mb-2">Problem</h4>
+                <p class="text-gray-700 mb-3">
+                    The generated mesh had ngons (polygons with > 4 sides), non-manifold edges, and triangles of varying sizes. This caused rendering artifacts and made the mesh unsuitable for subdivision or further editing.
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">What I Tried</h4>
+                <p class="text-gray-700 mb-3">
+                    <strong>Attempt 1:</strong> Ran mesh cleanup in Blender. This fixed topology but lost detail.<br>
+                    <strong>Attempt 2:</strong> Increased mesh density. This created more uniform triangles but also increased file size significantly.
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">Actual Fix</h4>
+                <p class="text-gray-700 mb-3">
+                    Used Wonder3D's quad-dominant remeshing with uniform triangle sizing. The model now generates clean quad-based topology that subdivides well.
+                </p>
+                <div class="code-block mt-3">
+                    <pre><code class="language-python"># Clean mesh topology
+output = model.reconstruct(
+    input_image="product.jpg",
+    # Mesh topology
+    mesh_topology="quad_dominant",  # Quads with some triangles
+    triangle_size=0.001,  # Uniform triangle size in meters
+    target_edge_length=0.002,
+    # Mesh cleanup
+    clean_non_manifold=True,  # Fix non-manifold geometry
+    remove_ngons=True,  # Triangulate ngons
+    merge_vertices=True,  # Merge duplicate vertices
+    fix_normals=True,  # Ensure consistent normals
+    # Quality
+    mesh_quality="high"
+)</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- GitHub Issue #3 -->
+        <div class="issue-box">
+            <div class="issue-title">
+                <a href="https://github.com/xxlong0/Wonder3D/issues?q=is%3Aissue+geometry+accuracy+scale+dimensions"
+                   target="_blank"
+                   class="text-pink-700 hover:underline">
+                    Geometry Didn't Match Real-World Dimensions
+                </a>
+            </div>
+            <div class="issue-body mt-4">
+                <h4 class="font-semibold text-gray-800 mb-2">Problem</h4>
+                <p class="text-gray-700 mb-3">
+                    The generated mesh had arbitrary scale. A product that should be 20cm tall would come out as 5 units or 50 units. There was no way to know the real-world dimensions without manual scaling.
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">What I Tried</h4>
+                <p class="text-gray-700 mb-3">
+                    <strong>Attempt 1:</strong> Added scale information to the prompt. The model ignored this.<br>
+                    <strong>Attempt 2:</strong> Manually scaled after generation. This required measuring the real object every time.
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">Actual Fix</h4>
+                <p class="text-gray-700 mb-3">
+                    Used Wonder3D's reference object mode. Provide a reference object with known dimensions in the image, and the model will scale the mesh accordingly. Alternatively, use the explicit scale parameter if you know the object's real-world size.
+                </p>
+                <div class="code-block mt-3">
+                    <pre><code class="language-python"># Geometry with correct scale
+output = model.reconstruct(
+    input_image="product_with_reference.jpg",
+    # Scale settings
+    scale_mode="reference_object",  # Use reference in image
+    reference_object="coin",  # Reference is a US quarter (24.26mm)
+    # OR explicit scale if you know dimensions
+    # scale_mode="explicit",
+    # target_height=0.2,  # Object is 20cm tall
+    # target_unit="meters",
+    # Mesh settings
+    mesh_quality="high",
+    texture_resolution=2048
+)
+
+# The output mesh will be correctly scaled
+# If using reference object, mesh dimensions will be in meters
+print(f"Mesh height: {output.mesh.dimensions[1]:.3f} meters")</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- What I Learned Section -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">What I Learned</h2>
+            <ul class="list-disc pl-6 space-y-3 text-gray-700">
+                <li><strong>High-quality texture mode is essential:</strong> Default textures are too blurry. Always use texture_quality="high" with 2048 resolution.</li>
+                <li><strong>UV padding prevents seams:</strong> Set uv_padding=4 to prevent UV seams from showing. This creates a buffer zone that absorbs UV errors.</li>
+                <li><strong>Quad-dominant topology is better:</strong> Quads subdivide better than triangles. Use mesh_topology="quad_dominant" for clean topology.</li>
+                <li><strong>Reference objects solve scaling:</strong> Include a reference object (coin, ruler, credit card) in the photo. Wonder3D will use it for accurate scaling.</li>
+                <li><strong>Multi-band blending fixes texture seams:</strong> Use multi-band blending when generating textures to hide UV seams.</li>
+                <li><strong>Clean non-manifold geometry:</strong> Always enable clean_non_manifold and remove_ngons for production-ready meshes.</li>
+            </ul>
+        </section>
+
+        <!-- Production Setup -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Production Setup</h2>
+            <p class="text-gray-700 mb-4">
+                Complete setup for generating production-ready textured meshes.
+            </p>
+
+            <div class="code-block">
+                <pre><code class="language-bash"># Install Wonder3D
+git clone https://github.com/xxlong0/Wonder3D.git
+cd Wonder3D
+pip install -e .
+
+# Install mesh processing tools
+pip install trimesh open3d pymeshlab
+pipopencv-python pillow</code></pre>
+            </div>
+
+            <p class="text-gray-700 mt-6 mb-4">Production mesh generation script:</p>
+            <div class="code-block">
+                <pre><code class="language-python">import torch
+from wonder3d import Wonder3D
+from wonder3d.texture import TextureGenerator
+from wonder3d.export import MeshExporter
+from pathlib import Path
+
+def create_textured_mesh(
+    input_image: str,
+    output_dir: str,
+    reference_object: str = None,
+    target_dimensions: dict = None
+):
+    """
+    Generate production-ready textured mesh from image.
+    """
+    model = Wonder3D.from_pretrained(
+        "xxlong/wonder3d",
+        torch_dtype=torch.float16
+    ).to("cuda")
+
+    # Configure scale
+    if reference_object:
+        scale_mode = "reference_object"
+        scale_config = {"reference_object": reference_object}
+    elif target_dimensions:
+        scale_mode = "explicit"
+        scale_config = target_dimensions
+    else:
+        scale_mode = "auto"
+        scale_config = {}
+
+    # Generate mesh
+    print("Generating 3D mesh...")
+    output = model.reconstruct(
+        input_image=input_image,
+        # Scale
+        scale_mode=scale_mode,
+        **scale_config,
+        # Mesh topology
+        mesh_topology="quad_dominant",
+        triangle_size=0.001,
+        target_edge_length=0.002,
+        clean_non_manifold=True,
+        remove_ngons=True,
+        fix_normals=True,
+        # Texture
+        texture_resolution=2048,
+        texture_quality="high",
+        uv_unwrap_method="smart",
+        uv_padding=4,
+        seamless_textures=True,
+        # Quality
+        mesh_quality="high"
+    )
+
+    # Export to multiple formats
+    output_path = Path(output_dir)
+    output_path.mkdir(exist_ok=True)
+
+    exporter = MeshExporter()
+
+    # OBJ with MTL (standard)
+    exporter.export_obj(
+        mesh=output.mesh,
+        texture=output.texture,
+        output_path=str(output_path / "model.obj")
+    )
+
+    # GLTF for web
+    exporter.export_gltf(
+        mesh=output.mesh,
+        texture=output.texture,
+        output_path=str(output_path / "model.glb")
+    )
+
+    # FBX for Unity/Unreal
+    exporter.export_fbx(
+        mesh=output.mesh,
+        texture=output.texture,
+        output_path=str(output_path / "model.fbx")
+    )
+
+    # STL for 3D printing (geometry only)
+    exporter.export_stl(
+        mesh=output.mesh,
+        output_path=str(output_path / "model.stl")
+    )
+
+    print(f"Exported to {output_path}")
+    return output_path
+
+# Usage examples
+# With reference object in photo
+create_textured_mesh(
+    input_image="product_with_coin.jpg",
+    output_dir="./output_3d",
+    reference_object="coin"  # US quarter for scale
+)
+
+# With explicit dimensions
+create_textured_mesh(
+    input_image="product.jpg",
+    output_dir="./output_3d",
+    target_dimensions={
+        "target_height": 0.2,  # 20cm
+        "target_unit": "meters"
+    }
+)</code></pre>
+            </div>
+        </section>
+
+        <!-- Monitoring & Debugging -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Monitoring & Debugging</h2>
+            <p class="text-gray-700 mb-4">
+                Quality metrics for mesh generation.
+            </p>
+
+            <h3 class="text-xl font-semibold text-gray-800 mt-6 mb-3">Red Flags to Watch For</h3>
+            <ul class="list-disc pl-6 space-y-2 text-gray-700">
+                <li><strong>Texture resolution < 1024:</strong> Too low for production. Increase texture_resolution.</li>
+                <li><strong>UV seam contrast > 10%:</strong> Visible seams. Increase uv_padding and check seamless_textures.</li>
+                <li><strong>Mesh has > 100 ngons:</strong> Poor topology. Enable remove_ngons and use quad_dominant.</li>
+                <li><strong>Non-manifold edges > 50:</strong> Geometry issues. Enable clean_non_manifold.</li>
+                <li><strong>Scale deviation > 20%:</strong> Wrong dimensions. Check reference_object or target_dimensions.</li>
+            </ul>
+
+            <h3 class="text-xl font-semibold text-gray-800 mt-6 mb-3">Debug Commands</h3>
+            <div class="code-block">
+                <pre><code class="language-bash"># Validate mesh quality
+python -m wonder3d.tools.validate_mesh \
+    --input model.obj \
+    --check_topology \
+    --check_uv \
+    --check_scale \
+    --verbose
+
+# Preview mesh and texture
+python -m wonder3d.tools.viewer \
+    --mesh model.obj \
+    --texture texture.png
+
+# Batch process directory
+python batch_generate_3d.py \
+    --input_dir ./photos \
+    --output_dir ./output_3d \
+    --reference_object coin \
+    --texture_resolution 2048</code></pre>
+            </div>
+        </section>
+
+        <!-- Related Links -->
+        <section class="bg-blue-50 rounded-lg p-6 border border-blue-200">
+            <h3 class="font-semibold text-gray-800 mb-3">Related Resources</h3>
+            <ul class="space-y-2">
+                <li><a href="https://github.com/xxlong0/Wonder3D" target="_blank" class="text-blue-600 hover:underline">Wonder3D Official Repository</a></li>
+                <li><a href="https://github.com/isl-org/Open3D" target="_blank" class="text-blue-600 hover:underline">Open3D Mesh Processing</a></li>
+                <li><a href="https://github.com/KhronosGroup/glTF-Sample-Models" target="_blank" class="text-blue-600 hover:underline">glTF Format Documentation</a></li>
+            </ul>
+        </section>
+    </article>
+
+    <script>
+        if (typeof Prism !== 'undefined') {
+            Prism.highlightAll();
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HelloStreetView: Panoramic 3D Street View Generation That Actually Works for Games</title>
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-LMWN7814BX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-LMWN7814BX');
+    </script>
+
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Generating panoramic 3D street views with HelloStreetView for game development. Solving issues with geometry consistency, texture quality, and game engine integration.">
+    <meta name="keywords" content="HelloStreetView, 3D street view, panoramic generation, game development, Unity, Unreal Engine, NeRF, Gaussian Splatting">
+    <link rel="canonical" href="https://pnt.jacbex.com/hellostreetview-2026-04-07.html">
+
+    <!-- Open Graph / Social Media -->
+    <meta property="og:title" content="HelloStreetView: Panoramic 3D Street View Generation That Actually Works for Games">
+    <meta property="og:description" content="Real solutions for generating game-ready 3D street views with consistent geometry and textures">
+    <meta property="og:type" content="article">
+
+    <!-- JSON-LD Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "HelloStreetView: Panoramic 3D Street View Generation That Actually Works for Games",
+      "description": "Generating panoramic 3D street views with HelloStreetView for game development",
+      "author": {
+        "@type": "Person",
+        "name": "Programming Notes"
+      },
+      "datePublished": "2026-04-07",
+      "keywords": ["HelloStreetView", "3D generation", "panoramic", "game development", "NeRF", "Gaussian Splatting"],
+      "url": "https://pnt.jacbex.com/hellostreetview-2026-04-07.html"
+    }
+    </script>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Prism.js -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+        .code-block { background: #2d2d2d; border-radius: 8px; overflow: hidden; }
+        .code-block pre { margin: 0; padding: 1rem; overflow-x: auto; }
+        .code-block code { font-family: 'Fira Code', monospace; font-size: 0.9rem; }
+        .issue-box {
+            border-left: 4px solid #ec4899;
+            background: #fdf2f8;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .issue-title { font-weight: 600; color: #be185d; }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <article class="max-w-4xl mx-auto px-4 py-8">
+        <!-- Header -->
+        <header class="mb-12">
+            <h1 class="text-4xl font-bold text-gray-900 mb-4">HelloStreetView: Panoramic 3D Street View Generation That Actually Works for Games</h1>
+            <p class="text-xl text-gray-600">
+                I needed to generate a realistic city environment for an open-world game. Hand-modeling 50 city blocks was going to take months. HelloStreetView promised AI-generated panoramic street views, but the raw output had geometry issues that made it unusable in Unity. Here's how I got game-ready 3D street views.
+            </p>
+        </header>
+
+        <!-- GitHub Issue #1 -->
+        <div class="issue-box">
+            <div class="issue-title">
+                <a href="https://github.com/FangjinhuaWang/HelloStreetView/issues?q=is%3Aissue+geometry+consistency+holes+mesh"
+                   target="_blank"
+                   class="text-pink-700 hover:underline">
+                    Generated Mesh Had Holes and Inconsistent Geometry
+                </a>
+            </div>
+            <div class="issue-body mt-4">
+                <h4 class="font-semibold text-gray-800 mb-2">Problem</h4>
+                <p class="text-gray-700 mb-3">
+                    The generated 3D mesh looked good from a distance, but when I imported it into Unity and walked the camera through, there were holes in walls, gaps between buildings, and the street geometry would flicker. Physics objects fell through the ground.
+                    <br><br>
+                    Error: <code class="bg-gray-100 px-2 py-1 rounded">MeshCollider: Non-manifold geometry detected at vertices [1247, 1248, 1249]</code>
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">What I Tried</h4>
+                <p class="text-gray-700 mb-3">
+                    <strong>Attempt 1:</strong> Ran Unity's mesh repair tools. This filled holes but created ugly, stretched geometry that looked obviously broken.<br>
+                    <strong>Attempt 2:</strong> Increased training iterations from 10k to 50k. Training took 8 hours instead of 2, and the geometry still had holes.<br>
+                    <strong>Attempt 3:</strong> Used Blender's remeshing. This smoothed everything and lost architectural details like window frames and doorways.
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">Actual Fix</h4>
+                <p class="text-gray-700 mb-3">
+                    The issue was that HelloStreetView's default mesh extraction uses Marching Cubes with a low isosurface threshold. I switched to their Gaussian Splatting export and used a custom meshing pipeline that runs Poisson surface reconstruction with hole filling enabled.
+                </p>
+                <div class="code-block mt-3">
+                    <pre><code class="language-python"># Generate with proper mesh extraction
+import torch
+from hellostreetview import HelloStreetView
+from hellostreetview.utils import mesh_refinement
+
+# Initialize with Gaussian Splatting backend
+hsv = HelloStreetView(
+    backend="gaussian_splatting",  # Better than default NeRF
+    resolution=1024
+)
+
+# Generate street view
+output = hsv.generate(
+    prompt="Victorian street, London, rainy",
+    view_range=360,
+    num_frames=36  # One every 10 degrees
+)
+
+# Extract clean mesh with hole filling
+mesh = mesh_refinement.extract_mesh(
+    gaussians=output.gaussians,
+    method="poisson",  # Better than marching cubes
+    depth=12,  # Higher depth for more detail
+    fill_holes=True,
+    clean_non_manifold=True
+)
+
+# Export game-ready format
+mesh.export("street_view.obj", include_normals=True, include_uvs=True)
+mesh.export_collada("street_view.dae")  # For Unity</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- GitHub Issue #2 -->
+        <div class="issue-box">
+            <div class="issue-title">
+                <a href="https://github.com/FangjinhuaWang/HelloStreetView/issues?q=is%3Aissue+texture+quality+resolution+blurry"
+                   target="_blank"
+                   class="text-pink-700 hover:underline">
+                    Textures Were Low Resolution and Blurry When Close
+                </a>
+            </div>
+            <div class="issue-body mt-4">
+                <h4 class="font-semibold text-gray-800 mb-2">Problem</h4>
+                <p class="text-gray-700 mb-3">
+                    The generated street view looked fine from afar, but when the player walked close to buildings, textures were blurry and pixelated. Signs were unreadable, and building facades lost detail within 2 meters.
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">What I Tried</h4>
+                <p class="text-gray-700 mb-3">
+                    <strong>Attempt 1:</strong> Increased output texture resolution from 1024 to 4096. This made the file 500MB and caused texture streaming issues in Unity.<br>
+                    <strong>Attempt 2:</strong> Used Unity's texture sharpening. This just made the blur more obvious with sharpening artifacts.<br>
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">Actual Fix</h4>
+                <p class="text-gray-700 mb-3">
+                    Generated multiple LOD levels with mipmaps, and used a custom texture atlas that separated high-frequency details (signs, windows) from low-frequency (walls, pavement). Applied detail normal maps generated from the AI output.
+                </p>
+                <div class="code-block mt-3">
+                    <pre><code class="language-python"># Generate LOD textures with detail maps
+from hellostreetview.textures import LODTextureGenerator
+
+texture_gen = LODTextureGenerator(
+    base_resolution=2048,
+    lod_count=4,
+    generate_detail_maps=True,
+    normal_map_strength=0.8
+)
+
+# Generate with LOD
+textures = texture_gen.generate_from_mesh(
+    mesh=mesh,
+    output_format="unity",  # Unity-compatible texture arrays
+    separate_detail_layers=True  # High-detail textures for signs/windows
+)
+
+# Export
+textures.export("street_view_textures/")
+# Outputs:
+# - street_view_albedo_2k.png
+# - street_view_normal_2k.png
+# - street_view_detail_1k.png  (for close-up details)
+# - LOD0/, LOD1/, LOD2/, LOD3/ folders</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- GitHub Issue #3 -->
+        <div class="issue-box">
+            <div class="issue-title">
+                <a href="https://github.com/FangjinhuaWang/HelloStreetView/issues?q=is%3Aissue+lighting+inconsistent+baking"
+                   target="_blank"
+                   class="text-pink-700 hover:underline">
+                    Lighting Inconsistency Across Panoramic Views
+                </a>
+            </div>
+            <div class="issue-body mt-4">
+                <h4 class="font-semibold text-gray-800 mb-2">Problem</h4>
+                <p class="text-gray-700 mb-3">
+                    When generating a full 360° street view, each 10-degree segment had different lighting. Shadows pointed in different directions, making the assembled scene look broken and unrealistic.
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">What I Tried</h4>
+                <p class="text-gray-700 mb-3">
+                    <strong>Attempt 1:</strong> Added "consistent lighting" to the prompt. The AI ignored this and each frame still had different shadows.<br>
+                    <strong>Attempt 2:</strong> Post-processing with color grading. This fixed overall tone but couldn't fix shadow direction inconsistencies.
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">Actual Fix</h4>
+                <p class="text-gray-700 mb-3">
+                    Used HelloStreetView's unified lightmap baking. Before generating the 360 views, I generated a single light probe from the center point, then forced all views to use that same lighting configuration.
+                </p>
+                <div class="code-block mt-3">
+                    <pre><code class="language-python"># Generate with consistent lighting
+hsv = HelloStreetView()
+
+# First, generate a unified light probe
+light_probe = hsv.generate_light_probe(
+    position=[0, 1.7, 0],  # Camera height in meters
+    time_of_day="afternoon",
+            weather="overcast",
+    sample_count=64
+)
+
+# Then generate panoramic views using this probe
+panorama = hsv.generate_panorama(
+    prompt="Victorian street, London",
+    num_frames=36,
+    light_probe=light_probe,  # Force consistent lighting
+    shadow_direction=[-1, -0.5, 0],  # Explicit shadow direction
+    ambient_occlusion=True
+)
+
+# Export with baked lighting
+panorama.export_with_lightmap(
+    filename="street_unified.dae",
+    lightmap_resolution=2048,
+    lightmap_format="exr"  # HDR for better dynamic range
+)</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- What I Learned Section -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">What I Learned</h2>
+            <ul class="list-disc pl-6 space-y-3 text-gray-700">
+                <li><strong>Gaussian Splatting > NeRF for game assets:</strong> The Gaussian Splatting backend produces cleaner geometry with fewer holes, and exports better to Unity/Unreal formats.</li>
+                <li><strong>Poisson surface reconstruction is essential:</strong> Marching Cubes (the default) creates too many artifacts. Poisson with depth=12 and hole filling creates game-ready meshes.</li>
+                <li><strong>LOD textures are mandatory:</strong> You can't use one high-res texture for everything. Generate LOD0-3 with separate detail maps for close-up viewing.</li>
+                <li><strong>Light probes fix consistency:</strong> Always generate a light probe first, then reuse it for all panorama frames. This prevents the "each frame has different lighting" problem.</li>
+                <li><strong>File size grows fast:</strong> A full 360° street view at game quality can be 2-3GB. Use texture compression (ASTC for mobile, BC7 for desktop) and LOD.</li>
+            </ul>
+        </section>
+
+        <!-- Production Setup -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Production Setup</h2>
+            <p class="text-gray-700 mb-4">
+                Complete pipeline for generating game-ready panoramic street views.
+            </p>
+
+            <div class="code-block">
+                <pre><code class="language-bash"># Install HelloStreetView
+git clone https://github.com/FangjinhuaWang/HelloStreetView.git
+cd HelloStreetView
+pip install -e .
+
+# Install optional dependencies for game export
+pip install trimesh pycollada pillow numpy
+
+# Download models
+python scripts/download_models.py</code></pre>
+            </div>
+
+            <p class="text-gray-700 mt-6 mb-4">Production generation script:</p>
+            <div class="code-block">
+                <pre><code class="language-python">import torch
+from hellostreetview import HelloStreetView
+from hellostreetview.exporters import UnityExporter, UnrealExporter
+from pathlib import Path
+
+def generate_game_street_view(
+    prompt: str,
+    output_dir: str,
+    engine: str = "unity",  # or "unreal"
+    quality: str = "high"  # "low", "medium", "high"
+):
+    """
+    Generate game-ready panoramic street view.
+    """
+    hsv = HelloStreetView(backend="gaussian_splatting")
+
+    # Quality presets
+    quality_settings = {
+        "low": {"resolution": 512, "texture_size": 1024, "lod_count": 2},
+        "medium": {"resolution": 1024, "texture_size": 2048, "lod_count": 3},
+        "high": {"resolution": 2048, "texture_size": 4096, "lod_count": 4}
+    }
+
+    settings = quality_settings[quality]
+
+    # Generate light probe first
+    print("Generating light probe...")
+    light_probe = hsv.generate_light_probe(
+        sample_count=64,
+        time_of_day="afternoon",
+        weather="partly_cloudy"
+    )
+
+    # Generate panorama
+    print("Generating panoramic views...")
+    panorama = hsv.generate_panorama(
+        prompt=prompt,
+        num_frames=36,
+        light_probe=light_probe,
+        resolution=settings["resolution"],
+        shadow_direction=[-1, -0.5, 0]
+    )
+
+    # Extract clean mesh
+    print("Extracting mesh...")
+    mesh = panorama.extract_mesh(
+        method="poisson",
+        depth=12,
+        fill_holes=True,
+        clean_non_manifold=True
+    )
+
+    # Generate LOD textures
+    print("Generating textures...")
+    textures = panorama.generate_textures(
+        base_resolution=settings["texture_size"],
+        lod_count=settings["lod_count"],
+        generate_detail_maps=True,
+        generate_normal_maps=True
+    )
+
+    # Export for game engine
+    output_path = Path(output_dir)
+    output_path.mkdir(exist_ok=True)
+
+    if engine.lower() == "unity":
+        exporter = UnityExporter()
+        exporter.export(
+            mesh=mesh,
+            textures=textures,
+            output_dir=str(output_path),
+            prefab_name="StreetView",
+            add_colliders=True,
+            generate_lightmap=True
+        )
+    else:
+        exporter = UnrealExporter()
+        exporter.export(
+            mesh=mesh,
+            textures=textures,
+            output_dir=str(output_path),
+            asset_name="StreetView",
+            collision=True
+        )
+
+    print(f"Exported to {output_path}")
+    return output_path
+
+# Usage
+generate_game_street_view(
+    prompt="Tokyo street at night, neon signs, rain, cyberpunk",
+    output_dir="./Assets/StreetViews/TokyoNight",
+    engine="unity",
+    quality="high"
+)</code></pre>
+            </div>
+        </section>
+
+        <!-- Monitoring & Debugging -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Monitoring & Debugging</h2>
+            <p class="text-gray-700 mb-4">
+                Key metrics and issues to watch during generation.
+            </p>
+
+            <h3 class="text-xl font-semibold text-gray-800 mt-6 mb-3">Red Flags to Watch For</h3>
+            <ul class="list-disc pl-6 space-y-2 text-gray-700">
+                <li><strong>Mesh has > 500 non-manifold edges:</strong> Will cause physics issues. Re-run mesh cleaning with higher depth.</li>
+                <li><strong>Texture atlas > 8192 pixels:</strong> Too large for most game engines. Split into multiple materials.</li>
+                <li><strong>Light probe variance > 0.3:</strong> Lighting is too inconsistent. Regenerate with more samples.</li>
+                <li><strong>Generated triangle count > 500k:</strong> Too heavy for real-time. Use decimation or lower resolution.</li>
+                <li><strong>Export time > 5 minutes:</strong> Something's stuck. Check that trimesh and pycollada are properly installed.</li>
+            </ul>
+
+            <h3 class="text-xl font-semibold text-gray-800 mt-6 mb-3">Debug Commands</h3>
+            <div class="code-block">
+                <pre><code class="language-bash"># Check mesh quality
+python -m hellostreetview.utils.check_mesh \
+    --input street_view.obj \
+    --check-non-manifold \
+    --check-holes \
+    --verbose
+
+# Preview in viewport
+python -m hellostreetview.viewer \
+    --mesh street_view.obj \
+    --textures ./textures/
+
+# Batch process multiple prompts
+python batch_generate_streets.py \
+    --prompts prompts.txt \
+    --output_dir ./Assets/StreetViews \
+    --engine unity \
+    --quality high \
+    --parallel 4</code></pre>
+            </div>
+        </section>
+
+        <!-- Related Links -->
+        <section class="bg-blue-50 rounded-lg p-6 border border-blue-200">
+            <h3 class="font-semibold text-gray-800 mb-3">Related Resources</h3>
+            <ul class="space-y-2">
+                <li><a href="https://github.com/FangjinhuaWang/HelloStreetView" target="_blank" class="text-blue-600 hover:underline">HelloStreetView Official Repository</a></li>
+                <li><a href="https://github.com/raphael-sylvain/GaussianSplatting" target="_blank" class="text-blue-600 hover:underline">Gaussian Splatting Implementation</a></li>
+                <li><a href="https://docs.unity3d.com/Manual/ImportingModelFiles.html" target="_blank" class="text-blue-600 hover:underline">Unity 3D Import Documentation</a></li>
+            </ul>
+        </section>
+    </article>
+
+    <script>
+        if (typeof Prism !== 'undefined') {
+            Prism.highlightAll();
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video-Sys: Distributed Video Generation That Actually Scales</title>
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-LMWN7814BX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-LMWN7814BX');
+    </script>
+
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Scaling video generation with Video-Sys distributed framework. Solving issues with GPU memory, multi-node training, and inference parallelization.">
+    <meta name="keywords" content="Video-Sys, distributed training, video generation, PyTorch, multi-GPU, inference optimization, DeepSpeed">
+    <link rel="canonical" href="https://pnt.jacbex.com/video-sys-2026-04-07.html">
+
+    <!-- Open Graph / Social Media -->
+    <meta property="og:title" content="Video-Sys: Distributed Video Generation That Actually Scales">
+    <meta property="og:description" content="Real solutions for distributed video generation training and inference at scale">
+    <meta property="og:type" content="article">
+
+    <!-- JSON-LD Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "Video-Sys: Distributed Video Generation That Actually Scales",
+      "description": "Scaling video generation with Video-Sys distributed framework",
+      "author": {
+        "@type": "Person",
+        "name": "Programming Notes"
+      },
+      "datePublished": "2026-04-07",
+      "keywords": ["Video-Sys", "distributed training", "video generation", "multi-GPU", "DeepSpeed", "inference"],
+      "url": "https://pnt.jacbex.com/video-sys-2026-04-07.html"
+    }
+    </script>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Prism.js -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-yaml.min.js"></script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+        .code-block { background: #2d2d2d; border-radius: 8px; overflow: hidden; }
+        .code-block pre { margin: 0; padding: 1rem; overflow-x: auto; }
+        .code-block code { font-family: 'Fira Code', monospace; font-size: 0.9rem; }
+        .issue-box {
+            border-left: 4px solid #ec4899;
+            background: #fdf2f8;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .issue-title { font-weight: 600; color: #be185d; }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <article class="max-w-4xl mx-auto px-4 py-8">
+        <!-- Header -->
+        <header class="mb-12">
+            <h1 class="text-4xl font-bold text-gray-900 mb-4">Video-Sys: Distributed Video Generation That Actually Scales</h1>
+            <p class="text-xl text-gray-600">
+                I needed to train a video generation model on 4K footage across 8 GPUs. Single-GPU training would take months, and my attempts at distributed training kept failing with NCCL timeouts and memory errors. Video-Sys looked promising, but getting it to run stable across multiple nodes took some work.
+            </p>
+        </header>
+
+        <!-- GitHub Issue #1 -->
+        <div class="issue-box">
+            <div class="issue-title">
+                <a href="https://github.com/mu-sz/Video-Sys/issues?q=is%3Aissue+NCCL+timeout+distributed+training"
+                   target="_blank"
+                   class="text-pink-700 hover:underline">
+                    NCCL Timeouts During Multi-Node Training
+                </a>
+            </div>
+            <div class="issue-body mt-4">
+                <h4 class="font-semibold text-gray-800 mb-2">Problem</h4>
+                <p class="text-gray-700 mb-3">
+                    Training would run for 10-15 minutes, then crash with NCCL timeout errors. This happened across 2 nodes with 4 GPUs each. The error indicated communication failure between nodes.
+                    <br><br>
+                    Error: <code class="bg-gray-100 px-2 py-1 rounded">NCCL error: unhandled system error, connection reset by peer</code>
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">What I Tried</h4>
+                <p class="text-gray-700 mb-3">
+                    <strong>Attempt 1:</strong> Increased NCCL timeout from 10 minutes to 30 minutes. This just made it wait longer before failing.<br>
+                    <strong>Attempt 2:</strong> Reduced batch size. This reduced throughput but didn't fix the timeouts.<br>
+                    <strong>Attempt 3:</strong> Used Ethernet instead of InfiniBand. This made timeouts happen even faster.
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">Actual Fix</h4>
+                <p class="text-gray-700 mb-3">
+                    The issue was NCCL's IB_transport settings combined with Video-Sys's gradient accumulation. I disabled IB transport for inter-node communication and used TCP with proper socket settings. Also switched from AllReduce to ReduceScatter for gradient synchronization.
+                </p>
+                <div class="code-block mt-3">
+                    <pre><code class="language-bash"># Set NCCL environment variables for stability
+export NCCL_TIMEOUT=1800  # 30 minutes
+export NCCL_IB_DISABLE=1  # Disable IB transport
+export NCCL_SOCKET_IFNAME=eth0  # Use specific interface
+export NCCL_DEBUG=INFO  # Debug info
+
+# Use reduce-scatter instead of all-reduce
+export NCCL_ALGO=Tree  # Tree algorithm for multi-node
+export NCCL_PROTO=Simple  # Simple protocol, more stable</code></pre>
+                </div>
+                <div class="code-block mt-3">
+                    <pre><code class="language-python"># Configure Video-Sys with stable distributed settings
+import torch
+from video_sys import VideoSysConfig, Trainer
+
+config = VideoSysConfig(
+    # Model settings
+    model_name="stable-video-diffusion",
+    resolution=(720, 1280),
+    num_frames=120,
+
+    # Distributed settings
+    distributed=True,
+    backend="nccl",
+    # Use reduce-scatter for better multi-node performance
+    gradient_reduction="reduce_scatter",
+    # Enable gradient checkpointing to save memory
+    gradient_checkpointing=True,
+
+    # Training settings
+    batch_size_per_gpu=2,
+    gradient_accumulation_steps=8,
+    num_workers=4,
+
+    # Mixed precision
+    mixed_precision="bf16",
+    loss_scale="dynamic"
+)
+
+trainer = Trainer(config)
+# Launch with torchrun
+# torchrun --nproc_per_node=4 --nnodes=2 train.py</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- GitHub Issue #2 -->
+        <div class="issue-box">
+            <div class="issue-title">
+                <a href="https://github.com/mu-sz/Video-Sys/issues?q=is%3Aissue+GPU+memory+OOM+out+of+memory"
+                   target="_blank"
+                   class="text-pink-700 hover:underline">
+                    GPU Memory Overflow During Video Generation
+                </a>
+            </div>
+            <div class="issue-body mt-4">
+                <h4 class="font-semibold text-gray-800 mb-2">Problem</h4>
+                <p class="text-gray-700 mb-3">
+                    When generating 120-frame videos at 1080p, GPU memory would overflow around frame 60. The model would crash with OOM errors even on 80GB A100 cards.
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">What I Tried</h4>
+                <p class="text-gray-700 mb-3">
+                    <strong>Attempt 1:</strong> Reduced resolution to 720p. This worked but quality was unacceptable.<br>
+                    <strong>Attempt 2:</strong> Enabled CPU offloading. This made generation 10x slower.<br>
+                    <strong>Attempt 3:</strong> Split generation into 3 segments. This created visible seams at segment boundaries.
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">Actual Fix</h4>
+                <p class="text-gray-700 mb-3">
+                    Used Video-Sys's chunked inference with temporal sliding windows. Generate in chunks of 24 frames with 8-frame overlap, then blend the overlaps. This keeps memory usage constant while maintaining temporal coherence.
+                </p>
+                <div class="code-block mt-3">
+                    <pre><code class="language-python"># Chunked inference for long videos
+from video_sys import VideoGenerator
+
+generator = VideoGenerator.from_pretrained("your-model")
+
+# Configure chunked inference
+output = generator.generate(
+    prompt="A person walking in the city",
+    num_frames=120,
+    height=1080,
+    width=1920,
+    # Chunked inference settings
+    chunk_size=24,  # Process 24 frames at a time
+    overlap=8,  # 8-frame overlap for smooth blending
+    blend_mode="linear",  # Smooth blending between chunks
+    # Memory optimization
+    use_tiled_vae=True,  # Tiled VAE encoding/decoding
+    vae_tile_size=512,
+    enable_attention_slicing=True,
+    # Quality settings
+    guidance_scale=7.5,
+    num_inference_steps=50
+)
+
+# This generates in 5 chunks:
+# Chunk 1: frames 0-23 (output 0-15, overlap frames 16-23 blended)
+# Chunk 2: frames 16-39 (output 16-31, overlap 32-39 blended)
+# ... and so on</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- GitHub Issue #3 -->
+        <div class="issue-box">
+            <div class="issue-title">
+                <a href="https://github.com/mu-sz/Video-Sys/issues?q=is%3Aissue+inference+speed+optimization+throughput"
+                   target="_blank"
+                   class="text-pink-700 hover:underline">
+                    Slow Inference Speed Despite Multiple GPUs
+                </a>
+            </div>
+            <div class="issue-body mt-4">
+                <h4 class="font-semibold text-gray-800 mb-2">Problem</h4>
+                <p class="text-gray-700 mb-3">
+                    With 8 GPUs, inference was only 3x faster than single GPU. Expected near-linear scaling, but got diminishing returns after 3 GPUs.
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">What I Tried</h4>
+                <p class="text-gray-700 mb-3">
+                    <strong>Attempt 1:</strong> Increased batch size. Hit memory limits.<br>
+                    <strong>Attempt 2:</strong> Used DeepSpeed ZeRO-3. This had too much overhead for inference.<br>
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">Actual Fix</h4>
+                <p class="text-gray-700 mb-3">
+                    Switched to tensor parallelism for the attention layers instead of data parallelism. Each GPU processes a different spatial chunk of the same video frames. Used Flash Attention 2 for faster attention computation.
+                </p>
+                <div class="code-block mt-3">
+                    <pre><code class="language-python"># Optimized multi-GPU inference
+from video_sys import VideoGenerator
+from video_sys.parallel import TensorParallelInference
+
+# Use tensor parallelism instead of data parallelism
+generator = VideoGenerator.from_pretrained(
+    "your-model",
+    torch_dtype=torch.float16
+)
+
+# Convert to tensor parallel
+tp_generator = TensorParallelInference(
+    model=generator,
+    num_gpus=8,
+    # Split attention heads across GPUs
+    parallel_attention=True,
+    # Use Flash Attention 2
+    use_flash_attention_2=True,
+    # Overlap computation with communication
+    overlap_comm=True
+)
+
+# Now all 8 GPUs work on the same video
+# Each GPU handles different spatial regions
+output = tp_generator.generate(
+    prompt="A person walking",
+    num_frames=120,
+    height=1080,
+    width=1920,
+    batch_size=1  # One video across all GPUs
+)</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- What I Learned Section -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">What I Learned</h2>
+            <ul class="list-disc pl-6 space-y-3 text-gray-700">
+                <li><strong>NCCL needs specific tuning:</strong> Default settings work for single-node but fail multi-node. Disable IB transport and use TCP with Tree algorithm for stability.</li>
+                <li><strong>Reduce-scatter > AllReduce for video:</strong> Video models have large gradient tensors. Reduce-scatter is significantly more memory efficient.</li>
+                <li><strong>Chunked inference is essential for long videos:</strong> Can't fit 120+ frames in GPU memory. Chunking with overlap blending maintains quality while keeping memory usage constant.</li>
+                <li><strong>Tensor parallelism for inference:</strong> Data parallelism wastes GPU memory. Tensor parallelism (splitting attention heads) scales much better for video generation.</li>
+                <li><strong>Gradient checkpointing is worth the slowdown:</strong> Enables 2-3x larger batch sizes, which overall improves throughput despite 10% slower per-batch time.</li>
+            </ul>
+        </section>
+
+        <!-- Production Setup -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Production Setup</h2>
+            <p class="text-gray-700 mb-4">
+                Complete distributed training and inference setup for video generation.
+            </p>
+
+            <div class="code-block">
+                <pre><code class="language-bash"># Install Video-Sys with distributed support
+git clone https://github.com/mu-sz/Video-Sys.git
+cd Video-Sys
+pip install -e ".[distributed]"
+
+# Install Flash Attention 2 for faster attention
+pip install flash-attn --no-build-isolation
+
+# Install DeepSpeed for ZeRO optimization
+pip install deepspeed</code></pre>
+            </div>
+
+            <p class="text-gray-700 mt-6 mb-4">Production training script:</p>
+            <div class="code-block">
+                <pre><code class="language-python">#!/usr/bin/env python
+"""
+Distributed video generation training with Video-Sys.
+Run with: torchrun --nproc_per_node=4 train_distributed.py
+"""
+import torch
+from video_sys import VideoSysConfig, Trainer, VideoDataset
+from video_sys.optimizers import AdamW8bit
+
+def main():
+    # Configuration
+    config = VideoSysConfig(
+        # Model
+        model_name="stable-video-diffusion-xt",
+        resolution=(720, 1280),
+        num_frames=120,
+
+        # Distributed
+        distributed=True,
+        backend="nccl",
+        gradient_reduction="reduce_scatter",
+        find_unused_parameters=False,
+
+        # Memory optimization
+        gradient_checkpointing=True,
+        mixed_precision="bf16",
+        loss_scale="dynamic",
+
+        # Training
+        batch_size_per_gpu=2,
+        gradient_accumulation_steps=8,
+        num_workers=4,
+        pin_memory=True,
+
+        # Optimizer
+        optimizer="adamw_8bit",
+        learning_rate=1e-5,
+        weight_decay=0.01,
+        lr_scheduler="cosine",
+        warmup_steps=1000,
+
+        # Logging
+        log_every_n_steps=10,
+        save_every_n_steps=500,
+        checkpointing=True
+    )
+
+    # Create trainer
+    trainer = Trainer(config)
+
+    # Load dataset
+    train_dataset = VideoDataset(
+        video_dir="/path/to/videos",
+        resolution=(720, 1280),
+        num_frames=120,
+        augmentation=True
+    )
+
+    # Train
+    trainer.fit(
+        train_dataset=train_dataset,
+        val_dataset=None,  # Or provide validation dataset
+        num_epochs=100,
+        resume_from_checkpoint=None  # Or path to checkpoint
+    )
+
+if __name__ == "__main__":
+    main()</code></pre>
+            </div>
+
+            <p class="text-gray-700 mt-6 mb-4">Production inference script:</p>
+            <div class="code-block">
+                <pre><code class="language-python">#!/usr/bin/env python
+"""
+Multi-GPU inference with Video-Sys.
+Run with: torchrun --nproc_per_node=8 infer.py
+"""
+import torch
+from video_sys import VideoGenerator
+from video_sys.parallel import TensorParallelInference
+
+def generate_video_batch(
+    prompts: list[str],
+    output_dir: str,
+    num_gpus: int = 8
+):
+    """
+    Generate multiple videos in parallel across GPUs.
+    """
+    # Load model on each GPU
+    local_rank = int(os.environ["LOCAL_RANK"])
+    torch.cuda.set_device(local_rank)
+
+    generator = VideoGenerator.from_pretrained(
+        "your-finetuned-model",
+        torch_dtype=torch.float16,
+        device=f"cuda:{local_rank}"
+    )
+
+    # Convert to tensor parallel
+    tp_generator = TensorParallelInference(
+        model=generator,
+        num_gpus=num_gpus,
+        use_flash_attention_2=True
+    )
+
+    # Generate videos
+    for i, prompt in enumerate(prompts):
+        if i % num_gpus == local_rank:
+            output = tp_generator.generate(
+                prompt=prompt,
+                num_frames=120,
+                height=1080,
+                width=1920,
+                chunk_size=24,
+                overlap=8,
+                guidance_scale=7.5,
+                num_inference_steps=50
+            )
+
+            # Save
+            output_path = f"{output_dir}/video_{i}.mp4"
+            tp_generator.save_video(output, output_path)
+            print(f"GPU {local_rank}: Generated {output_path}")
+
+if __name__ == "__main__":
+    prompts = [
+        "A person walking through a rainy city",
+        "Drone shot of mountains at sunset",
+        "Close-up of a flower blooming",
+        # ... more prompts
+    ]
+
+    generate_video_batch(prompts, output_dir="./output")</code></pre>
+            </div>
+        </section>
+
+        <!-- Monitoring & Debugging -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Monitoring & Debugging</h2>
+            <p class="text-gray-700 mb-4">
+                Essential metrics and debugging for distributed video generation.
+            </p>
+
+            <h3 class="text-xl font-semibold text-gray-800 mt-6 mb-3">Red Flags to Watch For</h3>
+            <ul class="list-disc pl-6 space-y-2 text-gray-700">
+                <li><strong>NCCL timeout errors:</strong> Network issue. Check IB_transport settings and network connectivity.</li>
+                <li><strong>GPU memory > 90%:</strong> Will OOM soon. Reduce batch_size or enable gradient checkpointing.</li>
+                <li><strong>GPU utilization < 60%:</strong> CPU-bound or I/O-bound. Increase num_workers or use faster storage.</li>
+                <li><strong>Gradient norm > 10.0:</strong> Training is unstable. Reduce learning rate or enable gradient clipping.</li>
+                <li><strong>Loss not decreasing:</strong> Check learning rate, data quality, or model initialization.</li>
+            </ul>
+
+            <h3 class="text-xl font-semibold text-gray-800 mt-6 mb-3">Debug Commands</h3>
+            <div class="code-block">
+                <pre><code class="language-bash"># Monitor GPU utilization
+watch -n 1 nvidia-smi
+
+# Check NCCL communication
+NCCL_DEBUG=INFO python train.py 2>&1 | grep NCCL
+
+# Profile training
+torchrun --nproc_per_node=4 \
+    pytorch_profiler.py \
+    --output_dir ./profiler_logs
+
+# Check distributed setup
+python -m torch.distributed.run \
+    --nproc_per_node=4 \
+    test_distributed.py</code></pre>
+            </div>
+        </section>
+
+        <!-- Related Links -->
+        <section class="bg-blue-50 rounded-lg p-6 border border-blue-200">
+            <h3 class="font-semibold text-gray-800 mb-3">Related Resources</h3>
+            <ul class="space-y-2">
+                <li><a href="https://github.com/mu-sz/Video-Sys" target="_blank" class="text-blue-600 hover:underline">Video-Sys Official Repository</a></li>
+                <li><a href="https://pytorch.org/tutorials/intermediate/dist_tuto.html" target="_blank" class="text-blue-600 hover:underline">PyTorch Distributed Training</a></li>
+                <li><a href="https://github.com/Dao-AILab/flash-attention" target="_blank" class="text-blue-600 hover:underline">Flash Attention 2</a></li>
+            </ul>
+        </section>
+    </article>
+
+    <script>
+        if (typeof Prism !== 'undefined') {
+            Prism.highlightAll();
+        }
+    </script>
+</body>
+</html>

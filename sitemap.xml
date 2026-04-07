@@ -612,4 +612,52 @@
         <changefreq>weekly</changefreq>
         <priority>0.9</priority>
     </url>
+    <url>
+        <loc>https://pnt.jacbex.com/mimicmotion-2026-04-07.html</loc>
+        <lastmod>2026-04-07</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.9</priority>
+    </url>
+    <url>
+        <loc>https://pnt.jacbex.com/hellostreetview-2026-04-07.html</loc>
+        <lastmod>2026-04-07</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.9</priority>
+    </url>
+    <url>
+        <loc>https://pnt.jacbex.com/video-sys-2026-04-07.html</loc>
+        <lastmod>2026-04-07</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.9</priority>
+    </url>
+    <url>
+        <loc>https://pnt.jacbex.com/musetalk-2026-04-07.html</loc>
+        <lastmod>2026-04-07</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.9</priority>
+    </url>
+    <url>
+        <loc>https://pnt.jacbex.com/syncdreamer-2026-04-07.html</loc>
+        <lastmod>2026-04-07</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.9</priority>
+    </url>
+    <url>
+        <loc>https://pnt.jacbex.com/animatediff-lightning-2026-04-07.html</loc>
+        <lastmod>2026-04-07</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.9</priority>
+    </url>
+    <url>
+        <loc>https://pnt.jacbex.com/dynamicrafter-2026-04-07.html</loc>
+        <lastmod>2026-04-07</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.9</priority>
+    </url>
+    <url>
+        <loc>https://pnt.jacbex.com/wonder3d-2026-04-07.html</loc>
+        <lastmod>2026-04-07</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.9</priority>
+    </url>
 </urlset>

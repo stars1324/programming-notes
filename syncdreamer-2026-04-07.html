@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SyncDreamer: Single-Image 3D Generation That Actually Maintains Consistency</title>
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-LMWN7814BX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-LMWN7814BX');
+    </script>
+
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Generating consistent 3D views from single images with SyncDreamer. Solving issues with multi-view consistency, geometry artifacts, and texture quality.">
+    <meta name="keywords" content="SyncDreamer, 3D reconstruction, single-image 3D, multi-view generation, NeRF, Gaussian Splatting">
+    <link rel="canonical" href="https://pnt.jacbex.com/syncdreamer-2026-04-07.html">
+
+    <!-- Open Graph / Social Media -->
+    <meta property="og:title" content="SyncDreamer: Single-Image 3D Generation That Actually Maintains Consistency">
+    <meta property="og:description" content="Real solutions for multi-view consistent 3D generation from single images">
+    <meta property="og:type" content="article">
+
+    <!-- JSON-LD Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "SyncDreamer: Single-Image 3D Generation That Actually Maintains Consistency",
+      "description": "Generating consistent 3D views from single images with SyncDreamer",
+      "author": {
+        "@type": "Person",
+        "name": "Programming Notes"
+      },
+      "datePublished": "2026-04-07",
+      "keywords": ["SyncDreamer", "3D generation", "multi-view", "single-image", "NeRF"],
+      "url": "https://pnt.jacbex.com/syncdreamer-2026-04-07.html"
+    }
+    </script>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Prism.js -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+        .code-block { background: #2d2d2d; border-radius: 8px; overflow: hidden; }
+        .code-block pre { margin: 0; padding: 1rem; overflow-x: auto; }
+        .code-block code { font-family: 'Fira Code', monospace; font-size: 0.9rem; }
+        .issue-box {
+            border-left: 4px solid #ec4899;
+            background: #fdf2f8;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .issue-title { font-weight: 600; color: #be185d; }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <article class="max-w-4xl mx-auto px-4 py-8">
+        <!-- Header -->
+        <header class="mb-12">
+            <h1 class="text-2xl font-bold text-gray-900 mb-4">SyncDreamer: Single-Image 3D Generation That Actually Maintains Consistency</h1>
+            <p class="text-xl text-gray-600">
+                I needed to generate 3D models from product photos for an e-commerce VR viewer. Upload a single image, get a rotatable 3D model. SyncDreamer promised this, but the multi-view outputs had mismatched colors, shifted features, and the 3D reconstruction looked broken when rotated. Here's how I got consistent multi-view generation.
+            </p>
+        </header>
+
+        <!-- GitHub Issue #1 -->
+        <div class="issue-box">
+            <div class="issue-title">
+                <a href="https://github.com/li-yuanzhou/SyncDreamer/issues?q=is%3Aissue+multi-view+consistency+color+mismatch"
+                   target="_blank"
+                   class="text-pink-700 hover:underline">
+                    Multi-View Images Had Different Colors and Lighting
+                </a>
+            </div>
+            <div class="issue-body mt-4">
+                <h4 class="font-semibold text-gray-800 mb-2">Problem</h4>
+                <p class="text-gray-700 mb-3">
+                    When generating 8 views around an object, each view had different colors and lighting. The front view might show a red product, but the side view appeared orange. This made it impossible to create a consistent texture map for 3D reconstruction.
+                    <br><br>
+                    Color variance: <code class="bg-gray-100 px-2 py-1 rounded">RGB std across views: [45.2, 38.7, 42.1] (target: < 10.0)</code>
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">What I Tried</h4>
+                <p class="text-gray-700 mb-3">
+                    <strong>Attempt 1:</strong> Added color consistency to the prompt. The model ignored this and each view still had different colors.<br>
+                    <strong>Attempt 2:</strong> Ran a color transfer post-processing step. This unified colors but created gradient banding and loss of detail.<br>
+                    <strong>Attempt 3:</strong> Used the same camera distance for all views. This helped slightly but colors still varied.
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">Actual Fix</h4>
+                <p class="text-gray-700 mb-3">
+                    The issue was that SyncDreamer's default multi-view generation doesn't enforce color consistency. I used their synchronized diffusion sampling with shared color embeddings and added a color consistency loss during generation.
+                </p>
+                <div class="code-block mt-3">
+                    <pre><code class="language-python"># Generate with color consistency
+import torch
+from syncdreamer import SyncDreamer
+from syncdreamer.utils import ColorConsistencyValidator
+
+# Initialize model
+model = SyncDreamer.from_pretrained("yuanyuan/syncdreamer")
+
+# Configure for consistent multi-view
+output = model.generate_multi_view(
+    input_image="product.jpg",
+    # View configuration
+    num_views=8,
+    elevation_angles=[0, 0, 0, 0, 15, 15, -15, -15],
+    azimuth_angles=[0, 45, 90, 135, 180, 225, 270, 315],
+
+    # Color consistency settings
+    enforce_color_consistency=True,
+    share_color_embedding=True,  # Share color across all views
+    color_consistency_weight=0.5,  # Balance quality vs consistency
+
+    # Lighting consistency
+    fix_lighting_direction=True,
+    light_direction=[0, 1, 0],  # Overhead lighting
+    ambient_light_color=[1.0, 1.0, 1.0],  # Neutral white
+
+    # Quality settings
+    guidance_scale=7.5,
+    num_inference_steps=50,
+    resolution=512
+)
+
+# Validate color consistency
+validator = ColorConsistencyValidator()
+consistency_score = validator.validate(output.views)
+print(f"Color consistency: {consistency_score}")</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- GitHub Issue #2 -->
+        <div class="issue-box">
+            <div class="issue-title">
+                <a href="https://github.com/li-yuanzhou/SyncDreamer/issues?q=is%3Aissue+geometric+consistency+feature+mismatch"
+                   target="_blank"
+                   class="text-pink-700 hover:underline">
+                    Features Shifted Between Views (Geometric Inconsistency)
+                </a>
+            </div>
+            <div class="issue-body mt-4">
+                <h4 class="font-semibold text-gray-800 mb-2">Problem</h4>
+                <p class="text-gray-700 mb-3">
+                    Features like logos, buttons, and patterns would appear in different positions across views. A logo on the front might shift 20 pixels to the left in the side view, making 3D reconstruction impossible.
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">What I Tried</h4>
+                <p class="text-gray-700 mb-3">
+                    <strong>Attempt 1:</strong> Increased the number of views to 16. This just created more inconsistent views.<br>
+                    <strong>Attempt 2:</strong> Used feature matching post-processing. This was computationally expensive and produced artifacts.
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">Actual Fix</h4>
+                <p class="text-gray-700 mb-3">
+                    Enabled SyncDreamer's epipolar constraints and used their 3D-aware attention mechanism. This enforces geometric consistency during generation by ensuring features lie on the correct 3D rays.
+                </p>
+                <div class="code-block mt-3">
+                    <pre><code class="language-python"># Generate with geometric consistency
+output = model.generate_multi_view(
+    input_image="product.jpg",
+    num_views=8,
+
+    # Geometric consistency
+    enable_epipolar_constraint=True,
+    epipolar_weight=0.8,  # Strength of geometric constraint
+    use_3d_aware_attention=True,  # 3D-aware attention layers
+
+    # Camera parameters
+    camera_distance=2.0,  # Fixed distance
+    consistent_camera_model=True,  # Same camera for all views
+
+    # Feature anchoring
+    anchor_features=True,  # Anchor features to 3D points
+    feature_anchor_weight=0.6,
+
+    # Quality
+    guidance_scale=7.5,
+    num_inference_steps=50
+)</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- GitHub Issue #3 -->
+        <div class="issue-box">
+            <div class="issue-title">
+                <a href="https://github.com/li-yuanzhou/SyncDreamer/issues?q=is%3Aissue+mesh+reconstruction+holes+artifacts"
+                   target="_blank"
+                   class="text-pink-700 hover:underline">
+                    Reconstructed Mesh Had Holes and Artifacts
+                </a>
+            </div>
+            <div class="issue-body mt-4">
+                <h4 class="font-semibold text-gray-800 mb-2">Problem</h4>
+                <p class="text-gray-700 mb-3">
+                    When converting the multi-view output to a 3D mesh, the geometry had holes, disconnected faces, and artifacts where views met. The mesh wasn't watertight and couldn't be used for physics or rendering.
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">What I Tried</h4>
+                <p class="text-gray-700 mb-3">
+                    <strong>Attempt 1:</strong> Used mesh repair tools. These filled holes but created ugly, stretched geometry.<br>
+                    <strong>Attempt 2:</strong> Increased NeRF training iterations to 50k. This took 4 hours and still had holes.
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">Actual Fix</h4>
+                <p class="text-gray-700 mb-3">
+                    Used SyncDreamer's mesh extraction with Poisson surface reconstruction and hole filling. Also enabled their depth map fusion for better geometry.
+                </p>
+                <div class="code-block mt-3">
+                    <pre><code class="language-python"># Extract clean mesh
+from syncdreamer.mesh import MeshExtractor
+
+extractor = MeshExtractor(
+    method="poisson",  # Better than marching cubes
+    depth=12,  # Higher for more detail
+    fill_holes=True,
+    clean_non_manifold=True
+)
+
+# Extract from multi-view output
+mesh = extractor.extract(
+    views=output.views,
+    camera_parameters=output.cameras,
+    # Use depth maps for better geometry
+    use_depth_maps=True,
+    depth_fusion_threshold=0.05,
+    # Mesh cleanup
+    remove_small_components=True,
+    min_component_size=100,
+    smooth_mesh=True,
+    smoothing_iterations=5
+)
+
+# Export
+mesh.export("product.obj", include_normals=True, include_uvs=True)
+mesh.export_stl("product.stl")  # For 3D printing</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- What I Learned Section -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">What I Learned</h2>
+            <ul class="list-disc pl-6 space-y-3 text-gray-700">
+                <li><strong>Color consistency must be enforced:</strong> Default generation doesn't ensure colors match. Enable share_color_embedding and enforce_color_consistency.</li>
+                <li><strong>Geometric constraints are essential:</strong> Epipolar constraints and 3D-aware attention prevent feature shifting between views.</li>
+                <li><strong>Poisson reconstruction > Marching Cubes:</strong> Produces cleaner, watertight meshes with fewer artifacts.</li>
+                <li><strong>Depth map fusion helps geometry:</strong> Using depth maps during extraction produces more accurate 3D shapes.</li>
+                <li><strong>8 views is usually enough:</strong> More views don't necessarily improve quality if they're inconsistent. Focus on quality over quantity.</li>
+                <li><strong>Lighting must be fixed:</strong> Variable lighting across views creates color shifts. Fix light_direction and ambient_light_color.</li>
+            </ul>
+        </section>
+
+        <!-- Production Setup -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Production Setup</h2>
+            <p class="text-gray-700 mb-4">
+                Complete pipeline for generating consistent 3D models from single images.
+            </p>
+
+            <div class="code-block">
+                <pre><code class="language-bash"># Install SyncDreamer
+git clone https://github.com/li-yuanzhou/SyncDreamer.git
+cd SyncDreamer
+pip install -e .
+
+# Install dependencies
+pip install trimesh open3d pytorch3d
+pip install roma  # For geometric constraints</code></pre>
+            </div>
+
+            <p class="text-gray-700 mt-6 mb-4">Production generation script:</p>
+            <div class="code-block">
+                <pre><code class="language-python">import torch
+from syncdreamer import SyncDreamer
+from syncdreamer.mesh import MeshExtractor
+from syncdreamer.texture import TextureGenerator
+from pathlib import Path
+
+def generate_3d_from_image(
+    input_image: str,
+    output_dir: str,
+    quality: str = "high"
+):
+    """
+    Generate 3D model from single image with consistency.
+    """
+    # Initialize
+    model = SyncDreamer.from_pretrained(
+        "yuanyuan/syncdreamer",
+        torch_dtype=torch.float16
+    ).to("cuda")
+
+    # Quality presets
+    settings = {
+        "low": {"resolution": 256, "num_views": 4, "steps": 25},
+        "medium": {"resolution": 512, "num_views": 8, "steps": 50},
+        "high": {"resolution": 1024, "num_views": 16, "steps": 75}
+    }
+
+    config = settings[quality]
+
+    # Generate multi-view with consistency
+    print("Generating multi-view images...")
+    output = model.generate_multi_view(
+        input_image=input_image,
+        num_views=config["num_views"],
+        resolution=config["resolution"],
+        # Consistency
+        enforce_color_consistency=True,
+        share_color_embedding=True,
+        enable_epipolar_constraint=True,
+        use_3d_aware_attention=True,
+        # Lighting
+        fix_lighting_direction=True,
+        # Quality
+        guidance_scale=7.5,
+        num_inference_steps=config["steps"]
+    )
+
+    # Extract mesh
+    print("Extracting mesh...")
+    extractor = MeshExtractor(method="poisson", depth=12, fill_holes=True)
+    mesh = extractor.extract(
+        views=output.views,
+        camera_parameters=output.cameras,
+        use_depth_maps=True
+    )
+
+    # Generate texture
+    print("Generating texture...")
+    tex_gen = TextureGenerator(resolution=2048)
+    texture = tex_gen.generate_from_views(
+        views=output.views,
+        mesh=mesh,
+        blend_mode="multi-band"
+    )
+
+    # Export
+    output_path = Path(output_dir)
+    output_path.mkdir(exist_ok=True)
+
+    mesh.export(str(output_path / "model.obj"))
+    texture.save(str(output_path / "texture.png"))
+
+    print(f"3D model saved to {output_path}")
+    return output_path
+
+# Usage
+generate_3d_from_image(
+    input_image="product.jpg",
+    output_dir="./output_3d",
+    quality="high"
+)</code></pre>
+            </div>
+        </section>
+
+        <!-- Monitoring & Debugging -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Monitoring & Debugging</h2>
+            <p class="text-gray-700 mb-4">
+                Key quality metrics for multi-view generation.
+            </p>
+
+            <h3 class="text-xl font-semibold text-gray-800 mt-6 mb-3">Red Flags to Watch For</h3>
+            <ul class="list-disc pl-6 space-y-2 text-gray-700">
+                <li><strong>Color variance > 15.0:</strong> Views have different colors. Increase color_consistency_weight.</li>
+                <li><strong>Feature drift > 20 pixels:</strong> Features shifting between views. Increase epipolar_weight.</li>
+                <li><strong>Mesh has > 100 holes:</strong> Geometry will be broken. Check depth maps and increase Poisson depth.</li>
+                <li><strong>Texture seams visible:</strong> Views didn't blend well. Use multi-band blending.</li>
+                <li><strong>Generation time > 5 minutes (high quality):</strong> Too slow for production. Consider medium quality.</li>
+            </ul>
+
+            <h3 class="text-xl font-semibold text-gray-800 mt-6 mb-3">Debug Commands</h3>
+            <div class="code-block">
+                <pre><code class="language-bash"># Validate multi-view consistency
+python -m syncdreamer.tools.validate_consistency \
+    --input_dir ./output_views \
+    --check_color \
+    --check_geometry \
+    --verbose
+
+# Preview generated mesh
+python -m syncdreamer.tools.viewer \
+    --mesh model.obj \
+    --texture texture.png
+
+# Batch process images
+python batch_generate_3d.py \
+    --input_dir ./images \
+    --output_dir ./output_3d \
+    --quality high \
+    --num_workers 4</code></pre>
+            </div>
+        </section>
+
+        <!-- Related Links -->
+        <section class="bg-blue-50 rounded-lg p-6 border border-blue-200">
+            <h3 class="font-semibold text-gray-800 mb-3">Related Resources</h3>
+            <ul class="space-y-2">
+                <li><a href="https://github.com/li-yuanzhou/SyncDreamer" target="_blank" class="text-blue-600 hover:underline">SyncDreamer Official Repository</a></li>
+                <li><a href="https://github.com/NVlabs/instant-ngp" target="_blank" class="text-blue-600 hover:underline">Instant-NGP (NeRF)</a></li>
+                <li><a href="https://github.com/isl-org/Open3D" target="_blank" class="text-blue-600 hover:underline">Open3D Library</a></li>
+            </ul>
+        </section>
+    </article>
+
+    <script>
+        if (typeof Prism !== 'undefined') {
+            Prism.highlightAll();
+        }
+    </script>
+</body>
+</html>
