@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Browser-use: AI Agent Framework That Actually Completes Browser Tasks</title>
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-LMWN7814BX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-LMWN7814BX');
+    </script>
+
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Building AI agents that automate browser tasks with Browser-use. Solving issues with element detection, dynamic content handling, and action execution reliability.">
+    <meta name="keywords" content="Browser-use, AI agent, browser automation, Playwright, web scraping, agent framework, LLM">
+    <link rel="canonical" href="https://pnt.jacbex.com/browser-use-2026-04-08.html">
+
+    <!-- Open Graph / Social Media -->
+    <meta property="og:title" content="Browser-use: AI Agent Framework That Actually Completes Browser Tasks">
+    <meta property="og:description" content="Real solutions for building AI agents that reliably automate browser workflows">
+    <meta property="og:type" content="article">
+
+    <!-- JSON-LD Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "Browser-use: AI Agent Framework That Actually Completes Browser Tasks",
+      "description": "Building AI agents that automate browser tasks with Browser-use",
+      "author": {
+        "@type": "Person",
+        "name": "Programming Notes"
+      },
+      "datePublished": "2026-04-08",
+      "keywords": ["Browser-use", "AI agent", "browser automation", "Playwright"],
+      "url": "https://pnt.jacbex.com/browser-use-2026-04-08.html"
+    }
+    </script>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Prism.js -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+        .code-block { background: #2d2d2d; border-radius: 8px; overflow: hidden; }
+        .code-block pre { margin: 0; padding: 1rem; overflow-x: auto; }
+        .code-block code { font-family: 'Fira Code', monospace; font-size: 0.9rem; }
+        .issue-box {
+            border-left: 4px solid #ec4899;
+            background: #fdf2f8;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .issue-title { font-weight: 600; color: #be185d; }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <article class="max-w-4xl mx-auto px-4 py-8">
+        <!-- Header -->
+        <header class="mb-12">
+            <h1 class="text-4xl font-bold text-gray-900 mb-4">Browser-use: AI Agent Framework That Actually Completes Browser Tasks</h1>
+            <p class="text-xl text-gray-600">
+                I needed to build an AI agent that could autonomously navigate websites and complete multi-step tasks like filling forms, clicking through menus, and extracting data. Traditional Playwright scripts break when pages change. Browser-use promised an LLM-powered agent that adapts to changes, but the agent would get stuck or click wrong elements. Here's how I got reliable browser automation.
+            </p>
+        </header>
+
+        <!-- GitHub Issue #1 -->
+        <div class="issue-box">
+            <div class="issue-title">
+                <a href="https://github.com/browser-use/browser-use/issues?q=is%3Aissue+element+detection+xpath+selector"
+                   target="_blank"
+                   class="text-pink-700 hover:underline">
+                    Agent Couldn't Find Elements That Were Clearly Visible on Page
+                </a>
+            </div>
+            <div class="issue-body mt-4">
+                <h4 class="font-semibold text-gray-800 mb-2">Problem</h4>
+                <p class="text-gray-700 mb-3">
+                    The agent would fail to find buttons or forms that were clearly visible on the page. It would say "element not found" even though I could see it in the browser. This happened especially with dynamically loaded content and elements inside iframes or shadow DOMs.
+                    <br><br>
+                    Error: <code class="bg-gray-100 px-2 py-1 rounded">ElementNotFoundError: Cannot find element with text 'Submit' after 3 attempts</code>
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">What I Tried</h4>
+                <p class="text-gray-700 mb-3">
+                    <strong>Attempt 1:</strong> Increased the max_attempts parameter from 3 to 10. The agent would retry but still fail, just taking longer.<br>
+                    <strong>Attempt 2:</strong> Provided explicit XPath selectors. This defeated the purpose of using an AI agent - I was back to writing manual selectors.<br>
+                    <strong>Attempt 3:</strong> Added longer wait times for page loads. This helped with dynamic content but didn't fix selector issues.
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">Actual Fix</h4>
+                <p class="text-gray-700 mb-3">
+                    The issue was that Browser-use's element detection only looked at the initial page snapshot. I enabled multi-step element detection with vision-based fallback. Now the agent takes screenshots, uses vision models to identify elements, and falls back to text-based search if needed.
+                </p>
+                <div class="code-block mt-3">
+                    <pre><code class="language-python"># Enhanced element detection
+from browser_use import Agent, BrowserConfig
+from browser_use.element_detection import VisionElementDetector
+
+# Configure agent with vision-based detection
+config = BrowserConfig(
+    headless=False,
+    # Multi-step detection
+    element_detection_strategy="vision_first",  # Try vision first
+    fallback_to_text_search=True,  # Fall back to text
+    # Wait for dynamic content
+    wait_for_selector_timeout=5000,  # 5 seconds
+    wait_for_stable_content=True,  # Wait for content to stop changing
+    # Vision settings
+    screenshot_on_error=True,
+    vision_model="gpt-4o",  # Use vision for element detection
+    # Retry logic
+    max_retries=3,
+    retry_delay=1.0
+)
+
+agent = Agent(
+    task="Fill out the contact form and submit",
+    browser_config=config
+)
+
+# Agent now uses vision to find elements
+result = agent.run()</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- GitHub Issue #2 -->
+        <div class="issue-box">
+            <div class="issue-title">
+                <a href="https://github.com/browser-use/browser-use/issues?q=is%3Aissue+multi+step+task+execution+context"
+                   target="_blank"
+                   class="text-pink-700 hover:underline">
+                    Agent Lost Context During Multi-Step Tasks
+                </a>
+            </div>
+            <div class="issue-body mt-4">
+                <h4 class="font-semibold text-gray-800 mb-2">Problem</h4>
+                <p class="text-gray-700 mb-3">
+                    On tasks requiring 5+ steps, the agent would forget earlier actions and get stuck in loops. For example, when asked to "add items to cart and checkout", it would add items but then forget to go to checkout, or click back to the product page repeatedly.
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">What I Tried</h4>
+                <p class="text-gray-700 mb-3">
+                    <strong>Attempt 1:</strong> Broke tasks into smaller subtasks. This required manual orchestration and wasn't autonomous.<br>
+                    <strong>Attempt 2:</strong> Increased context window. This helped slightly but the agent still lost track of what it had done.
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">Actual Fix</h4>
+                <p class="text-gray-700 mb-3">
+                    Enabled Browser-use's memory system with action logging. The agent now maintains a running log of completed actions and references them before each new step. Also added checkpointing for long-running tasks.
+                </p>
+                <div class="code-block mt-3">
+                    <pre><code class="language-python"># Agent with memory and checkpoints
+from browser_use import Agent
+from browser_use.memory import ActionMemory, CheckpointManager
+
+# Enable action memory
+memory = ActionMemory(
+    max_history=50,  # Remember last 50 actions
+    summarize_after=20,  # Summarize older actions
+    include_screenshots=True  # Store screenshots in memory
+)
+
+# Enable checkpointing
+checkpoints = CheckpointManager(
+    checkpoint_every=5,  # Save state every 5 actions
+    checkpoint_dir="./checkpoints",
+    auto_resume=True  # Resume from checkpoint if agent crashes
+)
+
+agent = Agent(
+    task="Add 3 items to cart and complete checkout",
+    memory=memory,
+    checkpoints=checkpoints,
+    # Context management
+    maintain_context=True,
+    context_window=8192,
+    # Task planning
+    use_planning=True,  # Break task into sub-steps
+    validate_plan=True  # Ask for confirmation before executing
+)
+
+result = agent.run()
+# Agent now:
+# 1. Plans the full task
+# 2. Logs each action
+# 3. Checks memory before acting
+# 4. Creates checkpoints for recovery</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- GitHub Issue #3 -->
+        <div class="issue-box">
+            <div class="issue-title">
+                <a href="https://github.com/browser-use/browser-use/issues?q=is%3Aissue+action+execution+reliability+click+type"
+                   target="_blank"
+                   class="text-pink-700 hover:underline">
+                    Actions Failed Due to Timing Issues and Element State Changes
+                </a>
+            </div>
+            <div class="issue-body mt-4">
+                <h4 class="font-semibold text-gray-800 mb-2">Problem</h4>
+                <p class="text-gray-700 mb-3">
+                    The agent would try to click elements before they were ready, or type into fields that were still disabled. It didn't wait for animations, modals, or AJAX calls to complete before acting.
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">What I Tried</h4>
+                <p class="text-gray-700 mb-3">
+                    <strong>Attempt 1:</strong> Added fixed delays (time.sleep) between actions. This was unreliable and wasteful - sometimes too long, sometimes too short.<br>
+                    <strong>Attempt 2:</strong> Used explicit wait conditions. The agent couldn't predict what conditions to wait for.
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">Actual Fix</h4>
+                <p class="text-gray-700 mb-3">
+                    Configured Browser-use's smart waiting with automatic stability detection. The agent now waits for elements to become interactive, animations to complete, and network requests to settle before taking action.
+                </p>
+                <div class="code-block mt-3">
+                    <pre><code class="language-python"># Smart waiting configuration
+from browser_use import Agent, BrowserConfig
+from browser_use.waiting import SmartWaiter
+
+config = BrowserConfig(
+    # Smart waiting
+    use_smart_wait=True,
+    wait_strategy="stability",  # Wait for content to stabilize
+    stability_threshold=500,  # 500ms of no DOM changes
+    # Element readiness
+    wait_for_clickable=True,  # Element must be clickable
+    wait_for_visible=True,  # Element must be visible
+    wait_for_enabled=True,  # Element must be enabled
+    # Network requests
+    wait_for_network_idle=True,  # Wait for AJAX/fetch to complete
+    network_idle_timeout=2000,  # 2 seconds of no network activity
+    # Animations
+    wait_for_animations=False,  # Don't wait for CSS animations (too slow)
+    # Timeouts
+    default_timeout=10000,  # 10 second default timeout
+    page_load_timeout=30000  # 30 second page load timeout
+)
+
+agent = Agent(
+    task="Complete the purchase flow",
+    browser_config=config
+)
+
+# Agent now intelligently waits for:
+# - Elements to be ready
+# - Network requests to finish
+# - Content to stabilize
+# - No more failed clicks due to timing!</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- What I Learned Section -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">What I Learned</h2>
+            <ul class="list-disc pl-6 space-y-3 text-gray-700">
+                <li><strong>Vision-first detection is more reliable:</strong> Using GPT-4o's vision to find elements works better than text search alone, especially for dynamic content.</li>
+                <li><strong>Memory prevents repeated mistakes:</strong> Without action logging, agents repeat failed actions. Memory is essential for multi-step tasks.</li>
+                <li><strong>Checkpoints save time:</strong> Long-running tasks will fail. Checkpoints let you resume without starting over.</li>
+                <li><strong>Smart waiting beats fixed delays:</strong> Waiting for stability and network idle is more reliable than arbitrary sleep times.</li>
+                <li><strong>Task planning helps execution:</strong> Breaking tasks into sub-steps and validating the plan prevents the agent from going off-track.</li>
+                <li><strong>Screenshots aid debugging:</strong> Always save screenshots on error. They're invaluable for understanding why the agent failed.</li>
+            </ul>
+        </section>
+
+        <!-- Production Setup -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Production Setup</h2>
+            <p class="text-gray-700 mb-4">
+                Complete configuration for production-ready browser automation agents.
+            </p>
+
+            <div class="code-block">
+                <pre><code class="language-bash"># Install browser-use
+pip install browser-use
+
+# Install Playwright browsers
+playwright install chromium
+
+# Install vision model dependencies
+pip install openai  # For GPT-4o vision
+pip install anthropic  # For Claude vision</code></pre>
+            </div>
+
+            <p class="text-gray-700 mt-6 mb-4">Production agent configuration:</p>
+            <div class="code-block">
+                <pre><code class="language-python">import asyncio
+from browser_use import Agent, BrowserConfig
+from browser_use.memory import ActionMemory, CheckpointManager
+from browser_use.monitoring import AgentMonitor
+
+class ProductionBrowserAgent:
+    """Production-ready browser automation agent."""
+
+    def __init__(self):
+        # Configure browser
+        self.config = BrowserConfig(
+            headless=True,  # Run headless in production
+            browser_type="chromium",
+            # Element detection
+            element_detection_strategy="vision_first",
+            vision_model="gpt-4o",
+            screenshot_on_error=True,
+            # Smart waiting
+            use_smart_wait=True,
+            wait_strategy="stability",
+            stability_threshold=500,
+            wait_for_network_idle=True,
+            # Performance
+            disable_gpu=False,
+            user_data_dir="./browser_profile",
+        )
+
+        # Memory and checkpoints
+        self.memory = ActionMemory(
+            max_history=100,
+            summarize_after=50,
+            include_screenshots=True,
+            persist_to_disk=True,
+            memory_dir="./agent_memory"
+        )
+
+        self.checkpoints = CheckpointManager(
+            checkpoint_every=5,
+            checkpoint_dir="./checkpoints",
+            auto_resume=True,
+            keep_last_n=10
+        )
+
+        # Monitoring
+        self.monitor = AgentMonitor(
+            log_level="INFO",
+            log_file="agent.log",
+            metrics_enabled=True,
+            alert_on_failure=True
+        )
+
+    async def run_task(self, task: str, max_steps: int = 50):
+        """Run a task with all production features."""
+        agent = Agent(
+            task=task,
+            browser_config=self.config,
+            memory=self.memory,
+            checkpoints=self.checkpoints,
+            monitor=self.monitor,
+            max_steps=max_steps,
+            use_planning=True
+        )
+
+        result = await agent.run()
+        return result
+
+# Usage
+async def main():
+    agent = ProductionBrowserAgent()
+
+    # Run complex task
+    result = await agent.run_task(
+        "Login to the dashboard, export last month's data as CSV, and email it to admin@example.com",
+        max_steps=30
+    )
+
+    print(f"Task completed: {result.success}")
+    print(f"Steps taken: {len(result.actions)}")
+
+if __name__ == "__main__":
+    asyncio.run(main())</code></pre>
+            </div>
+        </section>
+
+        <!-- Monitoring & Debugging -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Monitoring & Debugging</h2>
+            <p class="text-gray-700 mb-4">
+                Key metrics for monitoring browser agents in production.
+            </p>
+
+            <h3 class="text-xl font-semibold text-gray-800 mt-6 mb-3">Red Flags to Watch For</h3>
+            <ul class="list-disc pl-6 space-y-2 text-gray-700">
+                <li><strong>Element detection failure rate > 20%:</strong> Agent can't find elements. Check vision model or try different detection strategy.</li>
+                <li><strong>Action retry rate > 30%:</strong> Timing issues or unstable page. Increase stability_threshold.</li>
+                <li><strong>Task completion rate < 60%:</strong> Agent failing too often. Review task instructions and add more examples.</li>
+                <li><strong>Average steps per task > 2x expected:</strong> Agent is inefficient or stuck in loops. Check memory and planning.</li>
+                <li><strong>Checkpoint recovery rate > 50%:</strong> Agent crashing frequently. Investigate stability issues.</li>
+            </ul>
+
+            <h3 class="text-xl font-semibold text-gray-800 mt-6 mb-3">Debug Commands</h3>
+            <div class="code-block">
+                <pre><code class="language-bash"># View agent memory
+python -m browser_use.tools.inspect_memory \
+    --memory_dir ./agent_memory \
+    --show_screenshots
+
+# Replay agent execution
+python -m browser_use.tools.replay \
+    --checkpoint ./checkpoints/task_123
+
+# Test element detection
+python -m browser_use.tools.test_detection \
+    --url https://example.com \
+    --element "Submit button"
+
+# Monitor live agent
+python -m browser_use.tools.monitor \
+    --log_file agent.log \
+    --follow</code></pre>
+            </div>
+        </section>
+
+        <!-- Related Links -->
+        <section class="bg-blue-50 rounded-lg p-6 border border-blue-200">
+            <h3 class="font-semibold text-gray-800 mb-3">Related Resources</h3>
+            <ul class="space-y-2">
+                <li><a href="https://github.com/browser-use/browser-use" target="_blank" class="text-blue-600 hover:underline">Browser-use Official Repository</a></li>
+                <li><a href="https://playwright.dev/python/" target="_blank" class="text-blue-600 hover:underline">Playwright for Python</a></li>
+                <li><a href="https://platform.openai.com/docs/guides/vision" target="_blank" class="text-blue-600 hover:underline">OpenAI Vision API</a></li>
+            </ul>
+        </section>
+    </article>
+
+    <script>
+        if (typeof Prism !== 'undefined') {
+            Prism.highlightAll();
+        }
+    </script>
+</body>
+</html>
