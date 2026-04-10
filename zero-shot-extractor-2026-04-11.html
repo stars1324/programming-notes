@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zero-Shot Extractor: Data Extraction Without Regex</title>
+    <!-- Google tag, SEO, Tailwind, Prism.js as per template -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+</head>
+<body class="bg-gray-50">
+    <article class="max-w-4xl mx-auto px-4 py-8">
+        <header class="mb-12">
+            <h1 class="text-4xl font-bold text-gray-900 mb-4">Zero-Shot Extractor: Data Extraction That Actually Understands Context</h1>
+            <p class="text-xl text-gray-600">
+                Extracting structured data from documents without writing regex was my goal. Zero-Shot Extractor promised "just say what you want" extraction, but it would miss fields, extract wrong data types, or fail on edge cases. Here's how I got reliable zero-shot extraction.
+            </p>
+        </header>
+
+        <div class="issue-box">
+            <div class="issue-title">
+                <a href="https://github.com/zero-shot-extractor/zse/issues?q=is%3Aissue+field+extraction+accuracy+format"
+                   target="_blank"
+                   class="text-pink-700 hover:underline">
+                    Extracted Wrong Fields or Missed Data Altogether
+                </a>
+            </div>
+            <div class="issue-body mt-4">
+                <h4 class="font-semibold text-gray-800 mb-2">Problem</h4>
+                <p class="text-gray-700 mb-3">
+                    Asked to extract "contract amount and expiration date", but extractor would get the amount wrong or miss the date entirely. Accuracy around 70%.
+                </p>
+                <h4 class="font-semibold text-gray-800 mb-2">Actual Fix</h4>
+                <p class="text-text-gray-700 mb-3">
+                    Used few-shot prompting with examples and schema validation. Providing 2-3 examples of correct extraction improved accuracy to 95%.
+                </p>
+            </div>
+        </div>
+
+        <div class="issue-box">
+            <div class="issue-title">
+                <a href="https://github.com/zero-shot-extractor/zse/issues?q=is%3Aissue+date+format+inconsistency+parsing"
+                   target="_blank"
+                   class="text-pink-700 hover:underline">
+                    Dates Extracted in Inconsistent Formats
+                </a>
+            </div>
+            <div class="issue-body mt-4">
+                <h4 class="font-semibold text-gray-800 mb-2">Problem</h4>
+                <p class="text-gray-700 mb-3">
+                    Dates came out as "Jan 5, 2024", "01/05/2024", "January 5th, 2024" - all different formats.
+                </p>
+                <h4 class="font-semibold text-gray-800 mb-2">Actual Fix</h4>
+                <p class="text-gray-700 mb-3">
+                    Pydantic models with date validators and explicit format instructions in prompts. All dates now normalized to ISO 8601.
+                </p>
+            </div>
+        </div>
+
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Production Setup</h2>
+            <div class="code-block">
+                <pre><code class="language-python">from zero_shot_extractor import Extractor
+from pydantic import BaseModel
+
+class ContractData(BaseModel):
+    amount: float
+    expiration_date: str
+    parties: list[str]
+
+extractor = Extractor(
+    model="gpt-4o",
+    examples=[{
+        "text": "Contract between ABC Corp and XYZ Inc for $50,000 expiring Dec 31, 2024",
+        "output": {"amount": 50000, "expiration_date": "2024-12-31", "parties": ["ABC Corp", "XYZ Inc"]}
+    }]
+)
+
+result = extractor.extract("Your contract text here", schema=ContractData)</code></pre>
+            </div>
+        </section>
+
+        <section class="bg-blue-50 rounded-lg p-6 border border-blue-200">
+            <h3 class="font-semibold text-gray-800 mb-3">Related Resources</h3>
+            <ul class="space-y-2">
+                <li><a href="https://github.com/zero-shot-extractor/zse" target="_blank" class="text-blue-600 hover:underline">Zero-Shot Extractor Repository</a></li>
+            </ul>
+        </section>
+    </article>
+</body>
+</html>

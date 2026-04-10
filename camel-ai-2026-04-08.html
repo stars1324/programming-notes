@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Camel-AI: Multi-Agent Systems That Actually Collaborate Effectively</title>
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-LMWN7814BX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-LMWN7814BX');
+    </script>
+
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Building multi-agent systems with Camel-AI that simulate company structures. Solving issues with agent communication, role consistency, and task coordination.">
+    <meta name="keywords" content="Camel-AI, multi-agent systems, agent roleplay, company simulation, AI agents, agent communication">
+    <link rel="canonical" href="https://pnt.jacbex.com/camel-ai-2026-04-08.html">
+
+    <!-- Open Graph / Social Media -->
+    <meta property="og:title" content="Camel-AI: Multi-Agent Systems That Actually Collaborate Effectively">
+    <meta property="og:description" content="Real solutions for building effective multi-agent collaborations">
+    <meta property="og:type" content="article">
+
+    <!-- JSON-LD Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "Camel-AI: Multi-Agent Systems That Actually Collaborate Effectively",
+      "description": "Building multi-agent systems with Camel-AI",
+      "author": {
+        "@type": "Person",
+        "name": "Programming Notes"
+      },
+      "datePublished": "2026-04-08",
+      "keywords": ["Camel-AI", "multi-agent systems", "agent roleplay"],
+      "url": "https://pnt.jacbex.com/camel-ai-2026-04-08.html"
+    }
+    </script>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Prism.js -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+        .code-block { background: #2d2d2d; border-radius: 8px; overflow: hidden; }
+        .code-block pre { margin: 0; padding: 1rem; overflow-x: auto; }
+        .code-block code { font-family: 'Fira Code', monospace; font-size: 0.9rem; }
+        .issue-box {
+            border-left: 4px solid #ec4899;
+            background: #fdf2f8;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .issue-title { font-weight: 600; color: #be185d; }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <article class="max-w-4xl mx-auto px-4 py-8">
+        <!-- Header -->
+        <header class="mb-12">
+            <h1 class="text-4xl font-bold text-gray-900 mb-4">Camel-AI: Multi-Agent Systems That Actually Collaborate Effectively</h1>
+            <p class="text-xl text-gray-600">
+                I wanted to build a virtual company - AI agents acting as CEO, CTO, developers, and designers working together on projects. Camel-AI's role-playing framework seemed perfect, but the agents would talk in circles, forget their roles, and fail to coordinate on tasks. Here's how I built a functional multi-agent system.
+            </p>
+        </header>
+
+        <!-- GitHub Issue #1 -->
+        <div class="issue-box">
+            <div class="issue-title">
+                <a href="https://github.com/camel-ai/camel/issues?q=is%3Aissue+agent+communication+loops+circular+talk"
+                   target="_blank"
+                   class="text-pink-700 hover:underline">
+                    Agents Got Stuck in Circular Communication Loops
+                </a>
+            </div>
+            <div class="issue-body mt-4">
+                <h4 class="font-semibold text-gray-800 mb-2">Problem</h4>
+                <p class="text-gray-700 mb-3">
+                    When multiple agents needed to collaborate, they would get stuck agreeing with each other or asking clarifying questions indefinitely. For example, the Product Manager would propose a feature, the Developer would ask for clarification, the PM would clarify, the Developer would ask another question, and so on - never reaching a decision.
+                    <br><br>
+                    Loop detection: <code class="bg-gray-100 px-2 py-1 rounded">Same conversation pattern repeated 5 times</code>
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">What I Tried</h4>
+                <p class="text-gray-700 mb-3">
+                    <strong>Attempt 1:</strong> Limited the number of conversation turns. This forced decisions but often cut off important discussion.<br>
+                    <strong>Attempt 2:</strong> Added a moderator agent. The moderator became another participant in the loop.<br>
+                    <strong>Attempt 3:</strong> Used stricter system prompts. This reduced collaboration and made agents less helpful.
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">Actual Fix</h4>
+                <p class="text-gray-700 mb-3">
+                    Implemented Camel-AI's task-oriented communication with explicit decision gates and conversation state tracking. Agents now have clear objectives, must reach decisions within N turns, and the system detects and breaks circular conversations.
+                </p>
+                <div class="code-block mt-3">
+                    <pre><code class="language-python"># Multi-agent setup with communication guards
+from camel.agents import ChatAgent
+from camel.messages import BaseMessage
+from camel.conversations import Conversation
+from camel.types import RoleType
+
+# Define agents with clear objectives
+pm_agent = ChatAgent(
+    system_message="""You are a Product Manager.
+    OBJECTIVE: Define product requirements.
+    DECISION AUTHORITY: You make final decisions on features.
+    COMMUNICATION STYLE: Be decisive, not exploratory.
+    After 3 rounds of discussion, you MUST make a decision.
+    """,
+    role_type=RoleType.PRODUCT_MANAGER,
+    decision_authority=True  # This agent can make final decisions
+)
+
+dev_agent = ChatAgent(
+    system_message="""You are a Senior Developer.
+    OBJECTIVE: Assess technical feasibility.
+    DECISION AUTHORITY: You advise but PM decides.
+    COMMUNICATION STYLE: Be specific about technical concerns.
+    If you need clarification, ask ONCE, then make assumptions.
+    """,
+    role_type=RoleType.DEVELOPER,
+    decision_authority=False
+)
+
+# Conversation with guards
+conversation = Conversation(
+    agents=[pm_agent, dev_agent],
+    # Communication guards
+    max_turns=6,  # Total limit
+    decision_required_after=3,  # Must decide by turn 3
+    # Loop detection
+    detect_loops=True,
+    loop_threshold=2,  # Alert if same point discussed 2x
+    break_loop_action="force_decision",  # Force decision on loop
+    # State tracking
+    track_conversation_state=True,
+    state_save_interval=2
+)
+
+# Run with monitoring
+turn_count = 0
+decision_reached = False
+
+while turn_count < 6 and not decision_reached:
+    # Get next agent response
+    response = conversation.next_turn()
+
+    # Check for decision
+    if "DECISION:" in response.content:
+        decision_reached = True
+        print(f"Decision reached: {response.content}")
+        break
+
+    # Check for loops
+    if conversation.is_looping():
+        print("Loop detected, forcing decision")
+        conversation.force_decision(agent=pm_agent)
+        break
+
+    turn_count += 1</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- GitHub Issue #2 -->
+        <div class="issue-box">
+            <div class="issue-title">
+                <a href="https://github.com/camel-ai/camel/issues?q=is%3Aissue+role+consistency+character+drift"
+                   target="_blank"
+                   class="text-pink-700 hover:underline">
+                    Agents Forgot Their Roles and Acted Out of Character
+                </a>
+            </div>
+            <div class="issue-body mt-4">
+                <h4 class="font-semibold text-gray-800 mb-2">Problem</h4>
+                <p class="text-gray-700 mb-3">
+                    After a few exchanges, agents would drift from their assigned roles. A Developer agent would start making product decisions, or a Designer would begin writing code. The role-playing broke down quickly.
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">What I Tried</h4>
+                <p class="text-gray-700 mb-3">
+                    <strong>Attempt 1:</strong> Added more detailed role descriptions in system prompts. Agents would still drift.<br>
+                    <strong>Attempt 2:</strong> Re-injected role prompts every turn. This was expensive and didn't always work.
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">Actual Fix</h4>
+                <p class="text-gray-700 mb-3">
+                    Implemented role enforcement with action validation. Each agent has defined allowed actions and outputs. Before responding, the system validates that the agent is acting within its role and authority level.
+                </p>
+                <div class="code-block mt-3">
+                    <pre><code class="language-python"># Role enforcement with validation
+from camel.agents import ChatAgent
+from camel.validators import RoleValidator
+
+# Define role permissions
+role_permissions = {
+    "product_manager": {
+        "allowed_actions": ["define_requirements", "prioritize_features", "make_decisions"],
+        "forbidden_actions": ["write_code", "design_ui"],
+        "can_decide": True,
+        "must_consult": ["developer", "designer"]
+    },
+    "developer": {
+        "allowed_actions": ["assess_feasibility", "estimate_effort", "write_code"],
+        "forbidden_actions": ["define_requirements", "make_product_decisions"],
+        "can_decide": False,
+        "must_consult": ["product_manager"]
+    },
+    "designer": {
+        "allowed_actions": ["design_ui", "define_user_experience", "create_mockups"],
+        "forbidden_actions": ["write_code", "define_technical_specs"],
+        "can_decide": False,
+        "must_consult": ["product_manager"]
+    }
+}
+
+# Create validator
+validator = RoleValidator(role_permissions)
+
+# Create agents with role enforcement
+pm = ChatAgent(
+    system_message="You are a Product Manager...",
+    role="product_manager",
+    # Enable role enforcement
+    enforce_role=True,
+    validator=validator
+)
+
+developer = ChatAgent(
+    system_message="You are a Senior Developer...",
+    role="developer",
+    enforce_role=True,
+    validator=validator
+)
+
+# Before each response, validate
+def get_validated_response(agent, message):
+    # Generate response
+    response = agent.step(message)
+
+    # Validate action
+    validation = validator.validate_action(
+        role=agent.role,
+        action=response.action,
+        content=response.content
+    )
+
+    if not validation.is_valid:
+        # Re-generate with correction
+        correction = f"Your response violated your role. {validation.error}. Stay within your authority."
+        response = agent.step(message + f"\n\n{correction}")
+
+    return response
+
+# Now agents:
+# - Cannot take actions outside their role
+# - Are corrected if they drift
+# - Maintain consistent character</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- GitHub Issue #3 -->
+        <div class="issue-box">
+            <div class="issue-title">
+                <a href="https://github.com/camel-ai/camel/issues?q=is%3Aissue+task+coordination+workflow+orchestration"
+                   target="_blank"
+                   class="text-pink-700 hover:underline">
+                    Agents Failed to Coordinate on Complex Multi-Stage Tasks
+                </a>
+            </div>
+            <div class="issue-body mt-4">
+                <h4 class="font-semibold text-gray-800 mb-2">Problem</h4>
+                <p class="text-gray-700 mb-3">
+                    When given a complex task like "build a web app", agents would all try to do everything at once. The designer would write code, the developer would design UI, and the PM would implement features. There was no coordination or workflow.
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">What I Tried</h4>
+                <p class="text-gray-700 mb-3">
+                    <strong>Attempt 1:</strong> Manually orchestrated the workflow step by step. This defeated the purpose of autonomous agents.<br>
+                    <strong>Attempt 2:</strong> Used a project manager agent to coordinate. It became a bottleneck and agents would ignore its instructions.
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">Actual Fix</h4>
+                <p class="text-gray-700 mb-3">
+                    Implemented Camel-AI's workflow orchestration with stage gates and handoffs. Tasks are broken into stages, each stage has required agent roles, and completion is validated before moving to the next stage.
+                </p>
+                <div class="code-block mt-3">
+                    <pre><code class="language-python"># Workflow orchestration with stage gates
+from camel.workflows import Workflow, Stage, StageGate
+from camel.agents import ChatAgent
+
+# Define agents
+pm = ChatAgent("Product Manager")
+dev = ChatAgent("Developer")
+designer = ChatAgent("Designer")
+qa = ChatAgent("QA Engineer")
+
+# Define workflow stages
+stages = [
+    Stage(
+        name="requirements",
+        description="Define product requirements",
+        required_agents=[pm],
+        optional_agents=[dev, designer],
+        # Stage gate
+        gate=StageGate(
+            requirement="Clear requirements document",
+            validator=lambda msg: "REQUIREMENTS:" in msg.content,
+            approver=pm
+        )
+    ),
+    Stage(
+        name="design",
+        description="Design UI/UX",
+        required_agents=[designer],
+        optional_agents=[pm],
+        # Must complete requirements first
+        depends_on=["requirements"],
+        gate=StageGate(
+            requirement="Design mockups approved",
+            validator=lambda msg: "DESIGN_APPROVED:" in msg.content,
+            approver=pm
+        )
+    ),
+    Stage(
+        name="development",
+        description="Implement features",
+        required_agents=[dev],
+        optional_agents=[designer],
+        depends_on=["design"],
+        gate=StageGate(
+            requirement="Code implementation complete",
+            validator=lambda msg: "IMPLEMENTATION_COMPLETE:" in msg.content,
+            approver=dev
+        )
+    ),
+    Stage(
+        name="testing",
+        description="Test and validate",
+        required_agents=[qa],
+        optional_agents=[dev, pm],
+        depends_on=["development"],
+        gate=StageGate(
+            requirement="All tests passing",
+            validator=lambda msg: "TESTS_PASSING:" in msg.content,
+            approver=qa
+        )
+    )
+]
+
+# Create workflow
+workflow = Workflow(
+    name="web_app_development",
+    stages=stages,
+    # Coordination settings
+    coordination_mode="sequential",  # Stages run in order
+    allow_parallel=False,  # No parallel stages
+    # Handoff
+    handoff_method="formal",  # Formal handoff between stages
+    handoff_template="""
+    STAGE COMPLETE: {from_stage}
+    Deliverables: {deliverables}
+    Next stage: {to_stage}
+    Assigned to: {next_agent}
+    """,
+    # Monitoring
+    track_progress=True,
+    save_checkpoints=True
+)
+
+# Execute workflow
+result = workflow.run(
+    initial_task="Build a todo list web app",
+    # Callbacks
+    on_stage_complete=lambda stage: print(f"Completed: {stage.name}"),
+    on_gate_failure=lambda gate: print(f"Gate failed: {gate.requirement}")
+)
+
+# Workflow now:
+# 1. Runs stages sequentially
+# 2. Validates stage completion before proceeding
+# 3. Formal handoffs between agents
+# 4. No role confusion or duplication</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- What I Learned Section -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">What I Learned</h2>
+            <ul class="list-disc pl-6 space-y-3 text-gray-700">
+                <li><strong>Communication loops need explicit breaking:</strong> Agents will talk forever without forced decision points. Set turn limits and detect loops.</li>
+                <li><strong>Decision authority must be clear:</strong> Not all agents should decide. Define who can make decisions and who can only advise.</li>
+                <li><strong>Role enforcement requires validation:</strong> System prompts aren't enough. Validate actions against role permissions.</li>
+                <li><strong>Workflow orchestration beats free-form:</strong> Complex tasks need structured stages with gates. Let agents be autonomous within stages, not across the whole project.</li>
+                <li><strong>Stage gates ensure quality:</strong> Don't proceed until criteria are met. This prevents half-finished work from moving forward.</li>
+                <li><strong>Formal handoffs reduce confusion:</strong> Explicitly transfer context between stages. Don't assume agents will pick up where others left off.</li>
+            </ul>
+        </section>
+
+        <!-- Production Setup -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Production Setup</h2>
+            <p class="text-gray-700 mb-4">
+                Complete setup for production multi-agent systems.
+            </p>
+
+            <div class="code-block">
+                <pre><code class="language-bash"># Install Camel-AI
+pip install camel-ai
+
+# For local models (optional)
+pip install llama-cpp-python
+pip install transformers</code></pre>
+            </div>
+
+            <p class="text-gray-700 mt-6 mb-4">Production multi-agent system:</p>
+            <div class="code-block">
+                <pre><code class="language-python">import asyncio
+from camel.agents import ChatAgent
+from camel.workflows import Workflow, Stage, StageGate
+from camel.validators import RoleValidator
+from camel.types import RoleType, ModelType
+
+class VirtualCompany:
+    """Virtual company with multiple AI agents."""
+
+    def __init__(self):
+        # Role permissions
+        self.permissions = {
+            "ceo": {
+                "allowed": ["make_decisions", "approve_strategy", "allocate_budget"],
+                "forbidden": ["write_code", "design_ui"],
+                "decides": True
+            },
+            "cto": {
+                "allowed": ["technical_decisions", "approve_architecture", "assign_tasks"],
+                "forbidden": ["business_decisions"],
+                "decides": True
+            },
+            "developer": {
+                "allowed": ["write_code", "implement_features", "report_bugs"],
+                "forbidden": ["make_product_decisions", "allocate_resources"],
+                "decides": False
+            },
+            "designer": {
+                "allowed": ["design_ui", "create_mockups", "define_ux"],
+                "forbidden": ["write_code", "business_decisions"],
+                "decides": False
+            }
+        }
+
+        self.validator = RoleValidator(self.permissions)
+        self.agents = {}
+        self._create_agents()
+
+    def _create_agents(self):
+        """Create agents with role enforcement."""
+        self.agents["ceo"] = ChatAgent(
+            system_message="""You are the CEO.
+            Focus: Business strategy and decisions.
+            You have final say on business matters.
+            Consult CTO for technical input.
+            """,
+            role="ceo",
+            model=ModelType.GPT_4,
+            enforce_role=True,
+            validator=self.validator
+        )
+
+        self.agents["cto"] = ChatAgent(
+            system_message="""You are the CTO.
+            Focus: Technical decisions and architecture.
+            You have final say on technical matters.
+            Consult CEO for business alignment.
+            """,
+            role="cto",
+            model=ModelType.GPT_4,
+            enforce_role=True,
+            validator=self.validator
+        )
+
+        self.agents["developer"] = ChatAgent(
+            system_message="""You are a Senior Developer.
+            Focus: Implementation and code quality.
+            You do NOT make product or business decisions.
+            Ask CTO for direction.
+            """,
+            role="developer",
+            model=ModelType.GPT_4,
+            enforce_role=True,
+            validator=self.validator
+        )
+
+        self.agents["designer"] = ChatAgent(
+            system_message="""You are a UI/UX Designer.
+            Focus: User experience and visual design.
+            You do NOT make technical or business decisions.
+            Ask CEO for product direction.
+            """,
+            role="designer",
+            model=ModelType.GPT_4,
+            enforce_role=True,
+            validator=self.validator
+        )
+
+    def create_workflow(self, task: str) -> Workflow:
+        """Create a workflow for the task."""
+        return Workflow(
+            name="product_development",
+            stages=[
+                Stage(
+                    name="planning",
+                    description="Plan the product",
+                    required_agents=[self.agents["ceo"], self.agents["cto"]],
+                    gate=StageGate(
+                        requirement="Product plan approved",
+                        approver=self.agents["ceo"]
+                    )
+                ),
+                Stage(
+                    name="design",
+                    description="Design the UI",
+                    required_agents=[self.agents["designer"]],
+                    optional_agents=[self.agents["ceo"]],
+                    depends_on=["planning"],
+                    gate=StageGate(
+                        requirement="Designs approved",
+                        approver=self.agents["ceo"]
+                    )
+                ),
+                Stage(
+                    name="development",
+                    description="Implement features",
+                    required_agents=[self.agents["developer"]],
+                    optional_agents=[self.agents["cto"]],
+                    depends_on=["design"],
+                    gate=StageGate(
+                        requirement="Implementation complete",
+                        approver=self.agents["cto"]
+                    )
+                )
+            ],
+            coordination_mode="sequential",
+            max_turns_per_stage=4,
+            detect_loops=True
+        )
+
+    async def run_project(self, task: str):
+        """Run a complete project."""
+        workflow = self.create_workflow(task)
+
+        result = await workflow.run_async(
+            initial_task=task,
+            on_stage_complete=lambda s: print(f"✓ Completed: {s.name}"),
+            on_gate_failure=lambda g: print(f"✗ Gate failed: {g.requirement}")
+        )
+
+        return result
+
+# Usage
+async def main():
+    company = VirtualCompany()
+
+    result = await company.run_project(
+        "Build a dashboard for tracking sales metrics"
+    )
+
+    print(f"Project success: {result.success}")
+    print(f"Stages completed: {len(result.completed_stages)}")
+
+if __name__ == "__main__":
+    asyncio.run(main())</code></pre>
+            </div>
+        </section>
+
+        <!-- Monitoring & Debugging -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Monitoring & Debugging</h2>
+            <p class="text-gray-700 mb-4">
+                Key metrics for multi-agent systems.
+            </p>
+
+            <h3 class="text-xl font-semibold text-gray-800 mt-6 mb-3">Red Flags to Watch For</h3>
+            <ul class="list-disc pl-6 space-y-2 text-gray-700">
+                <li><strong>Conversation loop rate > 30%:</strong> Agents talking in circles. Check turn limits and loop detection.</li>
+                <li><strong>Role violation rate > 15%:</strong> Agents acting out of character. Strengthen role enforcement.</li>
+                <li><strong>Stage failure rate > 25%:</strong> Gates failing too often. Review requirements or agent capabilities.</li>
+                <li><strong>Average turns per stage > 2x expected:</strong> Inefficient communication. Check coordination settings.</li>
+                <li><strong>Decision rate < 50%:</strong> Agents not reaching decisions. Check decision authority settings.</li>
+            </ul>
+
+            <h3 class="text-xl font-semibold text-gray-800 mt-6 mb-3">Debug Commands</h3>
+            <div class="code-block">
+                <pre><code class="language-bash"># Test agent interaction
+camel test-interaction \
+    --agents ./agents_config.yaml \
+    --scenario "Plan a new feature" \
+    --max-turns 5
+
+# Validate role permissions
+camel validate-roles \
+    --config ./role_permissions.yaml
+
+# Analyze workflow
+camel analyze-workflow \
+    --workflow ./product_development.yaml \
+    --check-deadlocks \
+    --check-loops
+
+# Monitor running workflow
+camel monitor \
+    --workflow-id wf_123 \
+    --live</code></pre>
+            </div>
+        </section>
+
+        <!-- Related Links -->
+        <section class="bg-blue-50 rounded-lg p-6 border border-blue-200">
+            <h3 class="font-semibold text-gray-800 mb-3">Related Resources</h3>
+            <ul class="space-y-2">
+                <li><a href="https://github.com/camel-ai/camel" target="_blank" class="text-blue-600 hover:underline">Camel-AI Official Repository</a></li>
+                <li><a href="https://www.camel-ai.io" target="_blank" class="text-blue-600 hover:underline">Camel-AI Documentation</a></li>
+                <li><a href="https://arxiv.org/abs/2311.08254" target="_blank" class="text-blue-600 hover:underline">Communicative Agents for Problem Solving (Paper)</a></li>
+            </ul>
+        </section>
+    </article>
+
+    <script>
+        if (typeof Prism !== 'undefined') {
+            Prism.highlightAll();
+        }
+    </script>
+</body>
+</html>

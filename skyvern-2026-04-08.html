@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skyvern: Workflow Automation That Actually Handles Complex Forms</title>
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-LMWN7814BX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-LMWN7814BX');
+    </script>
+
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Automating business workflows with Skyvern LAM. Solving issues with complex form filling, multi-step workflows, and browser-based automation reliability.">
+    <meta name="keywords" content="Skyvern, workflow automation, LAM, business automation, form filling, RPA, browser automation">
+    <link rel="canonical" href="https://pnt.jacbex.com/skyvern-2026-04-08.html">
+
+    <!-- Open Graph / Social Media -->
+    <meta property="og:title" content="Skyvern: Workflow Automation That Actually Handles Complex Forms">
+    <meta property="og:description" content="Real solutions for automating complex business workflows with AI">
+    <meta property="og:type" content="article">
+
+    <!-- JSON-LD Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "Skyvern: Workflow Automation That Actually Handles Complex Forms",
+      "description": "Automating business workflows with Skyvern LAM",
+      "author": {
+        "@type": "Person",
+        "name": "Programming Notes"
+      },
+      "datePublished": "2026-04-08",
+      "keywords": ["Skyvern", "workflow automation", "LAM", "business automation"],
+      "url": "https://pnt.jacbex.com/skyvern-2026-04-08.html"
+    }
+    </script>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Prism.js -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-yaml.min.js"></script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+        .code-block { background: #2d2d2d; border-radius: 8px; overflow: hidden; }
+        .code-block pre { margin: 0; padding: 1rem; overflow-x: auto; }
+        .code-block code { font-family: 'Fira Code', monospace; font-size: 0.9rem; }
+        .issue-box {
+            border-left: 4px solid #ec4899;
+            background: #fdf2f8;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .issue-title { font-weight: 600; color: #be185d; }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <article class="max-w-4xl mx-auto px-4 py-8">
+        <!-- Header -->
+        <header class="mb-12">
+            <h1 class="text-4xl font-bold text-gray-900 mb-4">Skyvern: Workflow Automation That Actually Handles Complex Forms</h1>
+            <p class="text-xl text-gray-600">
+                I needed to automate a client onboarding process - a 15-step workflow with multiple forms, document uploads, and verification steps. Traditional RPA tools couldn't handle the dynamic forms. Skyvern promised AI-powered workflow automation, but it would get stuck on validation errors and couldn't handle complex field types. Here's how I got reliable end-to-end automation.
+            </p>
+        </header>
+
+        <!-- GitHub Issue #1 -->
+        <div class="issue-box">
+            <div class="issue-title">
+                <a href="https://github.com/skyvern-ai/skyvern/issues?q=is%3Aissue+form+validation+error+handling+dynamic"
+                   target="_blank"
+                   class="text-pink-700 hover:underline">
+                    Automation Failed on Forms with Dynamic Validation Rules
+                </a>
+            </div>
+            <div class="issue-body mt-4">
+                <h4 class="font-semibold text-gray-800 mb-2">Problem</h4>
+                <p class="text-gray-700 mb-3">
+                    The onboarding form had fields that would appear/disappear based on previous answers, and real-time validation that changed error messages dynamically. Skyvern would fill out the form but fail on submission because it didn't handle the dynamic validation.
+                    <br><br>
+                    Error: <code class="bg-gray-100 px-2 py-1 rounded">FormSubmissionError: Validation failed - 3 fields have errors</code>
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">What I Tried</h4>
+                <p class="text-gray-700 mb-3">
+                    <strong>Attempt 1:</strong> Added explicit wait times between fields. This was unreliable and slow.<br>
+                    <strong>Attempt 2:</strong> Tried to fill all visible fields at once. The form would reject partially filled data.<br>
+                    <strong>Attempt 3:</strong> Used screenshots to read validation errors. This worked but required manual setup for each form.
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">Actual Fix</h4>
+                <p class="text-gray-700 mb-3">
+                    Configured Skyvern's adaptive form mode with real-time validation monitoring. The system now watches for validation state changes, reads error messages dynamically, and retries fields with validation feedback.
+                </p>
+                <div class="code-block mt-3">
+                    <pre><code class="language-yaml"># Skyvern workflow configuration with adaptive form handling
+workflow:
+  name: client_onboarding
+  description: Automated client onboarding with dynamic forms
+
+  # Form handling settings
+  form_settings:
+    # Adaptive form detection
+    detect_dynamic_fields: true
+    detect_conditional_fields: true
+    detect_validation_rules: true
+
+    # Validation monitoring
+    monitor_validation_state: true
+    validation_check_interval: 500  # Check every 500ms
+    wait_for_stable_validation: true
+    stable_validation_duration: 1000  # Wait 1s of no errors
+
+    # Error handling
+    read_validation_errors: true
+    error_selector_strategy: "auto"  # Auto-detect error messages
+    retry_on_validation_error: true
+    max_field_retries: 3
+
+    # Field interaction
+    fill_method: "sequential"  # Fill one field at a time
+    wait_between_fields: 200  # 200ms between fields
+    trigger_validation_on_change: true
+
+  # Steps
+  steps:
+    - name: navigate_to_form
+      action: goto
+      url: "https://example.com/onboarding"
+
+    - name: fill_personal_info
+      action: fill_form
+      fields:
+        - name: first_name
+          selector: "#firstName"
+          value: "{{client.first_name}}"
+          validate_after: true
+        - name: last_name
+          selector: "#lastName"
+          value: "{{client.last_name}}"
+          validate_after: true
+        - name: email
+          selector: "#email"
+          value: "{{client.email}}"
+          validate_after: true
+          # This field has complex validation
+          wait_for_validation: true
+          read_error_message: true
+
+    - name: handle_conditional_fields
+      action: conditional_fill
+      condition:
+        field: "company_type"
+        equals: "LLC"
+      then_fill:
+        - field: "ein_number"
+          value: "{{client.ein}}"
+
+    - name: submit_and_verify
+      action: submit_form
+      verify_success: true
+      success_selector: ".success-message"</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- GitHub Issue #2 -->
+        <div class="issue-box">
+            <div class="issue-title">
+                <a href="https://github.com/skyvern-ai/skyvern/issues?q=is%3Aissue+multi+step+workflow+context+state"
+                   target="_blank"
+                   class="text-pink-700 hover:underline">
+                    Lost Context and State Between Workflow Steps
+                </a>
+            </div>
+            <div class="issue-body mt-4">
+                <h4 class="font-semibold text-gray-800 mb-2">Problem</h4>
+                <p class="text-gray-700 mb-3">
+                    The onboarding workflow spanned multiple pages and required data from earlier steps (like a generated ID). Skyvern would complete step 1, but by step 3 it had "forgotten" the ID from step 1, causing failures.
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">What I Tried</h4>
+                <p class="text-gray-700 mb-3">
+                    <strong>Attempt 1:</strong> Hard-coded the ID in the workflow. This only worked for one run.<br>
+                    <strong>Attempt 2:</strong> Extracted data to a file and read it back. This was fragile and required extra steps.
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">Actual Fix</h4>
+                <p class="text-gray-700 mb-3">
+                    Enabled Skyvern's state management with variable extraction and persistence. The system now extracts values from pages, stores them in workflow state, and makes them available to subsequent steps.
+                </p>
+                <div class="code-block mt-3">
+                    <pre><code class="language-yaml"># Workflow with state management
+workflow:
+  name: multi_step_onboarding
+  description: Multi-step workflow with state persistence
+
+  # State management
+  state:
+    persist_state: true
+    state_file: "./workflows/state/{{workflow_id}}.json"
+    # Extract variables from pages
+    extract_variables:
+      - name: client_id
+        selector: ".client-id"
+        extract_method: "text"
+        required: true
+      - name: confirmation_code
+        selector: "[data-confirmation-code]"
+        extract_method: "attribute"
+        attribute: "data-confirmation-code"
+      - name: session_token
+        selector: "meta[name=session-token]"
+        extract_method: "attribute"
+        attribute: "content"
+
+  # Steps with state usage
+  steps:
+    - name: create_account
+      action: submit_form
+      form:
+        fields:
+          - email: "{{client.email}}"
+          - password: "{{client.password}}"
+      # Extract client_id from response page
+      extract:
+        client_id:
+          selector: ".client-id"
+          required: true
+
+    - name: upload_documents
+      action: upload_files
+      files:
+        - field: "id_document"
+          path: "{{client.id_doc_path}}"
+        - field: "proof_address"
+          path: "{{client.address_doc_path}}"
+      # Use extracted client_id in URL
+      url_params:
+        client_id: "{{state.client_id}}"
+
+    - name: verify_identity
+      action: navigate
+      url: "https://example.com/verify?client={{state.client_id}}&code={{state.confirmation_code}}"
+
+    - name: complete_setup
+      action: submit_form
+      form:
+        fields:
+          - session_token: "{{state.session_token}}"
+          - preferences: "{{client.preferences}}"</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- GitHub Issue #3 -->
+        <div class="issue-box">
+            <div class="issue-title">
+                <a href="https://github.com/skyvern-ai/skyvern/issues?q=is%3Aissue+file+upload+handling+document+automation"
+                   target="_blank"
+                   class="text-pink-700 hover:underline">
+                    File Uploads Failed Due to Security Restrictions and File Type Issues
+                </a>
+            </div>
+            <div class="issue-body mt-4">
+                <h4 class="font-semibold text-gray-800 mb-2">Problem</h4>
+                <p class="text-gray-700 mb-3">
+                    The workflow required uploading PDF and image files. Skyvern would try to upload but the server would reject files due to security checks, wrong file types, or file size issues.
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">What I Tried</h4>
+                <p class="text-gray-700 mb-3">
+                    <strong>Attempt 1:</strong> Converted all files to PDF. Some uploads required images specifically.<br>
+                    <strong>Attempt 2:</strong> Disabled browser security. This didn't work and was unsafe.
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">Actual Fix</h4>
+                <p class="text-gray-700 mb-3">
+                    Configured file upload handling with automatic type detection, size validation, and security header management. Skyvern now validates files before upload, handles multipart forms correctly, and works with cloud storage.
+                </p>
+                <div class="code-block mt-3">
+                    <pre><code class="language-yaml"># File upload configuration
+workflow:
+  name: document_upload_workflow
+
+  # File handling
+  file_settings:
+    # Validation
+    validate_before_upload: true
+    check_file_size: true
+    max_file_size: 10485760  # 10MB
+    check_file_type: true
+    allowed_types:
+      - "application/pdf"
+      - "image/png"
+      - "image/jpeg"
+
+    # Conversion
+    auto_convert_format: false
+    compress_if_needed: true
+    compression_quality: 0.9
+
+    # Upload method
+    upload_method: "multipart"  # or "base64", "cloud_storage"
+    chunk_size: 5242880  # 5MB chunks
+
+    # Headers
+    set_content_type: true
+    set_content_disposition: true
+    custom_headers:
+      X-File-Authorization: "{{api_token}}"
+
+  # Upload steps
+  steps:
+    - name: upload_id_document
+      action: upload_file
+      file:
+        path: "{{client.id_document}}"
+        field: "id_doc"
+        # Validate and prepare
+        validate: true
+        convert_if_needed: false
+      # Handle upload response
+      on_success:
+        extract:
+          upload_id:
+            selector: ".upload-id"
+            required: true
+      on_failure:
+        retry: true
+        max_retries: 3
+        fallback_action: "convert_and_retry"
+
+    - name: upload_proof_of_address
+      action: upload_file
+      file:
+        path: "{{client.address_proof}}"
+        field: "address_proof"
+        # This file might need conversion
+        auto_convert: true
+        target_format: "pdf"
+      # Cloud storage option
+      use_cloud_storage: true
+      storage_provider: "s3"
+      storage_bucket: "workflow-uploads"</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- What I Learned Section -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">What I Learned</h2>
+            <ul class="list-disc pl-6 space-y-3 text-gray-700">
+                <li><strong>Adaptive form handling is essential:</strong> Modern forms change based on input. You need real-time validation monitoring, not static selectors.</li>
+                <li><strong>Sequential filling works better than bulk:</strong> Fill one field at a time, wait for validation, then move to the next. More reliable but slower.</li>
+                <li><strong>State management enables multi-step workflows:</strong> Extract and persist variables between steps. Don't rely on the AI to remember context.</li>
+                <li><strong>File uploads need special handling:</strong> Validate files before upload, handle security headers, and support cloud storage for large files.</li>
+                <li><strong>Error recovery is critical:</strong> Forms will fail. Configure retry logic with error message reading and adaptive strategies.</li>
+                <li><strong>Workflow checkpoints save time:</strong> Save state after each major step. If automation fails, resume from checkpoint instead of starting over.</li>
+            </ul>
+        </section>
+
+        <!-- Production Setup -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Production Setup</h2>
+            <p class="text-gray-700 mb-4">
+                Complete setup for production workflow automation.
+            </p>
+
+            <div class="code-block">
+                <pre><code class="language-bash"># Install Skyvern
+pip install skyvern
+
+# Install browser dependencies
+playwright install chromium
+
+# For file handling (optional)
+pip install python-magic  # File type detection
+pip install pillow  # Image processing</code></pre>
+            </div>
+
+            <p class="text-gray-700 mt-6 mb-4">Production workflow runner:</p>
+            <div class="code-block">
+                <pre><code class="language-python">import asyncio
+from skyvern import Skyvern
+from skyvern.config import WorkflowConfig
+from pathlib import Path
+
+class WorkflowRunner:
+    """Production workflow automation runner."""
+
+    def __init__(self):
+        self.skyvern = Skyvern(
+            # Browser settings
+            browser_type="chromium",
+            headless=True,
+            # Performance
+            concurrency=2,  # Run 2 workflows in parallel
+            # State
+            state_dir="./workflows/state",
+            checkpoint_dir="./workflows/checkpoints",
+            # Monitoring
+            log_level="INFO",
+            log_dir="./logs",
+            metrics_enabled=True
+        )
+
+    async def run_workflow(self, workflow_path: str, data: dict):
+        """Run a workflow with data."""
+        # Load workflow
+        config = WorkflowConfig.from_yaml(workflow_path)
+
+        # Validate data
+        config.validate_data(data)
+
+        # Run workflow
+        result = await self.skyvern.run(
+            config=config,
+            data=data,
+            # Options
+            save_checkpoint=True,
+            resume_from_checkpoint=True,
+            on_error="continue"  # Continue to next step on error
+        )
+
+        return result
+
+    async def run_batch(self, workflow_path: str, data_list: list[dict]):
+        """Run workflow for multiple data sets."""
+        tasks = [
+            self.run_workflow(workflow_path, data)
+            for data in data_list
+        ]
+
+        results = await asyncio.gather(*tasks, return_exceptions=True)
+
+        # Process results
+        for i, result in enumerate(results):
+            if isinstance(result, Exception):
+                print(f"Workflow {i} failed: {result}")
+            else:
+                print(f"Workflow {i} completed: {result.success}")
+
+# Usage
+async def main():
+    runner = WorkflowRunner()
+
+    # Single workflow
+    result = await runner.run_workflow(
+        workflow_path="./workflows/client_onboarding.yaml",
+        data={
+            "client": {
+                "first_name": "John",
+                "last_name": "Doe",
+                "email": "john@example.com",
+                "company_type": "LLC",
+                "ein": "12-3456789",
+                "id_doc_path": "./docs/id.pdf",
+                "address_doc_path": "./docs/address.pdf"
+            }
+        }
+    )
+
+    print(f"Success: {result.success}")
+    print(f"Client ID: {result.state.get('client_id')}")
+
+    # Batch processing
+    clients = load_clients_from_csv("./clients.csv")
+    await runner.run_batch(
+        workflow_path="./workflows/client_onboarding.yaml",
+        data_list=clients
+    )
+
+if __name__ == "__main__":
+    asyncio.run(main())</code></pre>
+            </div>
+        </section>
+
+        <!-- Monitoring & Debugging -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Monitoring & Debugging</h2>
+            <p class="text-gray-700 mb-4">
+                Key metrics for workflow automation.
+            </p>
+
+            <h3 class="text-xl font-semibold text-gray-800 mt-6 mb-3">Red Flags to Watch For</h3>
+            <ul class="list-disc pl-6 space-y-2 text-gray-700">
+                <li><strong>Validation error rate > 15%:</strong> Form filling strategy needs adjustment. Check validation timing.</li>
+                <li><strong>State extraction failure rate > 10%:</strong> Selectors are breaking or page structure changed. Update extraction rules.</li>
+                <li><strong>File upload failure rate > 20%:</strong> File validation or upload method issues. Check file types and sizes.</li>
+                <li><strong>Workflow completion rate < 80%:</strong> Too many failures. Review error logs and add better error handling.</li>
+                <li><strong>Average workflow time > 2x expected:</strong> Performance issue. Check wait times and concurrency settings.</li>
+            </ul>
+
+            <h3 class="text-xl font-semibold text-gray-800 mt-6 mb-3">Debug Commands</h3>
+            <div class="code-block">
+                <pre><code class="language-bash"># Test workflow with dry run
+skyvern test \
+    --workflow ./workflows/client_onboarding.yaml \
+    --data ./test_data.json \
+    --dry-run
+
+# Validate workflow configuration
+skyvern validate \
+    --workflow ./workflows/client_onboarding.yaml
+
+# Run workflow with debugging
+skyvern run \
+    --workflow ./workflows/client_onboarding.yaml \
+    --data ./test_data.json \
+    --debug \
+    --screenshot-on-error
+
+# View workflow logs
+skyvern logs \
+    --workflow client_onboarding \
+    --tail
+
+# Analyze workflow performance
+skyvern analyze \
+    --log_dir ./logs \
+    --workflow client_onboarding</code></pre>
+            </div>
+        </section>
+
+        <!-- Related Links -->
+        <section class="bg-blue-50 rounded-lg p-6 border border-blue-200">
+            <h3 class="font-semibold text-gray-800 mb-3">Related Resources</h3>
+            <ul class="space-y-2">
+                <li><a href="https://github.com/skyvern-ai/skyvern" target="_blank" class="text-blue-600 hover:underline">Skyvern Official Repository</a></li>
+                <li><a href="https://www.skyvern.ai/docs" target="_blank" class="text-blue-600 hover:underline">Skyvern Documentation</a></li>
+                <li><a href="https://playwright.dev" target="_blank" class="text-blue-600 hover:underline">Playwright Documentation</a></li>
+            </ul>
+        </section>
+    </article>
+
+    <script>
+        if (typeof Prism !== 'undefined') {
+            Prism.highlightAll();
+        }
+    </script>
+</body>
+</html>
