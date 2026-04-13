@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hono: Web Framework That Actually Runs Everywhere (Edge, Bun, Deno)</title>
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-LMWN7814BX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-LMWN7814BX');
+    </script>
+
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Migrating from Express to Hono for edge computing. Real solutions for Cloudflare Workers deployment, type-safe routing, middleware chains, and multi-runtime compatibility.">
+    <meta name="keywords" content="Hono, web framework, edge computing, Cloudflare Workers, Bun, Deno, TypeScript, Express alternative">
+    <link rel="canonical" href="https://pnt.jacbex.com/hono-2026-04-13.html">
+
+    <!-- Open Graph / Social Media -->
+    <meta property="og:title" content="Hono: Web Framework That Actually Runs Everywhere (Edge, Bun, Deno)">
+    <meta property="og:description" content="Moving from Express to Hono for edge deployment — real issues and fixes">
+    <meta property="og:type" content="article">
+
+    <!-- JSON-LD Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "Hono: Web Framework That Actually Runs Everywhere (Edge, Bun, Deno)",
+      "description": "Migrating from Express to Hono for edge computing with Cloudflare Workers",
+      "author": {
+        "@type": "Person",
+        "name": "Programming Notes"
+      },
+      "datePublished": "2026-04-13",
+      "keywords": ["Hono", "edge computing", "Cloudflare Workers", "TypeScript", "web framework"],
+      "url": "https://pnt.jacbex.com/hono-2026-04-13.html"
+    }
+    </script>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Prism.js -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-typescript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+        .code-block { background: #2d2d2d; border-radius: 8px; overflow: hidden; }
+        .code-block pre { margin: 0; padding: 1rem; overflow-x: auto; }
+        .code-block code { font-family: 'Fira Code', monospace; font-size: 0.9rem; }
+        .issue-box {
+            border-left: 4px solid #ec4899;
+            background: #fdf2f8;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .issue-title { font-weight: 600; color: #be185d; }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <article class="max-w-4xl mx-auto px-4 py-8">
+        <!-- Header -->
+        <header class="mb-12">
+            <h1 class="text-4xl font-bold text-gray-900 mb-4">Hono: Web Framework That Actually Runs Everywhere (Edge, Bun, Deno)</h1>
+            <p class="text-xl text-gray-600">
+                I had an Express API running on a $20/month VPS that handled 500 requests per minute. When Cloudflare Workers offered 100K requests/day for free, I wanted in. But Express doesn't run on Workers — no Node.js runtime available. Found Hono, which promised Express-like syntax on any runtime. After porting three APIs to it, here's what I learned.
+            </p>
+        </header>
+
+        <!-- Table of Contents -->
+        <nav class="bg-white rounded-lg shadow-sm p-6 mb-8 border border-gray-200">
+            <h2 class="text-xl font-semibold mb-4 text-gray-800">Quick Navigation</h2>
+            <ul class="space-y-2">
+                <li><a href="#why-not-express" class="text-blue-600 hover:underline">Why Not Express Anymore</a></li>
+                <li><a href="#quick-start" class="text-blue-600 hover:underline">Quick Start on Cloudflare Workers</a></li>
+                <li><a href="#middleware" class="text-blue-600 hover:underline">Building a Real API with Middleware</a></li>
+                <li><a href="#type-safe" class="text-blue-600 hover:underline">Type-Safe Routing with RPC</a></li>
+                <li><a href="#multi-runtime" class="text-blue-600 hover:underline">Deploying to Multiple Runtimes</a></li>
+                <li><a href="#lessons" class="text-blue-600 hover:underline">What I Learned</a></li>
+            </ul>
+        </nav>
+
+        <!-- Why Not Express -->
+        <section id="why-not-express" class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Why Not Express Anymore</h2>
+            <p class="text-gray-700 mb-4">
+                Express is 14 years old. It works, but it's tied to Node.js. In 2026, that's a problem. I need my APIs to run on:
+            </p>
+            <ul class="list-disc pl-6 space-y-2 text-gray-700 mb-4">
+                <li><strong>Cloudflare Workers</strong> — for edge deployment, 50ms cold starts</li>
+                <li><strong>Bun</strong> — for local dev, 3x faster than Node.js</li>
+                <li><strong>AWS Lambda</strong> — for existing infra</li>
+                <li><strong>Deno Deploy</strong> — for some clients who prefer it</li>
+            </ul>
+            <p class="text-gray-700">
+                Hono's selling point: the same code runs on all of them. Not "similar code" — the same file. The framework abstracts away the runtime differences. Your routes, middleware, and helpers are portable.
+            </p>
+        </section>
+
+        <!-- Quick Start -->
+        <section id="quick-start" class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Quick Start on Cloudflare Workers</h2>
+
+            <div class="code-block">
+                <pre><code class="language-bash"># Create Hono project for Cloudflare Workers
+npm create hono@latest my-api
+# Choose "cloudflare-workers" template
+
+cd my-api
+npm install
+npm run dev   # Local dev with Wrangler
+npm run deploy # Deploy to Cloudflare</code></pre>
+            </div>
+
+            <p class="text-gray-700 mt-4 mb-4">
+                The generated <code>src/index.ts</code> is minimal:
+            </p>
+
+            <div class="code-block">
+                <pre><code class="language-typescript">import { Hono } from "hono"
+
+const app = new Hono()
+
+app.get("/", (c) => c.json({ message: "Hello from the edge!" }))
+
+// Route with path params
+app.get("/users/:id", (c) => {
+  const id = c.req.param("id")
+  return c.json({ userId: id })
+})
+
+// POST with JSON body
+app.post("/users", async (c) => {
+  const body = await c.req.json()
+  // Validate and save...
+  return c.json({ created: true, user: body }, 201)
+})
+
+export default app</code></pre>
+            </div>
+
+            <p class="text-gray-700 mt-4">
+                That's it. The <code>c</code> object (Context) replaces Express's <code>req</code>/<code>res</code> pair. <code>c.req</code> for request data, <code>c.json()</code> for responses. If you know Express, you know Hono.
+            </p>
+        </section>
+
+        <!-- GitHub Issue #1 -->
+        <div class="issue-box">
+            <div class="issue-title">
+                <a href="https://github.com/honojs/hono/issues?q=is%3Aissue+middleware+order+execution"
+                   target="_blank"
+                   class="text-pink-700 hover:underline">
+                    Middleware execution order causes auth to run before CORS
+                </a>
+            </div>
+            <div class="issue-body mt-4">
+                <h4 class="font-semibold text-gray-800 mb-2">Problem</h4>
+                <p class="text-gray-700 mb-3">
+                    My API had CORS middleware and auth middleware. The auth middleware was rejecting preflight <code>OPTIONS</code> requests because it ran before the CORS middleware could set headers. Browsers got 401 on preflight, which meant no actual requests ever went through.
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">What I Tried</h4>
+                <p class="text-gray-700 mb-3">
+                    I tried adding <code>cors()</code> inside the auth middleware for OPTIONS requests. That worked for CORS but created a mess of conditional logic that was hard to maintain.
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">Actual Fix</h4>
+                <p class="text-gray-700 mb-3">
+                    Middleware in Hono runs in the order you add it. CORS must come before auth, and auth must handle the <code>OPTIONS</code> case gracefully:
+                </p>
+                <div class="code-block mt-3">
+                    <pre><code class="language-typescript">import { Hono, createMiddleware } from "hono/factory"
+import { cors } from "hono/cors"
+import { bearerAuth } from "hono/bearer-auth"
+
+const app = new Hono()
+
+// 1. CORS first — handles all preflight requests
+app.use("/api/*", cors({
+  origin: ["https://myapp.com"],
+  allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowHeaders: ["Content-Type", "Authorization"],
+}))
+
+// 2. Auth second — only runs after CORS headers are set
+app.use("/api/*", async (c, next) => {
+  // Skip auth for health check
+  if (c.req.path === "/api/health") return next()
+
+  const token = c.req.header("Authorization")
+  if (!token || !validateToken(token)) {
+    return c.json({ error: "Unauthorized" }, 401)
+  }
+  await next()
+})
+
+// 3. Routes last
+app.get("/api/users", async (c) => {
+  const users = await getUsers()
+  return c.json(users)
+})</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- Middleware Section -->
+        <section id="middleware" class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Building a Real API with Middleware</h2>
+            <p class="text-gray-700 mb-4">
+                Here's a real middleware stack I use in production. It handles logging, auth, rate limiting, and error handling:
+            </p>
+
+            <div class="code-block">
+                <pre><code class="language-typescript">import { Hono } from "hono"
+import { logger } from "hono/logger"
+import { prettyJSON } from "hono/pretty-json"
+import { HTTPException } from "hono/http-exception"
+
+type Bindings = {
+  DB: D1Database
+  KV: KVNamespace
+  JWT_SECRET: string
+}
+
+type Variables = {
+  userId: string
+  userRole: "admin" | "user"
+}
+
+const app = new Hono<{ Bindings: Bindings; Variables: Variables }>()
+
+// Logging
+app.use(logger())
+
+// Custom auth middleware — sets userId for downstream handlers
+app.use("/api/*", async (c, next) => {
+  const token = c.req.header("Authorization")?.replace("Bearer ", "")
+  if (!token) throw new HTTPException(401, { message: "Missing token" })
+
+  try {
+    const payload = await verifyJWT(token, c.env.JWT_SECRET)
+    c.set("userId", payload.sub)
+    c.set("userRole", payload.role)
+    await next()
+  } catch {
+    throw new HTTPException(401, { message: "Invalid token" })
+  }
+})
+
+// Rate limiting with KV
+app.use("/api/*", async (c, next) => {
+  const key = `rate:${c.get("userId")}`
+  const count = parseInt(await c.env.KV.get(key) || "0")
+
+  if (count > 100) {
+    throw new HTTPException(429, { message: "Rate limit exceeded" })
+  }
+
+  await c.env.KV.put(key, String(count + 1), { expirationTtl: 60 })
+  await next()
+})
+
+// Global error handler
+app.onError((err, c) => {
+  if (err instanceof HTTPException) {
+    return c.json({ error: err.message }, err.status)
+  }
+  console.error("Unhandled error:", err)
+  return c.json({ error: "Internal server error" }, 500)
+})
+
+// Routes with typed context
+app.get("/api/profile", async (c) => {
+  const userId = c.get("userId") // TypeScript knows this is a string
+  const profile = await c.env.DB.prepare(
+    "SELECT * FROM users WHERE id = ?"
+  ).bind(userId).first()
+
+  return c.json(profile)
+})
+
+export default app</code></pre>
+            </div>
+        </section>
+
+        <!-- GitHub Issue #2 -->
+        <div class="issue-box">
+            <div class="issue-title">
+                <a href="https://github.com/honojs/hono/issues?q=is%3Aissue+RPC+type+inference+client"
+                   target="_blank"
+                   class="text-pink-700 hover:underline">
+                    RPC client type inference breaks with route-specific middleware
+                </a>
+            </div>
+            <div class="issue-body mt-4">
+                <h4 class="font-semibold text-gray-800 mb-2">Problem</h4>
+                <p class="text-gray-700 mb-3">
+                    Hono's RPC feature lets you share types between server and client automatically. But when I added route-specific middleware (like admin-only checks on certain routes), the client lost type inference for those routes — the response type became <code>unknown</code>.
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">What I Tried</h4>
+                <p class="text-gray-700 mb-3">
+                    Tried manually typing the client calls. That worked but defeated the purpose of RPC. Tried moving middleware to route level instead of app level — same issue.
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">Actual Fix</h4>
+                <p class="text-gray-700 mb-3">
+                    The fix was to define route types explicitly using Hono's <code>AppType</code> and make sure the middleware types are properly chained. Here's the pattern:
+                </p>
+                <div class="code-block mt-3">
+                    <pre><code class="language-typescript">// server.ts
+import { Hono } from "hono"
+
+const app = new Hono()
+  .get("/api/users", (c) => {
+    return c.json({ users: [{ id: 1, name: "Alice" }] })
+  })
+  .post("/api/users", async (c) => {
+    const body = await c.req.json<{ name: string }>()
+    return c.json({ id: 2, name: body.name }, 201)
+  })
+
+type AppType = typeof app
+export type { AppType }
+
+// client.ts (different package)
+import { hc } from "hono/client"
+import type { AppType } from "../server"
+
+const client = hc<AppType>("https://my-api.workers.dev")
+
+async function main() {
+  // Full type inference — response type is known
+  const res = await client.api.users.$get()
+  const data = await res.json()
+  console.log(data.users[0].name) // TypeScript knows this is string
+
+  // POST with typed body
+  const createRes = await client.api.users.$post({
+    json: { name: "Bob" }
+  })
+}</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- Type-Safe Routing -->
+        <section id="type-safe" class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Type-Safe Routing with RPC</h2>
+            <p class="text-gray-700 mb-4">
+                The RPC client is Hono's killer feature. You share the type of your Hono app between server and client, and the client gets full autocompletion for routes, request bodies, and response types. No OpenAPI spec generation step, no codegen.
+            </p>
+            <p class="text-gray-700 mb-4">
+                This works great in a monorepo where server and client share the same TypeScript project. For separate repos, you export the <code>AppType</code> from a shared package.
+            </p>
+        </section>
+
+        <!-- Multi-Runtime -->
+        <section id="multi-runtime" class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Deploying to Multiple Runtimes</h2>
+            <p class="text-gray-700 mb-4">
+                The same Hono app can target different runtimes by changing the entry point. Here's how I set up a project that deploys to both Cloudflare Workers and Bun:
+            </p>
+
+            <div class="code-block">
+                <pre><code class="language-typescript">// src/app.ts — shared app definition
+import { Hono } from "hono"
+
+export const app = new Hono()
+app.get("/api/health", (c) => c.json({ status: "ok" }))
+// ... all routes
+
+// src/worker.ts — Cloudflare Workers entry
+import { app } from "./app"
+export default app
+
+// src/bun.ts — Bun entry
+import { serve } from "bun"
+import { app } from "./app"
+
+serve({
+  fetch: app.fetch,
+  port: 3000,
+})</code></pre>
+            </div>
+
+            <div class="code-block mt-4">
+                <pre><code class="language-bash"># package.json scripts
+{
+  "scripts": {
+    "dev:worker": "wrangler dev",
+    "dev:bun": "bun run src/bun.ts",
+    "deploy:worker": "wrangler deploy",
+    "deploy:bun": "bun build src/bun.ts --compile --outfile my-api"
+  }
+}</code></pre>
+            </div>
+
+            <p class="text-gray-700 mt-4">
+                For Deno Deploy, just import directly — no build step needed:
+            </p>
+            <div class="code-block">
+                <pre><code class="language-typescript">// main.ts for Deno Deploy
+import { Hono } from "jsr:@hono/hono"
+
+const app = new Hono()
+// Same routes...
+Deno.serve(app.fetch)</code></pre>
+            </div>
+        </section>
+
+        <!-- What I Learned -->
+        <section id="lessons" class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">What I Learned</h2>
+            <ul class="list-disc pl-6 space-y-3 text-gray-700">
+                <li><strong>Middleware order matters more than in Express.</strong> Hono middleware is linear, not a stack. Put CORS before auth, always.</li>
+                <li><strong>RPC is worth the setup cost.</strong> Once you have type-safe client-server communication, you'll never want to go back to manual API typing.</li>
+                <li><strong>Cloudflare Workers has limits.</strong> 10ms CPU time on free plan, 50ms on paid. If your API does heavy computation, you need a different runtime.</li>
+                <li><strong>D1 is surprisingly good for edge databases.</strong> Hono + D1 + KV covers 80% of what I used to use PostgreSQL + Redis for.</li>
+                <li><strong>Bun is the best dev experience.</strong> Instant startup, fast HMR. I develop locally with Bun and deploy to Workers.</li>
+            </ul>
+        </section>
+
+        <!-- Wrapping Up -->
+        <section class="mb-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Wrapping Up</h2>
+            <p class="text-gray-700">
+                Hono replaced Express for all my new projects. The API is familiar enough that the learning curve is measured in hours, not days. Running the same code on Workers, Bun, and Deno means I'm not locked into any single platform. And the RPC client feature eliminates an entire class of type-related bugs between frontend and backend.
+            </p>
+        </section>
+
+        <!-- Related Links -->
+        <section class="bg-blue-50 rounded-lg p-6 border border-blue-200">
+            <h3 class="font-semibold text-gray-800 mb-3">Related Articles</h3>
+            <ul class="space-y-2">
+                <li><a href="bun-2026-04-13.html" class="text-blue-600 hover:underline">Bun 2.0: Finally Replaced Node.js Without Breaking Everything</a></li>
+                <li><a href="astro-5-2026-04-13.html" class="text-blue-600 hover:underline">Astro 5.0: Static Site Generator That Actually Handles Dynamic Content</a></li>
+                <li><a href="shadcn-ui-2026-04-13.html" class="text-blue-600 hover:underline">Shadcn/UI + Next.js: Component System That Actually Stays in Your Codebase</a></li>
+            </ul>
+        </section>
+    </article>
+
+    <script>
+        if (typeof Prism !== 'undefined') {
+            Prism.highlightAll();
+        }
+    </script>
+</body>
+</html>

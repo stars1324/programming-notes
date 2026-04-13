@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Novu: Notification Engine That Actually Handles Email + SMS + Push Together</title>
+
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-LMWN7814BX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-LMWN7814BX');
+    </script>
+
+    <meta name="description" content="Building a unified notification system with Novu. Real solutions for email+SMS+push workflows, template rendering, digest aggregation, and user preference management.">
+    <meta name="keywords" content="Novu, notifications, email, SMS, push notifications, notification engine, workflow">
+    <link rel="canonical" href="https://pnt.jacbex.com/novu-2026-04-13.html">
+
+    <meta property="og:title" content="Novu: Notification Engine That Actually Handles Email + SMS + Push Together">
+    <meta property="og:description" content="Unified notification system with Novu — email, SMS, push workflows">
+    <meta property="og:type" content="article">
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "Novu: Notification Engine That Actually Handles Email + SMS + Push Together",
+      "description": "Building unified notification workflows with Novu — email, SMS, push",
+      "author": { "@type": "Person", "name": "Programming Notes" },
+      "datePublished": "2026-04-13",
+      "keywords": ["Novu", "notifications", "email", "SMS", "push notifications"],
+      "url": "https://pnt.jacbex.com/novu-2026-04-13.html"
+    }
+    </script>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-typescript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+        .code-block { background: #2d2d2d; border-radius: 8px; overflow: hidden; }
+        .code-block pre { margin: 0; padding: 1rem; overflow-x: auto; }
+        .code-block code { font-family: 'Fira Code', monospace; font-size: 0.9rem; }
+        .issue-box { border-left: 4px solid #ec4899; background: #fdf2f8; padding: 1.5rem; margin: 2rem 0; border-radius: 0 8px 8px 0; }
+        .issue-title { font-weight: 600; color: #be185d; }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <article class="max-w-4xl mx-auto px-4 py-8">
+        <header class="mb-12">
+            <h1 class="text-4xl font-bold text-gray-900 mb-4">Novu: Notification Engine That Actually Handles Email + SMS + Push Together</h1>
+            <p class="text-xl text-gray-600">
+                I built a notification system from scratch three times. The first time was just SendGrid for emails. Then I added Twilio for SMS. Then Firebase for push notifications. Three different APIs, three different dashboard, three different sets of templates. When a user said "I only want push, not email," I had to code that logic myself. Novu replaces all of that with a single workflow engine. One API call triggers email + SMS + push through a template system with user preference management. Here's what I learned.
+            </p>
+        </header>
+
+        <nav class="bg-white rounded-lg shadow-sm p-6 mb-8 border border-gray-200">
+            <h2 class="text-xl font-semibold mb-4 text-gray-800">Quick Navigation</h2>
+            <ul class="space-y-2">
+                <li><a href="#why-novu" class="text-blue-600 hover:underline">Why Not SendGrid + Twilio Separately</a></li>
+                <li><a href="#workflow" class="text-blue-600 hover:underline">Building a Notification Workflow</a></li>
+                <li><a href="#templates" class="text-blue-600 hover:underline">Template Engine with Handlebars</a></li>
+                <li><a href="#digest" class="text-blue-600 hover:underline">Digest and Aggregation for Spam Prevention</a></li>
+                <li><a href="#preferences" class="text-blue-600 hover:underline">User Preference Management</a></li>
+                <li><a href="#lessons" class="text-blue-600 hover:underline">What I Learned</a></li>
+            </ul>
+        </nav>
+
+        <section id="why-novu" class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Why Not SendGrid + Twilio Separately</h2>
+            <p class="text-gray-700 mb-4">The problem with separate providers:</p>
+            <ul class="list-disc pl-6 space-y-2 text-gray-700">
+                <li><strong>Three different template systems.</strong> SendGrid uses Handlebars, Twilio uses their own format, Firebase has no templates.</li>
+                <li><strong>No unified user preferences.</strong> "Don't email me about X but SMS me about Y" requires custom code per provider.</li>
+                <li><strong>No digest/aggregation.</strong> If a user gets 20 notifications in an hour, you want to batch them into one email. You have to build that yourself.</li>
+                <li><strong>No single dashboard.</strong> You can't see all notification activity in one place.</li>
+            </ul>
+            <p class="text-gray-700 mt-4">Novu solves all of this by abstracting the providers behind a workflow engine. You define workflows (when to send, what channels), templates (what the message looks like), and user preferences (what each user wants). Novu handles the rest.</p>
+        </section>
+
+        <section id="workflow" class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Building a Notification Workflow</h2>
+
+            <div class="code-block">
+                <pre><code class="language-bash"># Install Novu
+npm install @novu/node @novu/api
+
+# Start Novu locally (self-hosted)
+npx novu start
+# Dashboard: http://localhost:4200</code></pre>
+            </div>
+
+            <div class="code-block mt-4">
+                <pre><code class="language-typescript">// Create a notification workflow programmatically
+import { Novu } from "@novu/node"
+
+const novu = new Novu(process.env.NOVU_API_KEY!)
+
+// Define a workflow: "order-shipped"
+// This sends email + SMS + push when an order ships
+await novu.workflows.create({
+  name: "order-shipped",
+  notificationGroupId: "orders",
+  steps: [
+    // Step 1: Send email immediately
+    {
+      type: "email",
+      name: "shipping-email",
+      template: {
+        subject: "Your order {{orderNumber}} has shipped!",
+        body: `Hi {{firstName}},
+
+Your order #{{orderNumber}} is on its way!
+
+Tracking: {{trackingUrl}}
+Expected delivery: {{estimatedDelivery}}
+
+Thanks for shopping with us.`,
+      },
+    },
+    // Step 2: Send SMS (only if email bounces)
+    {
+      type: "sms",
+      name: "shipping-sms",
+      template: {
+        content: "Your order #{{orderNumber}} has shipped! Track: {{trackingUrl}}",
+      },
+    },
+    // Step 3: Send push notification
+    {
+      type: "push",
+      name: "shipping-push",
+      template: {
+        title: "Order Shipped!",
+        content: "Order #{{orderNumber}} is on its way",
+      },
+    },
+  ],
+})
+
+// Trigger the workflow
+await novu.trigger("order-shipped", {
+  to: {
+    subscriberId: "user-123",
+    email: "alice@example.com",
+    phone: "+1234567890",
+  },
+  payload: {
+    firstName: "Alice",
+    orderNumber: "ORD-789",
+    trackingUrl: "https://track.example.com/ORD-789",
+    estimatedDelivery: "April 15, 2026",
+  },
+})</code></pre>
+            </div>
+
+            <p class="text-gray-700 mt-4">One API call. Novu sends the email, the SMS, and the push notification. It respects user preferences (if Alice disabled push, she won't get it). It handles retries and delivery tracking.</p>
+        </section>
+
+        <div class="issue-box">
+            <div class="issue-title">
+                <a href="https://github.com/novuhq/novu/issues?q=is%3Aissue+template+rendering+handlebars+variable"
+                   target="_blank"
+                   class="text-pink-700 hover:underline">
+                    Template rendering fails when payload variables contain special characters
+                </a>
+            </div>
+            <div class="issue-body mt-4">
+                <h4 class="font-semibold text-gray-800 mb-2">Problem</h4>
+                <p class="text-gray-700 mb-3">Email templates with Handlebars would break when the payload contained HTML characters (<code>&amp;</code>, <code>&lt;</code>, <code>&gt;</code>) or when nested objects were passed. User names like "O'Brien" caused template rendering to fail silently — the notification was marked as "sent" but the email content was corrupted.</p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">What I Tried</h4>
+                <p class="text-gray-700 mb-3">Tried escaping all payload values before passing to Novu. That worked for HTML but broke URLs and phone numbers. Tried using triple braces <code>{{{variable}}}</code> in templates — introduced XSS risk.</p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">Actual Fix</h4>
+                <p class="text-gray-700 mb-3">Use double braces for auto-escaped content and sanitize payload data at the application level:</p>
+                <div class="code-block mt-3">
+                    <pre><code class="language-typescript">// Sanitize payload before triggering
+function sanitizePayload(payload: Record<string, any>) {
+  const sanitized: Record<string, any> = {}
+  for (const [key, value] of Object.entries(payload)) {
+    if (typeof value === "string") {
+      // Only escape for email templates, not for SMS/push
+      sanitized[key] = value.replace(/&/g, "&amp;")
+                            .replace(/</g, "&lt;")
+                            .replace(/>/g, "&gt;")
+    } else {
+      sanitized[key] = value
+    }
+  }
+  return sanitized
+}
+
+// Or better: use separate templates for email (HTML) vs SMS (plain text)
+// Novu supports different content per channel in the same workflow</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <section id="templates" class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Template Engine with Handlebars</h2>
+            <p class="text-gray-700 mb-4">Novu's template engine supports Handlebars with custom helpers. Here's a more complex template for a weekly digest:</p>
+
+            <div class="code-block">
+                <pre><code class="language-typescript">// Weekly activity digest template
+const digestTemplate = `
+<h1>Hi {{firstName}}, here's your weekly summary</h1>
+
+{{#if hasNewFollowers}}
+<h2>New Followers ({{newFollowerCount}})</h2>
+<ul>
+{{#each newFollowers}}
+  <li>{{this.name}} — <a href="https://app.example.com/profile/{{this.id}}">View Profile</a></li>
+{{/each}}
+</ul>
+{{/if}}
+
+{{#if hasNewComments}}
+<h2>Comments on Your Posts ({{commentCount}})</h2>
+{{#each comments}}
+  <p><strong>{{this.author}}</strong> commented on "{{this.postTitle}}":
+  <blockquote>{{this.content}}</blockquote></p>
+{{/each}}
+{{/if}}
+
+{{#unless hasActivity}}
+<p>Nothing new this week. Check out <a href="https://app.example.com/explore">what's trending</a>.</p>
+{{/unless}}
+`
+
+// Trigger with array data
+await novu.trigger("weekly-digest", {
+  to: { subscriberId: userId, email: userEmail },
+  payload: {
+    firstName: user.name,
+    hasNewFollowers: newFollowers.length > 0,
+    newFollowerCount: newFollowers.length,
+    newFollowers: newFollowers.map(f => ({ name: f.name, id: f.id })),
+    hasNewComments: comments.length > 0,
+    commentCount: comments.length,
+    comments: comments,
+    hasActivity: newFollowers.length > 0 || comments.length > 0,
+  },
+})</code></pre>
+            </div>
+        </section>
+
+        <section id="digest" class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Digest and Aggregation for Spam Prevention</h2>
+            <p class="text-gray-700 mb-4">The most underrated Novu feature. Instead of sending 20 emails for 20 comments, digest them into one:</p>
+
+            <div class="code-block">
+                <pre><code class="language-typescript">// Define a digest workflow
+await novu.workflows.create({
+  name: "comment-notification",
+  steps: [
+    // Step 1: Digest — collect comments for 1 hour
+    {
+      type: "digest",
+      name: "comment-digest",
+      digestMeta: {
+        amount: 1,
+        unit: "hours", // Batch all comments within 1 hour
+      },
+    },
+    // Step 2: Send aggregated email
+    {
+      type: "email",
+      name: "comment-email",
+      template: {
+        subject: "You have {{events.length}} new comments",
+        body: `Hi {{firstName}},
+
+You received {{events.length}} new comments:
+
+{{#each events}}
+- {{this.payload.authorName}}: "{{this.payload.content}}"
+{{/each}}
+
+View all: https://app.example.com/comments`,
+      },
+    },
+  ],
+})
+
+// Trigger for each comment — Novu batches them
+for (const comment of comments) {
+  await novu.trigger("comment-notification", {
+    to: { subscriberId: postAuthorId, email: postAuthorEmail },
+    payload: {
+      firstName: postAuthorName,
+      authorName: comment.author,
+      content: comment.text,
+    },
+  })
+}
+// Result: one email with all comments, sent 1 hour after the first comment</code></pre>
+            </div>
+        </section>
+
+        <div class="issue-box">
+            <div class="issue-title">
+                <a href="https://github.com/novuhq/novu/issues?q=is%3Aissue+digest+aggregation+duplicate"
+                   target="_blank"
+                   class="text-pink-700 hover:underline">
+                    Digest aggregation sends duplicate notifications when multiple events trigger simultaneously
+                </a>
+            </div>
+            <div class="issue-body mt-4">
+                <h4 class="font-semibold text-gray-800 mb-2">Problem</h4>
+                <p class="text-gray-700 mb-3">When 5 users commented within seconds, the digest sent 3 emails instead of 1. The events weren't being grouped into the same digest window because they triggered before the first digest timer was established.</p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">Actual Fix</h4>
+                <p class="text-gray-700 mb-3">Add a <code>digestKey</code> to group related events. Events with the same key go into the same digest window:</p>
+                <div class="code-block mt-3">
+                    <pre><code class="language-typescript">// Use digestKey to group events for the same user/post
+await novu.trigger("comment-notification", {
+  to: { subscriberId: postAuthorId },
+  payload: { /* ... */ },
+  // All comments on the same post go into one digest
+  overrides: {
+    "comment-digest": {
+      digestKey: `post-${postId}`, // Group key
+    },
+  },
+})</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <section id="preferences" class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">User Preference Management</h2>
+            <p class="text-gray-700 mb-4">Novu stores per-user notification preferences. Users can opt out of specific channels or specific notification types:</p>
+
+            <div class="code-block">
+                <pre><code class="language-typescript">// Set user preferences via API
+await novu.subscribers.updatePreferences("user-123", {
+  // Global channel preferences
+  channels: {
+    email: true,
+    sms: false,    // No SMS for this user
+    push: true,
+  },
+  // Per-workflow preferences
+  workflows: {
+    "order-shipped": {
+      enabled: true,
+      channels: { email: true, sms: false, push: true },
+    },
+    "marketing-update": {
+      enabled: false, // Completely opted out of marketing
+    },
+    "weekly-digest": {
+      enabled: true,
+      channels: { email: true },
+    },
+  },
+})
+
+// When you trigger a notification, Novu checks preferences automatically
+// If the user disabled marketing notifications, this trigger is silently skipped
+await novu.trigger("marketing-update", {
+  to: { subscriberId: "user-123" },
+  payload: { /* ... */ },
+})
+
+// Frontend: let users manage their own preferences
+import { NovuProvider, Preferences } from "@novu/react"
+
+function NotificationSettings() {
+  return (
+    &lt;NovuProvider subscriberId="user-123" applicationIdentifier={APP_ID}&gt;
+      &lt;Preferences /&gt; {/* Built-in preferences UI */}
+    &lt;/NovuProvider&gt;
+  )
+}</code></pre>
+            </div>
+        </section>
+
+        <section id="lessons" class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">What I Learned</h2>
+            <ul class="list-disc pl-6 space-y-3 text-gray-700">
+                <li><strong>Use Novu from the start.</strong> Retrofitting a unified notification system onto separate SendGrid/Twilio integrations is painful. Start with Novu.</li>
+                <li><strong>Digest is the killer feature.</strong> Batching notifications into hourly or daily digests prevents notification fatigue and reduces email costs.</li>
+                <li><strong>Let users control their preferences.</strong> Novu's built-in preference UI saves you from building a settings page.</li>
+                <li><strong>Template testing matters.</strong> Test templates with real data (including special characters) before going live. Use the Novu dashboard's preview feature.</li>
+                <li><strong>Self-hosted Novu costs nothing at scale.</strong> Cloud plan charges per notification. Self-hosted is free — just pay for your email/SMS providers.</li>
+            </ul>
+        </section>
+
+        <section class="mb-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Wrapping Up</h2>
+            <p class="text-gray-700">
+                Novu replaced three separate notification services (SendGrid, Twilio, Firebase) with one workflow engine. The digest feature alone was worth the migration — my users went from getting 20 emails per day to getting one well-formatted digest. And the built-in preference management means I don't have to build notification settings into every app. If you're sending notifications through more than one channel, Novu is the right tool.
+            </p>
+        </section>
+
+        <section class="bg-blue-50 rounded-lg p-6 border border-blue-200">
+            <h3 class="font-semibold text-gray-800 mb-3">Related Articles</h3>
+            <ul class="space-y-2">
+                <li><a href="refine-2026-04-13.html" class="text-blue-600 hover:underline">Refine: Admin Panel Framework That Scales Beyond CRUD</a></li>
+                <li><a href="appsmith-2026-04-13.html" class="text-blue-600 hover:underline">Appsmith: Internal Tool Builder That Handles Complex Business Logic</a></li>
+                <li><a href="pocketbase-v1-2026-04-13.html" class="text-blue-600 hover:underline">PocketBase v1.0: Single-File Backend That Handles Production Traffic</a></li>
+            </ul>
+        </section>
+    </article>
+
+    <script>if (typeof Prism !== 'undefined') Prism.highlightAll();</script>
+</body>
+</html>

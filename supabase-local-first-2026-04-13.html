@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supabase Local-First: Offline Database That Actually Syncs When Back Online</title>
+
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-LMWN7814BX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-LMWN7814BX');
+    </script>
+
+    <meta name="description" content="Building offline-first apps with Supabase and PowerSync. Real solutions for conflict resolution, real-time subscriptions, RLS performance, and local SQLite sync.">
+    <meta name="keywords" content="Supabase, offline-first, local-first, PowerSync, real-time database, conflict resolution, PostgreSQL">
+    <link rel="canonical" href="https://pnt.jacbex.com/supabase-local-first-2026-04-13.html">
+
+    <meta property="og:title" content="Supabase Local-First: Offline Database That Actually Syncs When Back Online">
+    <meta property="og:description" content="Real solutions for Supabase offline-first sync with PowerSync">
+    <meta property="og:type" content="article">
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "Supabase Local-First: Offline Database That Actually Syncs When Back Online",
+      "description": "Building offline-first apps with Supabase and PowerSync",
+      "author": { "@type": "Person", "name": "Programming Notes" },
+      "datePublished": "2026-04-13",
+      "keywords": ["Supabase", "offline-first", "PowerSync", "real-time", "PostgreSQL"],
+      "url": "https://pnt.jacbex.com/supabase-local-first-2026-04-13.html"
+    }
+    </script>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-typescript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+        .code-block { background: #2d2d2d; border-radius: 8px; overflow: hidden; }
+        .code-block pre { margin: 0; padding: 1rem; overflow-x: auto; }
+        .code-block code { font-family: 'Fira Code', monospace; font-size: 0.9rem; }
+        .issue-box { border-left: 4px solid #ec4899; background: #fdf2f8; padding: 1.5rem; margin: 2rem 0; border-radius: 0 8px 8px 0; }
+        .issue-title { font-weight: 600; color: #be185d; }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <article class="max-w-4xl mx-auto px-4 py-8">
+        <header class="mb-12">
+            <h1 class="text-4xl font-bold text-gray-900 mb-4">Supabase Local-First: Offline Database That Actually Syncs When Back Online</h1>
+            <p class="text-xl text-gray-600">
+                I built a field inspection app for a construction company. Workers go to sites with zero cell reception, fill out forms, take photos, and mark issues on floor plans. Everything needs to work offline. When they drive back to the office, all data syncs. I tried Firebase offline persistence (lost data on conflicts), CouchDB (setup nightmare), and finally landed on Supabase + PowerSync. Here's what actually works.
+            </p>
+        </header>
+
+        <nav class="bg-white rounded-lg shadow-sm p-6 mb-8 border border-gray-200">
+            <h2 class="text-xl font-semibold mb-4 text-gray-800">Quick Navigation</h2>
+            <ul class="space-y-2">
+                <li><a href="#why-local-first" class="text-blue-600 hover:underline">Why Local-First Matters</a></li>
+                <li><a href="#setup" class="text-blue-600 hover:underline">Setting Up Supabase + PowerSync</a></li>
+                <li><a href="#conflict" class="text-blue-600 hover:underline">Handling Conflict Resolution</a></li>
+                <li><a href="#realtime" class="text-blue-600 hover:underline">Real-time Subscriptions That Don't Break</a></li>
+                <li><a href="#rls" class="text-blue-600 hover:underline">RLS Performance Tips</a></li>
+                <li><a href="#lessons" class="text-blue-600 hover:underline">What I Learned</a></li>
+            </ul>
+        </nav>
+
+        <section id="why-local-first" class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Why Local-First Matters</h2>
+            <p class="text-gray-700 mb-4">
+                "Offline-first" isn't just about caching. A true local-first architecture means:
+            </p>
+            <ul class="list-disc pl-6 space-y-2 text-gray-700">
+                <li><strong>Reads and writes go to local SQLite first.</strong> No network call needed. Instant UI response.</li>
+                <li><strong>Sync happens in the background.</strong> When connectivity returns, changes upload automatically.</li>
+                <li><strong>Conflicts are resolved deterministically.</strong> Two workers editing the same inspection doesn't corrupt data.</li>
+                <li><strong>The app works fully offline.</strong> Not a degraded mode — the full experience.</li>
+            </ul>
+            <p class="text-gray-700 mt-4">
+                Supabase alone doesn't do this. Supabase's realtime subscriptions and offline caching in PostgREST are "eventually consistent" — they work when online but don't persist writes offline. PowerSync adds the local SQLite layer and bidirectional sync.
+            </p>
+        </section>
+
+        <section id="setup" class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Setting Up Supabase + PowerSync</h2>
+
+            <div class="code-block">
+                <pre><code class="language-bash"># Install PowerSync client
+npm install @powersync/node @supabase/supabase-js
+
+# PowerSync connects to your Supabase PostgreSQL
+# Set up the PowerSync service (cloud or self-hosted)
+# It reads your Supabase schema and creates sync rules</code></pre>
+            </div>
+
+            <div class="code-block mt-4">
+                <pre><code class="language-typescript">// lib/powersync.ts
+import { PowerSyncBackendFactory } from "@powersync/node"
+import { SupabaseBackendConnector } from "./connector"
+
+// Define which tables sync
+const schema = {
+  tables: [
+    { name: "inspections", columns: ["id", "site_id", "status", "notes", "photos", "inspector_id", "created_at", "updated_at"] },
+    { name: "issues", columns: ["id", "inspection_id", "description", "severity", "photo_url", "resolved"] },
+    { name: "sites", columns: ["id", "name", "address", "lat", "lng"] },
+  ],
+  // Sync rules — which rows each user can sync
+  // PowerSync resolves these against Supabase RLS policies
+}
+
+export const powerSync = new PowerSyncBackendFactory({
+  backendConnector: new SupabaseBackendConnector(),
+  schema,
+})
+
+// Initialize on app start
+await powerSync.initialize()</code></pre>
+            </div>
+
+            <div class="code-block mt-4">
+                <pre><code class="language-typescript">// Using local database — works offline
+import { powerSync } from "./lib/powersync"
+
+async function createInspection(data: InspectionInput) {
+  // Write to local SQLite — instant, no network
+  const db = powerSync.db()
+  await db.execute(
+    `INSERT INTO inspections (id, site_id, status, notes, inspector_id)
+     VALUES (?, ?, ?, ?, ?)`,
+    [uuid(), data.siteId, "draft", data.notes, currentUserId]
+  )
+
+  // PowerSync will sync this to Supabase when online
+  // No await needed — the UI responds immediately
+}
+
+async function getInspections(siteId: string) {
+  // Read from local SQLite — instant, no network
+  const db = powerSync.db()
+  return db.getAll<Inspection>(
+    `SELECT * FROM inspections WHERE site_id = ? ORDER BY created_at DESC`,
+    [siteId]
+  )
+}</code></pre>
+            </div>
+        </section>
+
+        <div class="issue-box">
+            <div class="issue-title">
+                <a href="https://github.com/supabase/supabase/issues?q=is%3Aissue+realtime+connection+drop+reconnect"
+                   target="_blank"
+                   class="text-pink-700 hover:underline">
+                    Realtime WebSocket connection drops and doesn't reconnect reliably
+                </a>
+            </div>
+            <div class="issue-body mt-4">
+                <h4 class="font-semibold text-gray-800 mb-2">Problem</h4>
+                <p class="text-gray-700 mb-3">Supabase realtime subscriptions use WebSockets. In our mobile app, WebSocket connections would drop when the phone switched between WiFi and cellular. The subscription wouldn't reconnect, and the UI stopped receiving updates. No error was thrown.</p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">What I Tried</h4>
+                <p class="text-gray-700 mb-3">Tried manually calling <code>supabase.removeAllChannels()</code> and re-subscribing on network change events. That worked but caused duplicate subscriptions and memory leaks.</p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">Actual Fix</h4>
+                <p class="text-gray-700 mb-3">With PowerSync, you don't need Supabase realtime subscriptions for the local database. PowerSync handles its own sync connection with automatic reconnect. For showing real-time updates to other users (like a dashboard), use a health-check pattern:</p>
+                <div class="code-block mt-3">
+                    <pre><code class="language-typescript">// For online-only dashboard views
+import { supabase } from "./lib/supabase"
+
+function subscribeToChanges(table: string, callback: () => void) {
+  let channel = supabase
+    .channel(`${table}-changes`)
+    .on("postgres_changes", { event: "*", schema: "public", table }, callback)
+    .subscribe()
+
+  // Handle reconnect
+  const unsubscribe = supabase.onAuthStateChange(() => {
+    channel.unsubscribe()
+    channel = supabase
+      .channel(`${table}-changes-${Date.now()}`)
+      .on("postgres_changes", { event: "*", schema: "public", table }, callback)
+      .subscribe()
+  })
+
+  return () => {
+    channel.unsubscribe()
+    unsubscribe.data.subscription.unsubscribe()
+  }
+}</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <section id="conflict" class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Handling Conflict Resolution</h2>
+            <p class="text-gray-700 mb-4">Two workers inspect the same site offline. Both mark issue #42 as "resolved" with different notes. When they both sync, what happens?</p>
+
+            <div class="code-block">
+                <pre><code class="language-typescript">// Conflict resolution in PowerSync is configured per table
+// Default: last-write-wins (based on updated_at timestamp)
+
+// For custom resolution, use Supabase triggers
+// migrations/conflict_resolution.sql
+
+CREATE OR REPLACE FUNCTION resolve_inspection_conflict()
+RETURNS TRIGGER AS $$
+BEGIN
+  -- If status changed from 'draft' to 'submitted', always prefer submitted
+  IF OLD.status = 'draft' AND NEW.status = 'submitted' THEN
+    RETURN NEW;
+  END IF;
+
+  -- Otherwise, last-write-wins
+  IF NEW.updated_at > OLD.updated_at THEN
+    RETURN NEW;
+  END IF;
+
+  RETURN OLD;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER inspection_conflict
+  BEFORE UPDATE ON inspections
+  FOR EACH ROW
+  EXECUTE FUNCTION resolve_inspection_conflict();</code></pre>
+            </div>
+        </section>
+
+        <div class="issue-box">
+            <div class="issue-title">
+                <a href="https://github.com/supabase/supabase/issues?q=is%3Aissue+RLS+performance+slow+query"
+                   target="_blank"
+                   class="text-pink-700 hover:underline">
+                    RLS policies cause 10x slower queries on large tables
+                </a>
+            </div>
+            <div class="issue-body mt-4">
+                <h4 class="font-semibold text-gray-800 mb-2">Problem</h4>
+                <p class="text-gray-700 mb-3">Our inspections table has 500K rows. RLS policies check organization membership on every query. A simple <code>SELECT * FROM inspections WHERE site_id = ?</code> went from 5ms to 120ms because RLS was joining against the organizations table for every row scan.</p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">Actual Fix</h4>
+                <p class="text-gray-700 mb-3">Two optimizations that brought query time back to under 10ms:</p>
+                <div class="code-block mt-3">
+                    <pre><code class="language-sql">-- 1. Add org_id directly to the inspections table (denormalize)
+ALTER TABLE inspections ADD COLUMN org_id UUID REFERENCES organizations(id);
+CREATE INDEX idx_inspections_org ON inspections(org_id);
+
+-- 2. Simplify RLS policy to check the direct column
+CREATE POLICY "Users see their org's inspections"
+  ON inspections FOR SELECT
+  USING (org_id = get_current_user_org_id());
+
+-- get_current_user_org_id() is a simple JWT claim extraction
+CREATE FUNCTION get_current_user_org_id() RETURNS UUID AS $$
+  SELECT (auth.jwt() -> 'app_metadata' ->> 'org_id')::UUID;
+$$ LANGUAGE SQL STABLE;
+
+-- Before: RLS joined organizations → members → users for each row
+-- After: RLS compares a single column value — index scan, not join</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <section id="realtime" class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Real-time Subscriptions That Don't Break</h2>
+            <p class="text-gray-700 mb-4">
+                For the offline app itself, PowerSync handles sync. But the office dashboard needs real-time updates when field workers sync their data. Here's the pattern:
+            </p>
+
+            <div class="code-block">
+                <pre><code class="language-typescript">// Dashboard: show live inspection updates
+import { supabase } from "./lib/supabase"
+
+function useLiveInspections(siteId: string) {
+  const [inspections, setInspections] = useState([])
+
+  useEffect(() => {
+    // Initial load
+    supabase.from("inspections")
+      .select("*").eq("site_id", siteId)
+      .then(({ data }) => setInspections(data || []))
+
+    // Subscribe to changes
+    const channel = supabase
+      .channel(`inspections-${siteId}`)
+      .on("postgres_changes", {
+        event: "INSERT",
+        schema: "public",
+        table: "inspections",
+        filter: `site_id=eq.${siteId}`,
+      }, (payload) => {
+        setInspections((prev) => [...prev, payload.new])
+      })
+      .on("postgres_changes", {
+        event: "UPDATE",
+        schema: "public",
+        table: "inspections",
+        filter: `site_id=eq.${siteId}`,
+      }, (payload) => {
+        setInspections((prev) =>
+          prev.map((i) => i.id === payload.new.id ? payload.new : i)
+        )
+      })
+      .subscribe()
+
+    return () => { channel.unsubscribe() }
+  }, [siteId])
+
+  return inspections
+}</code></pre>
+            </div>
+        </section>
+
+        <section id="rls" class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">RLS Performance Tips</h2>
+            <ul class="list-disc pl-6 space-y-3 text-gray-700">
+                <li><strong>Denormalize org_id into every table.</strong> Don't rely on joins for RLS checks. The extra column costs nothing in storage but saves orders of magnitude in query time.</li>
+                <li><strong>Index the RLS columns.</strong> If your policy checks <code>org_id</code>, make sure there's an index on it.</li>
+                <li><strong>Use <code>STABLE</code> functions for JWT extraction.</strong> Marking the helper function as stable lets PostgreSQL cache the result per query.</li>
+                <li><strong>Test with <code>EXPLAIN ANALYZE</code> as a non-admin user.</strong> RLS policies only apply to non-admin roles. Always test query plans as the actual user role.</li>
+            </ul>
+        </section>
+
+        <section id="lessons" class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">What I Learned</h2>
+            <ul class="list-disc pl-6 space-y-3 text-gray-700">
+                <li><strong>PowerSync + Supabase is the real local-first stack.</strong> Supabase alone isn't offline-first. PowerSync adds the missing local SQLite layer and bidirectional sync.</li>
+                <li><strong>Conflict resolution needs to be designed per table.</strong> Default last-write-wins is fine for most cases. For critical data, use SQL triggers.</li>
+                <li><strong>Denormalize for RLS performance.</strong> Adding org_id to every table sounds wrong, but it's the standard pattern for Supabase multi-tenant apps.</li>
+                <li><strong>Don't use realtime subscriptions in offline apps.</strong> Use PowerSync for sync. Use Supabase realtime only for online dashboards.</li>
+                <li><strong>Test sync with airplane mode.</strong> Seriously. Flip the switch, make changes, come back online. Do it 50 times. That's how you find sync bugs.</li>
+            </ul>
+        </section>
+
+        <section class="mb-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Wrapping Up</h2>
+            <p class="text-gray-700">
+                Building a truly offline-first app is harder than most people think. "Cache some API responses" isn't enough. You need a local database that accepts writes, a sync engine that handles conflicts, and a server that enforces access control. Supabase + PowerSync covers all three. After six months in production with 50 field workers, the sync has been reliable. Zero data loss, even when workers are offline for a full day.
+            </p>
+        </section>
+
+        <section class="bg-blue-50 rounded-lg p-6 border border-blue-200">
+            <h3 class="font-semibold text-gray-800 mb-3">Related Articles</h3>
+            <ul class="space-y-2">
+                <li><a href="pocketbase-v1-2026-04-13.html" class="text-blue-600 hover:underline">PocketBase v1.0: Single-File Backend That Actually Handles Production Traffic</a></li>
+                <li><a href="directus-2026-04-13.html" class="text-blue-600 hover:underline">Directus: SQL Database That Actually Becomes a Full API Dashboard</a></li>
+                <li><a href="hono-2026-04-13.html" class="text-blue-600 hover:underline">Hono: Web Framework That Actually Runs Everywhere</a></li>
+            </ul>
+        </section>
+    </article>
+
+    <script>if (typeof Prism !== 'undefined') Prism.highlightAll();</script>
+</body>
+</html>

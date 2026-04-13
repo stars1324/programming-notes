@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Appsmith: Internal Tool Builder That Actually Handles Complex Business Logic</title>
+
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-LMWN7814BX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-LMWN7814BX');
+    </script>
+
+    <meta name="description" content="Building enterprise internal tools with Appsmith. Real solutions for multi-datasource connections, complex JS queries, Git version control, and self-hosted deployment.">
+    <meta name="keywords" content="Appsmith, internal tools, low-code, enterprise, JS queries, self-hosted, Git sync">
+    <link rel="canonical" href="https://pnt.jacbex.com/appsmith-2026-04-13.html">
+
+    <meta property="og:title" content="Appsmith: Internal Tool Builder That Actually Handles Complex Business Logic">
+    <meta property="og:description" content="Enterprise internal tools with Appsmith — JS queries, Git sync, multi-datasource">
+    <meta property="og:type" content="article">
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "Appsmith: Internal Tool Builder That Actually Handles Complex Business Logic",
+      "description": "Building enterprise internal tools with Appsmith — JS queries, Git sync, deployment",
+      "author": { "@type": "Person", "name": "Programming Notes" },
+      "datePublished": "2026-04-13",
+      "keywords": ["Appsmith", "internal tools", "enterprise", "low-code", "self-hosted"],
+      "url": "https://pnt.jacbex.com/appsmith-2026-04-13.html"
+    }
+    </script>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-typescript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+        .code-block { background: #2d2d2d; border-radius: 8px; overflow: hidden; }
+        .code-block pre { margin: 0; padding: 1rem; overflow-x: auto; }
+        .code-block code { font-family: 'Fira Code', monospace; font-size: 0.9rem; }
+        .issue-box { border-left: 4px solid #ec4899; background: #fdf2f8; padding: 1.5rem; margin: 2rem 0; border-radius: 0 8px 8px 0; }
+        .issue-title { font-weight: 600; color: #be185d; }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <article class="max-w-4xl mx-auto px-4 py-8">
+        <header class="mb-12">
+            <h1 class="text-4xl font-bold text-gray-900 mb-4">Appsmith: Internal Tool Builder That Actually Handles Complex Business Logic</h1>
+            <p class="text-xl text-gray-600">
+                The ops team was running customer support on spreadsheets. 50 support agents, 200 tickets/day, tracked in a shared Google Sheet with color-coded cells. It was a disaster. They needed a proper ticket management system. The IT team quoted 4 months. I built it in Appsmith in 3 days. Self-hosted, connected to their existing PostgreSQL database, with role-based views and automated escalations. Here's how.
+            </p>
+        </header>
+
+        <nav class="bg-white rounded-lg shadow-sm p-6 mb-8 border border-gray-200">
+            <h2 class="text-xl font-semibold mb-4 text-gray-800">Quick Navigation</h2>
+            <ul class="space-y-2">
+                <li><a href="#why-appsmith" class="text-blue-600 hover:underline">Why Appsmith Over Retool for Self-Hosting</a></li>
+                <li><a href="#datasources" class="text-blue-600 hover:underline">Connecting to Multiple Data Sources</a></li>
+                <li><a href="#js-queries" class="text-blue-600 hover:underline">Writing Complex JS Queries</a></li>
+                <li><a href="#git-sync" class="text-blue-600 hover:underline">Git Version Control for Apps</a></li>
+                <li><a href="#deployment" class="text-blue-600 hover:underline">Deploying to Production</a></li>
+                <li><a href="#lessons" class="text-blue-600 hover:underline">What I Learned</a></li>
+            </ul>
+        </nav>
+
+        <section id="why-appsmith" class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Why Appsmith Over Retool for Self-Hosting</h2>
+            <p class="text-gray-700 mb-4">I compared Appsmith and Retool for this project. Key differences:</p>
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm text-left border-collapse mb-4">
+                    <thead class="bg-gray-100"><tr><th class="p-3 border">Feature</th><th class="p-3 border">Retool</th><th class="p-3 border">Appsmith</th></tr></thead>
+                    <tbody>
+                        <tr><td class="p-3 border">Self-hosted</td><td class="p-3 border">Enterprise plan only ($$$)</td><td class="p-3 border">Free (open-source)</td></tr>
+                        <tr><td class="p-3 border">Pricing model</td><td class="p-3 border">Per user/month</td><td class="p-3 border">Free self-hosted</td></tr>
+                        <tr><td class="p-3 border">Git version control</td><td class="p-3 border">Available</td><td class="p-3 border">Available</td></tr>
+                        <tr><td class="p-3 border">JS in queries</td><td class="p-3 border">Full JS support</td><td class="p-3 border">Full JS support</td></tr>
+                        <tr><td class="p-3 border">Custom components</td><td class="p-3 border">React components</td><td class="p-3 border">React + HTML widgets</td></tr>
+                        <tr><td class="p-3 border">Community</td><td class="p-3 border">Smaller</td><td class="p-3 border">Larger (GitHub stars)</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <p class="text-gray-700">The deal-breaker was cost. 50 support agents on Retool would cost thousands per month. Appsmith self-hosted is free. The features are comparable. Appsmith wins for self-hosted use cases.</p>
+        </section>
+
+        <section id="datasources" class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Connecting to Multiple Data Sources</h2>
+            <p class="text-gray-700 mb-4">The ticket system needed data from three places:</p>
+            <ul class="list-disc pl-6 space-y-2 text-gray-700">
+                <li><strong>PostgreSQL</strong> — main ticket and customer data</li>
+                <li><strong>REST API</strong> — external CRM for customer details</li>
+                <li><strong>Redis</strong> — real-time agent status (online/busy/away)</li>
+            </ul>
+
+            <div class="code-block mt-4">
+                <pre><code class="language-javascript">// In Appsmith, data sources are configured in the UI
+// Each query runs against a specific data source
+
+// Query: get_tickets (PostgreSQL)
+// SELECT * FROM tickets
+// WHERE assigned_to = {{appsmith.user.email}}
+//   AND status IN ({{JSON.stringify(Table1.selectedRows.map(r => r.status))}})
+// ORDER BY priority DESC, created_at ASC
+// LIMIT 50
+
+// Query: get_customer_from_crm (REST API)
+// GET https://crm.example.com/api/customers/{{ticket.customer_id}}
+// Headers: Authorization: Bearer {{appsmith.store.crmToken}}
+
+// Query: get_agent_status (Redis)
+// GET agent:status:{{agent_email}}
+
+// These queries can be chained in JS</code></pre>
+            </div>
+        </section>
+
+        <section id="js-queries" class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Writing Complex JS Queries</h2>
+            <p class="text-gray-700 mb-4">This is where Appsmith separates itself from simpler low-code tools. You write real JavaScript for business logic:</p>
+
+            <div class="code-block">
+                <pre><code class="language-javascript">// JS Object: ticketActions
+// This runs server-side in Appsmith's sandbox
+
+export default {
+  // Escalate a ticket: update status, reassign, notify manager
+  async escalateTicket(ticketId, reason) {
+    // Step 1: Get current ticket
+    const ticket = await get_ticket.run({ id: ticketId })
+
+    // Step 2: Find the escalation manager based on department
+    const manager = await find_manager.run({
+      department: ticket.department,
+      level: "escalation",
+    })
+
+    // Step 3: Update the ticket
+    await update_ticket.run({
+      id: ticketId,
+      status: "escalated",
+      assigned_to: manager.email,
+      escalation_reason: reason,
+      escalated_at: new Date().toISOString(),
+    })
+
+    // Step 4: Log the escalation
+    await create_audit_log.run({
+      action: "ticket_escalated",
+      ticket_id: ticketId,
+      from_agent: ticket.assigned_to,
+      to_agent: manager.email,
+      reason: reason,
+      timestamp: new Date().toISOString(),
+    })
+
+    // Step 5: Send notification via Novu
+    await fetch("https://api.novu.co/v1/events/trigger", {
+      method: "POST",
+      headers: {
+        "Authorization": `ApiKey ${appsmith.store.novuKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        name: "ticket-escalated",
+        to: { subscriberId: manager.email, email: manager.email },
+        payload: {
+          ticketId,
+          customerName: ticket.customer_name,
+          reason,
+          fromAgent: ticket.assigned_to,
+        },
+      }),
+    })
+
+    // Step 6: Refresh the ticket list
+    await get_tickets.run()
+
+    // Show success message
+    showAlert("Ticket escalated to " + manager.email, "success")
+  },
+
+  // Bulk close resolved tickets older than 7 days
+  async bulkCloseOldTickets() {
+    const sevenDaysAgo = new Date()
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7)
+
+    const tickets = await get_resolved_tickets.run({
+      before_date: sevenDaysAgo.toISOString(),
+    })
+
+    let closed = 0
+    for (const ticket of tickets) {
+      await close_ticket.run({ id: ticket.id })
+      closed++
+    }
+
+    showAlert(`Closed ${closed} tickets`, "success")
+    await get_tickets.run()
+  },
+}</code></pre>
+            </div>
+        </section>
+
+        <div class="issue-box">
+            <div class="issue-title">
+                <a href="https://github.com/appsmithorg/appsmith/issues?q=is%3Aissue+query+performance+timeout+large"
+                   target="_blank"
+                   class="text-pink-700 hover:underline">
+                    JS query functions timeout on large datasets with sequential API calls
+                </a>
+            </div>
+            <div class="issue-body mt-4">
+                <h4 class="font-semibold text-gray-800 mb-2">Problem</h4>
+                <p class="text-gray-700 mb-3">The bulk close function ran sequentially — each ticket took 200ms for the API call. With 500 tickets, it took 100 seconds. Appsmith's default timeout is 30 seconds. The function would fail halfway through.</p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">What I Tried</h4>
+                <p class="text-gray-700 mb-3">Tried increasing the timeout in Appsmith settings. That helped but didn't scale. Tried batching the SQL updates into one query — better, but some tickets needed individual API calls.</p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">Actual Fix</h4>
+                <p class="text-gray-700 mb-3">Use <code>Promise.all</code> for parallel execution and batch SQL updates:</p>
+                <div class="code-block mt-3">
+                    <pre><code class="language-javascript">// Parallel execution with controlled concurrency
+async bulkCloseOldTickets() {
+  const tickets = await get_resolved_tickets.run({})
+
+  // Batch the SQL updates — one query instead of 500
+  const ids = tickets.map(t => t.id)
+  await bulk_close_tickets.run({ ids }) // UPDATE tickets SET status='closed' WHERE id = ANY({{ids}})
+
+  // For individual API calls that can't be batched:
+  // Use Promise.all with a concurrency limit
+  const BATCH_SIZE = 10
+  for (let i = 0; i < tickets.length; i += BATCH_SIZE) {
+    const batch = tickets.slice(i, i + BATCH_SIZE)
+    await Promise.all(
+      batch.map(ticket => send_close_notification.run({ ticketId: ticket.id }))
+    )
+  }
+
+  showAlert(`Closed ${tickets.length} tickets`, "success")
+}
+
+// In the PostgreSQL query: bulk_close_tickets
+// UPDATE tickets
+// SET status = 'closed', closed_at = NOW()
+// WHERE id = ANY({{ids}}::int[])</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <section id="git-sync" class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Git Version Control for Apps</h2>
+            <p class="text-gray-700 mb-4">This is critical for team development. Appsmith's Git sync lets you branch, commit, and review changes like code:</p>
+
+            <div class="code-block">
+                <pre><code class="language-bash"># Connect Appsmith to Git
+# 1. In Appsmith settings, go to "Git Sync"
+# 2. Connect to your Git repository
+# 3. Appsmith commits the app JSON to the repo
+
+# The repo structure looks like:
+# ├── ticket_system/
+# │   ├── metadata.json        # App metadata
+# │   ├── datasources/         # Database connections
+# │   ├── pages/
+# │   │   ├── Dashboard/
+# │   │   │   ├── canvas.json  # UI layout
+# │   │   │   └── queries/     # Page-specific queries
+# │   │   └── TicketDetail/
+# │   └── js-objects/          # Shared JS functions
+
+# Workflow:
+# 1. Developer creates a branch in Appsmith
+# 2. Makes changes to the app
+# 3. Commits and pushes to Git
+# 4. PR review in GitHub/GitLab
+# 5. Merge triggers deployment to production
+
+# This means:
+# - Multiple developers can work on the same app
+# - Changes are reviewed before going live
+# - You can roll back to any previous version
+# - Audit trail of who changed what and when</code></pre>
+            </div>
+        </section>
+
+        <div class="issue-box">
+            <div class="issue-title">
+                <a href="https://github.com/appsmithorg/appsmith/issues?q=is%3Aissue+git+sync+merge+conflict+deployment"
+                   target="_blank"
+                   class="text-pink-700 hover:underline">
+                    Git sync merge conflicts corrupt app JSON when multiple developers edit
+                </a>
+            </div>
+            <div class="issue-body mt-4">
+                <h4 class="font-semibold text-gray-800 mb-2">Problem</h4>
+                <p class="text-gray-700 mb-3">Two developers edited the same page at the same time. Both pushed to Git. The JSON merge conflict left the app in a broken state — widgets had missing properties and some queries disappeared.</p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">Actual Fix</h4>
+                <p class="text-gray-700 mb-3">Avoid merge conflicts by splitting work across pages or JS objects. If conflicts happen, resolve in Git and re-import:</p>
+                <div class="code-block mt-3">
+                    <pre><code class="language-bash"># If merge conflict happens:
+# 1. Don't try to fix it in Appsmith UI
+# 2. Fix the JSON conflict in your Git tool
+# 3. Accept one version of the conflicting file
+# 4. Push the resolution
+# 5. In Appsmith, pull the resolved version
+
+# Prevention: assign pages to developers
+# Developer A: Dashboard page + dashboard queries
+# Developer B: TicketDetail page + ticket queries
+# Developer C: JS objects + shared functions</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <section id="deployment" class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Deploying to Production</h2>
+
+            <div class="code-block">
+                <pre><code class="language-bash"># Self-hosted deployment with Docker
+docker run -d \
+  --name appsmith \
+  -p 8080:80 \
+  -v appsmith_stacks:/appsmith-stacks \
+  appsmith/appsmith-ee:latest
+
+# For production, use Docker Compose with:
+# - PostgreSQL for Appsmith internal DB
+# - MongoDB for Appsmith metadata
+# - Redis for session management
+# - Nginx for SSL termination
+
+# docker-compose.yml highlights:
+version: "3"
+services:
+  appsmith:
+    image: appsmith/appsmith-ee:latest
+    ports: ["8080:80"]
+    volumes: ["./stacks:/appsmith-stacks"]
+    environment:
+      - APPSMITH_MAIL_ENABLED=true
+      - APPSMITH_MAIL_HOST=smtp.example.com
+      - APPSMITH_MAIL_USERNAME=notifications@example.com
+      - APPSMITH_MAIL_PASSWORD=****
+      - APPSMITH_DISABLE_TELEMETRY=true
+      - APPSMITH_GOOGLE_MAPS_API_KEY=****</code></pre>
+            </div>
+        </section>
+
+        <section id="lessons" class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">What I Learned</h2>
+            <ul class="list-disc pl-6 space-y-3 text-gray-700">
+                <li><strong>Appsmith handles complex logic through JS objects.</strong> This isn't just drag-and-drop — you write real JavaScript for business rules.</li>
+                <li><strong>Batch database operations.</strong> Don't loop through rows making individual queries. Use batch SQL and <code>Promise.all</code> for API calls.</li>
+                <li><strong>Git sync is essential for team development.</strong> Without it, only one person can edit the app at a time.</li>
+                <li><strong>Split work across pages to avoid conflicts.</strong> Each page has its own JSON file. Different developers on different pages = no conflicts.</li>
+                <li><strong>Self-hosted Appsmith is truly free.</strong> No user limits, no feature gates. You just need a server and someone to maintain it.</li>
+                <li><strong>The widget library is good but not infinite.</strong> For custom UI needs, use the Custom Widget (React component embedding).</li>
+            </ul>
+        </section>
+
+        <section class="mb-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Wrapping Up</h2>
+            <p class="text-gray-700">
+                Appsmith replaced a spreadsheet-based support system for 50 agents. The ticket management app handles 200+ tickets/day, connects to three different data sources, and includes automated escalation logic. The JS query system handles complex business rules that simpler low-code tools can't. And the self-hosted deployment costs nothing beyond the server. For enterprise internal tools where cost and control matter, Appsmith is the right choice.
+            </p>
+        </section>
+
+        <section class="bg-blue-50 rounded-lg p-6 border border-blue-200">
+            <h3 class="font-semibold text-gray-800 mb-3">Related Articles</h3>
+            <ul class="space-y-2">
+                <li><a href="budibase-2026-04-13.html" class="text-blue-600 hover:underline">Budibase: Low-Code Platform That Actually Connects to My Database</a></li>
+                <li><a href="refine-2026-04-13.html" class="text-blue-600 hover:underline">Refine: Admin Panel Framework That Scales Beyond CRUD</a></li>
+                <li><a href="directus-2026-04-13.html" class="text-blue-600 hover:underline">Directus: SQL Database That Actually Becomes a Full API Dashboard</a></li>
+            </ul>
+        </section>
+    </article>
+
+    <script>if (typeof Prism !== 'undefined') Prism.highlightAll();</script>
+</body>
+</html>

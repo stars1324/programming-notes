@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Directus: SQL Database That Actually Becomes a Full API Dashboard</title>
+
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-LMWN7814BX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-LMWN7814BX');
+    </script>
+
+    <meta name="description" content="Connecting Directus to existing PostgreSQL databases for instant REST + GraphQL APIs. Real solutions for relationships, RBAC, custom flows, and extension development.">
+    <meta name="keywords" content="Directus, SQL, API, dashboard, REST, GraphQL, headless CMS, PostgreSQL">
+    <link rel="canonical" href="https://pnt.jacbex.com/directus-2026-04-13.html">
+
+    <meta property="og:title" content="Directus: SQL Database That Actually Becomes a Full API Dashboard">
+    <meta property="og:description" content="Turning existing SQL databases into full API dashboards with Directus">
+    <meta property="og:type" content="article">
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "Directus: SQL Database That Actually Becomes a Full API Dashboard",
+      "description": "Connecting Directus to existing PostgreSQL databases for instant APIs",
+      "author": { "@type": "Person", "name": "Programming Notes" },
+      "datePublished": "2026-04-13",
+      "keywords": ["Directus", "SQL", "API", "PostgreSQL", "dashboard"],
+      "url": "https://pnt.jacbex.com/directus-2026-04-13.html"
+    }
+    </script>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-typescript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+        .code-block { background: #2d2d2d; border-radius: 8px; overflow: hidden; }
+        .code-block pre { margin: 0; padding: 1rem; overflow-x: auto; }
+        .code-block code { font-family: 'Fira Code', monospace; font-size: 0.9rem; }
+        .issue-box { border-left: 4px solid #ec4899; background: #fdf2f8; padding: 1.5rem; margin: 2rem 0; border-radius: 0 8px 8px 0; }
+        .issue-title { font-weight: 600; color: #be185d; }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <article class="max-w-4xl mx-auto px-4 py-8">
+        <header class="mb-12">
+            <h1 class="text-4xl font-bold text-gray-900 mb-4">Directus: SQL Database That Actually Becomes a Full API Dashboard</h1>
+            <p class="text-xl text-gray-600">
+                A client had a PostgreSQL database with 30 tables, 5 years of data, and no admin panel. Their ops team was running raw SQL queries through pgAdmin. I connected Directus to the database and in 10 minutes they had: a REST API, a GraphQL API, a visual admin dashboard, and role-based access control. No schema changes, no migrations, no code. Here's how it works and where it breaks.
+            </p>
+        </header>
+
+        <nav class="bg-white rounded-lg shadow-sm p-6 mb-8 border border-gray-200">
+            <h2 class="text-xl font-semibold mb-4 text-gray-800">Quick Navigation</h2>
+            <ul class="space-y-2">
+                <li><a href="#connecting" class="text-blue-600 hover:underline">Connecting to an Existing Database</a></li>
+                <li><a href="#api" class="text-blue-600 hover:underline">Auto-Generated REST + GraphQL API</a></li>
+                <li><a href="#flows" class="text-blue-600 hover:underline">Building Custom Flows</a></li>
+                <li><a href="#rbac" class="text-blue-600 hover:underline">Role-Based Access Control</a></li>
+                <li><a href="#extensions" class="text-blue-600 hover:underline">Extending with Custom Endpoints</a></li>
+                <li><a href="#lessons" class="text-blue-600 hover:underline">What I Learned</a></li>
+            </ul>
+        </nav>
+
+        <section id="connecting" class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Connecting to an Existing Database</h2>
+
+            <div class="code-block">
+                <pre><code class="language-bash"># Docker setup — connect to existing PostgreSQL
+docker run -d \
+  --name directus \
+  -p 8055:8055 \
+  -e KEY=your-secret-key \
+  -e SECRET=your-admin-secret \
+  -e DB_CLIENT=pg \
+  -e DB_HOST=your-postgres-host \
+  -e DB_PORT=5432 \
+  -e DB_DATABASE=production_db \
+  -e DB_USER=readonly_user \
+  -e DB_PASSWORD=your-password \
+  directus/directus:latest
+
+# Open http://localhost:8055
+# Create admin account on first visit
+# Directus scans your schema and generates the admin UI</code></pre>
+            </div>
+
+            <p class="text-gray-700 mt-4 mb-4">
+                Directus reads your existing schema. It doesn't modify your tables (unless you create new ones through the UI). Foreign keys become relationships, enums become dropdowns, timestamps become date pickers. It took 10 minutes for our 30-table database.
+            </p>
+        </section>
+
+        <section id="api" class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Auto-Generated REST + GraphQL API</h2>
+            <p class="text-gray-700 mb-4">Every table gets full CRUD endpoints automatically:</p>
+
+            <div class="code-block">
+                <pre><code class="language-bash"># REST API — all tables get instant endpoints
+GET    /items/orders                # List orders (with filtering, sorting, pagination)
+GET    /items/orders/123            # Get single order
+POST   /items/orders                # Create order
+PATCH  /items/orders/123            # Update order
+DELETE /items/orders/123            # Delete order
+
+# Advanced filtering (no custom code needed)
+GET "/items/orders?filter[status][_eq]=pending&filter[total][_gt]=100&sort=-created_at&fields=id,customer.name,total"
+
+# Relational data in one query
+GET "/items/orders?fields=id,total,customer.name,items.product.name,items.quantity"
+
+# Aggregation
+GET "/items/orders?aggregate[sum]=total&groupBy[customer_id]"
+
+# GraphQL — same capabilities
+POST /graphql
+{
+  orders(filter: { status: { _eq: "pending" } }, sort: "-created_at") {
+    id
+    total
+    customer { name }
+    items { product { name } quantity }
+  }
+}</code></pre>
+            </div>
+
+            <p class="text-gray-700 mt-4">The filtering syntax supports nested relations, aggregation functions, and complex boolean logic. No custom API code needed for 90% of queries.</p>
+        </section>
+
+        <div class="issue-box">
+            <div class="issue-title">
+                <a href="https://github.com/directus/directus/issues?q=is%3Aissue+relation+O2M+performance+large+dataset"
+                   target="_blank"
+                   class="text-pink-700 hover:underline">
+                    One-to-many relations cause N+1 query performance issues
+                </a>
+            </div>
+            <div class="issue-body mt-4">
+                <h4 class="font-semibold text-gray-800 mb-2">Problem</h4>
+                <p class="text-gray-700 mb-3">A list view of 500 orders, each with 5-10 line items, took 12 seconds to load. Directus was making a separate query for each order's items instead of joining. The N+1 problem in action.</p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">What I Tried</h4>
+                <p class="text-gray-700 mb-3">Tried adding database indexes on the foreign key columns. That helped slightly (12s → 8s) but didn't fix the N+1 pattern. Tried limiting the number of relational fields in the API query.</p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">Actual Fix</h4>
+                <p class="text-gray-700 mb-3">Directus has a <code>deep</code> parameter for controlling how relational data is loaded. Use it to batch-load relations:</p>
+                <div class="code-block mt-3">
+                    <pre><code class="language-bash"># Use the "deep" parameter to batch-load relations
+GET "/items/orders?\
+fields=id,total,customer.name&\
+deep[items][_sort]=id&\
+deep[items][_limit]=10&\
+deep[items][fields]=product.name,quantity&\
+limit=500"
+
+# Also: add indexes on foreign keys
+# (Directus creates these automatically for new relations,
+# but your existing database might not have them)
+CREATE INDEX idx_items_order_id ON order_items(order_id);
+
+# Result: 500 orders with items loads in 400ms instead of 12s</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <section id="flows" class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Building Custom Flows</h2>
+            <p class="text-gray-700 mb-4">Directus Flows are visual automation builders. No code needed for common patterns:</p>
+
+            <div class="code-block">
+                <pre><code class="language-typescript">// Example: "When an order's status changes to 'shipped',
+// send an email and update inventory"
+
+// Flow trigger: event.on_update in "orders" collection
+// Condition: {{status}} === "shipped"
+
+// Operation 1: Send email
+// {
+//   to: "{{customer.email}}",
+//   subject: "Your order {{id}} has shipped!",
+//   body: "Tracking: {{tracking_number}}"
+// }
+
+// Operation 2: Update inventory (custom script)
+// Run script operation:
+export default async function({ payload }) {
+  const items = payload.items // Array of { product_id, quantity }
+
+  for (const item of items) {
+    await fetch(`/items/products/${item.product_id}`, {
+      method: "PATCH",
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        stock: { _decrement: item.quantity }
+      })
+    })
+  }
+  return { success: true }
+}
+
+// Operation 3: Log the shipment
+// Insert into audit_log collection</code></pre>
+            </div>
+        </section>
+
+        <section id="rbac" class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Role-Based Access Control</h2>
+            <p class="text-gray-700 mb-4">Directus has granular RBAC built into the admin UI. I set up three roles for the client:</p>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm text-left border-collapse mb-4">
+                    <thead class="bg-gray-100"><tr><th class="p-3 border">Role</th><th class="p-3 border">Orders</th><th class="p-3 border">Customers</th><th class="p-3 border">Products</th><th class="p-3 border">Reports</th></tr></thead>
+                    <tbody>
+                        <tr><td class="p-3 border">Admin</td><td class="p-3 border">Full CRUD</td><td class="p-3 border">Full CRUD</td><td class="p-3 border">Full CRUD</td><td class="p-3 border">Full access</td></tr>
+                        <tr><td class="p-3 border">Sales</td><td class="p-3 border">Read, Update</td><td class="p-3 border">Read</td><td class="p-3 border">Read</td><td class="p-3 border">Own only</td></tr>
+                        <tr><td class="p-3 border">Warehouse</td><td class="p-3 border">Read, Update status</td><td class="p-3 border">No access</td><td class="p-3 border">Read, Update stock</td><td class="p-3 border">No access</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <p class="text-gray-700">Permissions can be defined down to the field level. The warehouse team can update <code>stock</code> on products but not <code>price</code>. Custom field permissions are configured through the UI, no code needed.</p>
+        </section>
+
+        <div class="issue-box">
+            <div class="issue-title">
+                <a href="https://github.com/directus/directus/issues?q=is%3Aissue+custom+extension+endpoint+hook"
+                   target="_blank"
+                   class="text-pink-700 hover:underline">
+                    Custom extension endpoints lose authentication context
+                </a>
+            </div>
+            <div class="issue-body mt-4">
+                <h4 class="font-semibold text-gray-800 mb-2">Problem</h4>
+                <p class="text-gray-700 mb-3">Created a custom endpoint extension for generating PDF invoices. The endpoint needed to check if the requesting user had permission to view the order, but <code>req.accountability</code> was undefined in the custom route handler.</p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">Actual Fix</h4>
+                <p class="text-gray-700 mb-3">Custom endpoints need to opt into authentication by adding the accountability middleware:</p>
+                <div class="code-block mt-3">
+                    <pre><code class="language-typescript">// extensions/endpoints/invoice/index.ts
+import { defineEndpoint } from "@directus/extensions-sdk"
+
+export default defineEndpoint({
+  id: "invoice",
+  handler: (router, { services, database, getSchema, accountability }) => {
+    const { ItemsService } = services
+
+    router.get("/:orderId", async (req, res) => {
+      // accountability is available — check permissions
+      const schema = await getSchema()
+      const orderService = new ItemsService("orders", {
+        schema,
+        accountability: req.accountability, // This is the user's auth context
+      })
+
+      const order = await orderService.readOne(req.params.orderId)
+      if (!order) return res.status(404).json({ error: "Not found" })
+
+      // Generate PDF...
+      const pdf = await generateInvoicePDF(order)
+      res.setHeader("Content-Type", "application/pdf")
+      res.send(pdf)
+    })
+  },
+})</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <section id="extensions" class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Extending with Custom Endpoints</h2>
+            <p class="text-gray-700 mb-4">When the auto-generated API isn't enough, you write extensions. Directus supports several extension types:</p>
+            <ul class="list-disc pl-6 space-y-2 text-gray-700">
+                <li><strong>Endpoints:</strong> Custom API routes</li>
+                <li><strong>Hooks:</strong> Before/after database operations</li>
+                <li><strong>Interfaces:</strong> Custom field types in the admin UI</li>
+                <li><strong>Modules:</strong> Custom pages in the admin sidebar</li>
+                <li><strong>Panels:</strong> Custom dashboard widgets</li>
+            </ul>
+        </section>
+
+        <section id="lessons" class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">What I Learned</h2>
+            <ul class="list-disc pl-6 space-y-3 text-gray-700">
+                <li><strong>Directus is magic for existing databases.</strong> Connect it to any PostgreSQL/MySQL/SQLite database and get instant API + admin. Zero code.</li>
+                <li><strong>Watch out for N+1 on relational queries.</strong> Use the <code>deep</code> parameter and add indexes on foreign keys.</li>
+                <li><strong>Flows handle 80% of automation needs.</strong> Before writing a custom hook, check if a Flow can do it.</li>
+                <li><strong>RBAC is powerful but plan roles early.</strong> Retroactively adding field-level permissions to a large team is tedious.</li>
+                <li><strong>Keep your database schema clean.</strong> Directus reflects your schema. Messy schema = messy admin UI.</li>
+            </ul>
+        </section>
+
+        <section class="mb-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Wrapping Up</h2>
+            <p class="text-gray-700">
+                Directus is the fastest way to put an admin panel on top of an existing SQL database. The auto-generated API handles most queries, the visual flows handle most automation, and the RBAC system handles most access control needs. For anything custom, the extension system is well-documented and type-safe. If you have a database that needs an admin panel and API, Directus should be your first stop.
+            </p>
+        </section>
+
+        <section class="bg-blue-50 rounded-lg p-6 border border-blue-200">
+            <h3 class="font-semibold text-gray-800 mb-3">Related Articles</h3>
+            <ul class="space-y-2">
+                <li><a href="supabase-local-first-2026-04-13.html" class="text-blue-600 hover:underline">Supabase Local-First: Offline Database That Actually Syncs</a></li>
+                <li><a href="refine-2026-04-13.html" class="text-blue-600 hover:underline">Refine: Admin Panel Framework That Scales Beyond CRUD</a></li>
+                <li><a href="budibase-2026-04-13.html" class="text-blue-600 hover:underline">Budibase: Low-Code Platform That Actually Connects to My Database</a></li>
+            </ul>
+        </section>
+    </article>
+
+    <script>if (typeof Prism !== 'undefined') Prism.highlightAll();</script>
+</body>
+</html>

@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payload CMS v3: Headless CMS That Actually Integrates with Next.js</title>
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-LMWN7814BX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-LMWN7814BX');
+    </script>
+
+    <meta name="description" content="Migrating from Strapi to Payload CMS v3 with Next.js App Router. Real solutions for code-first config, access control, rich text editing, and collection management.">
+    <meta name="keywords" content="Payload CMS, headless CMS, Next.js, TypeScript, content management, Strapi alternative">
+    <link rel="canonical" href="https://pnt.jacbex.com/payload-cms-v3-2026-04-13.html">
+
+    <meta property="og:title" content="Payload CMS v3: Headless CMS That Actually Integrates with Next.js">
+    <meta property="og:description" content="Real solutions for Payload CMS v3 with Next.js App Router integration">
+    <meta property="og:type" content="article">
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "Payload CMS v3: Headless CMS That Actually Integrates with Next.js",
+      "description": "Migrating from Strapi to Payload CMS v3 with Next.js App Router",
+      "author": { "@type": "Person", "name": "Programming Notes" },
+      "datePublished": "2026-04-13",
+      "keywords": ["Payload CMS", "headless CMS", "Next.js", "TypeScript"],
+      "url": "https://pnt.jacbex.com/payload-cms-v3-2026-04-13.html"
+    }
+    </script>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-typescript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+        .code-block { background: #2d2d2d; border-radius: 8px; overflow: hidden; }
+        .code-block pre { margin: 0; padding: 1rem; overflow-x: auto; }
+        .code-block code { font-family: 'Fira Code', monospace; font-size: 0.9rem; }
+        .issue-box { border-left: 4px solid #ec4899; background: #fdf2f8; padding: 1.5rem; margin: 2rem 0; border-radius: 0 8px 8px 0; }
+        .issue-title { font-weight: 600; color: #be185d; }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <article class="max-w-4xl mx-auto px-4 py-8">
+        <header class="mb-12">
+            <h1 class="text-4xl font-bold text-gray-900 mb-4">Payload CMS v3: Headless CMS That Actually Integrates with Next.js</h1>
+            <p class="text-xl text-gray-600">
+                I ran Strapi v4 for two years on a content site with 5K articles. The JSON-based config was a nightmare to version control. Every time a teammate changed a content type in the admin UI, we had to manually sync it to git. Payload CMS v3 takes the opposite approach: code-first, TypeScript config, and it runs inside your Next.js app. Not alongside it — inside it. Here's how the migration went.
+            </p>
+        </header>
+
+        <nav class="bg-white rounded-lg shadow-sm p-6 mb-8 border border-gray-200">
+            <h2 class="text-xl font-semibold mb-4 text-gray-800">Quick Navigation</h2>
+            <ul class="space-y-2">
+                <li><a href="#why-payload" class="text-blue-600 hover:underline">Why Payload v3 Over Strapi</a></li>
+                <li><a href="#code-first" class="text-blue-600 hover:underline">Code-First Config That Makes Sense</a></li>
+                <li><a href="#nextjs" class="text-blue-600 hover:underline">Building a Blog with Next.js App Router</a></li>
+                <li><a href="#access-control" class="text-blue-600 hover:underline">Custom Access Control Rules</a></li>
+                <li><a href="#lessons" class="text-blue-600 hover:underline">What I Learned</a></li>
+            </ul>
+        </nav>
+
+        <section id="why-payload" class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Why Payload v3 Over Strapi</h2>
+            <p class="text-gray-700 mb-4">Side-by-side comparison from my actual migration:</p>
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm text-left border-collapse mb-4">
+                    <thead class="bg-gray-100"><tr><th class="p-3 border">Feature</th><th class="p-3 border">Strapi v4</th><th class="p-3 border">Payload v3</th></tr></thead>
+                    <tbody>
+                        <tr><td class="p-3 border">Config format</td><td class="p-3 border">JSON (admin UI)</td><td class="p-3 border">TypeScript (code)</td></tr>
+                        <tr><td class="p-3 border">Version control</td><td class="p-3 border">Hard — JSON diffs</td><td class="p-3 border">Easy — TS files in git</td></tr>
+                        <tr><td class="p-3 border">Next.js integration</td><td class="p-3 border">Separate server</td><td class="p-3 border">Runs inside Next.js</td></tr>
+                        <tr><td class="p-3 border">Custom endpoints</td><td class="p-3 border">Plugin system</td><td class="p-3 border">Express routes</td></tr>
+                        <tr><td class="p-3 border">Rich text editor</td><td class="p-3 border">Basic WYSIWYG</td><td class="p-3 border">Lexical (block-based)</td></tr>
+                        <tr><td class="p-3 border">Auth</td><td class="p-3 border">Built-in, limited</td><td class="p-3 border">Built-in, extensible</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section id="code-first" class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Code-First Config That Makes Sense</h2>
+            <p class="text-gray-700 mb-4">Every content type is a TypeScript file. Here's a blog post collection:</p>
+
+            <div class="code-block">
+                <pre><code class="language-typescript">// src/collections/Posts.ts
+import { CollectionConfig } from "payload"
+
+export const Posts: CollectionConfig = {
+  slug: "posts",
+  labels: { singular: "Post", plural: "Posts" },
+  admin: {
+    defaultColumns: ["title", "status", "publishedAt"],
+    useAsTitle: "title",
+  },
+  access: {
+    read: () => true, // Public read
+    create: ({ req: { user } }) => user?.role === "editor" || user?.role === "admin",
+    update: ({ req: { user }, data }) => {
+      // Editors can only update their own drafts; admins can update anything
+      if (user?.role === "admin") return true
+      return data.author === user.id && data.status === "draft"
+    },
+  },
+  fields: [
+    { name: "title", type: "text", required: true },
+    { name: "slug", type: "text", unique: true, index: true },
+    {
+      name: "content",
+      type: "richText",
+      editor: "lexical", // Block-based editor
+    },
+    {
+      name: "featuredImage",
+      type: "upload",
+      relationTo: "media",
+    },
+    {
+      name: "author",
+      type: "relationship",
+      relationTo: "users",
+      required: true,
+    },
+    {
+      name: "status",
+      type: "select",
+      options: [
+        { label: "Draft", value: "draft" },
+        { label: "Published", value: "published" },
+      ],
+      defaultValue: "draft",
+    },
+    {
+      name: "publishedAt",
+      type: "date",
+      admin: { condition: (data) => data.status === "published" },
+    },
+    {
+      name: "tags",
+      type: "relationship",
+      relationTo: "tags",
+      hasMany: true,
+    },
+  ],
+  hooks: {
+    beforeChange: [
+      ({ data }) => {
+        // Auto-set publishedAt when status changes to published
+        if (data.status === "published" && !data.publishedAt) {
+          data.publishedAt = new Date().toISOString()
+        }
+        return data
+      },
+    ],
+  },
+}</code></pre>
+            </div>
+
+            <p class="text-gray-700 mt-4">
+                This is just a TypeScript file in my project. It's version-controlled, type-checked, and I can refactor it like any other code. In Strapi, this would be a JSON blob edited through a web UI.
+            </p>
+        </section>
+
+        <!-- GitHub Issue #1 -->
+        <div class="issue-box">
+            <div class="issue-title">
+                <a href="https://github.com/payloadcms/payload/issues?q=is%3Aissue+migration+v2+v3+breaking"
+                   target="_blank"
+                   class="text-pink-700 hover:underline">
+                    Migration from Payload v2 to v3 breaks relationship fields
+                </a>
+            </div>
+            <div class="issue-body mt-4">
+                <h4 class="font-semibold text-gray-800 mb-2">Problem</h4>
+                <p class="text-gray-700 mb-3">
+                    Upgrading from Payload v2 to v3. All relationship fields returned <code>null</code> after migration. The data was in the database but the API responses were empty. This affected every collection that had <code>type: "relationship"</code>.
+                </p>
+                <h4 class="font-semibold text-gray-800 mb-2">What I Tried</h4>
+                <p class="text-gray-700 mb-3">
+                    Tried running the migration script again. Tried re-saving each collection through the admin UI. Checked the database directly — the foreign key values were there.
+                </p>
+                <h4 class="font-semibold text-gray-800 mb-2">Actual Fix</h4>
+                <p class="text-gray-700 mb-3">
+                    Payload v3 changed how relationships are stored. In v2, relationships used a <code>relationTo</code> field alongside the ID. In v3, they use a unified relationship format. I had to run the migration script with the <code>--rebuild</code> flag:
+                </p>
+                <div class="code-block mt-3">
+                    <pre><code class="language-bash"># Run the v2-to-v3 migration with rebuild
+npx payload migrate:fresh --rebuild
+
+# If that doesn't work, manually update relationship format
+# v2 stored: { value: "abc123", relationTo: "users" }
+# v3 stores: "abc123" (with relationTo defined in config)
+
+# For large databases, use the batch migration:
+npx payload migrate:relationships --batch-size 1000</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <section id="nextjs" class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Building a Blog with Next.js App Router</h2>
+            <p class="text-gray-700 mb-4">Payload v3 runs inside Next.js. No separate server. Here's the setup:</p>
+
+            <div class="code-block">
+                <pre><code class="language-bash"># Create Payload + Next.js project
+npx create-payload-app@latest my-blog --template blog</code></pre>
+            </div>
+
+            <div class="code-block mt-4">
+                <pre><code class="language-typescript">// src/app/(frontend)/blog/[slug]/page.tsx
+import { getPayload } from "payload"
+import config from "@payload-config"
+import { notFound } from "next/navigation"
+
+export default async function BlogPost({
+  params,
+}: {
+  params: Promise<{ slug: string }>
+}) {
+  const { slug } = await params
+  const payload = await getPayload({ config })
+
+  const posts = await payload.find({
+    collection: "posts",
+    where: { slug: { equals: slug }, status: { equals: "published" } },
+    depth: 2, // Populate relationships (author, tags)
+    limit: 1,
+  })
+
+  const post = posts.docs[0]
+  if (!post) notFound()
+
+  return (
+    &lt;article className="max-w-3xl mx-auto px-4 py-12"&gt;
+      &lt;h1 className="text-4xl font-bold mb-4"&gt;{post.title}&lt;/h1&gt;
+      &lt;div className="text-gray-500 mb-8"&gt;
+        By {(post.author as any).name} • {new Date(post.publishedAt).toLocaleDateString()}
+      &lt;/div&gt;
+      &lt;div className="prose max-w-none"&gt;
+        {/* Lexical content rendered as React components */}
+        &lt;RichText content={post.content} /&gt;
+      &lt;/div&gt;
+    &lt;/article&gt;
+  )
+}
+
+// Generate static pages at build time
+export async function generateStaticParams() {
+  const payload = await getPayload({ config })
+  const posts = await payload.find({
+    collection: "posts",
+    where: { status: { equals: "published" } },
+    limit: 1000,
+  })
+  return posts.docs.map((post) => ({ slug: post.slug }))
+}</code></pre>
+            </div>
+        </section>
+
+        <section id="access-control" class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Custom Access Control Rules</h2>
+            <p class="text-gray-700 mb-4">Payload's access control is per-field and per-operation. Here's a real example — a multi-tenant CMS where each organization can only see its own content:</p>
+
+            <div class="code-block">
+                <pre><code class="language-typescript">// src/collections/Posts.ts — access control
+import { Access } from "payload"
+
+const canReadPublishedPosts: Access = ({ req: { user } }) => {
+  // Public users can read published posts
+  if (!user) return { status: { equals: "published" } }
+
+  // Admins can read everything
+  if (user.role === "admin") return true
+
+  // Editors can read their org's posts (any status)
+  return { "organization.id": { equals: user.organization.id } }
+}
+
+const canUpdatePosts: Access = ({ req: { user }, data, id }) => {
+  if (!user) return false
+  if (user.role === "admin") return true
+
+  // Editors can only edit their own posts in draft status
+  return {
+    and: [
+      { author: { equals: user.id } },
+      { status: { equals: "draft" } },
+      { "organization.id": { equals: user.organization.id } },
+    ],
+  }
+}
+
+export const Posts: CollectionConfig = {
+  slug: "posts",
+  access: {
+    read: canReadPublishedPosts,
+    update: canUpdatePosts,
+    create: ({ req: { user } }) => !!user && ["editor", "admin"].includes(user.role),
+    delete: ({ req: { user } }) => user?.role === "admin",
+  },
+  fields: [
+    // ... fields
+    {
+      name: "organization",
+      type: "relationship",
+      relationTo: "organizations",
+      access: {
+        // Only admins can change the organization
+        update: ({ req: { user } }) => user?.role === "admin",
+      },
+    },
+  ],
+}</code></pre>
+            </div>
+        </section>
+
+        <!-- GitHub Issue #2 -->
+        <div class="issue-box">
+            <div class="issue-title">
+                <a href="https://github.com/payloadcms/payload/issues?q=is%3Aissue+lexical+editor+custom+block"
+                   target="_blank"
+                   class="text-pink-700 hover:underline">
+                    Lexical editor custom blocks don't render in frontend
+                </a>
+            </div>
+            <div class="issue-body mt-4">
+                <h4 class="font-semibold text-gray-800 mb-2">Problem</h4>
+                <p class="text-gray-700 mb-3">
+                    Created custom Lexical blocks for code snippets and callouts in the admin editor. They showed up fine in the admin UI but rendered as empty <code>&lt;div&gt;</code> elements on the frontend. The JSON data was there — the frontend just didn't know how to render the custom block types.
+                </p>
+                <h4 class="font-semibold text-gray-800 mb-2">Actual Fix</h4>
+                <p class="text-gray-700 mb-3">
+                    You need to register the same custom blocks in your frontend <code>RichText</code> component. The admin and frontend are separate rendering contexts:
+                </p>
+                <div class="code-block mt-3">
+                    <pre><code class="language-typescript">// src/components/RichText.tsx
+import { RichText as BaseRichText } from "@payloadcms/richtext-lexical/react"
+
+// Define your custom block components
+const customBlocks = {
+  codeBlock: ({ fields }) => (
+    &lt;div className="bg-gray-900 text-green-400 p-4 rounded-lg my-4"&gt;
+      &lt;code&gt;{fields.code}&lt;/code&gt;
+    &lt;/div&gt;
+  ),
+  callout: ({ fields }) => (
+    &lt;div className={`p-4 rounded-lg border-l-4 my-4 ${
+      fields.type === "warning" ? "bg-yellow-50 border-yellow-400" : "bg-blue-50 border-blue-400"
+    }`}&gt;
+      &lt;p&gt;{fields.message}&lt;/p&gt;
+    &lt;/div&gt;
+  ),
+}
+
+export function RichText({ content }) {
+  return &lt;BaseRichText elements={customBlocks} data={content} /&gt;
+}</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <section id="lessons" class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">What I Learned</h2>
+            <ul class="list-disc pl-6 space-y-3 text-gray-700">
+                <li><strong>Code-first config is the right call.</strong> TypeScript collections in git > JSON config edited in a browser. Period.</li>
+                <li><strong>Payload running inside Next.js eliminates the two-server problem.</strong> One deployment, one domain, one set of env vars.</li>
+                <li><strong>The Lexical editor is powerful but needs frontend setup.</strong> Custom blocks need to be registered in both admin and frontend.</li>
+                <li><strong>Access control per field is underrated.</strong> Being able to restrict individual fields, not just whole collections, enables real multi-tenant setups.</li>
+                <li><strong>Migration from v2 needs planning.</strong> Budget a full day for the v2-to-v3 migration on a production database.</li>
+            </ul>
+        </section>
+
+        <section class="mb-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Wrapping Up</h2>
+            <p class="text-gray-700">
+                Payload CMS v3 is what I wish Strapi had been. The code-first approach means my CMS config lives in git alongside my code. The Next.js integration means one deployment instead of two. And the access control system is flexible enough for real multi-tenant content management. If you're building a content site or blog with Next.js in 2026, Payload v3 is the best CMS option.
+            </p>
+        </section>
+
+        <section class="bg-blue-50 rounded-lg p-6 border border-blue-200">
+            <h3 class="font-semibold text-gray-800 mb-3">Related Articles</h3>
+            <ul class="space-y-2">
+                <li><a href="astro-5-2026-04-13.html" class="text-blue-600 hover:underline">Astro 5.0: Static Site Generator That Actually Handles Dynamic Content</a></li>
+                <li><a href="directus-2026-04-13.html" class="text-blue-600 hover:underline">Directus: SQL Database That Actually Becomes a Full API Dashboard</a></li>
+                <li><a href="shadcn-ui-2026-04-13.html" class="text-blue-600 hover:underline">Shadcn/UI + Next.js: Component System That Actually Stays in Your Codebase</a></li>
+            </ul>
+        </section>
+    </article>
+
+    <script>if (typeof Prism !== 'undefined') Prism.highlightAll();</script>
+</body>
+</html>

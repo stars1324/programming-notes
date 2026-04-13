@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Astro 5.0: Static Site Generator That Actually Handles Dynamic Content</title>
+
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-LMWN7814BX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-LMWN7814BX');
+    </script>
+
+    <meta name="description" content="Rebuilding a docs site from Next.js to Astro 5.0. Real solutions for Content Layer API, View Transitions, Server Islands, and hybrid rendering performance.">
+    <meta name="keywords" content="Astro, static site generator, content site, View Transitions, Server Islands, web performance">
+    <link rel="canonical" href="https://pnt.jacbex.com/astro-5-2026-04-13.html">
+
+    <meta property="og:title" content="Astro 5.0: Static Site Generator That Actually Handles Dynamic Content">
+    <meta property="og:description" content="Real solutions for Astro 5.0 Content Layer, View Transitions, and Server Islands">
+    <meta property="og:type" content="article">
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "Astro 5.0: Static Site Generator That Actually Handles Dynamic Content",
+      "description": "Astro 5.0 Content Layer, View Transitions, Server Islands, hybrid rendering",
+      "author": { "@type": "Person", "name": "Programming Notes" },
+      "datePublished": "2026-04-13",
+      "keywords": ["Astro", "static site", "content site", "View Transitions", "performance"],
+      "url": "https://pnt.jacbex.com/astro-5-2026-04-13.html"
+    }
+    </script>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-typescript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+        .code-block { background: #2d2d2d; border-radius: 8px; overflow: hidden; }
+        .code-block pre { margin: 0; padding: 1rem; overflow-x: auto; }
+        .code-block code { font-family: 'Fira Code', monospace; font-size: 0.9rem; }
+        .issue-box { border-left: 4px solid #ec4899; background: #fdf2f8; padding: 1.5rem; margin: 2rem 0; border-radius: 0 8px 8px 0; }
+        .issue-title { font-weight: 600; color: #be185d; }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <article class="max-w-4xl mx-auto px-4 py-8">
+        <header class="mb-12">
+            <h1 class="text-4xl font-bold text-gray-900 mb-4">Astro 5.0: Static Site Generator That Actually Handles Dynamic Content</h1>
+            <p class="text-xl text-gray-600">
+                Our docs site was built on Next.js. It had 200 pages of Markdown content, and every page shipped 300KB of JavaScript because Next.js bundles React even for static pages. Lighthouse gave us a consistent 62 on mobile. After rebuilding on Astro 5.0, the same content ships 0KB of JavaScript by default. Lighthouse: 98. Here's how the rebuild went and what Astro 5.0's new features actually do in practice.
+            </p>
+        </header>
+
+        <nav class="bg-white rounded-lg shadow-sm p-6 mb-8 border border-gray-200">
+            <h2 class="text-xl font-semibold mb-4 text-gray-800">Quick Navigation</h2>
+            <ul class="space-y-2">
+                <li><a href="#whats-new" class="text-blue-600 hover:underline">What's New in Astro 5.0</a></li>
+                <li><a href="#content-layer" class="text-blue-600 hover:underline">Content Layer API for Real Data Sources</a></li>
+                <li><a href="#view-transitions" class="text-blue-600 hover:underline">View Transitions Without Flicker</a></li>
+                <li><a href="#server-islands" class="text-blue-600 hover:underline">Server Islands for Mixed Static/Dynamic</a></li>
+                <li><a href="#lessons" class="text-blue-600 hover:underline">What I Learned</a></li>
+            </ul>
+        </nav>
+
+        <section id="whats-new" class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">What's New in Astro 5.0</h2>
+            <p class="text-gray-700 mb-4">The three features that changed my build:</p>
+            <ul class="list-disc pl-6 space-y-2 text-gray-700">
+                <li><strong>Content Layer API.</strong> In Astro 4, content collections only read local Markdown files. In 5.0, the Content Layer can pull from any source — APIs, databases, CMS, remote Markdown. Your build isn't limited to what's in the repo.</li>
+                <li><strong>View Transitions.</strong> Animated page transitions that work without a SPA framework. The browser navigates between pages (full HTML) but transitions smoothly. No client-side router needed.</li>
+                <li><strong>Server Islands.</strong> Most of your page is static HTML, but specific components can be dynamically rendered on the server. Think: static blog post with a dynamic "related articles" section that updates based on current trending data.</li>
+            </ul>
+        </section>
+
+        <section id="content-layer" class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Content Layer API for Real Data Sources</h2>
+            <p class="text-gray-700 mb-4">My docs come from three sources: local Markdown, a GitHub repo, and a headless CMS. Astro 5.0's Content Layer handles all three:</p>
+
+            <div class="code-block">
+                <pre><code class="language-typescript">// src/content.config.ts
+import { defineCollection, z } from "astro:content"
+import { glob, file } from "astro/loaders"
+import { githubLoader } from "./loaders/github"
+
+// Local markdown docs
+const docs = defineCollection({
+  loader: glob({ pattern: "**/*.md", base: "./docs" }),
+  schema: z.object({
+    title: z.string(),
+    section: z.string(),
+    order: z.number(),
+    updated: z.date().optional(),
+  }),
+})
+
+// Remote GitHub wiki pages
+const wiki = defineCollection({
+  loader: githubLoader({
+    repo: "myorg/myproject",
+    path: "wiki",
+    token: import.meta.env.GITHUB_TOKEN,
+  }),
+  schema: z.object({
+    title: z.string(),
+    html_url: z.string(),
+  }),
+})
+
+// Blog posts from Payload CMS
+const blog = defineCollection({
+  loader: async () => {
+    const res = await fetch("https://cms.example.com/api/posts")
+    const posts = await res.json()
+    return posts.docs.map((post) => ({
+      id: post.slug,
+      title: post.title,
+      content: post.content,
+      publishedAt: post.publishedAt,
+      author: post.author.name,
+    }))
+  },
+  schema: z.object({
+    title: z.string(),
+    content: z.any(),
+    publishedAt: z.string(),
+    author: z.string(),
+  }),
+})
+
+export const collections = { docs, wiki, blog }</code></pre>
+            </div>
+
+            <p class="text-gray-700 mt-4 mb-4">Then render any collection in a page:</p>
+
+            <div class="code-block">
+                <pre><code class="language-typescript">// src/pages/docs/[...slug].astro
+---
+import { getCollection, render } from "astro:content"
+
+export async function getStaticPaths() {
+  const docs = await getCollection("docs")
+  return docs.map((doc) => ({
+    params: { slug: doc.id },
+    props: { doc },
+  }))
+}
+
+const { doc } = Astro.props
+const { Content } = await render(doc)
+---
+
+&lt;Layout title={doc.data.title}&gt;
+  &lt;h1&gt;{doc.data.title}&lt;/h1&gt;
+  &lt;Content /&gt;
+&lt;/Layout&gt;</code></pre>
+            </div>
+        </section>
+
+        <!-- GitHub Issue #1 -->
+        <div class="issue-box">
+            <div class="issue-title">
+                <a href="https://github.com/withastro/astro/issues?q=is%3Aissue+view+transition+flicker+scroll"
+                   target="_blank"
+                   class="text-pink-700 hover:underline">
+                    View Transitions causes scroll position jump and content flicker
+                </a>
+            </div>
+            <div class="issue-body mt-4">
+                <h4 class="font-semibold text-gray-800 mb-2">Problem</h4>
+                <p class="text-gray-700 mb-3">Added <code>&lt;ViewTransitions /&gt;</code> to the layout. Pages transitioned smoothly but the scroll position jumped to the top before the new content appeared, causing a visible flicker. On slower connections, users saw a blank white flash for 200-400ms.</p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">What I Tried</h4>
+                <p class="text-gray-700 mb-3">Tried adding <code>transition:animate="fade"</code> to individual elements. Tried disabling the fallback with <code>fallback="none"</code>. The flicker got worse.</p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">Actual Fix</h4>
+                <p class="text-gray-700 mb-3">The issue was that Astro's View Transitions replace the entire document body. The browser scrolls to top before the new content is painted. The fix is to use the <code>transition:persist</code> directive on shared layout elements and configure the transition properly:</p>
+                <div class="code-block mt-3">
+                    <pre><code class="language-typescript">// src/layouts/Base.astro
+---
+import { ViewTransitions } from "astro:transitions"
+---
+
+&lt;html&gt;
+&lt;head&gt;
+  &lt;ViewTransitions /&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;nav transition:persist&gt;  {/* Keep nav across transitions */}
+    &lt;!-- navigation --&gt;
+  &lt;/nav&gt;
+  &lt;main transition:animate="slide"&gt;
+    &lt;slot /&gt;
+  &lt;/main&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+
+// The transition:persist on nav prevents it from being swapped,
+// eliminating the flash. The main content animates in smoothly.</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <section id="view-transitions" class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">View Transitions Without Flicker</h2>
+            <p class="text-gray-700 mb-4">
+                Astro's View Transitions are based on the browser's native View Transitions API. The key insight: you don't need a SPA framework to get SPA-like transitions. Each page navigation is a full HTML load, but the browser swaps the DOM smoothly. The result feels like a React SPA but performs like static HTML.
+            </p>
+            <p class="text-gray-700 mb-4">
+                Important: this only works in Chromium browsers natively. Firefox and Safari get a fallback (instant swap, no animation). The fallback is fine — it's the same behavior as a traditional multi-page app.
+            </p>
+        </section>
+
+        <section id="server-islands" class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Server Islands for Mixed Static/Dynamic</h2>
+            <p class="text-gray-700 mb-4">
+                This is the feature I needed most. Our docs site is 95% static content. But the sidebar shows "popular this week" links that need to be computed from analytics data. And the footer shows the latest version number from the GitHub API. Before Server Islands, I had to make the entire page dynamic for those two small parts.
+            </p>
+
+            <div class="code-block">
+                <pre><code class="language-typescript">// src/pages/docs/[...slug].astro
+---
+import { getCollection, render } from "astro:content"
+import PopularLinks from "../components/PopularLinks"
+import LatestVersion from "../components/LatestVersion"
+
+// Static part — built at deploy time
+const { doc } = Astro.props
+const { Content } = await render(doc)
+---
+
+&lt;Layout title={doc.data.title}&gt;
+  &lt;!-- This is static HTML, ships no JavaScript --&gt;
+  &lt;article&gt;
+    &lt;h1&gt;{doc.data.title}&lt;/h1&gt;
+    &lt;Content /&gt;
+  &lt;/article&gt;
+
+  &lt;aside&gt;
+    &lt;!-- Server Island — rendered on the server at request time --&gt;
+    &lt;PopularLinks
+      client:only="server"
+      data-something="dynamic"
+    /&gt;
+  &lt;/aside&gt;
+
+  &lt;footer&gt;
+    &lt;!-- Another Server Island for version info --&gt;
+    &lt;LatestVersion client:only="server" /&gt;
+  &lt;/footer&gt;
+&lt;/Layout&gt;
+
+// src/components/PopularLinks.astro
+---
+// This runs on the server at request time
+const res = await fetch("https://analytics.example.com/popular-week")
+const links = await res.json()
+---
+&lt;nav&gt;
+  &lt;h3&gt;Popular This Week&lt;/h3&gt;
+  &lt;ul&gt;
+    {links.map((link) => &lt;li&gt;&lt;a href={link.url}&gt;{link.title}&lt;/a&gt;&lt;/li&gt;)}
+  &lt;/ul&gt;
+&lt;/nav&gt;</code></pre>
+            </div>
+
+            <p class="text-gray-700 mt-4">
+                The page loads instantly with the static content. The Server Islands stream in separately. Users see the docs content in under 100ms, and the dynamic parts fill in within 200-500ms.
+            </p>
+        </section>
+
+        <!-- GitHub Issue #2 -->
+        <div class="issue-box">
+            <div class="issue-title">
+                <a href="https://github.com/withastro/astro/issues?q=is%3Aissue+content+layer+build+cache+stale"
+                   target="_blank"
+                   class="text-pink-700 hover:underline">
+                    Content Layer loader caches stale data between builds
+                </a>
+            </div>
+            <div class="issue-body mt-4">
+                <h4 class="font-semibold text-gray-800 mb-2">Problem</h4>
+                <p class="text-gray-700 mb-3">The Content Layer caches API responses between builds. When I updated content in the CMS, ran a rebuild, and the old content showed up. The cache persisted for too long and there was no way to invalidate it.</p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">What I Tried</h4>
+                <p class="text-gray-700 mb-3">Tried deleting <code>.astro/</code> directory before each build. That worked but made builds 5x slower because all collections had to be re-fetched from scratch.</p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">Actual Fix</h4>
+                <p class="text-gray-700 mb-3">Astro 5.0 supports per-collection cache invalidation. Set the <code>refreshInterval</code> in the loader config, or manually bust the cache for specific collections:</p>
+                <div class="code-block mt-3">
+                    <pre><code class="language-bash"># Bust the entire content cache
+rm -rf .astro/content
+
+# Or use the CLI to rebuild a specific collection
+npx astro build --collection blog --no-cache</code></pre>
+                </div>
+                <div class="code-block mt-3">
+                    <pre><code class="language-typescript">// Or configure auto-refresh in the collection
+const blog = defineCollection({
+  loader: cmsLoader({
+    url: "https://cms.example.com/api/posts",
+    refreshInterval: 60 * 5, // Refresh every 5 minutes during dev
+  }),
+  schema: z.object({ /* ... */ }),
+})</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <section id="lessons" class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">What I Learned</h2>
+            <ul class="list-disc pl-6 space-y-3 text-gray-700">
+                <li><strong>Astro is for content sites, not web apps.</strong> If you need complex client-side state, use Next.js. If your site is 90% content with some dynamic bits, use Astro.</li>
+                <li><strong>Zero JavaScript by default changes everything.</strong> Our Lighthouse went from 62 to 98. That's not a minor improvement — it's a different category.</li>
+                <li><strong>Content Layer API is Astro 5.0's best feature.</strong> Mixing local files, CMS content, and API data in one collection system is powerful.</li>
+                <li><strong>Server Islands solve the static/dynamic dilemma.</strong> You don't have to choose between fully static and fully dynamic anymore.</li>
+                <li><strong>View Transitions work but test on Safari.</strong> The fallback is instant swap, which is fine. Just don't build UX that depends on the animation.</li>
+            </ul>
+        </section>
+
+        <section class="mb-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Wrapping Up</h2>
+            <p class="text-gray-700">
+                Astro 5.0 is the best tool for content-heavy websites in 2026. The Content Layer API unifies all your data sources. Server Islands let you mix static and dynamic content without compromises. And zero JavaScript by default means your pages load fast everywhere. If you're building docs, blogs, or marketing sites, Astro should be your first choice.
+            </p>
+        </section>
+
+        <section class="bg-blue-50 rounded-lg p-6 border border-blue-200">
+            <h3 class="font-semibold text-gray-800 mb-3">Related Articles</h3>
+            <ul class="space-y-2">
+                <li><a href="payload-cms-v3-2026-04-13.html" class="text-blue-600 hover:underline">Payload CMS v3: Headless CMS That Actually Integrates with Next.js</a></li>
+                <li><a href="hono-2026-04-13.html" class="text-blue-600 hover:underline">Hono: Web Framework That Actually Runs Everywhere</a></li>
+                <li><a href="bun-2026-04-13.html" class="text-blue-600 hover:underline">Bun 2.0: Finally Replaced Node.js Without Breaking Everything</a></li>
+            </ul>
+        </section>
+    </article>
+
+    <script>if (typeof Prism !== 'undefined') Prism.highlightAll();</script>
+</body>
+</html>

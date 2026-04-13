@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Refine: Admin Panel Framework That Actually Scales Beyond CRUD</title>
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-LMWN7814BX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-LMWN7814BX');
+    </script>
+
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Building enterprise admin panels with Refine framework. Real solutions for custom data providers, authentication, server-side filtering, and role-based access control.">
+    <meta name="keywords" content="Refine, admin panel, React, enterprise, data provider, access control, headless framework">
+    <link rel="canonical" href="https://pnt.jacbex.com/refine-2026-04-13.html">
+
+    <!-- Open Graph / Social Media -->
+    <meta property="og:title" content="Refine: Admin Panel Framework That Actually Scales Beyond CRUD">
+    <meta property="og:description" content="Enterprise admin panel patterns with Refine — auth, custom data providers, access control">
+    <meta property="og:type" content="article">
+
+    <!-- JSON-LD Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "Refine: Admin Panel Framework That Actually Scales Beyond CRUD",
+      "description": "Building enterprise admin panels with Refine — custom data providers, auth, access control",
+      "author": {
+        "@type": "Person",
+        "name": "Programming Notes"
+      },
+      "datePublished": "2026-04-13",
+      "keywords": ["Refine", "admin panel", "React", "enterprise", "access control"],
+      "url": "https://pnt.jacbex.com/refine-2026-04-13.html"
+    }
+    </script>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Prism.js -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-typescript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+        .code-block { background: #2d2d2d; border-radius: 8px; overflow: hidden; }
+        .code-block pre { margin: 0; padding: 1rem; overflow-x: auto; }
+        .code-block code { font-family: 'Fira Code', monospace; font-size: 0.9rem; }
+        .issue-box {
+            border-left: 4px solid #ec4899;
+            background: #fdf2f8;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .issue-title { font-weight: 600; color: #be185d; }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <article class="max-w-4xl mx-auto px-4 py-8">
+        <header class="mb-12">
+            <h1 class="text-4xl font-bold text-gray-900 mb-4">Refine: Admin Panel Framework That Actually Scales Beyond CRUD</h1>
+            <p class="text-xl text-gray-600">
+                I've built five admin panels in the last three years. Used React Admin for two, AdminJS for one, and raw Next.js for two. Each one started fine and became a mess at scale. Refine is different because it's headless — no UI opinions forced on you. You bring your own components (I use Shadcn/UI), and Refine handles the data layer, auth, and access control. After two production apps with it, here's the real breakdown.
+            </p>
+        </header>
+
+        <nav class="bg-white rounded-lg shadow-sm p-6 mb-8 border border-gray-200">
+            <h2 class="text-xl font-semibold mb-4 text-gray-800">Quick Navigation</h2>
+            <ul class="space-y-2">
+                <li><a href="#why-refine" class="text-blue-600 hover:underline">Why Not AdminJS or React Admin</a></li>
+                <li><a href="#data-provider" class="text-blue-600 hover:underline">Setting Up a Custom Data Provider</a></li>
+                <li><a href="#auth" class="text-blue-600 hover:underline">Authentication That Works with Any Provider</a></li>
+                <li><a href="#list-view" class="text-blue-600 hover:underline">Building a Complex List View with Filters</a></li>
+                <li><a href="#access-control" class="text-blue-600 hover:underline">Access Control with Casbin</a></li>
+                <li><a href="#lessons" class="text-blue-600 hover:underline">What I Learned</a></li>
+            </ul>
+        </nav>
+
+        <section id="why-refine" class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Why Not AdminJS or React Admin</h2>
+            <p class="text-gray-700 mb-4">
+                AdminJS generates your admin from your database schema. Great for day one. Terrible on day 30 when you need custom business logic. React Admin is better — it has a data provider pattern — but the Material UI dependency is heavy and hard to customize. Both frameworks fight you when you need something that isn't a standard CRUD table.
+            </p>
+            <p class="text-gray-700 mb-4">
+                Refine's headless approach means:
+            </p>
+            <ul class="list-disc pl-6 space-y-2 text-gray-700">
+                <li><strong>Bring your own UI.</strong> Shadcn/UI, Ant Design, MUI, or raw HTML — Refine doesn't care.</li>
+                <li><strong>Data provider pattern.</strong> Connect to REST, GraphQL, Supabase, Appwrite, or write your own.</li>
+                <li><strong>Auth provider pattern.</strong> Same abstraction for auth — swap Firebase for Auth0 without changing components.</li>
+                <li><strong>Access control built-in.</strong> Role-based or ABAC via Casbin integration.</li>
+                <li><strong>No lock-in.</strong> It's React hooks and context. Standard stuff.</li>
+            </ul>
+        </section>
+
+        <section id="data-provider" class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Setting Up a Custom Data Provider</h2>
+            <p class="text-gray-700 mb-4">
+                My backend is a custom REST API (not Supabase, not Hasura). So I needed a custom data provider. Here's the implementation:
+            </p>
+
+            <div class="code-block">
+                <pre><code class="language-typescript">// src/providers/data-provider.ts
+import { DataProvider } from "@refinedev/core"
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL!
+
+export const dataProvider: DataProvider = {
+  // Get a list of records with pagination, sorting, filtering
+  getList: async ({ resource, pagination, sorters, filters }) => {
+    const params = new URLSearchParams()
+
+    // Pagination
+    if (pagination) {
+      params.set("_page", String(pagination.current))
+      params.set("_limit", String(pagination.pageSize))
+    }
+
+    // Sorting
+    if (sorters && sorters.length > 0) {
+      const sorter = sorters[0]
+      params.set("_sort", sorter.field)
+      params.set("_order", sorter.order)
+    }
+
+    // Filters — map Refine filter format to my API's format
+    if (filters) {
+      filters.forEach((filter) => {
+        if (filter.operator === "eq") {
+          params.set(filter.field, String(filter.value))
+        } else if (filter.operator === "contains") {
+          params.set(`${filter.field}_like`, String(filter.value))
+        }
+      })
+    }
+
+    const res = await fetch(`${API_URL}/${resource}?${params}`, {
+      headers: { Authorization: `Bearer ${getToken()}` },
+    })
+
+    const data = await res.json()
+    const total = parseInt(res.headers.get("X-Total-Count") || "0")
+
+    return { data, total }
+  },
+
+  // Get a single record
+  getOne: async ({ resource, id }) => {
+    const res = await fetch(`${API_URL}/${resource}/${id}`, {
+      headers: { Authorization: `Bearer ${getToken()}` },
+    })
+    const data = await res.json()
+    return { data }
+  },
+
+  // Create a record
+  create: async ({ resource, variables }) => {
+    const res = await fetch(`${API_URL}/${resource}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${getToken()}`,
+      },
+      body: JSON.stringify(variables),
+    })
+    const data = await res.json()
+    return { data }
+  },
+
+  // Update a record
+  update: async ({ resource, id, variables }) => {
+    const res = await fetch(`${API_URL}/${resource}/${id}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${getToken()}`,
+      },
+      body: JSON.stringify(variables),
+    })
+    const data = await res.json()
+    return { data }
+  },
+
+  // Delete a record
+  deleteOne: async ({ resource, id }) => {
+    const res = await fetch(`${API_URL}/${resource}/${id}`, {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${getToken()}` },
+    })
+    const data = await res.json()
+    return { data }
+  },
+}
+
+function getToken() {
+  if (typeof window !== "undefined") {
+    return localStorage.getItem("token") || ""
+  }
+  return ""
+}</code></pre>
+            </div>
+        </section>
+
+        <!-- GitHub Issue #1 -->
+        <div class="issue-box">
+            <div class="issue-title">
+                <a href="https://github.com/refinedev/refine/issues?q=is%3Aissue+auth+provider+refresh+token"
+                   target="_blank"
+                   class="text-pink-700 hover:underline">
+                    Auth provider doesn't handle token refresh correctly
+                </a>
+            </div>
+            <div class="issue-body mt-4">
+                <h4 class="font-semibold text-gray-800 mb-2">Problem</h4>
+                <p class="text-gray-700 mb-3">
+                    My auth provider issues JWT tokens that expire after 15 minutes. When a token expired during a user session, Refine's auth provider didn't automatically refresh it. The user saw a blank screen or got redirected to login. No error message, no retry.
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">What I Tried</h4>
+                <p class="text-gray-700 mb-3">
+                    First I tried wrapping every API call in a token check. That was repetitive and error-prone. Then I tried using React Query's retry mechanism — it kind of worked but the UX was bad (users saw loading states during refresh).
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">Actual Fix</h4>
+                <p class="text-gray-700 mb-3">
+                    Implemented token refresh in the auth provider's <code>check</code> method. Refine calls <code>check</code> before every authenticated request, which is the right place to handle refresh:
+                </p>
+                <div class="code-block mt-3">
+                    <pre><code class="language-typescript">// src/providers/auth-provider.ts
+import { AuthProvider } from "@refinedev/core"
+
+export const authProvider: AuthProvider = {
+  login: async ({ email, password }) => {
+    const res = await fetch("/api/auth/login", {
+      method: "POST",
+      body: JSON.stringify({ email, password }),
+    })
+    if (!res.ok) return { success: false }
+    const { token, refreshToken } = await res.json()
+    localStorage.setItem("token", token)
+    localStorage.setItem("refreshToken", refreshToken)
+    return { success: true, redirectTo: "/dashboard" }
+  },
+
+  check: async () => {
+    const token = localStorage.getItem("token")
+    if (!token) return { authenticated: false, redirectTo: "/login" }
+
+    // Check if token is expired
+    const payload = JSON.parse(atob(token.split(".")[1]))
+    const isExpired = payload.exp * 1000 < Date.now()
+
+    if (isExpired) {
+      // Try to refresh
+      const refreshToken = localStorage.getItem("refreshToken")
+      if (!refreshToken) {
+        return { authenticated: false, redirectTo: "/login" }
+      }
+
+      const res = await fetch("/api/auth/refresh", {
+        method: "POST",
+        body: JSON.stringify({ refreshToken }),
+      })
+
+      if (!res.ok) {
+        localStorage.removeItem("token")
+        localStorage.removeItem("refreshToken")
+        return { authenticated: false, redirectTo: "/login" }
+      }
+
+      const { token: newToken } = await res.json()
+      localStorage.setItem("token", newToken)
+    }
+
+    return { authenticated: true }
+  },
+
+  logout: async () => {
+    localStorage.removeItem("token")
+    localStorage.removeItem("refreshToken")
+    return { success: true, redirectTo: "/login" }
+  },
+
+  getIdentity: async () => {
+    const token = localStorage.getItem("token")
+    if (!token) return null
+    const payload = JSON.parse(atob(token.split(".")[1]))
+    return { id: payload.sub, name: payload.name, role: payload.role }
+  },
+}</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <section id="auth" class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Authentication That Works with Any Provider</h2>
+            <p class="text-gray-700 mb-4">
+                The auth provider abstraction is one of Refine's best features. I've used the same admin panel code with three different auth backends (Firebase Auth, Auth0, and custom JWT) just by swapping the provider. The components don't change.
+            </p>
+        </section>
+
+        <section id="list-view" class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Building a Complex List View with Filters</h2>
+            <p class="text-gray-700 mb-4">
+                Real admin panels need more than a basic table. Here's a list view with server-side filtering, sorting, and search — all connected to Refine's data hooks:
+            </p>
+
+            <div class="code-block">
+                <pre><code class="language-typescript">// src/pages/users/list.tsx
+"use client"
+
+import { useTable, useNavigation } from "@refinedev/core"
+import { useDataGrid } from "@refinedev/mui" // or your UI library
+import { Button, Input, Select } from "@/components/ui"
+
+export function UserList() {
+  const { tableQuery, filters, setFilters, sorters, setSorters } = useTable({
+    resource: "users",
+    pagination: { current: 1, pageSize: 20 },
+    sorters: { initial: [{ field: "createdAt", order: "desc" }] },
+  })
+
+  const { create } = useNavigation()
+
+  const users = tableQuery.data?.data ?? []
+  const total = tableQuery.data?.total ?? 0
+
+  return (
+    &lt;div className="p-6"&gt;
+      &lt;div className="flex justify-between mb-4"&gt;
+        &lt;h1 className="text-2xl font-bold"&gt;Users ({total})&lt;/h1&gt;
+        &lt;Button onClick={() => create("users")}&gt;Add User&lt;/Button&gt;
+      &lt;/div&gt;
+
+      {/* Filter bar */}
+      &lt;div className="flex gap-4 mb-4"&gt;
+        &lt;Input
+          placeholder="Search by name..."
+          onChange={(e) => setFilters([
+            { field: "name", operator: "contains", value: e.target.value }
+          ])}
+        /&gt;
+        &lt;Select
+          placeholder="Role"
+          onChange={(value) => setFilters([
+            { field: "role", operator: "eq", value }
+          ])}
+          options={[
+            { label: "All", value: "" },
+            { label: "Admin", value: "admin" },
+            { label: "User", value: "user" },
+          ]}
+        /&gt;
+      &lt;/div&gt;
+
+      {/* Table */}
+      &lt;table className="w-full"&gt;
+        &lt;thead&gt;
+          &lt;tr&gt;
+            &lt;th onClick={() => setSorters([{ field: "name", order: "asc" }])}&gt;Name&lt;/th&gt;
+            &lt;th&gt;Email&lt;/th&gt;
+            &lt;th&gt;Role&lt;/th&gt;
+            &lt;th onClick={() => setSorters([{ field: "createdAt", order: "desc" }])}&gt;Joined&lt;/th&gt;
+          &lt;/tr&gt;
+        &lt;/thead&gt;
+        &lt;tbody&gt;
+          {users.map((user) =&gt; (
+            &lt;tr key={user.id}&gt;
+              &lt;td&gt;{user.name}&lt;/td&gt;
+              &lt;td&gt;{user.email}&lt;/td&gt;
+              &lt;td&gt;{user.role}&lt;/td&gt;
+              &lt;td&gt;{new Date(user.createdAt).toLocaleDateString()}&lt;/td&gt;
+            &lt;/tr&gt;
+          ))}
+        &lt;/tbody&gt;
+      &lt;/table&gt;
+    &lt;/div&gt;
+  )
+}</code></pre>
+            </div>
+        </section>
+
+        <!-- GitHub Issue #2 -->
+        <div class="issue-box">
+            <div class="issue-title">
+                <a href="https://github.com/refinedev/refine/issues?q=is%3Aissue+access+control+role+permission"
+                   target="_blank"
+                   class="text-pink-700 hover:underline">
+                    Access control doesn't work with nested resources and dynamic roles
+                </a>
+            </div>
+            <div class="issue-body mt-4">
+                <h4 class="font-semibold text-gray-800 mb-2">Problem</h4>
+                <p class="text-gray-700 mb-3">
+                    Needed fine-grained access control where users can access some resources based on organization membership and role. Admin of Org A can't access Org B's data. Standard RBAC wasn't enough.
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">What I Tried</h4>
+                <p class="text-gray-700 mb-3">
+                    Tried implementing custom access control with a simple role check. That failed because it didn't account for resource ownership. Tried adding org_id to every query manually — error-prone.
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">Actual Fix</h4>
+                <p class="text-gray-700 mb-3">
+                    Used Refine's access control provider with Casbin for policy-based access:
+                </p>
+                <div class="code-block mt-3">
+                    <pre><code class="language-typescript">// src/providers/access-control.ts
+import { AccessControlProvider } from "@refinedev/core"
+import { newEnforcer } from "casbin"
+
+// Model: sub (user) can act (verb) on resource (obj) in org (org)
+// p = sub, org, resource, action
+// g = _, _ (grouping)
+
+const model = `
+[request_definition]
+r = sub, org, obj, act
+
+[policy_definition]
+p = sub, org, obj, act
+
+[role_definition]
+g = _, _
+
+[policy_effect]
+e = some(where (p.eft == allow))
+
+[matchers]
+m = g(r.sub, p.sub) && r.org == p.org && r.obj == p.obj && r.act == p.act
+`
+
+export const accessControlProvider: AccessControlProvider = {
+  can: async ({ resource, action, params }) => {
+    const user = params?.identity
+    if (!user) return { can: false }
+
+    const enforcer = await newEnforcer(model, policyFile)
+    const allowed = await enforcer.enforce(
+      user.role,      // sub: "admin" or "user"
+      user.orgId,     // org: "org_123"
+      resource,       // obj: "users", "orders"
+      action,         // act: "list", "create", "delete"
+    )
+
+    return { can: allowed }
+  },
+}</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <section id="access-control" class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Access Control with Casbin</h2>
+            <p class="text-gray-700 mb-4">
+                Refine's access control integrates with the <code>&lt;CanAccess&gt;</code> component to conditionally render UI based on permissions. This means buttons, menu items, and entire pages can be hidden based on the user's role and organization:
+            </p>
+
+            <div class="code-block">
+                <pre><code class="language-typescript">import { CanAccess } from "@refinedev/core"
+
+// Hide the "Delete User" button for non-admins
+function UserActions({ userId }: { userId: string }) {
+  return (
+    &lt;CanAccess resource="users" action="delete" params={{ id: userId }}&gt;
+      &lt;Button variant="destructive" onClick={() => deleteUser(userId)}&gt;
+        Delete User
+      &lt;/Button&gt;
+    &lt;/CanAccess&gt;
+  )
+}</code></pre>
+            </div>
+        </section>
+
+        <section id="lessons" class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">What I Learned</h2>
+            <ul class="list-disc pl-6 space-y-3 text-gray-700">
+                <li><strong>Start with the data provider.</strong> Getting the data layer right first means the rest of the admin panel falls into place. Custom data providers aren't hard to write.</li>
+                <li><strong>Auth provider is worth investing time in.</strong> Handle token refresh in <code>check</code>, not in your components.</li>
+                <li><strong>Headless wins at scale.</strong> When your admin panel has 50+ pages with custom business logic, being tied to a specific UI library becomes a liability.</li>
+                <li><strong>Refine + Shadcn/UI</strong> is the sweet spot in 2026. Refine handles data/auth, Shadcn handles the look. No overlap.</li>
+                <li><strong>Access control needs to be planned from day one.</strong> Retrofitting RBAC into an admin panel is painful. Set up the access control provider early.</li>
+            </ul>
+        </section>
+
+        <section class="mb-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Wrapping Up</h2>
+            <p class="text-gray-700">
+                Refine hits the sweet spot between "raw React" (too much boilerplate) and "opinionated admin framework" (too rigid). The provider pattern keeps your code decoupled, the headless approach means you pick your own UI, and the access control system handles real enterprise requirements. If you're building admin panels that need to grow beyond basic CRUD, Refine is the right choice.
+            </p>
+        </section>
+
+        <section class="bg-blue-50 rounded-lg p-6 border border-blue-200">
+            <h3 class="font-semibold text-gray-800 mb-3">Related Articles</h3>
+            <ul class="space-y-2">
+                <li><a href="shadcn-ui-2026-04-13.html" class="text-blue-600 hover:underline">Shadcn/UI + Next.js: Component System That Actually Stays in Your Codebase</a></li>
+                <li><a href="directus-2026-04-13.html" class="text-blue-600 hover:underline">Directus: SQL Database That Actually Becomes a Full API Dashboard</a></li>
+                <li><a href="budibase-2026-04-13.html" class="text-blue-600 hover:underline">Budibase: Low-Code Platform That Actually Connects to My Existing Database</a></li>
+            </ul>
+        </section>
+    </article>
+
+    <script>
+        if (typeof Prism !== 'undefined') {
+            Prism.highlightAll();
+        }
+    </script>
+</body>
+</html>
