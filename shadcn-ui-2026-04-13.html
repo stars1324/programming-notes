@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shadcn/UI + Next.js: Component System That Actually Stays in Your Codebase</title>
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-LMWN7814BX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-LMWN7814BX');
+    </script>
+
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Migrating from MUI to Shadcn/UI with Next.js 15. Real solutions for form validation, custom theming, Server Component compatibility, and copy-paste component workflows.">
+    <meta name="keywords" content="Shadcn UI, Next.js, React components, Tailwind CSS, Radix UI, form validation, Server Components">
+    <link rel="canonical" href="https://pnt.jacbex.com/shadcn-ui-2026-04-13.html">
+
+    <!-- Open Graph / Social Media -->
+    <meta property="og:title" content="Shadcn/UI + Next.js: Component System That Actually Stays in Your Codebase">
+    <meta property="og:description" content="Real solutions for using Shadcn/UI with Next.js 15 — form validation, theming, and Server Component patterns">
+    <meta property="og:type" content="article">
+
+    <!-- JSON-LD Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "Shadcn/UI + Next.js: Component System That Actually Stays in Your Codebase",
+      "description": "Migrating from MUI to Shadcn/UI with Next.js 15 — form validation, custom theming, Server Components",
+      "author": {
+        "@type": "Person",
+        "name": "Programming Notes"
+      },
+      "datePublished": "2026-04-13",
+      "keywords": ["Shadcn UI", "Next.js", "React components", "Tailwind CSS", "Server Components"],
+      "url": "https://pnt.jacbex.com/shadcn-ui-2026-04-13.html"
+    }
+    </script>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Prism.js -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-typescript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+        .code-block { background: #2d2d2d; border-radius: 8px; overflow: hidden; }
+        .code-block pre { margin: 0; padding: 1rem; overflow-x: auto; }
+        .code-block code { font-family: 'Fira Code', monospace; font-size: 0.9rem; }
+        .issue-box {
+            border-left: 4px solid #ec4899;
+            background: #fdf2f8;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .issue-title { font-weight: 600; color: #be185d; }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <article class="max-w-4xl mx-auto px-4 py-8">
+        <!-- Header -->
+        <header class="mb-12">
+            <h1 class="text-4xl font-bold text-gray-900 mb-4">Shadcn/UI + Next.js: Component System That Actually Stays in Your Codebase</h1>
+            <p class="text-xl text-gray-600">
+                I spent two years fighting MUI's styling system. Every upgrade broke my custom theme. Every new component needed hours of override CSS. When I found Shadcn/UI, the "copy-paste components" pitch sounded gimmicky. But after migrating three production apps to it, I get it now — the components are yours. You own the code. No more wrestling with <code>!important</code> or buried class names.
+            </p>
+        </header>
+
+        <!-- Table of Contents -->
+        <nav class="bg-white rounded-lg shadow-sm p-6 mb-8 border border-gray-200">
+            <h2 class="text-xl font-semibold mb-4 text-gray-800">Quick Navigation</h2>
+            <ul class="space-y-2">
+                <li><a href="#why-copy-paste" class="text-blue-600 hover:underline">Why Copy-Paste Components Win</a></li>
+                <li><a href="#setup" class="text-blue-600 hover:underline">Setting Up with Next.js 15</a></li>
+                <li><a href="#forms" class="text-blue-600 hover:underline">Building a Real Form with Validation</a></li>
+                <li><a href="#theming" class="text-blue-600 hover:underline">Custom Theming That Doesn't Break</a></li>
+                <li><a href="#server-components" class="text-blue-600 hover:underline">Server Components Gotchas</a></li>
+                <li><a href="#lessons" class="text-blue-600 hover:underline">What I Learned</a></li>
+            </ul>
+        </nav>
+
+        <!-- Why Copy-Paste -->
+        <section id="why-copy-paste" class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Why Copy-Paste Components Win</h2>
+            <p class="text-gray-700 mb-4">
+                Here's the thing about traditional UI libraries: you're renting components. MUI, Ant Design, Chakra — they live in <code>node_modules</code>. When you need to change how a <code>Select</code> dropdown renders its options, you dig through their source, find the right override prop, and hope it doesn't break on the next version bump.
+            </p>
+            <p class="text-gray-700 mb-4">
+                Shadcn/UI flips this. You run <code>npx shadcn@latest add button</code> and it drops a <code>button.tsx</code> file into your <code>components/ui/</code> folder. You open it, read it, change it. It's just React code using Radix UI primitives and Tailwind classes. No wrapper hell, no theme provider nesting.
+            </p>
+            <p class="text-gray-700">
+                I migrated a dashboard from MUI v5 to Shadcn in about 3 days. The MUI version had 47 files with <code>makeStyles</code> or <code>sx</code> props. The Shadcn version has 12 files total, and I can grep any styling change in seconds.
+            </p>
+        </section>
+
+        <!-- Setup -->
+        <section id="setup" class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Setting Up with Next.js 15</h2>
+            <p class="text-gray-700 mb-4">
+                I tested this with Next.js 15.2, React 19, and Tailwind CSS v4. The init command handles most of the setup, but I hit a few configuration issues.
+            </p>
+
+            <div class="code-block">
+                <pre><code class="language-bash"># Create Next.js project
+npx create-next-app@latest my-app --typescript --tailwind --eslint --app
+
+# Initialize shadcn
+npx shadcn@latest init
+
+# It asks you a few questions:
+# - Style: New York (I prefer this over Default)
+# - Base color: Slate
+# - CSS variables: yes
+# - Tailwind CSS v4: yes
+
+# Add components you need
+npx shadcn@latest add button input form select dialog table</code></pre>
+            </div>
+
+            <p class="text-gray-700 mt-4 mb-4">
+                The init command creates a <code>components.json</code> file at the root. This tells the CLI where to put components. My config looks like this:
+            </p>
+
+            <div class="code-block">
+                <pre><code class="language-json">{
+  "$schema": "https://ui.shadcn.com/schema.json",
+  "style": "new-york",
+  "rsc": true,
+  "tsx": true,
+  "tailwind": {
+    "config": "",
+    "css": "app/globals.css",
+    "baseColor": "slate",
+    "cssVariables": true,
+    "prefix": ""
+  },
+  "aliases": {
+    "components": "@/components",
+    "utils": "@/lib/utils",
+    "ui": "@/components/ui"
+  }
+}</code></pre>
+            </div>
+        </section>
+
+        <!-- GitHub Issue #1 -->
+        <div class="issue-box">
+            <div class="issue-title">
+                <a href="https://github.com/shadcn-ui/ui/issues?q=is%3Aissue+form+validation+react-hook-form"
+                   target="_blank"
+                   class="text-pink-700 hover:underline">
+                    Form validation with react-hook-form doesn't trigger error messages
+                </a>
+            </div>
+            <div class="issue-body mt-4">
+                <h4 class="font-semibold text-gray-800 mb-2">Problem</h4>
+                <p class="text-gray-700 mb-3">
+                    I was building a form with Shadcn's Form component (which wraps react-hook-form) and Zod validation. The form submit worked fine, but error messages wouldn't show up next to the input fields. The <code>formState.errors</code> object was populated, but the UI didn't render anything.
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">What I Tried</h4>
+                <p class="text-gray-700 mb-3">
+                    First I tried using raw <code>react-hook-form</code> without the Shadcn Form wrapper — errors showed up but I lost the nice styling. Then I tried manually passing <code>error</code> props to the FormMessage component, but that created duplicate error rendering.
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">Actual Fix</h4>
+                <p class="text-gray-700 mb-3">
+                    The issue was that I wasn't using the <code>FormField</code>, <code>FormItem</code>, <code>FormLabel</code>, and <code>FormMessage</code> components together in the right structure. Each field needs to be wrapped in <code>FormField</code> with a <code>render</code> function that uses the full structure:
+                </p>
+                <div class="code-block mt-3">
+                    <pre><code class="language-typescript">// Working pattern for Shadcn Form + react-hook-form + Zod
+"use client"
+
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import * as z from "zod"
+import {
+  Form, FormControl, FormField,
+  FormItem, FormLabel, FormMessage,
+} from "@/components/ui/form"
+import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
+
+const formSchema = z.object({
+  email: z.string().email("Enter a real email"),
+  password: z.string().min(8, "At least 8 characters"),
+})
+
+export function LoginForm() {
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: { email: "", password: "" },
+  })
+
+  function onSubmit(values: z.infer<typeof formSchema>) {
+    console.log(values) // send to API
+  }
+
+  return (
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <FormField
+          control={form.control}
+          name="email"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Email</FormLabel>
+              <FormControl>
+                <Input placeholder="you@example.com" {...field} />
+              </FormControl>
+              <FormMessage /> {/* This shows the Zod error */}
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="password"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Password</FormLabel>
+              <FormControl>
+                <Input type="password" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <Button type="submit" className="w-full">Sign In</Button>
+      </form>
+    </Form>
+  )
+}</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- Forms Section -->
+        <section id="forms" class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Building a Real Form with Validation</h2>
+            <p class="text-gray-700 mb-4">
+                Most form tutorials stop at a login form. Let me show you what a real production form looks like — with conditional fields, async validation, and server-side error handling.
+            </p>
+
+            <div class="code-block">
+                <pre><code class="language-typescript">// Registration form with conditional fields and async validation
+const registerSchema = z.object({
+  username: z.string()
+    .min(3)
+    .refine(async (name) => {
+      // Check if username is taken
+      const res = await fetch(`/api/check-username?name=${name}`)
+      const data = await res.json()
+      return data.available
+    }, "Username is taken"),
+  email: z.string().email(),
+  accountType: z.enum(["personal", "business"]),
+  // Conditional field — only required for business accounts
+  companyName: z.string().optional(),
+}).refine(
+  (data) => data.accountType !== "business" || !!data.companyName,
+  { message: "Company name required for business accounts", path: ["companyName"] }
+)
+
+export function RegisterForm() {
+  const form = useForm<z.infer<typeof registerSchema>>({
+    resolver: zodResolver(registerSchema),
+    defaultValues: {
+      username: "", email: "", accountType: "personal", companyName: "",
+    },
+  })
+
+  const accountType = form.watch("accountType")
+
+  async function onSubmit(values: z.infer<typeof registerSchema>) {
+    try {
+      const res = await fetch("/api/register", {
+        method: "POST",
+        body: JSON.stringify(values),
+      })
+      if (!res.ok) {
+        const error = await res.json()
+        // Show server-side field errors
+        if (error.field === "username") {
+          form.setError("username", { message: error.message })
+        }
+        return
+      }
+      router.push("/dashboard")
+    } catch (err) {
+      // Network error
+      form.setError("root", { message: "Something went wrong" })
+    }
+  }
+
+  return (
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        {/* username, email fields... */}
+
+        <FormField
+          control={form.control}
+          name="accountType"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Account Type</FormLabel>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl><SelectTrigger /><SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger></FormControl>
+                <SelectContent>
+                  <SelectItem value="personal">Personal</SelectItem>
+                  <SelectItem value="business">Business</SelectItem>
+                </SelectContent>
+              </Select>
+            </FormItem>
+          )}
+        />
+
+        {accountType === "business" && (
+          <FormField
+            control={form.control}
+            name="companyName"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Company Name</FormLabel>
+                <FormControl><Input {...field} /></FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        )}
+
+        <Button type="submit">Create Account</Button>
+      </form>
+    </Form>
+  )
+}</code></pre>
+            </div>
+        </section>
+
+        <!-- GitHub Issue #2 -->
+        <div class="issue-box">
+            <div class="issue-title">
+                <a href="https://github.com/shadcn-ui/ui/issues?q=is%3Aissue+theme+dark+mode+css+variables"
+                   target="_blank"
+                   class="text-pink-700 hover:underline">
+                    Dark mode theming breaks with custom CSS variables
+                </a>
+            </div>
+            <div class="issue-body mt-4">
+                <h4 class="font-semibold text-gray-800 mb-2">Problem</h4>
+                <p class="text-gray-700 mb-3">
+                    I set up dark mode with <code>next-themes</code> and custom CSS variables in <code>globals.css</code>. Light mode looked fine, but switching to dark mode caused some components to have invisible text (white text on white background). The issue was that my custom color variables weren't properly scoped for both themes.
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">What I Tried</h4>
+                <p class="text-gray-700 mb-3">
+                    I tried adding <code>!important</code> to the dark mode variables. That fixed some components but broke others that relied on the default values. Then I tried using Tailwind's <code>dark:</code> prefix everywhere, which worked but meant touching 30+ component files.
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">Actual Fix</h4>
+                <p class="text-gray-700 mb-3">
+                    The fix was defining CSS variables correctly for both <code>:root</code> and <code>.dark</code> in <code>globals.css</code>. Shadcn uses HSL values, not hex. Here's the pattern:
+                </p>
+                <div class="code-block mt-3">
+                    <pre><code class="language-css">/* globals.css */
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --primary: 222.2 47.4% 11.2%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --ring: 222.2 84% 4.9%;
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --ring: 212.7 26.8% 83.9%;
+  }
+}</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- Theming -->
+        <section id="theming" class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Custom Theming That Doesn't Break</h2>
+            <p class="text-gray-700 mb-4">
+                The trick with Shadcn theming is: don't fight the system. All components reference the CSS variables defined above. If you want a custom brand color, change the variable values. Don't override component classes individually.
+            </p>
+            <p class="text-gray-700 mb-4">
+                Here's how I set up a custom brand color scheme for a client project:
+            </p>
+
+            <div class="code-block">
+                <pre><code class="language-css">/* Custom brand theme — just change the HSL values */
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 240 10% 3.9%;
+    --primary: 262 83% 58%;       /* Purple brand color */
+    --primary-foreground: 0 0% 98%;
+    --secondary: 240 4.8% 95.9%;
+    --accent: 262 83% 95%;         /* Light purple accent */
+    --destructive: 0 84.2% 60.2%;
+    --border: 240 5.9% 90%;
+    --ring: 262 83% 58%;           /* Matches primary */
+  }
+  .dark {
+    --background: 240 10% 3.9%;
+    --foreground: 0 0% 98%;
+    --primary: 262 83% 58%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 240 3.7% 15.9%;
+    --accent: 262 83% 20%;
+    --destructive: 0 62.8% 30.6%;
+    --border: 240 3.7% 15.9%;
+    --ring: 262 83% 58%;
+  }
+}</code></pre>
+            </div>
+
+            <p class="text-gray-700 mt-4">
+                After updating these variables, every Shadcn component picks up the new colors. Buttons, inputs, dialogs — all consistent. No touching individual component files.
+            </p>
+        </section>
+
+        <!-- Server Components -->
+        <section id="server-components" class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Server Components Gotchas</h2>
+            <p class="text-gray-700 mb-4">
+                This is where I burned the most time. Shadcn components use Radix UI primitives, which need client-side JavaScript for things like focus management, keyboard navigation, and portal rendering. That means most Shadcn components can't be pure Server Components.
+            </p>
+            <p class="text-gray-700 mb-4">
+                Here's the pattern that works:
+            </p>
+
+            <div class="code-block">
+                <pre><code class="language-typescript">// app/dashboard/page.tsx — this IS a Server Component
+import { UserTable } from "./user-table" // Client Component
+import { db } from "@/lib/db"
+
+export default async function DashboardPage() {
+  // Fetch data on the server
+  const users = await db.user.findMany()
+
+  return (
+    <div className="p-6">
+      <h1 className="text-2xl font-bold mb-4">Users</h1>
+      {/* Pass server data to client component */}
+      <UserTable users={users} />
+    </div>
+  )
+}
+
+// app/dashboard/user-table.tsx — this needs "use client"
+"use client"
+
+import { DataTable } from "@/components/data-table"
+import { columns } from "./columns"
+
+export function UserTable({ users }: { users: User[] }) {
+  return <DataTable columns={columns} data={users} />
+}</code></pre>
+            </div>
+
+            <p class="text-gray-700 mt-4 mb-4">
+                The rule of thumb: if a component has any interactivity (click handlers, state, effects), it needs <code>"use client"</code>. Keep your page components as Server Components that fetch data, then pass that data down to Client Components that handle the UI.
+            </p>
+
+            <h3 class="text-xl font-semibold text-gray-800 mt-8 mb-4">Components That Work as Server Components</h3>
+            <ul class="list-disc pl-6 space-y-2 text-gray-700">
+                <li><strong>Static text content</strong> — Card, CardHeader, CardTitle, CardDescription (without interactivity)</li>
+                <li><strong>Badge</strong> — if just displaying text</li>
+                <li><strong>Separator</strong> — purely visual</li>
+                <li><strong>Typography</strong> — h1, h2, p tags with Tailwind classes</li>
+            </ul>
+
+            <h3 class="text-xl font-semibold text-gray-800 mt-8 mb-4">Components That Need "use client"</h3>
+            <ul class="list-disc pl-6 space-y-2 text-gray-700">
+                <li><strong>Dialog/Sheet</strong> — needs open/close state + portal</li>
+                <li><strong>Select/DropdownMenu</strong> — needs focus management</li>
+                <li><strong>Tabs</strong> — needs active tab state</li>
+                <li><strong>Form</strong> — needs react-hook-form state</li>
+                <li><strong>Table with sorting/pagination</strong> — needs state</li>
+            </ul>
+        </section>
+
+        <!-- GitHub Issue #3 -->
+        <div class="issue-box">
+            <div class="issue-title">
+                <a href="https://github.com/shadcn-ui/ui/issues?q=is%3Aissue+server+component+hydration"
+                   target="_blank"
+                   class="text-pink-700 hover:underline">
+                    Hydration mismatch when using Shadcn components in Server Components
+                </a>
+            </div>
+            <div class="issue-body mt-4">
+                <h4 class="font-semibold text-gray-800 mb-2">Problem</h4>
+                <p class="text-gray-700 mb-3">
+                    Got <code>Hydration failed because the server rendered HTML didn't match the client</code> errors when rendering Shadcn Dialog components that were conditionally shown based on server data.
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">What I Tried</h4>
+                <p class="text-gray-700 mb-3">
+                    Tried wrapping everything in <code>suppressHydrationWarning</code> — bad idea, masks real issues. Tried using <code>dynamic</code> imports with <code>ssr: false</code> — caused layout shift.
+                </p>
+
+                <h4 class="font-semibold text-gray-800 mb-2">Actual Fix</h4>
+                <p class="text-gray-700 mb-3">
+                    The Dialog content was rendering differently on server vs client because of portal rendering. The fix is to control the open state with client-side state only, and don't try to render Dialog content during SSR:
+                </p>
+                <div class="code-block mt-3">
+                    <pre><code class="language-typescript">"use client"
+
+import { useState } from "react"
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
+
+export function EditDialog({ userId }: { userId: string }) {
+  const [open, setOpen] = useState(false)
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button variant="outline">Edit</Button>
+      </DialogTrigger>
+      <DialogContent>
+        {/* Content only renders when dialog is open */}
+        {/* Fetch data inside, not from parent server component */}
+        {open && <EditForm userId={userId} />}
+      </DialogContent>
+    </Dialog>
+  )
+}</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- What I Learned -->
+        <section id="lessons" class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">What I Learned</h2>
+            <ul class="list-disc pl-6 space-y-3 text-gray-700">
+                <li><strong>Own your components.</strong> Copy-paste sounds messy, but it's better than fighting <code>node_modules</code> overrides for hours.</li>
+                <li><strong>Zod + react-hook-form + Shadcn Form</strong> is the validation stack. Don't try to skip the Shadcn Form wrapper — it handles error display.</li>
+                <li><strong>Theme by changing CSS variables</strong>, not by overriding component classes. Every component reads from the same variable set.</li>
+                <li><strong>Server/Client boundary matters.</strong> Keep pages as Server Components for data fetching. Only mark leaf components with <code>"use client"</code>.</li>
+                <li><strong>The Shadcn CLI diffs your changes.</strong> When you update a component, it shows you what changed. You decide what to keep. This is safer than <code>npm update</code> breaking your entire UI.</li>
+            </ul>
+        </section>
+
+        <!-- Wrapping Up -->
+        <section class="mb-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Wrapping Up</h2>
+            <p class="text-gray-700">
+                After a year with Shadcn/UI across three production apps, I wouldn't go back to MUI or Ant Design. The copy-paste model means I can customize anything without fighting the library. The components are well-built (thanks to Radix UI primitives underneath), and the Tailwind integration means styling is predictable. If you're starting a new Next.js project in 2026, this is the component system to use.
+            </p>
+        </section>
+
+        <!-- Related Links -->
+        <section class="bg-blue-50 rounded-lg p-6 border border-blue-200">
+            <h3 class="font-semibold text-gray-800 mb-3">Related Articles</h3>
+            <ul class="space-y-2">
+                <li><a href="hono-2026-04-13.html" class="text-blue-600 hover:underline">Hono: Web Framework That Actually Runs Everywhere</a></li>
+                <li><a href="bun-2026-04-13.html" class="text-blue-600 hover:underline">Bun 2.0: Finally Replaced Node.js Without Breaking Everything</a></li>
+                <li><a href="astro-5-2026-04-13.html" class="text-blue-600 hover:underline">Astro 5.0: Static Site Generator That Actually Handles Dynamic Content</a></li>
+                <li><a href="tiptap-3-2026-04-13.html" class="text-blue-600 hover:underline">Tiptap 3.0: Rich Text Editor That Actually Handles Collaborative Editing</a></li>
+            </ul>
+        </section>
+    </article>
+
+    <script>
+        if (typeof Prism !== 'undefined') {
+            Prism.highlightAll();
+        }
+    </script>
+</body>
+</html>
